@@ -1,10 +1,20 @@
 {
   "WebMcpBridge - NoAgent › renders every catalog tool rather than an empty list": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",
@@ -19,10 +29,20 @@
   },
   "WebMcpBridge - NoAgent › reports that no agent is attached, with a reason": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",
@@ -37,10 +57,20 @@
   },
   "WebMcpBridge - NoAgent › shows nothing awaiting an answer": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",
@@ -55,10 +85,20 @@
   },
   "WebMcpBridge - pending states › clears the questions and records the answer once the person replies": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",
@@ -73,10 +113,20 @@
   },
   "WebMcpBridge - pending states › renders a single outstanding question": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",
@@ -91,10 +141,20 @@
   },
   "WebMcpBridge - pending states › renders both questions and marks the agent as working": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",
@@ -109,10 +169,20 @@
   },
   "WebMcpBridge - pending states › renders every question when an agent asks several at once": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T09:53:22.372372631+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T10:31:46.313324510+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T10:31:46.313324510+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T10:31:02.858897072+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T09:53:22.372372631+00:00",
         "kind": "full",

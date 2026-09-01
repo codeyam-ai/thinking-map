@@ -1,65 +1,65 @@
 {
   "tests": [
     {
-      "description": "The regression this file exists for: the copy promises these tools are reachable, so all seven must actually render.",
+      "description": "The regression this file exists for: WebMcpBridge renders copy promising these tools are reachable, so all seven must actually appear beside it.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › renders every catalog tool rather than an empty list",
-      "line": 82,
+      "line": 83,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
     {
-      "description": "The resting state of every preview and capture. It must say an agent is absent rather than looking broken or, worse, claiming a connection.",
+      "description": "WebMcpBridge renders its resting state — the one every preview and capture shows. It must say an agent is absent, with a reason, rather than looking broken or, worse, claiming a connection it does not have.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › reports that no agent is attached, with a reason",
-      "line": 70,
+      "line": 71,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
     {
-      "description": "Nothing outstanding, and the trigger — not the answer block — is showing.",
+      "description": "With nothing outstanding, WebMcpBridge shows the trigger rather than the answer block, and displays a zero count.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › shows nothing awaiting an answer",
-      "line": 91,
+      "line": 93,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
     {
-      "description": "Answering releases the agent and returns the surface to its resting state. The answer must reach the log too, since an agent that already gave up can only find it there.",
+      "description": "Answering releases the agent, and WebMcpBridge renders its resting state again. The answer must reach the log too, since an agent that already gave up can only find it there.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › clears the questions and records the answer once the person replies",
-      "line": 150,
+      "line": 153,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
     {
-      "description": "One question outstanding: the none-to-some boundary.",
+      "description": "WebMcpBridge renders the none-to-some boundary: exactly one question outstanding, with its text on screen.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders a single outstanding question",
-      "line": 101,
+      "line": 104,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
     {
-      "description": "Two questions, and the status flips to working — the agent's turn is paused until the person answers.",
+      "description": "WebMcpBridge displays both questions and shows the status flipped to working — the agent's turn is paused until the person answers.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders both questions and marks the agent as working",
-      "line": 114,
+      "line": 117,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
     {
-      "description": "The many state: five full sentences, all of them rendered rather than truncated to the first few.",
+      "description": "The many state: WebMcpBridge renders all five full-sentence questions rather than truncating to the first few.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders every question when an agent asks several at once",
-      "line": 131,
+      "line": 134,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },

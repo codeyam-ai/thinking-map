@@ -65,8 +65,9 @@ afterEach(() => {
 });
 
 describe('WebMcpBridge - NoAgent', () => {
-  // The resting state of every preview and capture. It must say an agent is
-  // absent rather than looking broken or, worse, claiming a connection.
+  // WebMcpBridge renders its resting state — the one every preview and capture
+  // shows. It must say an agent is absent, with a reason, rather than looking
+  // broken or, worse, claiming a connection it does not have.
   it('reports that no agent is attached, with a reason', () => {
     renderBridge();
     expect(screen.getByText('No agent attached')).toBeDefined();
@@ -77,8 +78,8 @@ describe('WebMcpBridge - NoAgent', () => {
     ).toBeDefined();
   });
 
-  // The regression this file exists for: the copy promises these tools are
-  // reachable, so all seven must actually render.
+  // The regression this file exists for: WebMcpBridge renders copy promising
+  // these tools are reachable, so all seven must actually appear beside it.
   it('renders every catalog tool rather than an empty list', () => {
     renderBridge();
     for (const name of TOOL_NAMES) {
@@ -87,7 +88,8 @@ describe('WebMcpBridge - NoAgent', () => {
     expect(screen.queryByText('No tools bound.')).toBeNull();
   });
 
-  // Nothing outstanding, and the trigger — not the answer block — is showing.
+  // With nothing outstanding, WebMcpBridge shows the trigger rather than the
+  // answer block, and displays a zero count.
   it('shows nothing awaiting an answer', () => {
     renderBridge();
     expect(screen.getByText('0')).toBeDefined();
@@ -97,7 +99,8 @@ describe('WebMcpBridge - NoAgent', () => {
 });
 
 describe('WebMcpBridge - pending states', () => {
-  // One question outstanding: the none-to-some boundary.
+  // WebMcpBridge renders the none-to-some boundary: exactly one question
+  // outstanding, with its text on screen.
   it('renders a single outstanding question', async () => {
     mockAskUser(['Is this for you alone, or shared?']);
     renderBridge(['Is this for you alone, or shared?']);
@@ -109,8 +112,8 @@ describe('WebMcpBridge - pending states', () => {
     expect(screen.getByText('1')).toBeDefined();
   });
 
-  // Two questions, and the status flips to working — the agent's turn is paused
-  // until the person answers.
+  // WebMcpBridge displays both questions and shows the status flipped to
+  // working — the agent's turn is paused until the person answers.
   it('renders both questions and marks the agent as working', async () => {
     const questions = [
       'Do you reread your own notes today?',
@@ -126,8 +129,8 @@ describe('WebMcpBridge - pending states', () => {
     expect(screen.getByText('2')).toBeDefined();
   });
 
-  // The many state: five full sentences, all of them rendered rather than
-  // truncated to the first few.
+  // The many state: WebMcpBridge renders all five full-sentence questions
+  // rather than truncating to the first few.
   it('renders every question when an agent asks several at once', async () => {
     const questions = [
       'Who is this for, specifically — you, or someone you have watched struggle with it?',
@@ -144,9 +147,9 @@ describe('WebMcpBridge - pending states', () => {
     for (const q of questions) expect(screen.getByText(q)).toBeDefined();
   });
 
-  // Answering releases the agent and returns the surface to its resting state.
-  // The answer must reach the log too, since an agent that already gave up can
-  // only find it there.
+  // Answering releases the agent, and WebMcpBridge renders its resting state
+  // again. The answer must reach the log too, since an agent that already gave
+  // up can only find it there.
   it('clears the questions and records the answer once the person replies', async () => {
     const questions = ['Do you reread your own notes today?'];
     const fetchMock = mockAskUser(questions);
