@@ -5,6 +5,7 @@
 import { prisma } from './prisma';
 import { KIND_EYEBROW } from './mapKinds';
 import { planMapMutations } from './nodePlan';
+import { recordEvents, type EventInput, type Origin } from './exchange';
 import type { ToolInvocation } from './thinkingPartner';
 
 export async function listMaps() {
@@ -38,12 +39,15 @@ export async function createMap(seedIdea: string) {
   const trimmed = seedIdea.trim();
   const title = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
 
-  return prisma.thinkingMap.create({
+  // The seed idea is the person's, so the root node and the opening message are
+  // user-origin. An agent reading the log must not mistake the human's starting
+  // idea for something it wrote itself.
+  const map = await prisma.thinkingMap.create({
     data: {
       title,
       seedIdea: trimmed,
       phase: 'deconstruct',
-      messages: { create: [{ role: 'user', content: trimmed }] },
+      messages: { create: [{ role: 'user', origin: 'user', content: trimmed }] },
       nodes: {
         create: [
           {
@@ -51,11 +55,27 @@ export async function createMap(seedIdea: string) {
             label: title,
             status: 'answered',
             order: 0,
+            origin: 'user',
           },
         ],
       },
     },
+    include: { nodes: true },
   });
+
+  // Revision 1 is "the root idea exists". Leaving a new map at revision 0 with
+  // an empty log would give an agent no way to tell a brand-new map from one it
+  // has already read to the end.
+  const root = map.nodes[0];
+  await recordEvents(map.id, [
+    {
+      kind: 'node.added',
+      origin: 'user',
+      payload: { id: root?.id, kind: 'idea', label: title },
+    },
+  ]);
+
+  return map;
 }
 
 /** A compact rendering of the current map, given to the model as context so it
@@ -92,10 +112,21 @@ export function summarizeMap(
  * This function is the thin executor: it walks the plan in order, resolving
  * each temporary ref to the real id the database just handed back, so one
  * add_nodes call can create a parent and its children together.
+ *
+ * It now has a second output: every write also becomes an ordered event on the
+ * map's log, tagged with the side that made it. That is what lets a person and
+ * an agent work the same map without either one having to be told what the
+ * other did.
  */
-export async function applyToolCalls(mapId: string, calls: ToolInvocation[]) {
+export async function applyToolCalls(
+  mapId: string,
+  calls: ToolInvocation[],
+  options: { origin?: Origin; requestId?: string | null } = {},
+) {
+  const origin: Origin = options.origin ?? 'agent';
   const { inserts, updates, phase } = planMapMutations(calls);
   const refToId = new Map<string, string>();
+  const events: EventInput[] = [];
 
   for (const node of inserts) {
     // A parentRef is either a ref from earlier in this same plan or the real
@@ -114,22 +145,46 @@ export async function applyToolCalls(mapId: string, calls: ToolInvocation[]) {
         status: node.status,
         sourceUrl: node.sourceUrl,
         order: node.order,
+        origin,
       },
     });
     if (node.ref) refToId.set(node.ref, created.id);
+    events.push({
+      kind: 'node.added',
+      origin,
+      payload: {
+        id: created.id,
+        parentId,
+        kind: created.kind,
+        label: created.label,
+        status: created.status,
+      },
+    });
   }
 
   for (const update of updates) {
     const resolved = refToId.get(update.id) ?? update.id;
     // A model can name a node that has since been deleted; updateMany skips
     // a miss rather than failing the whole turn.
-    await prisma.mapNode.updateMany({
+    const { count } = await prisma.mapNode.updateMany({
       where: { id: resolved, mapId },
-      data: update.data,
+      data: { ...update.data, origin },
     });
+    // Only log what actually changed. An event for a node that was not there
+    // would be a revision no agent could reconcile against the map it can read.
+    if (count > 0) {
+      events.push({
+        kind: 'node.updated',
+        origin,
+        payload: { id: resolved, ...update.data },
+      });
+    }
   }
 
   if (phase) {
     await prisma.thinkingMap.update({ where: { id: mapId }, data: { phase } });
+    events.push({ kind: 'phase.set', origin, payload: { phase } });
   }
+
+  return recordEvents(mapId, events, { requestId: options.requestId });
 }

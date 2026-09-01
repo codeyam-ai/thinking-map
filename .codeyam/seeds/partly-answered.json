@@ -4,18 +4,116 @@
       "id": "map-game",
       "title": "Educational game for kids",
       "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-      "phase": "map"
+      "phase": "map",
+      "revision": 5
     }
   ],
   "message": [
-    { "id": "msg-1", "mapId": "map-game", "role": "assistant", "content": "Who is this actually for, what should they learn, and what are they doing today instead?" },
-    { "id": "msg-2", "mapId": "map-game", "role": "user", "content": "Probably kids around 6 to 8, and I want them to learn vocabulary." },
-    { "id": "msg-3", "mapId": "map-game", "role": "assistant", "content": "Got it, updating the map. Want me to check what's already out there for vocabulary apps at that age?" }
+    {
+      "id": "msg-1",
+      "mapId": "map-game",
+      "role": "assistant",
+      "content": "Who is this actually for, what should they learn, and what are they doing today instead?",
+      "origin": "agent"
+    },
+    {
+      "id": "msg-2",
+      "mapId": "map-game",
+      "role": "user",
+      "content": "Probably kids around 6 to 8, and I want them to learn vocabulary.",
+      "origin": "user"
+    },
+    {
+      "id": "msg-3",
+      "mapId": "map-game",
+      "role": "assistant",
+      "content": "Got it, updating the map. Want me to check what's already out there for vocabulary apps at that age?",
+      "origin": "agent"
+    }
   ],
   "mapNode": [
-    { "id": "n-idea", "mapId": "map-game", "parentId": null, "kind": "idea", "label": "Educational game for kids", "status": "answered", "order": 0 },
-    { "id": "n-age", "mapId": "map-game", "parentId": "n-idea", "kind": "assumption", "label": "Ages 6-8", "detail": "Stated as \"probably\", so treat it as an assumption worth testing rather than a settled fact.", "status": "answered", "order": 0 },
-    { "id": "n-prob", "mapId": "map-game", "parentId": "n-idea", "kind": "problem", "label": "Vocabulary", "status": "answered", "order": 1 },
-    { "id": "n-goal", "mapId": "map-game", "parentId": "n-idea", "kind": "goal", "label": "Not yet explored", "status": "open", "order": 2 }
+    {
+      "id": "n-idea",
+      "mapId": "map-game",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Educational game for kids",
+      "status": "answered",
+      "order": 0,
+      "origin": "user"
+    },
+    {
+      "id": "n-age",
+      "mapId": "map-game",
+      "parentId": "n-idea",
+      "kind": "assumption",
+      "label": "Ages 6-8",
+      "detail": "Stated as \"probably\", so treat it as an assumption worth testing rather than a settled fact.",
+      "status": "answered",
+      "order": 0,
+      "origin": "agent"
+    },
+    {
+      "id": "n-prob",
+      "mapId": "map-game",
+      "parentId": "n-idea",
+      "kind": "problem",
+      "label": "Vocabulary",
+      "status": "answered",
+      "order": 1,
+      "origin": "agent"
+    },
+    {
+      "id": "n-goal",
+      "mapId": "map-game",
+      "parentId": "n-idea",
+      "kind": "goal",
+      "label": "Not yet explored",
+      "status": "open",
+      "order": 2,
+      "origin": "agent"
+    }
+  ],
+  "mapEvent": [
+    {
+      "id": "ev-map-game-1",
+      "mapId": "map-game",
+      "revision": 1,
+      "kind": "node.added",
+      "origin": "user",
+      "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
+    },
+    {
+      "id": "ev-map-game-2",
+      "mapId": "map-game",
+      "revision": 2,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"n-age\", \"parentId\": \"n-idea\", \"kind\": \"assumption\", \"label\": \"Ages 6-8\", \"status\": \"answered\"}"
+    },
+    {
+      "id": "ev-map-game-3",
+      "mapId": "map-game",
+      "revision": 3,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"n-prob\", \"parentId\": \"n-idea\", \"kind\": \"problem\", \"label\": \"Vocabulary\", \"status\": \"answered\"}"
+    },
+    {
+      "id": "ev-map-game-4",
+      "mapId": "map-game",
+      "revision": 4,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"goal\", \"label\": \"Not yet explored\", \"status\": \"open\"}"
+    },
+    {
+      "id": "ev-map-game-5",
+      "mapId": "map-game",
+      "revision": 5,
+      "kind": "phase.set",
+      "origin": "agent",
+      "payload": "{\"phase\": \"map\"}"
+    }
   ]
 }

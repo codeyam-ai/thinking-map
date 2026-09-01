@@ -15,7 +15,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": null,
-        "status": "answered"
+        "status": "answered",
+        "origin": "user"
       }
     ],
     "message": [
@@ -23,7 +24,8 @@
         "content": "I want to build an educational game for kids, but I don't know what it should be.",
         "id": "j1",
         "mapId": "map-game",
-        "role": "user"
+        "role": "user",
+        "origin": "user"
       }
     ],
     "thinkingMap": [
@@ -31,7 +33,26 @@
         "id": "map-game",
         "phase": "deconstruct",
         "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-        "title": "Educational game for kids"
+        "title": "Educational game for kids",
+        "revision": 2
+      }
+    ],
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "mapId": "map-game",
+        "revision": 1,
+        "kind": "node.added",
+        "origin": "user",
+        "payload": "{\"id\": \"j-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-2",
+        "mapId": "map-game",
+        "revision": 2,
+        "kind": "phase.set",
+        "origin": "agent",
+        "payload": "{\"phase\": \"deconstruct\"}"
       }
     ]
   },

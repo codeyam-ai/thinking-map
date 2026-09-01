@@ -15,7 +15,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": null,
-        "status": "answered"
+        "status": "answered",
+        "origin": "user"
       },
       {
         "id": "n-k1",
@@ -24,7 +25,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-k2",
@@ -33,7 +35,8 @@
         "mapId": "map-game",
         "order": 1,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-k3",
@@ -42,7 +45,8 @@
         "mapId": "map-game",
         "order": 2,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-u1",
@@ -51,7 +55,8 @@
         "mapId": "map-game",
         "order": 3,
         "parentId": "n-idea",
-        "status": "open"
+        "status": "open",
+        "origin": "agent"
       },
       {
         "id": "n-u2",
@@ -60,7 +65,8 @@
         "mapId": "map-game",
         "order": 4,
         "parentId": "n-idea",
-        "status": "open"
+        "status": "open",
+        "origin": "agent"
       },
       {
         "id": "n-u3",
@@ -69,7 +75,8 @@
         "mapId": "map-game",
         "order": 5,
         "parentId": "n-idea",
-        "status": "open"
+        "status": "open",
+        "origin": "agent"
       },
       {
         "id": "n-d1",
@@ -78,7 +85,8 @@
         "mapId": "map-game",
         "order": 6,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-d2",
@@ -87,7 +95,8 @@
         "mapId": "map-game",
         "order": 7,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-d3",
@@ -96,7 +105,8 @@
         "mapId": "map-game",
         "order": 8,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-s1",
@@ -105,7 +115,8 @@
         "mapId": "map-game",
         "order": 9,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-s2",
@@ -114,7 +125,8 @@
         "mapId": "map-game",
         "order": 10,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-s3",
@@ -123,7 +135,8 @@
         "mapId": "map-game",
         "order": 11,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-s4",
@@ -132,7 +145,8 @@
         "mapId": "map-game",
         "order": 12,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-s5",
@@ -141,7 +155,8 @@
         "mapId": "map-game",
         "order": 13,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       }
     ],
     "message": [
@@ -149,13 +164,15 @@
         "content": "So where would you start?",
         "id": "msg-1",
         "mapId": "map-game",
-        "role": "user"
+        "role": "user",
+        "origin": "user"
       },
       {
-        "content": "Here's what we've learned, the three strongest directions, and where I'd start tomorrow. Nothing here is locked in — say the word and we can keep pulling on any of it.",
+        "content": "Here's what we've learned, the three strongest directions, and where I'd start tomorrow. Nothing here is locked in \u2014 say the word and we can keep pulling on any of it.",
         "id": "msg-2",
         "mapId": "map-game",
-        "role": "assistant"
+        "role": "assistant",
+        "origin": "agent"
       }
     ],
     "thinkingMap": [
@@ -163,7 +180,138 @@
         "id": "map-game",
         "phase": "next-steps",
         "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-        "title": "Educational game for kids"
+        "title": "Educational game for kids",
+        "revision": 16
+      }
+    ],
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "mapId": "map-game",
+        "revision": 1,
+        "kind": "node.added",
+        "origin": "user",
+        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-2",
+        "mapId": "map-game",
+        "revision": 2,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-k1\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Vocabulary is the strongest fit for ages 6-8.\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-3",
+        "mapId": "map-game",
+        "revision": 3,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-k2\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Three existing apps miss parent involvement.\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-4",
+        "mapId": "map-game",
+        "revision": 4,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-k3\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Teachers are a viable second audience.\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-5",
+        "mapId": "map-game",
+        "revision": 5,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-u1\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"Whether teachers would pay for this.\", \"status\": \"open\"}"
+      },
+      {
+        "id": "ev-map-game-6",
+        "mapId": "map-game",
+        "revision": 6,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-u2\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"How much parent involvement really matters.\", \"status\": \"open\"}"
+      },
+      {
+        "id": "ev-map-game-7",
+        "mapId": "map-game",
+        "revision": 7,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-u3\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"Which age band responds best.\", \"status\": \"open\"}"
+      },
+      {
+        "id": "ev-map-game-8",
+        "mapId": "map-game",
+        "revision": 8,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-d1\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-9",
+        "mapId": "map-game",
+        "revision": 9,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-d2\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Teacher assessment tool\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-10",
+        "mapId": "map-game",
+        "revision": 10,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-d3\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Shared parent-teacher app\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-11",
+        "mapId": "map-game",
+        "revision": 11,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s1\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Interview 3 teachers\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-12",
+        "mapId": "map-game",
+        "revision": 12,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s2\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Shortlist one approach to prototype\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-13",
+        "mapId": "map-game",
+        "revision": 13,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s3\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Sketch the classroom vocabulary flow\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-14",
+        "mapId": "map-game",
+        "revision": 14,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s4\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Test the flow with one teacher\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-15",
+        "mapId": "map-game",
+        "revision": 15,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s5\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Check what district buy-in needs\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-16",
+        "mapId": "map-game",
+        "revision": 16,
+        "kind": "phase.set",
+        "origin": "agent",
+        "payload": "{\"phase\": \"next-steps\"}"
       }
     ]
   },

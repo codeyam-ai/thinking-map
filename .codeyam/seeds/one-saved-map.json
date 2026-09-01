@@ -4,7 +4,8 @@
       "id": "map-solo",
       "title": "Should the bakery deliver?",
       "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.",
-      "phase": "deconstruct"
+      "phase": "deconstruct",
+      "revision": 3
     }
   ],
   "message": [
@@ -12,7 +13,8 @@
       "id": "s1",
       "mapId": "map-solo",
       "role": "user",
-      "content": "I have an idea for a business."
+      "content": "I have an idea for a business.",
+      "origin": "user"
     }
   ],
   "mapNode": [
@@ -23,7 +25,8 @@
       "kind": "idea",
       "label": "Weekday morning bread",
       "status": "answered",
-      "order": 0
+      "order": 0,
+      "origin": "user"
     },
     {
       "id": "s-q",
@@ -32,7 +35,34 @@
       "kind": "open-question",
       "label": "Who actually buys at 7am?",
       "status": "open",
-      "order": 0
+      "order": 0,
+      "origin": "agent"
+    }
+  ],
+  "mapEvent": [
+    {
+      "id": "ev-map-solo-1",
+      "mapId": "map-solo",
+      "revision": 1,
+      "kind": "node.added",
+      "origin": "user",
+      "payload": "{\"id\": \"s-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Weekday morning bread\", \"status\": \"answered\"}"
+    },
+    {
+      "id": "ev-map-solo-2",
+      "mapId": "map-solo",
+      "revision": 2,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"s-q\", \"parentId\": \"s-idea\", \"kind\": \"open-question\", \"label\": \"Who actually buys at 7am?\", \"status\": \"open\"}"
+    },
+    {
+      "id": "ev-map-solo-3",
+      "mapId": "map-solo",
+      "revision": 3,
+      "kind": "phase.set",
+      "origin": "agent",
+      "payload": "{\"phase\": \"deconstruct\"}"
     }
   ]
 }

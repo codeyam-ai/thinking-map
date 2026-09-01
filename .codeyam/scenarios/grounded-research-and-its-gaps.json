@@ -15,7 +15,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": null,
-        "status": "answered"
+        "status": "answered",
+        "origin": "user"
       },
       {
         "id": "n-age",
@@ -24,7 +25,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-prob",
@@ -33,7 +35,8 @@
         "mapId": "map-game",
         "order": 1,
         "parentId": "n-idea",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "id": "n-goal",
@@ -42,7 +45,8 @@
         "mapId": "map-game",
         "order": 2,
         "parentId": "n-idea",
-        "status": "open"
+        "status": "open",
+        "origin": "agent"
       },
       {
         "id": "n-res",
@@ -51,7 +55,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": "n-prob",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "detail": "All three treat the child as the only user. Nobody surfaces what was learned to the adult who bought the app.",
@@ -61,7 +66,8 @@
         "mapId": "map-game",
         "order": 0,
         "parentId": "n-res",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       },
       {
         "detail": "Word lists are age-banded, not ability-banded, so a strong reader is bored within a week.",
@@ -71,7 +77,8 @@
         "mapId": "map-game",
         "order": 1,
         "parentId": "n-res",
-        "status": "answered"
+        "status": "answered",
+        "origin": "agent"
       }
     ],
     "message": [
@@ -79,25 +86,29 @@
         "content": "I want to build an educational game for kids, but I don't know what it should be.",
         "id": "msg-1",
         "mapId": "map-game",
-        "role": "user"
+        "role": "user",
+        "origin": "user"
       },
       {
         "content": "Before we think about the game itself: who is this actually for, what should they learn, and what are they doing today instead?",
         "id": "msg-2",
         "mapId": "map-game",
-        "role": "assistant"
+        "role": "assistant",
+        "origin": "agent"
       },
       {
         "content": "Probably kids around 6 to 8, and I want them to learn vocabulary.",
         "id": "msg-3",
         "mapId": "map-game",
-        "role": "user"
+        "role": "user",
+        "origin": "user"
       },
       {
         "content": "Got it. I looked at what already exists for that age and skill, found three apps worth knowing about, and added them to the map. Two gaps stood out right away.",
         "id": "msg-4",
         "mapId": "map-game",
-        "role": "assistant"
+        "role": "assistant",
+        "origin": "agent"
       }
     ],
     "thinkingMap": [
@@ -105,7 +116,74 @@
         "id": "map-game",
         "phase": "research",
         "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-        "title": "Educational game for kids"
+        "title": "Educational game for kids",
+        "revision": 8
+      }
+    ],
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "mapId": "map-game",
+        "revision": 1,
+        "kind": "node.added",
+        "origin": "user",
+        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-2",
+        "mapId": "map-game",
+        "revision": 2,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-age\", \"parentId\": \"n-idea\", \"kind\": \"assumption\", \"label\": \"Ages 6-8\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-3",
+        "mapId": "map-game",
+        "revision": 3,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-prob\", \"parentId\": \"n-idea\", \"kind\": \"problem\", \"label\": \"Vocabulary\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-4",
+        "mapId": "map-game",
+        "revision": 4,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"goal\", \"label\": \"Not yet explored\", \"status\": \"open\"}"
+      },
+      {
+        "id": "ev-map-game-5",
+        "mapId": "map-game",
+        "revision": 5,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-res\", \"parentId\": \"n-prob\", \"kind\": \"research\", \"label\": \"3 existing apps found\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-6",
+        "mapId": "map-game",
+        "revision": 6,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-gap1\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"No parent involvement\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-7",
+        "mapId": "map-game",
+        "revision": 7,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-gap2\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"Fixed difficulty level\", \"status\": \"answered\"}"
+      },
+      {
+        "id": "ev-map-game-8",
+        "mapId": "map-game",
+        "revision": 8,
+        "kind": "phase.set",
+        "origin": "agent",
+        "payload": "{\"phase\": \"research\"}"
       }
     ]
   },

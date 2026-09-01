@@ -1,0 +1,236 @@
+{
+  "name": "Mid-exchange - agent and human on one map",
+  "id": "bab49e26-8fc6-4912-affd-4a920e779c19",
+  "url": "/map/map-exchange",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "xe-1",
+        "kind": "node.added",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "payload": "{\"id\":\"xn-idea\",\"parentId\":null,\"kind\":\"idea\",\"label\":\"Tool for tracking reading\",\"status\":\"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "xe-2",
+        "kind": "agent.note",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"text\":\"Treating the abandonment as the real problem rather than the tracking.\"}",
+        "revision": 2
+      },
+      {
+        "id": "xe-3",
+        "kind": "node.added",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"id\":\"xn-prob\",\"parentId\":\"xn-idea\",\"kind\":\"problem\",\"label\":\"Abandoned after a week\",\"status\":\"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "xe-4",
+        "kind": "question.asked",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"questions\":[{\"id\":\"xn-q0\",\"text\":\"What were you hoping to get out of the record?\"}]}",
+        "revision": 4
+      },
+      {
+        "id": "xe-5",
+        "kind": "user.answer",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "payload": "{\"answers\":[{\"id\":\"xn-q0\",\"text\":\"What were you hoping to get out of the record?\",\"answer\":\"To find a half-remembered idea again months later.\"}]}",
+        "revision": 5
+      },
+      {
+        "id": "xe-6",
+        "kind": "user.node",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "payload": "{\"id\":\"xn-goal\",\"parentId\":\"xn-idea\",\"kind\":\"goal\",\"label\":\"Refind a half-remembered idea\",\"status\":\"answered\"}",
+        "revision": 6
+      },
+      {
+        "id": "xe-7",
+        "kind": "agent.note",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"text\":\"Your goal is retrieval, so I dropped the shelf-management branch entirely.\"}",
+        "revision": 7
+      },
+      {
+        "id": "xe-8",
+        "kind": "node.added",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"id\":\"xn-find\",\"parentId\":\"xn-prob\",\"kind\":\"finding\",\"label\":\"Logging gives nothing back\",\"status\":\"answered\"}",
+        "revision": 8
+      },
+      {
+        "id": "xe-9",
+        "kind": "user.note",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "payload": "{\"text\":\"That is exactly it — I kept feeding it and it never fed me back.\"}",
+        "revision": 9
+      },
+      {
+        "id": "xe-10",
+        "kind": "node.added",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"id\":\"xn-appr\",\"parentId\":\"xn-goal\",\"kind\":\"approach\",\"label\":\"Capture the thought, not the book\",\"status\":\"answered\"}",
+        "revision": 10
+      },
+      {
+        "id": "xe-11",
+        "kind": "node.added",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"id\":\"xn-q1\",\"parentId\":\"xn-appr\",\"kind\":\"open-question\",\"label\":\"Do you reread your own notes today?\",\"status\":\"open\"}",
+        "revision": 11
+      },
+      {
+        "id": "xe-12",
+        "kind": "node.added",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"id\":\"xn-q2\",\"parentId\":\"xn-appr\",\"kind\":\"open-question\",\"label\":\"Is this for you alone, or shared?\",\"status\":\"open\"}",
+        "revision": 12
+      },
+      {
+        "id": "xe-13",
+        "kind": "question.asked",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"questions\":[{\"id\":\"xn-q1\",\"text\":\"Do you reread your own notes today?\"},{\"id\":\"xn-q2\",\"text\":\"Is this for you alone, or shared?\"}]}",
+        "revision": 13
+      },
+      {
+        "id": "xe-14",
+        "kind": "phase.set",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "payload": "{\"phase\":\"explore\"}",
+        "revision": 14
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "xn-idea",
+        "kind": "idea",
+        "label": "Tool for tracking reading",
+        "mapId": "map-exchange",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "detail": "Every existing reading tracker has been dropped within days. The tracking is not the problem to solve — the abandonment is.",
+        "id": "xn-prob",
+        "kind": "problem",
+        "label": "Abandoned after a week",
+        "mapId": "map-exchange",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "xn-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "Contributed by the person directly: the point of the record is retrieval months later, not the log itself.",
+        "id": "xn-goal",
+        "kind": "goal",
+        "label": "Refind a half-remembered idea",
+        "mapId": "map-exchange",
+        "order": 1,
+        "origin": "user",
+        "parentId": "xn-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "The loop never closes: you put entries in and the tool never hands you anything for having done so.",
+        "id": "xn-find",
+        "kind": "finding",
+        "label": "Logging gives nothing back",
+        "mapId": "map-exchange",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "xn-prob",
+        "status": "answered"
+      },
+      {
+        "detail": "Record the sentence that struck you rather than the title and the page count — retrieval works on ideas, not metadata.",
+        "id": "xn-appr",
+        "kind": "approach",
+        "label": "Capture the thought, not the book",
+        "mapId": "map-exchange",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "xn-goal",
+        "status": "answered"
+      },
+      {
+        "id": "xn-q1",
+        "kind": "open-question",
+        "label": "Do you reread your own notes today?",
+        "mapId": "map-exchange",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "xn-appr",
+        "status": "open"
+      },
+      {
+        "id": "xn-q2",
+        "kind": "open-question",
+        "label": "Is this for you alone, or shared?",
+        "mapId": "map-exchange",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "xn-appr",
+        "status": "open"
+      }
+    ],
+    "message": [
+      {
+        "content": "I want to build something that helps me keep track of what I read, but every app I've tried I abandon after a week.",
+        "id": "xm-1",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "The abandonment is the interesting part, not the tracking. Before we design anything: what were you actually hoping to get out of the record, and what made logging feel like a chore?",
+        "id": "xm-2",
+        "mapId": "map-exchange",
+        "origin": "agent",
+        "role": "assistant"
+      },
+      {
+        "content": "Honestly I wanted to be able to find a half-remembered idea again months later. The logging itself never gave me anything back.",
+        "id": "xm-3",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-exchange",
+        "phase": "explore",
+        "revision": 14,
+        "seedIdea": "I want to build something that helps me keep track of what I read, but every app I've tried I abandon after a week.",
+        "title": "Tool for tracking reading"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "A map both sides have worked: agent notes and human contributions interleaved in the log, revision 14, and two questions the agent asked that nobody has answered yet."
+}

@@ -26,6 +26,15 @@
     ]
   },
   {
+    "description": "Renders what the bridge knows - whether an agent is attached, why not when it is not, the tools the page exposes, the questions an agent is waiting on, and the pending count. Exists so the bridge has something to show: WebMcpBridge renders only a context provider, so an isolated capture of it alone would be a blank frame. Its two buttons drive the REAL ask_user path through the headless driver and the real answer path back, so the AwaitingAnswer scenario captures the state the code actually produces rather than one staged to look like it.",
+    "filePath": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
+    "name": "BridgeReadout",
+    "untestabilityReason": {
+      "justification": "Lives under app/isolated-components/ and exists only to give that isolation route something to render. It is a presentational read of the bridge context; the state it displays is produced by WebMcpBridge, covered by the webmcpbridge-noagent scenario.",
+      "kind": "scaffold"
+    }
+  },
+  {
     "description": "A what-we-know or what-we-don't-know card on the summary screen, falling back to the keep-talking hint when its bucket is empty.",
     "filePath": "app/components/BulletCard.tsx",
     "name": "BulletCard",
@@ -290,6 +299,17 @@
     ]
   },
   {
+    "description": "Mounts the page's own front door. Binds the tool catalog to the current map for as long as the map page is open, disposing on unmount and on map change because re-registering a live tool name throws InvalidStateError. Holds the pending ask_user state and resolves the agent's turn when the person answers, writing the answer to the log BEFORE releasing it so an agent that already gave up still finds it. Publishes the headless driver whether or not a real agent is present, which is the only way the tools are reachable inside a capture iframe. Reports connection state through the same context, and exposes the tool names from the catalog rather than from the published driver - a consumer's effect runs before its parent's, so reading the driver would race the binding that creates it.",
+    "filePath": "app/components/WebMcpBridge.tsx",
+    "name": "WebMcpBridge",
+    "scenarios": [
+      "webmcpbridge-noagent",
+      "webmcpbridge-onequestion",
+      "webmcpbridge-awaitinganswer",
+      "webmcpbridge-manyquestions"
+    ]
+  },
+  {
     "description": "The product mark: three nodes and the connectors between them, doubling as the link home from every screen.",
     "filePath": "app/components/Wordmark.tsx",
     "name": "Wordmark",
@@ -298,7 +318,13 @@
     ]
   },
   {
-    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. All the rules live in planMapMutations, which is pure and tested.",
+    "description": "What the agent is told once the person has answered. Reports each question alongside its answer, because an agent that asked several cannot match them up from the answers alone.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "answeredResponse",
+    "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. All the rules live in planMapMutations, which is pure and tested. It now has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
     "filePath": "app/lib/mapStore.ts",
     "name": "applyToolCalls",
     "scenarios": [
@@ -306,13 +332,33 @@
     ]
   },
   {
-    "description": "Registers the six MCP tools on a server object, each delegating straight to the mapStore functions the web UI uses so the two front doors cannot drift apart. Response formatting lives in mcpFormat; this is registration only. Built fresh per request in the stateless HTTP mode.",
+    "description": "Registers the catalog with the browser agent for one map and returns a disposer. The WebMCP draft has already moved once - provideContext was removed in the March 2026 revision in favour of registerTool/unregisterTool, while the polyfill still ships the older shape - so both conventions are handled here, the one file that names navigator.modelContext. Re-registering a live name throws InvalidStateError, which is why unregister-then-register is the only safe update path and why the disposer exists.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "bindTools",
+    "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
+    "description": "Builds the HTTP and stdio front doors from the shared tool catalog rather than a hand-written list, which is what stops the three doors drifting apart. Loops the catalog, splicing a mapId argument onto each tool's own schema and stripping it back off before handing the call to the shared runtime - out here the agent has no page, so it must name the map it means. Adds the two whole-collection tools that belong only to the server doors, list_thinking_maps and create_thinking_map, since a page is already scoped to one map. Built fresh per request in the stateless HTTP mode.",
     "filePath": "app/lib/mcpServer.ts",
     "name": "buildMcpServer",
     "untestabilityReason": {
-      "justification": "Registration only after the formatting moved to mcpFormat: it constructs an SDK server, attaches six handlers that each call one mapStore function, and returns it. The formatting is covered by app/lib/mcpFormat.test.ts and the store functions by their own entries. The wiring was verified end to end over both transports - initialize, tools/list, and a create/add-node/read round trip over HTTP, plus a stdio handshake.",
+      "justification": "Registration only: it constructs an SDK server object and attaches handlers that delegate to runTool, whose behaviour is covered by its own entry and the mid-exchange scenario, and to createMap/listMaps which have theirs. The catalog it loops over is covered by app/lib/toolCatalog.test.ts. The wiring was verified end to end over both transports.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "The descriptors handed to a browser agent, one per catalog tool. Separated from registration so that WHAT the agent is offered can be checked without a navigator.modelContext: registering is a boundary call, but the set being registered is a contract. Each descriptor is bound to its own tool name, and annotations are carried only where the catalog declares them.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "buildToolDescriptors",
+    "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "Runs one tool on behalf of an agent attached to the page: validate, forward to the tools route because the implementations reach SQLite, and for ask_user perform the middle step only a page can do - putting the question to a person and recording their answer. Every decision it makes is delegated to toolInvocation; what remains here is the fetch and the wait.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "callCatalogTool",
+    "scenarios": [
+      "mid-exchange-agent-and-human-on-one-map"
+    ]
   },
   {
     "description": "Builds the orthogonal SVG path from a parent's bottom edge to a child's top edge, routed through a horizontal bus midway between the levels so siblings share it and the tree reads as one structure. Emits a straight line when the two are already aligned.",
@@ -321,12 +367,42 @@
     "testFile": "app/lib/mapLayout.test.ts"
   },
   {
-    "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title.",
+    "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title. The seed idea is the person's, so the root node and opening message are user-origin - an agent reading the log must not mistake the human's starting idea for something it wrote. Records the root as the map's first event, leaving it at revision 1: a new map at revision 0 with an empty log would give an agent no way to tell it from one it had already read to the end.",
     "filePath": "app/lib/mapStore.ts",
     "name": "createMap",
     "scenarios": [
       "day-one-nothing-yet"
     ]
+  },
+  {
+    "description": "The map's current revision for a caller that needs only the cursor and not the events - used by the waiting tools to report where to resume from, and by the conflict check before it decides whether reading the log is warranted at all.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "currentRevision",
+    "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
+    "description": "Turns a stored row into a readable event. SQLite has no JSON column, so payloads are strings that could be anything; a payload that will not parse degrades to null rather than throwing, because one bad row must not take down the whole catch-up read an agent depends on. The revision and kind survive regardless.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "decodeEvent",
+    "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Marks a response as a genuine fault. Deliberately narrow: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "errorResponse",
+    "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The user-origin changes to one node that landed after the revision an agent last read. Empty means the write is safe; non-empty means the person touched this node and the caller must decline instead of overwriting. Narrowed twice on purpose: an agent's own earlier writes are not a conflict with itself, and a busy map moves constantly so only a change to THIS node can clobber THIS write.",
+    "filePath": "app/lib/conflict.ts",
+    "name": "findConflictingChanges",
+    "testFile": "app/lib/conflict.test.ts"
+  },
+  {
+    "description": "Resolves a tool by name from the shared catalog. Every front door goes through it, and an unknown name comes back undefined so the caller can answer the agent rather than throw.",
+    "filePath": "app/lib/toolCatalog.ts",
+    "name": "findTool",
+    "testFile": "app/lib/toolCatalog.test.ts"
   },
   {
     "description": "Decides what to append to the conversation before the next request. An empty array ends the loop; a paused turn gets the assistant's partial content echoed back so the server-side search can resume; a tool round additionally gets the matching tool_result blocks in the single user message the API requires.",
@@ -345,6 +421,15 @@
     "filePath": "app/lib/mcpFormat.ts",
     "name": "formatMapList",
     "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
+    "description": "Sends a page-side tool call to the tools route, where the shared runtime executes it. The page cannot run the catalog itself because every implementation ends in SQLite, so this one hop is the only difference between the page door and the two server doors.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "forward",
+    "untestabilityReason": {
+      "justification": "A single fetch plus a non-2xx guard that turns a transport failure into a readable message. What it sends is decided by validateToolInput and what it receives is produced by runTool, both covered by their own entries.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Reads one map with its full conversation and node tree in creation order. The single read behind the workspace, the summary screen and the MCP get_thinking_map tool.",
@@ -387,6 +472,12 @@
     "testFile": "app/lib/turnInterpreter.test.ts"
   },
   {
+    "description": "Guard for the eight kinds the exchange log can record. A kind outside the set would become a row that nothing knows how to render or resume past.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "isEventKind",
+    "testFile": "app/lib/exchange.test.ts"
+  },
+  {
     "description": "Type guard for the node kinds the map knows how to draw. Used to drop a hallucinated kind at the planning stage rather than storing a node no component has a treatment for.",
     "filePath": "app/lib/mapKinds.ts",
     "name": "isNodeKind",
@@ -403,6 +494,18 @@
     "filePath": "app/lib/mapKinds.ts",
     "name": "isPhase",
     "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Guard for the three kinds a browser is allowed to write. This is a trust boundary rather than a convenience: the page posts these directly, so accepting an agent-side kind here would let a page forge the other half of the conversation.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "isUserEventKind",
+    "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Whether a browser agent can actually reach this page: a model context exists, the context is secure, and the page is top level. All three are real gates - WebMCP is top-level-secure-context only, so the codeyam capture iframe fails the last one by design in every preview and scenario.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "isWebMcpAvailable",
+    "testFile": "app/lib/webmcp.test.ts"
   },
   {
     "description": "Tidy-tree layout for the thinking map. Rebuilds the tree from flat nodes joined only by parentId, sizes each pill to its label, centres every parent over its children, and returns absolute pixel positions plus overall bounds. Treats an orphaned node as a root and terminates on a parent cycle rather than hanging the render.",
@@ -444,10 +547,34 @@
     "testFile": "app/lib/mapCaption.test.ts"
   },
   {
+    "description": "Whether the map named in the URL is real, checked before either verb touches the log. Both GET and POST answer 404 rather than minting a revision against a map that does not exist.",
+    "filePath": "app/api/maps/[id]/exchange/route.ts",
+    "name": "mapExists",
+    "untestabilityReason": {
+      "justification": "A bare findUnique selecting only the id, coerced to a boolean. The work is the database call itself; the route behaviour it guards is covered by the exchange route's own probes and the mid-exchange scenario.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Sizes a node pill to its label so text stays on two lines at most, capped so an unbounded label cannot stretch a pill into a paragraph. The root gets a fixed wider box.",
     "filePath": "app/lib/mapLayout.ts",
     "name": "measureWidth",
     "testFile": "app/lib/mapLayout.test.ts"
+  },
+  {
+    "description": "Reads navigator.modelContext, or null where there is none. The single place the WebMCP global is touched, so the draft spec moving again is one edit rather than a sweep.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "modelContext",
+    "untestabilityReason": {
+      "justification": "A guarded read of a browser global that exists only in Chrome 146+. The availability decisions built on it - isWebMcpAvailable and webMcpUnavailableReason - are covered by app/lib/webmcp.test.ts, which stubs this same global.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Whether a guarded write warrants reading the log at all. An unguarded write is the agent saying it does not care, and a map that has not moved cannot have a conflict, so neither case costs a read.",
+    "filePath": "app/lib/conflict.ts",
+    "name": "needsConflictCheck",
+    "testFile": "app/lib/conflict.test.ts"
   },
   {
     "description": "Picks the shell classes for a map node, encoding the design system's status-precedence rule: root beats updated beats open beats accent kind beats plain answered. Gaps deliberately fall through to plain, because a gap is the research phase's most valuable finding rather than a warning.",
@@ -456,10 +583,57 @@
     "testFile": "app/lib/nodeAppearance.test.ts"
   },
   {
+    "description": "The questions a pending ask_user is waiting on. The server writes them onto the map and returns this pending shape; only the page can perform the middle step of asking a person. Returns empty for an errored call or a result carrying none, which is the signal to hand the server's response straight back - putting a prompt on screen off the back of a failure would be worse than showing nothing.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "pendingQuestions",
+    "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
     "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase.",
     "filePath": "app/lib/nodePlan.ts",
     "name": "planMapMutations",
     "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
+    "description": "Records something the person did onto the map's log. The tools run in the browser but the log lives in SQLite, so an answer only becomes durable - and only becomes visible to an agent on another front door - once it has come back through this route.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "postUserEvent",
+    "untestabilityReason": {
+      "justification": "A single POST with no branching. The event kinds it may carry are enforced server-side by isUserEventKind, covered by app/lib/exchange.test.ts, and the answered path it serves is covered by answeredResponse in app/lib/toolInvocation.test.ts.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Publishes a headless driver on window over the same bound catalog. Not a debug convenience: WebMCP is top-level-secure-context only and codeyam renders the app inside a capture iframe, so navigator.modelContext is genuinely absent in every preview and captured scenario, and this driver is what makes the tools exercisable there at all. It calls the exact catalog entries a real agent would.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "publishAgentDriver",
+    "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
+    "description": "Everything that happened after a cursor. An omitted cursor means the whole log, which is what a fresh agent wants; a cursor means just the delta, which is what a returning one wants. Both return the map's current revision, so a caller always leaves holding a cursor it can resume from even when the delta is empty.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "readSince",
+    "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
+    "description": "The only place a map revision is minted. Appends events to the map's log and bumps ThinkingMap.revision once per event inside a single transaction, so a revision can never exist without its event or vice versa - either would hand a reader a cursor it cannot resume from. Every row of a batch carries the requestId, so a retry returns the whole original batch and its LAST revision; keying only the first row loses the batch's extent and hands a retrying agent a stale cursor, which makes it re-read its own writes as new. Fires the in-process emitter that waiting callers race against.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "recordEvents",
+    "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
+    "description": "Renders the log one line per event: revision, kind, origin, and the gist. Because the exchange is pull-only, this text is the whole of what an agent learns about what happened while it was not looking. The revision leads each line because it is what the agent passes back as its cursor, and the gist is pulled from whichever payload field that kind uses.",
+    "filePath": "app/lib/exchangeFormat.ts",
+    "name": "renderEvents",
+    "testFile": "app/lib/exchangeFormat.test.ts"
+  },
+  {
+    "description": "Validates and runs one catalog tool. Agent input is untrusted, so it is checked against the tool's own schema before reaching an implementation and a validation failure comes back as readable text. isError is reserved for genuine faults: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent. Every front door - page, HTTP, stdio - ends here, which is what stops the three drifting apart.",
+    "filePath": "app/lib/toolRuntime.ts",
+    "name": "runTool",
+    "scenarios": [
+      "mid-exchange-agent-and-human-on-one-map"
+    ]
   },
   {
     "description": "Runs one turn of the conversation against claude-opus-5 with adaptive thinking, the three map tools and Anthropic's server-side web_search. A thin loop: every decision about what a response means - refusal, paused server tool, more tool calls, or done - is made by interpretTurnResponse, which is pure and tested.",
@@ -472,6 +646,12 @@
     "filePath": "app/lib/messageLines.ts",
     "name": "splitAssistantLines",
     "testFile": "app/lib/messageLines.test.ts"
+  },
+  {
+    "description": "Picks the one readable field worth showing for an event, in preference order - label, then text, then phase, then answer. Each event kind carries its human-readable part under a different name, and an agent reading a wall of bare kinds learns nothing about what changed.",
+    "filePath": "app/lib/exchangeFormat.ts",
+    "name": "summarize",
+    "testFile": "app/lib/exchangeFormat.test.ts"
   },
   {
     "description": "Renders the current map as an indented outline carrying each node's real id, kind and status. This is the context the model reads before every turn, and the ids are what let it target an existing node with update_node.",
@@ -489,10 +669,22 @@
     }
   },
   {
+    "description": "Clamps an agent's requested wait into milliseconds: a default when none is given, a ceiling so a confused agent cannot pin a connection open indefinitely, and a one-second floor so a wait never degrades into a busy loop.",
+    "filePath": "app/lib/toolCatalog.ts",
+    "name": "timeoutMsFrom",
+    "testFile": "app/lib/toolCatalog.test.ts"
+  },
+  {
     "description": "Converts stored conversation rows into the API's message array, treating any role that is not 'assistant' as a user turn so an unexpected value in the free-string column cannot throw mid-conversation.",
     "filePath": "app/lib/turnInterpreter.ts",
     "name": "toMessageParams",
     "testFile": "app/lib/turnInterpreter.test.ts"
+  },
+  {
+    "description": "The catalog as a browser agent or the headless driver lists it. A tool missing here is a tool the agent never learns it can call, so it is derived from the catalog rather than restated.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "toolSummaries",
+    "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
     "description": "Scales a fixed-size plane to fit its frame down to a legibility floor, and opens an oversized map centred on its root. Seeing the whole shape at once is the point of the map, so fitting beats scrolling - but a map that would need shrinking past the floor scrolls instead.",
@@ -503,5 +695,32 @@
       "thinkingmapview-seeded",
       "sprawling-a-deep-wide-map"
     ]
+  },
+  {
+    "description": "Reads the bridge state - connection status, the questions an agent is waiting on, the current revision, and the two writers - from context. Throws outside a provider rather than returning a null the caller would have to guard at every use site.",
+    "filePath": "app/components/WebMcpBridge.tsx",
+    "name": "useWebMcpBridge",
+    "untestabilityReason": {
+      "justification": "A useContext read with a single null check and no other branching. The state it exposes is produced by the WebMcpBridge component, which is covered by the mid-exchange scenario.",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
+    "description": "Checks an agent's call against the tool it named and returns either the parsed input or the response to send back. Runs on the page as well as the server - not redundantly, but because it turns a malformed call into an immediate readable answer rather than a round trip, and agent input is untrusted on both sides of the wire. The message names the offending field so the agent can correct itself instead of guessing.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "validateToolInput",
+    "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "Blocks until the person contributes, or until the caller's timeout expires. Re-reads the log first because an event may already be waiting and a waiter that subscribed before checking would sleep through it; then races an in-process emitter against a ~500ms poll. The poll is what lets a write from the separate stdio process wake a waiter living in the web process - an emitter alone would be silently correct in dev and silently wrong across front doors. Always resolves: a timeout is a normal result carrying the cursor, never a hang.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "waitForUserActivity",
+    "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
+    "description": "Why the page is not bound, in words the UI can show honestly. Each reason names a different fix, so they deliberately do not collapse into one generic unavailable the person cannot act on. The security gates are reported before the missing-agent gate so an insecure page is told to fix that first.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "webMcpUnavailableReason",
+    "testFile": "app/lib/webmcp.test.ts"
   }
 ]

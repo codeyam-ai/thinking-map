@@ -1,36 +1,23 @@
-// The second front door.
+// The server front doors.
 //
-// Everything the web UI can do to a thinking map, an MCP client can do too —
-// and through the same mapStore functions, so the two surfaces cannot drift
-// apart. One brain, two front doors: the browser is one, this is the other.
+// Everything the page can do to a thinking map, an MCP client over HTTP or
+// stdio can do too — and now through the same tool catalog rather than a
+// parallel hand-written list, so the three doors cannot drift apart. This file
+// is only the server-side binding: it loops the catalog, injects `mapId` from
+// each call's input, and adds the two tools that make sense only out here.
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { applyToolCalls, createMap, getMap, listMaps } from './mapStore';
-import { formatMapDetail, formatMapList } from './mcpFormat';
-import { NODE_KINDS, NODE_STATUSES, PHASES } from './mapKinds';
+import { createMap, listMaps } from './mapStore';
+import { formatMapList } from './mcpFormat';
+import { TOOL_CATALOG } from './toolCatalog';
+import { runTool } from './toolRuntime';
 
-const nodeShape = z.object({
-  ref: z
-    .string()
-    .describe(
-      'A temporary id for this node so later nodes in the same call can name it as their parent.',
-    ),
-  parentRef: z
-    .string()
-    .optional()
-    .describe(
-      'The ref of a node created earlier in this call, or the real id of an existing node. Omit only for a root idea.',
-    ),
-  kind: z.enum(NODE_KINDS),
-  label: z.string().describe('Short text for the pill; aim for under 40 characters.'),
-  detail: z.string().optional(),
-  status: z.enum(NODE_STATUSES).optional(),
-  sourceUrl: z.string().optional(),
-});
-
-function textResult(text: string) {
-  return { content: [{ type: 'text' as const, text }] };
+function textResult(text: string, structured?: Record<string, unknown>) {
+  return {
+    content: [{ type: 'text' as const, text }],
+    ...(structured ? { structuredContent: structured } : {}),
+  };
 }
 
 /**
@@ -41,8 +28,12 @@ function textResult(text: string) {
 export function buildMcpServer(): McpServer {
   const server = new McpServer({
     name: 'thinking-map',
-    version: '0.1.0',
+    version: '0.2.0',
   });
+
+  // ── Server-door-only tools ───────────────────
+  // A page is already scoped to one map, so neither of these belongs in the
+  // shared catalog.
 
   server.registerTool(
     'list_thinking_maps',
@@ -50,23 +41,9 @@ export function buildMcpServer(): McpServer {
       title: 'List thinking maps',
       description:
         'List every thinking map, newest first, with the phase each has reached.',
+      annotations: { readOnlyHint: true },
     },
     async () => textResult(formatMapList(await listMaps())),
-  );
-
-  server.registerTool(
-    'get_thinking_map',
-    {
-      title: 'Read a thinking map',
-      description:
-        'Read one map in full: the conversation so far and the current node tree, indented by depth.',
-      inputSchema: { id: z.string() },
-    },
-    async ({ id }) => {
-      const map = await getMap(id);
-      if (!map) return textResult(`No map with id ${id}.`);
-      return textResult(formatMapDetail(map));
-    },
   );
 
   server.registerTool(
@@ -83,54 +60,36 @@ export function buildMcpServer(): McpServer {
     },
   );
 
-  server.registerTool(
-    'add_map_nodes',
-    {
-      title: 'Add nodes to a map',
-      description:
-        'Add one or more nodes. Parents must appear before their children. Use status "open" for a question nobody has answered yet.',
-      inputSchema: { mapId: z.string(), nodes: z.array(nodeShape) },
-    },
-    async ({ mapId, nodes }) => {
-      await applyToolCalls(mapId, [{ name: 'add_nodes', input: { nodes } }]);
-      return textResult(`Added ${nodes.length} node(s) to ${mapId}.`);
-    },
-  );
+  // ── The shared catalog ───────────────────────
+  // Out here the agent has no page, so it must name the map it means. The
+  // `mapId` argument is spliced onto each tool's own schema and stripped back
+  // off before the tool runs, which is the only difference between this door
+  // and the page's.
 
-  server.registerTool(
-    'update_map_node',
-    {
-      title: 'Update a node',
-      description:
-        'Change an existing node — typically when an answer resolves an open question. Set status "updated" for the one thing that just changed.',
-      inputSchema: {
-        mapId: z.string(),
-        id: z.string(),
-        label: z.string().optional(),
-        detail: z.string().optional(),
-        kind: z.enum(NODE_KINDS).optional(),
-        status: z.enum(NODE_STATUSES).optional(),
+  for (const tool of TOOL_CATALOG) {
+    server.registerTool(
+      tool.name,
+      {
+        title: tool.title,
+        description: tool.description,
+        inputSchema: {
+          mapId: z.string().describe('The map to act on.'),
+          ...(tool.inputSchema as z.ZodObject<z.ZodRawShape>).shape,
+        },
+        ...(tool.annotations ? { annotations: tool.annotations } : {}),
       },
-    },
-    async ({ mapId, ...patch }) => {
-      await applyToolCalls(mapId, [{ name: 'update_node', input: patch }]);
-      return textResult(`Updated node ${patch.id}.`);
-    },
-  );
-
-  server.registerTool(
-    'set_map_phase',
-    {
-      title: 'Move a map to a new phase',
-      description:
-        'Advance the map through the loop once the conversation has genuinely reached the next phase.',
-      inputSchema: { mapId: z.string(), phase: z.enum(PHASES) },
-    },
-    async ({ mapId, phase }) => {
-      await applyToolCalls(mapId, [{ name: 'set_phase', input: { phase } }]);
-      return textResult(`Map ${mapId} is now in the ${phase} phase.`);
-    },
-  );
+      async (args: Record<string, unknown>) => {
+        const { mapId, ...input } = args;
+        // No `client` on a server door: there is no page to raise a question
+        // in, so `ask_user` degrades to leaving the questions on the map and
+        // handing back a cursor to poll.
+        return runTool(tool.name, input, {
+          mapId: String(mapId),
+          origin: 'agent',
+        });
+      },
+    );
+  }
 
   return server;
 }

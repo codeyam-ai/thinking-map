@@ -1,6 +1,105 @@
 {
   "tests": [
     {
+      "description": "An answered call is a success, and its status is what an agent branches on.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "answeredResponse › marks the result answered and is not an error",
+      "line": 149,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The agent needs both the question and the answer, since it may have asked several and cannot match them up from the answers alone.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "answeredResponse › reports each question with the answer it received",
+      "line": 138,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "No agent at all — the common case, including every codeyam capture. It must be a silent no-op with a disposer that is safe to call.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › does nothing and returns a safe disposer with no browser agent",
+      "line": 174,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The pre-March-2026 convention the @mcp-b/global polyfill still ships: one call replaces the whole set, so disposal clears it with an empty set.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › falls back to provideContext when only the older convention exists",
+      "line": 160,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A name left registered by a binding that failed to dispose must not take down the whole binding — losing one tool beats losing all seven.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › keeps binding the rest when one registration throws",
+      "line": 143,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The current spec convention (Chrome 146+): one registerTool per tool.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › registers every tool through registerTool when that convention is present",
+      "line": 112,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Disposal must remove exactly what was registered, or re-binding the same name on the next map throws InvalidStateError.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › unregisters everything it registered when disposed",
+      "line": 128,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Only the two read-only tools should carry annotations; attaching them everywhere would tell an agent a write is safe to retry speculatively.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › attaches annotations only to the tools that declare them",
+      "line": 200,
+      "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Each descriptor must be wired to its OWN tool — a shared or misbound executor would silently run the wrong tool for every call.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › binds each descriptor to its own tool name",
+      "line": 208,
+      "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The description and schema are how the agent decides whether and how to call a tool, so they must come from the catalog rather than be restated.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › carries each tool’s description and schema through",
+      "line": 190,
+      "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "What a browser agent gets registered. A tool missing from this set is a capability the agent silently does not have.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › describes every catalog tool",
+      "line": 182,
+      "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "An aligned pair should get a straight line, not a degenerate dog-leg with zero-length segments.",
       "file": "app/lib/mapLayout.test.ts",
       "format": "vitest",
@@ -25,6 +124,141 @@
       "key": "connectorPath › starts at the parent bottom edge and ends at the child top edge",
       "line": 151,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The cheap cursor read the waiting tools report from.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "currentRevision › reports the map’s revision without reading the log",
+      "line": 197,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A missing map must be an error rather than a zero, which a caller would mistake for a real cursor at the start of the log.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "currentRevision › throws for a map that does not exist",
+      "line": 208,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "SQLite has no JSON column, so payloads are strings that could be anything. A single unparseable row must not take down a whole catch-up read — the revision and kind are the load-bearing parts and they survive.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "decodeEvent › degrades to a null payload rather than throwing on bad JSON",
+      "line": 81,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty column is the other shape a bad write leaves behind, and it must degrade identically rather than throwing.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "decodeEvent › handles an empty payload string the same way",
+      "line": 90,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The happy path: SQLite hands back a string and the agent needs an object.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "decodeEvent › parses the stored payload back into an object",
+      "line": 67,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Reserved for genuine faults: a conflict or a timeout is a normal result, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "errorResponse › marks the response as an error carrying the message",
+      "line": 224,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Each of these is written somewhere in the spine and read back by an agent. One dropped from the list becomes a row nothing can resume past.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "event kinds › accepts every kind the log can record",
+      "line": 11,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A typo would become a row nothing knows how to render or resume from.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "event kinds › rejects a kind the log does not define",
+      "line": 27,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An agent's own earlier write is not a conflict with itself. Counting it would deadlock a retrying agent against its own history.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › ignores the agent’s own changes to that node",
+      "line": 58,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A busy map moves constantly. \"Something changed\" is far too coarse — only a change to THIS node can destroy THIS write.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › ignores user changes to a different node",
+      "line": 67,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A user event that carries no node (a free-text note) is real activity but cannot conflict with a node write.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › ignores user events that name no node",
+      "line": 76,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The core case: the person edited the very node the agent is about to rewrite. Returning it is what turns the write into a declined result.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › reports a user change to the same node",
+      "line": 49,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Several people-edits to one node all come back, so the declined result can describe everything the agent would have destroyed.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › reports every user change to the node, in order",
+      "line": 92,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing happened to this node at all.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › reports nothing on an empty delta",
+      "line": 103,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A payload that failed to decode arrives as null. It must not throw here — that would turn one bad row into a failed write.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "findConflictingChanges › survives an event whose payload could not be decoded",
+      "line": 85,
+      "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
     {
@@ -262,6 +496,42 @@
       "runner": "tests"
     },
     {
+      "description": "The only configuration where a real agent can attach. If this goes false the feature is dead in the one place it is supposed to work.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "isWebMcpAvailable › is available in a top-level secure page with a browser agent",
+      "line": 42,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The codeyam capture iframe lands here every time.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "isWebMcpAvailable › is unavailable inside an iframe",
+      "line": 61,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Binding tools over plain HTTP would hand map-write access to anyone on the wire, so this gate must hold even when an agent is present.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "isWebMcpAvailable › is unavailable outside a secure context",
+      "line": 55,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Any browser older than Chrome 146 lands here, which is most of them today.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "isWebMcpAvailable › is unavailable without a browser agent",
+      "line": 48,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
       "description": "Depth is what puts a node on the right row; the database stores only parentId, so the tree has to be reconstructed correctly.",
       "file": "app/lib/mapLayout.test.ts",
       "format": "vitest",
@@ -478,6 +748,42 @@
       "runner": "tests"
     },
     {
+      "description": "The one case worth a read.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "needsConflictCheck › checks when the map moved past what the agent read",
+      "line": 41,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An agent that passes no expectedRevision is explicitly saying it does not care. Reading the log anyway would be work nobody asked for.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "needsConflictCheck › skips the check when the agent did not guard the write",
+      "line": 24,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The map has not moved since the agent read it, so nothing can have been clobbered.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "needsConflictCheck › skips the check when the map has not moved",
+      "line": 30,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A map BEHIND the expected revision cannot happen from a single writer, but if it does, treating it as a conflict would block writes forever.",
+      "file": "app/lib/conflict.test.ts",
+      "format": "vitest",
+      "key": "needsConflictCheck › skips the check when the map is somehow behind the agent",
+      "line": 36,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
       "description": "Pro and risk are the only kinds carrying colour; colour used more widely would stop meaning anything.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
@@ -556,6 +862,42 @@
       "key": "nodeShellClasses › marks a research node as a find",
       "line": 69,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An errored call has nothing to ask about — putting a prompt on screen off the back of a failure would be worse than showing nothing.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "pendingQuestions › asks nothing when the call failed",
+      "line": 95,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A tool that is not ask_user, or a result with no questions, must leave the caller returning the server's response untouched.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "pendingQuestions › asks nothing when the result carries no questions",
+      "line": 107,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A malformed entry is dropped rather than rendered as an undefined prompt.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "pendingQuestions › drops entries that are not a well-formed question",
+      "line": 118,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The normal hand-off: the server wrote the questions and the page now has somebody to ask.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "pendingQuestions › reads the questions out of a pending ask_user result",
+      "line": 82,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
     {
@@ -700,6 +1042,186 @@
       "key": "planMapMutations › survives a call with a missing or malformed input",
       "line": 146,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A disposer from a previous map must not delete the driver a newer binding has already published, or the current page loses its tools.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "publishAgentDriver › leaves a newer map’s driver alone when an older disposer runs",
+      "line": 207,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "This driver is the only way the tools can be driven inside a capture iframe, where WebMCP is unreachable by design.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "publishAgentDriver › publishes a driver listing every catalog tool",
+      "line": 183,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Disposal removes the driver so a stale one cannot answer for a map the page has already navigated away from.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "publishAgentDriver › removes its own driver on disposal",
+      "line": 198,
+      "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The payload round-trips through a text column, so a reader must get the object back rather than the string.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "readSince › decodes stored payloads back into objects",
+      "line": 184,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A caught-up agent must still leave holding a usable cursor, or it has no way to ask again.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "readSince › reports the current revision even when the delta is empty",
+      "line": 172,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A cursor means \"only what I have not seen\", which is what stops an agent re-ingesting its own writes as new information.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "readSince › returns only what happened after the cursor",
+      "line": 159,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "No cursor means \"give me everything\", which is what a fresh agent needs.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "readSince › returns the whole log when given no cursor",
+      "line": 146,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The bump and the insert share a transaction, so the map's own revision must agree with the last event written.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "recordEvents › leaves the map at the revision of its last event",
+      "line": 72,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The revision must advance once per event and the returned events must carry the revisions they were given, or an agent's cursor points at nothing.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "recordEvents › mints one revision per event and returns them in order",
+      "line": 59,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty batch is not an error — it is a caller whose plan produced no changes, and it must not move the revision.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "recordEvents › records nothing and holds the revision for an empty batch",
+      "line": 122,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Writing to a map that does not exist must fail loudly rather than minting a revision nobody can read.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "recordEvents › refuses to write against an unknown map",
+      "line": 134,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A retry must see everything the first attempt wrote, not just its first row.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "recordEvents › returns every event the original call wrote on a retry",
+      "line": 101,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The idempotency key is what makes an agent's retry safe. Without it a timed-out call that is retried inserts the same nodes twice.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "recordEvents › treats a repeated requestId as a no-op and returns the original revision",
+      "line": 83,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Order is the point of an ordered log.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › keeps events in the order given, one per line",
+      "line": 84,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The revision leads because it is what the agent passes back as its cursor.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › leads every line with the revision, kind and origin",
+      "line": 30,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty string is not a gist — appending a bare dash would be noise.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › omits the dash when the readable field is empty",
+      "line": 77,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`label` wins over the others so a node event reads as the node, not as whatever incidental text happens to ride along with it.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › prefers the label when an event carries several readable fields",
+      "line": 56,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An agent that asked for a delta and got nothing must be told so plainly — an empty string reads as a broken tool.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › says so when nothing happened",
+      "line": 25,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Each kind carries its readable part under a different key. A wall of bare kinds would tell the agent nothing about what actually changed.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › shows the gist from whichever field the kind uses",
+      "line": 39,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A payload that failed to decode arrives as null. One bad row must not take down the agent's whole catch-up read.",
+      "file": "app/lib/exchangeFormat.test.ts",
+      "format": "vitest",
+      "key": "renderEvents › still renders an event whose payload is null or empty",
+      "line": 65,
+      "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
     {
@@ -901,6 +1423,87 @@
       "runner": "tests"
     },
     {
+      "description": "If a door registers a different set, agents get different capabilities depending on how they connected — the drift this catalog exists to prevent.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "the shared tool catalog › exposes exactly the tools every front door shares",
+      "line": 17,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every door resolves tools through this lookup, and an unknown name must come back empty so the caller can answer rather than crash.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "the shared tool catalog › finds a tool by name and reports nothing for an unknown one",
+      "line": 46,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every tool needs a description the agent can act on — an empty one makes the tool unusable however correct its implementation is.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "the shared tool catalog › gives every tool a title and a description",
+      "line": 53,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A page is already scoped to one map, so these two would be meaningless there. They belong to the server doors only.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "the shared tool catalog › leaves the whole-collection tools out of the shared set",
+      "line": 31,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An agent decides whether it may call a tool speculatively from this hint.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "the shared tool catalog › marks the two read-only tools as read-only",
+      "line": 38,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The cap is what stops a confused agent pinning a connection open forever.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "timeoutMsFrom › caps a timeout longer than the ceiling",
+      "line": 74,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Most agents will not pass one, so the default is the value that actually governs how long a person has to answer.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "timeoutMsFrom › falls back to the default when the agent names no timeout",
+      "line": 64,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A zero or negative wait would make the tool a busy-loop rather than a wait.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "timeoutMsFrom › floors a zero or negative timeout at one second",
+      "line": 79,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An agent that knows its own patience should get exactly what it asked for.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
+      "line": 69,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
       "description": "The stored role column is a free string; an assistant turn must survive as one or the conversation loses its shape on the next request.",
       "file": "app/lib/turnInterpreter.test.ts",
       "format": "vitest",
@@ -925,6 +1528,177 @@
       "key": "toMessageParams › treats an unrecognised role as a user turn",
       "line": 139,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "What a driver or a browser agent lists. It must match the catalog exactly, since a tool missing here is a tool the agent never knows it can call.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "toolSummaries › summarises every catalog tool with a name, title and description",
+      "line": 159,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "These three are what the contribution affordances post. Narrowing this set would silently drop a person's contribution on the floor.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "user-writable event kinds › accepts the three kinds a person can contribute",
+      "line": 40,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The agent's own kinds are minted by the tools. Accepting one from the browser would let a page forge the other side of the conversation.",
+      "file": "app/lib/exchange.test.ts",
+      "format": "vitest",
+      "key": "user-writable event kinds › refuses the kinds only an agent may write",
+      "line": 48,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A tool whose fields are all optional must accept an omitted payload rather than forcing the agent to send an empty object.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › accepts a missing payload for a tool that needs no arguments",
+      "line": 41,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The happy path returns the parsed input, so defaults and coercions the schema applies are what actually reach the server.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › accepts input that fits the tool and hands back the parsed value",
+      "line": 30,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The message has to name the offending field, or the agent can only guess at what to change.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › names the field that did not fit",
+      "line": 47,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A required field left out is the other common agent mistake.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › rejects a call missing a required field",
+      "line": 57,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The controlled vocabulary is what keeps the map drawable: a kind the map cannot render must never reach the database.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › rejects a node kind the map cannot draw",
+      "line": 64,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The phase drives the nav; one outside the loop would leave the workspace with no step marked active.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › rejects a phase outside the loop",
+      "line": 73,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A name the catalog does not know must come back as an answer, not a throw, or one bad call takes down the whole binding.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "validateToolInput › rejects a tool the catalog does not define",
+      "line": 19,
+      "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The agent's own writes must not wake it — otherwise an agent that posts a note wakes itself and never actually waits for the person.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForUserActivity › does not wake on the agent’s own writes",
+      "line": 229,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An event may already be waiting. A waiter that subscribed before checking would sleep through it and time out with the answer already on disk.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForUserActivity › returns immediately when the person already acted",
+      "line": 217,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The timeout must RESOLVE, not hang and not throw. This is the guarantee an earlier unref'd-deadline bug broke: the promise simply never settled.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForUserActivity › times out cleanly with a resume cursor when nobody acts",
+      "line": 261,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The wake path: a user write during the wait must be delivered.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForUserActivity › wakes and returns the user’s events when they act during the wait",
+      "line": 244,
+      "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "This is the string every codeyam preview and captured scenario shows. It has to read as an expected condition, not as a failure.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "webMcpUnavailableReason › names the iframe",
+      "line": 84,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Each reason names a different fix, so they must not collapse into one generic \"unavailable\" the person cannot act on.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "webMcpUnavailableReason › names the insecure context",
+      "line": 77,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Naming the version requirement is the difference between a person knowing what to do next and assuming the page is broken.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "webMcpUnavailableReason › names the missing browser agent",
+      "line": 91,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A bound page must return null, since the UI shows this string only when there is genuinely something wrong to report.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "webMcpUnavailableReason › reports nothing to explain when the page is bound",
+      "line": 70,
+      "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The security gates are checked before the agent gate, so an insecure page is told to fix that first rather than being sent hunting for a browser.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "webMcpUnavailableReason › reports the security problem first when several apply",
+      "line": 98,
+      "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     }
   ],

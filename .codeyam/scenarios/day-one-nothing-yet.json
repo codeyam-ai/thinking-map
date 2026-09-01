@@ -9,7 +9,8 @@
   "seed": {
     "mapNode": [],
     "message": [],
-    "thinkingMap": []
+    "thinkingMap": [],
+    "mapEvent": []
   },
   "scenarioType": "application",
   "pageFilePath": "app/page.tsx",

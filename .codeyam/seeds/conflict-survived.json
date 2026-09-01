@@ -1,0 +1,189 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-conflict",
+      "title": "Somewhere to put half-finished thoughts",
+      "seedIdea": "I want somewhere to put half-finished thoughts so they stop rattling around, but I don't want another inbox to feel guilty about.",
+      "phase": "explore",
+      "revision": 12
+    }
+  ],
+  "message": [
+    {
+      "id": "cm-1",
+      "mapId": "map-conflict",
+      "role": "user",
+      "origin": "user",
+      "content": "I want somewhere to put half-finished thoughts so they stop rattling around, but I don't want another inbox to feel guilty about."
+    },
+    {
+      "id": "cm-2",
+      "mapId": "map-conflict",
+      "role": "assistant",
+      "origin": "agent",
+      "content": "The guilt is the constraint, not the storage. A place that never asks anything of you is a different product from a place that keeps a queue."
+    }
+  ],
+  "mapNode": [
+    {
+      "id": "cn-idea",
+      "mapId": "map-conflict",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Somewhere for half-finished thoughts",
+      "status": "answered",
+      "order": 0,
+      "origin": "user"
+    },
+    {
+      "id": "cn-con",
+      "mapId": "map-conflict",
+      "parentId": "cn-idea",
+      "kind": "constraint",
+      "label": "Must never accrue guilt",
+      "detail": "No unread count, no streak, no backlog that grows while you are not looking.",
+      "status": "answered",
+      "order": 0,
+      "origin": "agent"
+    },
+    {
+      "id": "cn-appr",
+      "mapId": "map-conflict",
+      "parentId": "cn-idea",
+      "kind": "approach",
+      "label": "A compost heap, not an inbox",
+      "detail": "The person rewrote this themselves. An agent later tried to replace it with 'A capture-first note store' against a stale revision; the write was declined, so their wording is what stands.",
+      "status": "updated",
+      "order": 1,
+      "origin": "user"
+    },
+    {
+      "id": "cn-pro",
+      "mapId": "map-conflict",
+      "parentId": "cn-appr",
+      "kind": "pro",
+      "label": "Nothing to keep on top of",
+      "status": "answered",
+      "order": 0,
+      "origin": "agent"
+    },
+    {
+      "id": "cn-risk",
+      "mapId": "map-conflict",
+      "parentId": "cn-appr",
+      "kind": "risk",
+      "label": "Things you wanted may rot too",
+      "status": "answered",
+      "order": 1,
+      "origin": "agent"
+    },
+    {
+      "id": "cn-q",
+      "mapId": "map-conflict",
+      "parentId": "cn-appr",
+      "kind": "open-question",
+      "label": "What should resurface, and when?",
+      "status": "open",
+      "order": 2,
+      "origin": "agent"
+    }
+  ],
+  "mapEvent": [
+    {
+      "id": "ce-1",
+      "mapId": "map-conflict",
+      "revision": 1,
+      "kind": "node.added",
+      "origin": "user",
+      "payload": "{\"id\":\"cn-idea\",\"parentId\":null,\"kind\":\"idea\",\"label\":\"Somewhere for half-finished thoughts\",\"status\":\"answered\"}"
+    },
+    {
+      "id": "ce-2",
+      "mapId": "map-conflict",
+      "revision": 2,
+      "kind": "agent.note",
+      "origin": "agent",
+      "payload": "{\"text\":\"Treating the guilt as the constraint rather than the storage.\"}"
+    },
+    {
+      "id": "ce-3",
+      "mapId": "map-conflict",
+      "revision": 3,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\":\"cn-con\",\"parentId\":\"cn-idea\",\"kind\":\"constraint\",\"label\":\"Must never accrue guilt\",\"status\":\"answered\"}"
+    },
+    {
+      "id": "ce-4",
+      "mapId": "map-conflict",
+      "revision": 4,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\":\"cn-appr\",\"parentId\":\"cn-idea\",\"kind\":\"approach\",\"label\":\"A capture-first note store\",\"status\":\"answered\"}"
+    },
+    {
+      "id": "ce-5",
+      "mapId": "map-conflict",
+      "revision": 5,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\":\"cn-pro\",\"parentId\":\"cn-appr\",\"kind\":\"pro\",\"label\":\"Nothing to keep on top of\",\"status\":\"answered\"}"
+    },
+    {
+      "id": "ce-6",
+      "mapId": "map-conflict",
+      "revision": 6,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\":\"cn-risk\",\"parentId\":\"cn-appr\",\"kind\":\"risk\",\"label\":\"Things you wanted may rot too\",\"status\":\"answered\"}"
+    },
+    {
+      "id": "ce-7",
+      "mapId": "map-conflict",
+      "revision": 7,
+      "kind": "phase.set",
+      "origin": "agent",
+      "payload": "{\"phase\":\"explore\"}"
+    },
+    {
+      "id": "ce-8",
+      "mapId": "map-conflict",
+      "revision": 8,
+      "kind": "user.node",
+      "origin": "user",
+      "payload": "{\"id\":\"cn-appr\",\"label\":\"A compost heap, not an inbox\",\"status\":\"updated\"}"
+    },
+    {
+      "id": "ce-9",
+      "mapId": "map-conflict",
+      "revision": 9,
+      "kind": "user.note",
+      "origin": "user",
+      "payload": "{\"text\":\"Capture-first is the thing I already bounced off. It has to rot.\"}"
+    },
+    {
+      "id": "ce-10",
+      "mapId": "map-conflict",
+      "revision": 10,
+      "kind": "agent.note",
+      "origin": "agent",
+      "payload": "{\"text\":\"I tried to rename that node from revision 7 and the write was declined - your wording stands. Reading again from 9.\"}"
+    },
+    {
+      "id": "ce-11",
+      "mapId": "map-conflict",
+      "revision": 11,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\":\"cn-q\",\"parentId\":\"cn-appr\",\"kind\":\"open-question\",\"label\":\"What should resurface, and when?\",\"status\":\"open\"}"
+    },
+    {
+      "id": "ce-12",
+      "mapId": "map-conflict",
+      "revision": 12,
+      "kind": "question.asked",
+      "origin": "agent",
+      "payload": "{\"questions\":[{\"id\":\"cn-q\",\"text\":\"What should resurface, and when?\"}]}"
+    }
+  ]
+}

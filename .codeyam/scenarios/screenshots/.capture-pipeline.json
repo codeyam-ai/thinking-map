@@ -7,6 +7,7 @@
   "bulletcard-default": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "bulletcard-empty": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "complete-what-to-do-next": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
+  "conflict-declined-the-person-rewording-survived": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "conversationpanel-default": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "conversationpanel-empty": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "day-one-nothing-yet": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
@@ -35,6 +36,7 @@
   "mapnodepill-rootidea": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "mapworkspace-default": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "mapworkspace-seeded": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
+  "mid-exchange-agent-and-human-on-one-map": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "nextstepstrack-default": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "nextstepstrack-empty": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "one-saved-map": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
@@ -68,5 +70,9 @@
   "userbubble-default": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "userbubble-long": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "userbubble-short": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
+  "webmcpbridge-awaitinganswer": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
+  "webmcpbridge-manyquestions": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
+  "webmcpbridge-noagent": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
+  "webmcpbridge-onequestion": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7",
   "wordmark-default": "f4ceb2ec3df1184a4e259e0600ca2eb92746923a635931326723af146b5a7ef7"
 }

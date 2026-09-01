@@ -1,0 +1,18 @@
+{
+  "surface": "WebMcpBridge",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "unavailable",
+      "value": "true",
+      "rationale": "source-derived state unavailable=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "unavailable",
+      "value": "false",
+      "rationale": "source-derived state unavailable=false",
+      "status": "covered"
+    }
+  ]
+}

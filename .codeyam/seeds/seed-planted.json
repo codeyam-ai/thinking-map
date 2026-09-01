@@ -4,7 +4,8 @@
       "id": "map-game",
       "title": "Educational game for kids",
       "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-      "phase": "deconstruct"
+      "phase": "deconstruct",
+      "revision": 5
     }
   ],
   "message": [
@@ -12,19 +13,99 @@
       "id": "msg-1",
       "mapId": "map-game",
       "role": "user",
-      "content": "I want to build an educational game for kids, but I don't know what it should be."
+      "content": "I want to build an educational game for kids, but I don't know what it should be.",
+      "origin": "user"
     },
     {
       "id": "msg-2",
       "mapId": "map-game",
       "role": "assistant",
-      "content": "Interesting. Before thinking about the game itself, there are three things I'd like to understand:\nWho is this actually for?\nWhat are you hoping they learn?\nAnd what are they doing instead today?"
+      "content": "Interesting. Before thinking about the game itself, there are three things I'd like to understand:\nWho is this actually for?\nWhat are you hoping they learn?\nAnd what are they doing instead today?",
+      "origin": "agent"
     }
   ],
   "mapNode": [
-    { "id": "n-idea", "mapId": "map-game", "parentId": null, "kind": "idea", "label": "Educational game for kids", "status": "answered", "order": 0 },
-    { "id": "n-who", "mapId": "map-game", "parentId": "n-idea", "kind": "open-question", "label": "Who is it for?", "status": "open", "order": 0 },
-    { "id": "n-what", "mapId": "map-game", "parentId": "n-idea", "kind": "open-question", "label": "What's the problem?", "status": "open", "order": 1 },
-    { "id": "n-goal", "mapId": "map-game", "parentId": "n-idea", "kind": "open-question", "label": "What's the goal?", "status": "open", "order": 2 }
+    {
+      "id": "n-idea",
+      "mapId": "map-game",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Educational game for kids",
+      "status": "answered",
+      "order": 0,
+      "origin": "user"
+    },
+    {
+      "id": "n-who",
+      "mapId": "map-game",
+      "parentId": "n-idea",
+      "kind": "open-question",
+      "label": "Who is it for?",
+      "status": "open",
+      "order": 0,
+      "origin": "agent"
+    },
+    {
+      "id": "n-what",
+      "mapId": "map-game",
+      "parentId": "n-idea",
+      "kind": "open-question",
+      "label": "What's the problem?",
+      "status": "open",
+      "order": 1,
+      "origin": "agent"
+    },
+    {
+      "id": "n-goal",
+      "mapId": "map-game",
+      "parentId": "n-idea",
+      "kind": "open-question",
+      "label": "What's the goal?",
+      "status": "open",
+      "order": 2,
+      "origin": "agent"
+    }
+  ],
+  "mapEvent": [
+    {
+      "id": "ev-map-game-1",
+      "mapId": "map-game",
+      "revision": 1,
+      "kind": "node.added",
+      "origin": "user",
+      "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
+    },
+    {
+      "id": "ev-map-game-2",
+      "mapId": "map-game",
+      "revision": 2,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"n-who\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"Who is it for?\", \"status\": \"open\"}"
+    },
+    {
+      "id": "ev-map-game-3",
+      "mapId": "map-game",
+      "revision": 3,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"n-what\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the problem?\", \"status\": \"open\"}"
+    },
+    {
+      "id": "ev-map-game-4",
+      "mapId": "map-game",
+      "revision": 4,
+      "kind": "node.added",
+      "origin": "agent",
+      "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the goal?\", \"status\": \"open\"}"
+    },
+    {
+      "id": "ev-map-game-5",
+      "mapId": "map-game",
+      "revision": 5,
+      "kind": "phase.set",
+      "origin": "agent",
+      "payload": "{\"phase\": \"deconstruct\"}"
+    }
   ]
 }

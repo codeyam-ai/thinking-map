@@ -37,12 +37,20 @@ model ThinkingMap {
   /// Which stage of the loop this map has reached:
   /// idea | deconstruct | map | research | explore | next-steps
   phase    String @default("idea")
+  /// Monotonic change counter, bumped once per committed change in the same
+  /// transaction as the write. This is the cursor an agent reads with, and the
+  /// only shared notion of "now" across all three front doors. It is a column
+  /// rather than an in-memory counter precisely because the stdio MCP server
+  /// runs in a different process from Next — a process-local counter would
+  /// hand two front doors two different answers.
+  revision Int    @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   messages Message[]
   nodes    MapNode[]
+  events   MapEvent[]
 }
 
 model Message {
@@ -51,6 +59,9 @@ model Message {
   map     ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
   /// user | assistant
   role    String
+  /// user | agent — who actually produced this turn. Distinct from `role`,
+  /// which is the chat transcript position the model sees.
+  origin  String @default("agent")
   content String
 
   createdAt DateTime @default(now())
@@ -84,10 +95,65 @@ model MapNode {
   sourceUrl String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
+  /// user | agent. Without this an agent re-reading the map cannot tell its
+  /// own writes from the person's, and will re-ingest its own output as new
+  /// information. It is also what lets the UI mark what the person contributed.
+  origin    String  @default("agent")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([mapId])
   @@index([parentId])
+}
+
+// ──────────────────────────────────────────────
+// The exchange log
+//
+// WebMCP is pull-only: a page cannot wake an agent, and there is no push
+// channel. So the give-and-take between the person and the agent has to be
+// built out of a durable, ordered, resumable record that either side can read
+// at any time — which is this table.
+//
+// One append-only log rather than three mechanisms, because the agent's
+// delta, the inbox of unread user contributions, and the activity feed the UI
+// renders are the same question asked three ways: "what happened after
+// revision N?". It also covers node deletion, which a diff over MapNode rows
+// cannot see at all.
+// ──────────────────────────────────────────────
+
+model MapEvent {
+  id    String      @id @default(cuid())
+  mapId String
+  map   ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+
+  /// The map revision this event created. Ordered and gapless per map, so a
+  /// reader that has seen revision N can ask for everything after it.
+  revision Int
+  /// node.added | node.updated | phase.set | agent.note
+  /// | question.asked | user.answer | user.note | user.node
+  kind     String
+  /// user | agent — which side of the exchange produced this.
+  origin   String
+  /// Event-specific JSON. Kept as a string because SQLite has no JSON column
+  /// type; the shapes live in app/lib/exchange.ts.
+  payload  String
+  /// Idempotency key, carried by EVERY row a single call wrote. A retried tool
+  /// call with the same requestId is a no-op that returns the original batch
+  /// and its last revision, rather than a duplicate write.
+  ///
+  /// Keyed per row rather than per batch because the retry needs the batch's
+  /// extent: with only the first row keyed, a retry hands back the first
+  /// revision as the resume cursor and the agent re-reads the rest of its own
+  /// batch as new information. Uniqueness therefore includes `revision` — the
+  /// duplicate a retry could create is caught by the in-transaction lookup in
+  /// `recordEvents`, which runs inside SQLite's serialized write lock.
+  requestId String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([mapId, revision])
+  @@unique([mapId, requestId, revision])
+  @@index([mapId, revision])
+  @@index([mapId, requestId])
 }

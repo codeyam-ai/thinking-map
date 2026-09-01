@@ -56,6 +56,61 @@
       "key-interaction": {
         "status": "covered"
       }
+    },
+    "MapWorkspace": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The workspace is server-rendered from the map, so it has no in-flight state of its own. The only work-in-progress a person sees on this surface belongs to the reply box while a turn is running, which is captured separately as ReplyForm - Busy."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The workspace renders whatever the map contains and has no failure state: a missing map is a 404 before this view mounts, and the one error a person actually meets - no model credential configured - is raised by the reply box and captured as ReplyForm - WithError."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
+    "WebMcpBridge": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "covered"
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The bridge has no error surface: a tool fault is returned to the AGENT as isError in the tool result, and a conflict or timeout is deliberately a normal result rather than an error. Nothing about a failure renders on the page, so there is no error state for a person to see here."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
     }
   }
 }

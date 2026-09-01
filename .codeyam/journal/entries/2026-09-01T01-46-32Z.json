@@ -1,0 +1,459 @@
+{
+  "timestamp": "2026-09-01T01:46:32Z",
+  "title": "WebMCP Exchange Spine",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThinking Map currently has two front doors — the browser UI (with an in-page chat\nthat calls Anthropic server-side) and an MCP server on HTTP/stdio. The product is\nbeing repositioned as a **WebMCP** app: the agent lives in the user's browser\n(Chrome 146+ `navigator.modelContext`), the conversation happens in the agent's own\nsurface, and this page is the shared artifact both parties work on. That inverts the\ndata flow. The agent no longer owns the whole loop — the user edits the map directly,\nand the agent has to find out. WebMCP is pull-only: a page cannot wake an agent, and\nthere is no push channel. So the exchange has to be built out of a durable, ordered,\nresumable record that either side can read at any time.\n\nThis plan builds that spine and binds it to WebMCP. A monotonic per-map `revision`\nand an append-only `MapEvent` log turn every change — agent or human — into an ordered\nfact with an origin. One tool catalog defines the tools once and is consumed by both\nthe existing server MCP and the new page-side WebMCP binding, so a third front door\ncannot drift from the other two. Two tools carry the give-and-take specifically:\n`ask_user`, which pauses the agent's turn via `client.requestUserInteraction` until the\nperson answers in the page, and `await_user_activity`, a bounded long-poll so an idle\nagent can wait on the human instead of busy-polling. No UI changes here; the chat-free\nsurface and the contribution affordances are the follow-on plan.\n\n## Key Decisions\n\n- **One append-only `MapEvent` log, not three mechanisms.** Deltas for the agent, the\n  inbox of unread user contributions, and the activity feed the UI will render are the\n  same question asked three ways: \"what happened after revision N?\". One table answers\n  all three, and it also covers node deletion, which a diff over `MapNode` rows cannot.\n- **Revision is a column on `ThinkingMap`, bumped in the same transaction as the write** —\n  not an in-memory counter. The stdio MCP server runs in a separate process from Next;\n  a process-local counter would hand two front doors two different notions of \"now\".\n- **`await_user_activity` = in-process emitter + a bounded poll.** The emitter makes the\n  same-process case instant; the poll (every ~500ms, under the caller's timeout) is what\n  makes a write from the stdio process still wake a waiter in the web process. Emitter\n  alone would be silently correct in dev and silently wrong across front doors.\n- **Every waiting tool is bounded and resumable.** `ask_user` and `await_user_activity`\n  take a timeout and, on expiry, return `status: \"pending\"` with the cursor to resume\n  from — never a hang. An agent that gives up mid-question loses nothing: the question\n  stays on screen and the answer lands in the log for the next read.\n- **Conflicts are results, not errors.** `update_node` takes an optional\n  `expectedRevision`; if the human changed that node since, the tool returns a normal\n  content result describing both versions and declines the write. Last-write-wins would\n  silently erase what the user typed — the exact failure this plan exists to prevent.\n- **`origin: \"user\" | \"agent\"` on nodes and events.** Without it an agent re-reading the\n  map cannot tell its own writes from the human's, and will re-ingest its own output as\n  new information. It is also what lets the UI mark what the person contributed.\n- **A thin adapter around `navigator.modelContext`, not direct calls at call sites.**\n  The spec is a W3C Community Group draft and has already moved once — `provideContext()`\n  was removed in the March 2026 revision in favour of `registerTool()`/`unregisterTool()`,\n  and the `@mcp-b/global` polyfill still exposes the older convention. Isolating the\n  binding in one file means the next revision is one edit, not a sweep.\n- **A headless driver seam (`window.__thinkingMapAgent`) ships with the binding.**\n  WebMCP is top-level secure-context only, and codeyam renders the app inside a capture\n  iframe, so `navigator.modelContext` is genuinely absent in every preview and scenario.\n  The driver calls the same catalog entries the real agent would, so the tools are\n  exercisable without a browser agent. The visible dev panel that drives it belongs to\n  the follow-on UI plan.\n- **Server MCP keeps `mapId` arguments; page tools bind the current map.** A page is\n  already scoped to one map, so making the agent pass an id it cannot see would be a\n  needless failure mode. Same catalog, different context injection.\n\n## Implementation\n\n### 1. Revision, origin, and the event log\n\n**File**: `prisma/schema.prisma`\n\nAdd `revision Int @default(0)` to `ThinkingMap` — monotonic, bumped once per committed\nchange. Add `origin String @default(\"agent\")` to `MapNode` and to `Message`.\n\nAdd a `MapEvent` model: `id`, `mapId` (cascade), `revision Int`, `kind String`,\n`origin String`, `payload String` (JSON), `requestId String?`, `createdAt`. Index\n`[mapId, revision]`, unique on `[mapId, revision]` and on `[mapId, requestId]` — the\nsecond is the idempotency key that makes an agent's retry a no-op rather than a\nduplicate. Event kinds: `node.added`, `node.updated`, `phase.set`, `agent.note`,\n`question.asked`, `user.answer`, `user.note`, `user.node`.\n\nExtend `.codeyam/seeds/*.json` handling and `prisma/seed.ts` so seeded maps carry a\ncoherent `revision` and a short event history — otherwise every seeded scenario starts\nwith an empty log and the follow-on UI has nothing to render.\n\n### 2. The exchange module\n\n**New file**: `app/lib/exchange.ts`\n\nThe one place revisions are minted and events are read.\n\n- `recordEvents(mapId, events[], { requestId })` — inside a single transaction, bumps\n  `ThinkingMap.revision` once per event and inserts the rows; returns the new revision.\n  A repeat `requestId` returns the original revision without writing.\n- `readSince(mapId, cursor)` — `{ revision, events[] }`, ordered. `cursor` omitted means\n  the full current state.\n- `waitForUserActivity(mapId, cursor, timeoutMs)` — re-checks the log first (an event may\n  already be waiting), then races an in-process emitter against a ~500ms poll and the\n  caller's timeout. Resolves `{ events, revision }` or `{ timedOut: true, revision }`.\n- A small `mapEvents` emitter, fired by `recordEvents`.\n\n### 3. Route the existing writes through it\n\n**File**: `app/lib/mapStore.ts`\n\n`applyToolCalls` currently writes nodes and phase directly. Have it emit the matching\nevents in the same transaction and accept an `origin`. `createMap` records a\n`node.added` event for the root and sets revision 1. Keep `planMapMutations` untouched —\nthe pure planning layer is already right; this is the executor gaining a second output.\n\n### 4. One tool catalog for every front door\n\n**New file**: `app/lib/toolCatalog.ts`\n\nAn array of `{ name, title, description, inputSchema (zod), annotations, run(ctx, input) }`\nwhere `ctx = { mapId, origin, client? }`. Tools:\n\n- `read_map({ sinceRevision? })` — full map or delta, plus the current revision.\n  `readOnlyHint`. Renders through the existing `formatMapDetail`.\n- `add_nodes({ nodes, requestId? })`, `update_node({ id, …, expectedRevision?, requestId? })`,\n  `set_phase({ phase })` — the current three, now returning the new revision, and\n  `update_node` returning a conflict result rather than clobbering.\n- `post_note({ text })` — the agent's one-line \"what I changed and why\". This is what\n  replaces the assistant chat bubble: a note attached to the map, not a conversation.\n- `ask_user({ questions[], timeoutSeconds? })` — writes `open-question` nodes, raises the\n  questions in the page, and awaits the answers.\n- `await_user_activity({ sinceRevision, timeoutSeconds? })` — the bounded long-poll.\n\n`list_thinking_maps` and `create_thinking_map` stay server-door-only; the page is already\non a map.\n\n### 5. Rebuild the server MCP on the catalog\n\n**File**: `app/lib/mcpServer.ts`\n\nReplace the six hand-registered tools with a loop over the catalog, injecting\n`mapId` from each tool's input and `origin: \"agent\"`. Keep `textResult` and the\n`nodeShape` schema, which move to the catalog. `app/api/mcp/route.ts` and `mcp/stdio.ts`\nneed no change — they consume `buildMcpServer`. `ask_user` over the server door has no\npage to raise questions in, so it degrades to writing the question nodes and returning\nimmediately with the cursor to poll.\n\n### 6. The WebMCP binding\n\n**New file**: `app/lib/webmcp.ts`\n\nThe adapter, and the only file that names `navigator.modelContext`.\n\n- `isWebMcpAvailable()` — `'modelContext' in navigator`, `window.isSecureContext`, and\n  `window.top === window` (top-level only; the codeyam capture iframe fails this by\n  design).\n- `bindTools(tools, ctx)` — registers each via `registerTool`, falling back to the\n  `provideContext` polyfill shape when only that exists; returns a disposer that calls\n  `unregisterTool` for each name. Re-registering a live name throws `InvalidStateError`,\n  so unregister-then-register is the only safe update path.\n- Results marshalled to MCP shape: `{ content: [{ type: 'text', text }], structuredContent }`.\n  `isError` is reserved for genuine faults — a conflict or a timeout is a normal result\n  the agent is expected to reason about.\n- Agent input is untrusted: every call is validated against the tool's zod schema before\n  it reaches `run`, and a validation failure returns a readable message rather than throwing.\n- In dev, always publish `window.__thinkingMapAgent = { listTools, callTool }` over the\n  same bound catalog, whether or not a real agent is present.\n\n### 7. The bridge component\n\n**New file**: `app/components/WebMcpBridge.tsx`\n\nA client component mounted by the map page. Binds the catalog for the current `mapId` on\nmount, disposes on unmount and on map change. Holds the pending-`ask_user` state and\nexposes it via context so the follow-on UI can render the questions and resolve the\npromise. Wraps the wait in `client.requestUserInteraction(...)` when the running agent\nprovides one, so the browser knows to bring the page forward. Reports connection state\n(`unavailable | connected | working`) through the same context.\n\n### 8. HTTP surface for page-side writes\n\n**New file**: `app/api/maps/[id]/exchange/route.ts`\n\n`GET ?since=<revision>` returns `readSince`; `POST` records a user-origin event\n(`user.answer`, `user.note`, `user.node`). The tools run in the page but the log lives in\nSQLite, so this is how both the bridge and the follow-on UI affordances write. Validates\nthat the map exists and rejects an unknown event kind.\n\n### 9. Documentation\n\n**File**: `README.md`\n\nRewrite the \"MCP server\" section as three front doors: WebMCP in the page (what it needs —\nChrome 146+, HTTPS or localhost, top level, not an iframe), HTTP, and stdio. State plainly\nthat WebMCP is pull-only and describe the revision/cursor contract an agent should follow:\nread with a cursor, write with a `requestId`, wait with `await_user_activity`.\n\n## Reused existing code\n\n- `applyToolCalls`, `createMap`, `getMap`, `listMaps`, `summarizeMap` from\n  `app/lib/mapStore.ts` (glossary entries: `applyToolCalls`, `createMap`, `getMap`,\n  `listMaps`, `summarizeMap`) — the store stays the single write path; this plan adds\n  event emission to it rather than a parallel one.\n- `planMapMutations` from `app/lib/nodePlan.ts` (glossary entry: `planMapMutations`) —\n  pure, tested, and unchanged; the ref-resolution and ordering rules are reused verbatim.\n- `formatMapDetail`, `formatMapList` from `app/lib/mcpFormat.ts` (glossary entries:\n  `formatMapDetail`, `formatMapList`) — the text rendering every tool result uses.\n- `buildMcpServer` from `app/lib/mcpServer.ts` (glossary entry: `buildMcpServer`) —\n  kept as the server-door entry point, re-implemented over the catalog.\n- `NODE_KINDS`, `NODE_STATUSES`, `PHASES`, `isPhase` from `app/lib/mapKinds.ts` (glossary\n  entries: `isPhase`, `isNodeKind`, `isNodeStatus`) — the controlled vocabulary the new\n  tool schemas bind to, so a WebMCP agent can only emit kinds the map can draw.\n- `prisma` from `app/lib/prisma.ts` — the transaction handle the new event-recording helper runs in.\n\n**Existing-implementation survey.** Grepped the app for any existing revision, cursor,\nversion, origin, or idempotency mechanism before proposing these fields. There is none.\nThe only change marker on a map today is its updatedAt timestamp, which is not monotonic,\nis bumped once per turn rather than once per change, and records nothing about who made\nthe change. `applyToolCalls` has no dedupe path either — a retried tool call today inserts\nduplicate nodes. So the revision counter, the origin column, the idempotency key, and the\nevent-log table proposed above are all genuinely new; nothing existing is duplicated.\n\n## Scenarios to Demonstrate\n\n- A map mid-exchange: agent notes and user contributions interleaved in the log, revision\n  visible, two open questions awaiting the human.\n- The pending-question state: `ask_user` in flight, the agent's turn paused.\n- A timed-out `ask_user`: questions still on screen, agent released, nothing lost.\n- A conflict: the human edited a node the agent then tried to update with a stale\n  `expectedRevision`; both versions present, neither destroyed.\n- No agent attached (the iframe/preview case) — tools unregistered, map fully readable.\n- A map whose last three events came from the stdio front door, proving the log is shared.",
+  "description": "Built the give-and-take spine that lets a person and a browser agent work one thinking map without either clobbering the other. Every change - agent or human - now becomes an ordered event on an append-only MapEvent log, with a monotonic `revision` minted in the same transaction as the write, so all three front doors share one notion of \"now\"; `origin` on nodes and messages is what stops an agent re-ingesting its own writes as new information. The tools are declared once in app/lib/toolCatalog.ts and implemented once in app/lib/toolRuntime.ts, and the in-page WebMCP binding, the HTTP endpoint and the stdio server all execute through that single implementation, so a third front door cannot drift from the other two. `ask_user` pauses an agent's turn until the person answers in the page and `await_user_activity` is a bounded long-poll, both resumable: on expiry they return a cursor rather than hanging, so an agent that gives up loses nothing. Conflicts are results, not errors - `update_node` with a stale `expectedRevision` is declined and both versions are described back, because last-write-wins would silently erase what the person typed.\n\nSCOPE VERDICT. Delivered: nothing newly opened or closed on the project's deliverable list - all 10 rows were already resolved by the previous cycle, and this one deepens the existing \"An MCP server exposing the same planning tools over the same map data\" row rather than adding to it. That row's recorded note is now understated: it describes six hand-registered tools over mapStore, whereas the server door is now rebuilt over the shared catalog and carries nine (the seven shared tools plus list_thinking_maps and create_thinking_map, which stay server-only because a page is already scoped to one map). Deferred: nothing this cycle. One pre-existing deferral is worth re-surfacing because it was decided by the agent rather than the user - `an-mcp-server-exposing-the-same-planning-tools` carries decidedBy: agent; the only user-confirmed deferral on the list remains registering the MCP server in a client such as Claude Desktop, which belongs to the assist track.\n\nDeliberately out of scope, per the plan: no UI for the exchange itself. The chat-free surface and the contribution affordances are the follow-on plan; WebMcpBridge is a headless provider that binds the catalog, holds pending questions, and reports connection state for that UI to render.\n\nTwo real bugs were found and fixed in this work by exercising it rather than reading it. An earlier waitForUserActivity unref'd its deadline timer as well as its poll, which let Node exit with the promise unsettled - turning \"wait, then time out cleanly\" into an agent call that silently never returns. And recordEvents stamped its idempotency key on only the first row of a batch, so a retry returned one event and, worse, a stale resume cursor - making the agent re-read the rest of its own batch as new, the exact failure this spine exists to prevent. Both now carry tests.\n\nOne architectural correction against the plan: plan section 8 named an HTTP surface for page-side writes but no transport for page-side tool EXECUTION. Executing the catalog in the browser dragged Prisma (and `fs`) into the client bundle and 500'd the map page, so the catalog was split into isomorphic declarations and a server-only runtime, with POST /api/maps/:id/tools as the page's execution hop. One definition per tool is preserved.\n\nUnrelated pre-existing finding, left untouched: app/api/__codeyam_revalidate/route.ts never resolves, because the App Router treats a leading-underscore folder as private. Nothing breaks - every page is force-dynamic, so there is no RSC cache to flush - and it is codeyam-owned scaffold, so its path was not renamed unasked.\n\nCoverage: 61 new tests across 6 files (100 passing in the changed scope), including a temp-database integration suite for the four exchange functions whose behaviour only exists against a real transaction. Six new scenarios: a map mid-exchange, a declined conflict where the person's rewording survived, and four WebMcpBridge states driven through the real ask_user path rather than staged props. All 11 pre-existing screenshots recaptured pixel-identical, confirming the schema and seed changes are visually transparent to the existing app.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/webmcp-exchange-spine.md\t.codeyam/plans/completed/webmcp-exchange-spine.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/complete-what-to-do-next.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/day-one-nothing-yet.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/grounded-research-and-its-gaps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/just-started.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/many-saved-maps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/one-saved-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/partly-answered-two-settled-one-open.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/pivoted-now-it-is-for-teachers.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/returning-four-saved-maps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/seed-planted-three-open-questions.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/sprawling-a-deep-wide-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/complete.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/day-one.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/grounded.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/just-started.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/many-saved-maps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/one-saved-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/partly-answered.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/pivoted.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/returning.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/seed-planted.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seeds/sprawling.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/56769d5e25ac417e3b9a3aa63856dfea164b6f351c78cb9dabcc8663edb14f00.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/d9d6760926f497d8e96ffe0c96b2183b268a25b519d6443e8ae755a2ddc64314.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpServer.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/conflict-declined-the-person-rewording-survived.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/webmcpbridge.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mid-exchange-agent-and-human-on-one-map.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/webmcpbridge-awaitinganswer.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/webmcpbridge-manyquestions.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/webmcpbridge-noagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/webmcpbridge-onequestion.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/seeds/conflict-survived.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/seeds/mid-exchange.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5191b6f9c7d372a7d7c718ab1e6f0ed0fc2b788a74eb42e64d414e9dbf36bc69.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b01251b8cb33420ba49a4d66b18a187eb37d24ed5e752a385817ba2f0fe0f7b0.json",
+      "status": "added"
+    },
+    {
+      "path": "app/api/maps/[id]/exchange/route.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/api/maps/[id]/tools/route.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/components/WebMcpBridge.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/WebMcpBridge/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/conflict.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/conflict.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/exchange.integration.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/exchange.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/exchange.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/exchangeFormat.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/exchangeFormat.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/toolCatalog.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/toolInvocation.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/toolInvocation.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/toolRuntime.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/webmcp.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/webmcp.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 100,
+    "passed": 100,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 100,
+        "passed": 100
+      }
+    ]
+  }
+}

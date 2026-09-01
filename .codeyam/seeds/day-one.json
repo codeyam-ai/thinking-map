@@ -1,1 +1,6 @@
-{ "thinkingMap": [], "message": [], "mapNode": [] }
+{
+  "thinkingMap": [],
+  "message": [],
+  "mapNode": [],
+  "mapEvent": []
+}
