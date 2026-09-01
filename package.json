@@ -44,5 +44,12 @@
     "tsx": "^4.19.4",
     "typescript": "^5",
     "vitest": "^3"
+  },
+  "allowScripts": {
+    "better-sqlite3": true,
+    "esbuild": true,
+    "prisma": true,
+    "unrs-resolver": true,
+    "@prisma/engines": true
   }
 }
