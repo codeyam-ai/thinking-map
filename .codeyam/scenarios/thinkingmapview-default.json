@@ -8,5 +8,11 @@
   "mocks": {},
   "componentName": "ThinkingMapView",
   "scenarioType": "component",
-  "description": "The map at the research phase, scaled to fit its panel."
+  "demonstratesState": {
+    "askedNode": "false",
+    "asking": "false",
+    "bridge": "false",
+    "panning": "false"
+  },
+  "description": "The map at the research phase, scaled to fit its panel. Rendered with no bridge, which is the isolated case: the map stays fully readable, foldable and draggable, it simply cannot be asked about - so no composer is open and no node is marked."
 }

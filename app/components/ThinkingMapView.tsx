@@ -4,8 +4,11 @@ import { useCallback, useMemo, useState } from 'react';
 import MapConnectors from './MapConnectors';
 import MapNodePill from './MapNodePill';
 import MapViewportControls from './MapViewportControls';
+import NodeQuestionComposer from './NodeQuestionComposer';
+import { useOptionalWebMcpBridge } from './WebMcpBridge';
 import { useMapViewport } from '../hooks/useMapViewport';
 import { collapsedDescendantCount, visibleNodes } from '../lib/collapse';
+import { askedNodeIds } from '../lib/exchangeRail';
 import { layoutMap, type FlatNode } from '../lib/mapLayout';
 
 /**
@@ -47,6 +50,20 @@ export default function ThinkingMapView({
     dx: number;
     dy: number;
   } | null>(null);
+  // Which node the composer is open on. One at a time: two open composers would
+  // make "which node is this about" ambiguous again, which is the exact problem
+  // a node-scoped question exists to remove.
+  const [asking, setAsking] = useState<string | null>(null);
+
+  // Optional because this same component renders in an isolated scenario, where
+  // there is no exchange to write to. Without a bridge the map is still fully
+  // readable, foldable and draggable — it simply cannot be asked about.
+  const bridge = useOptionalWebMcpBridge();
+
+  const askedIds = useMemo(
+    () => askedNodeIds(bridge?.events ?? []),
+    [bridge?.events],
+  );
 
   const arranged = useMemo(
     () =>
@@ -134,6 +151,13 @@ export default function ThinkingMapView({
     return counts;
   }, [layout.nodes, arranged]);
 
+  // Resolved against the LAID-OUT nodes, so a composer whose node has since
+  // been folded away simply stops rendering rather than hanging over empty
+  // canvas pointing at nothing.
+  const askedNode = asking
+    ? layout.nodes.find((node) => node.id === asking)
+    : undefined;
+
   // `min-w-0` below is load-bearing: a flex item defaults to `min-width: auto`,
   // so without it the panel grows to the map's full width instead of scrolling,
   // and the overflow is silently clipped out of reach.
@@ -192,8 +216,29 @@ export default function ThinkingMapView({
                   onDragMove={dragMove}
                   onNudge={nudge}
                   onToggleCollapse={toggleCollapse}
+                  onAsk={bridge ? setAsking : undefined}
+                  asked={askedIds.has(node.id)}
                 />
               ))}
+
+              {/* Anchored inside the plane so it travels with the node when the
+                  map is panned or zoomed, rather than floating over a pill that
+                  has since moved out from under it. */}
+              {askedNode ? (
+                <div
+                  className="absolute z-30"
+                  style={{
+                    left: askedNode.x,
+                    top: askedNode.y + askedNode.height + 12,
+                  }}
+                >
+                  <NodeQuestionComposer
+                    nodeId={askedNode.id}
+                    label={askedNode.label}
+                    onClose={() => setAsking(null)}
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         )}

@@ -127,6 +127,60 @@
       "runner": "tests"
     },
     {
+      "description": "The kind has to be in the accepted set at all — this is what makes it wake an agent parked on await_user_activity rather than sitting inert.",
+      "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "format": "vitest",
+      "key": "POST /api/maps/:id/exchange — user.question › accepts user.question as a user-writable kind",
+      "line": 169,
+      "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Asking about a node must not change it. The person has not decided anything yet, so marking, reopening or reordering the node would be the route inventing an act they did not perform.",
+      "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "format": "vitest",
+      "key": "POST /api/maps/:id/exchange — user.question › leaves the node it asks about untouched",
+      "line": 155,
+      "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, and the reason the label is denormalised: the rail names the node, and it should not have to re-query per row to do it.",
+      "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "format": "vitest",
+      "key": "POST /api/maps/:id/exchange — user.question › records the question with the node label resolved",
+      "line": 96,
+      "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The check that matters. A node on somebody else's map must be refused, not logged here — otherwise the ownership boundary the route already keeps for the map itself has a hole in it at the payload.",
+      "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "format": "vitest",
+      "key": "POST /api/maps/:id/exchange — user.question › refuses a node that belongs to a different map",
+      "line": 117,
+      "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A question about a node that does not exist at all is the same refusal — there is nothing for it to be about.",
+      "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "format": "vitest",
+      "key": "POST /api/maps/:id/exchange — user.question › refuses a nodeId that names nothing",
+      "line": 130,
+      "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Without an id this is a note wearing a question's name, and the agent is back to guessing which pill was meant.",
+      "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "format": "vitest",
+      "key": "POST /api/maps/:id/exchange — user.question › refuses a question with no nodeId",
+      "line": 142,
+      "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "Folding is a reading posture, so it has to be reversible in place.",
       "file": "app/components/ThinkingMapView.render.test.tsx",
       "format": "vitest",
@@ -349,6 +403,123 @@
       "key": "approxPages › scales with length",
       "line": 81,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The label has to change too. A send control reading \"Ask the agent\" with nothing attached is the exact overpromise this module exists to prevent.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › drops the promise of a reply from the send label when nothing is attached",
+      "line": 25,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "With someone listening the control should say what it does — ask — rather than the neutral \"send\" that reads the same in both worlds.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › names the agent in the send label when one is listening",
+      "line": 12,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Guarding the negative directly: no branch may promise an answer from an agent that is not there.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › never claims an agent will answer when none is attached",
+      "line": 37,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Both branches must be usable copy — an empty string would render as a control with no label and a blank line where the honesty should be.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › returns non-empty copy in both states",
+      "line": 44,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The wake is the real mechanism and worth saying, because it is what makes asking different from leaving a note.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › says asking wakes the agent when one is listening",
+      "line": 31,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point: absence is stated, not glossed over.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › says plainly that no agent is attached when none is",
+      "line": 17,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The two states must be distinguishable, or the UI is not actually telling the person which case they are in.",
+      "file": "app/lib/askPresence.test.ts",
+      "format": "vitest",
+      "key": "askPresence › says something different in each state",
+      "line": 54,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Several nodes asked about across a session all keep their marks.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "askedNodeIds › collects every distinct node across the log",
+      "line": 395,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: the id travels in the payload, which is the whole reason this is its own kind rather than a note with a name in the prose.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "askedNodeIds › collects the node a question names",
+      "line": 357,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A node asked about twice is still one marked node — the mark says whether, not how many.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "askedNodeIds › counts a node asked about twice only once",
+      "line": 370,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every other kind in the log must leave the marks alone — notes and answers carry node ids too, and marking those would badge half the map.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "askedNodeIds › ignores every other kind of event",
+      "line": 380,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A map nobody has touched yet must produce no rows at all, so the rail can show its own explanation of how anything gets into it.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "askedNodeIds › is empty for an empty log",
+      "line": 334,
+      "registeredAt": "2026-09-01T14:56:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A payload that lost its id must not throw and must not mark anything — one unattributable question should not take the marks off the rest.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "askedNodeIds › skips a question with a missing or non-string nodeId",
+      "line": 405,
+      "registeredAt": "2026-09-01T14:56:54Z",
       "runner": "tests"
     },
     {
@@ -734,7 +905,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeEvent › carries a note through as text",
-      "line": 187,
+      "line": 217,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -743,8 +914,17 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeEvent › drops the phase number when reporting a phase change",
-      "line": 178,
+      "line": 208,
       "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The label is denormalised at write time, so a question whose node was since deleted still reads as something rather than falling through to the raw kind name.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › falls back to naming no node when the label is gone",
+      "line": 200,
+      "registeredAt": "2026-09-01T14:56:54Z",
       "runner": "tests"
     },
     {
@@ -752,7 +932,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeEvent › falls back when the payload carries no label",
-      "line": 254,
+      "line": 284,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -761,8 +941,17 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeEvent › names a node the person added",
-      "line": 241,
+      "line": 271,
       "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Naming the node is the entire difference between a question and a note. A row reading \"You asked a question\" would put the reader back to guessing which of twenty pills it was about.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › names the node a question was about",
+      "line": 181,
+      "registeredAt": "2026-09-01T14:56:54Z",
       "runner": "tests"
     },
     {
@@ -770,7 +959,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeEvent › shows the answer text only when a single question was answered",
-      "line": 215,
+      "line": 245,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -779,7 +968,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeEvent › singularises one question and counts several",
-      "line": 199,
+      "line": 229,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -788,7 +977,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeRun › carries the last revision in the run",
-      "line": 167,
+      "line": 168,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -797,7 +986,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeRun › counts them once there is more than one",
-      "line": 148,
+      "line": 149,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -806,7 +995,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeRun › names the node when the run is a single add",
-      "line": 139,
+      "line": 140,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -815,7 +1004,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "describeRun › says \"You\" for the person and distinguishes an update",
-      "line": 158,
+      "line": 159,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -1778,7 +1967,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "payload readers › tolerate a missing, wrong-typed, or absent payload",
-      "line": 263,
+      "line": 293,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -1994,7 +2183,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "railEntries › gives every entry a distinct id",
-      "line": 309,
+      "line": 339,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2003,7 +2192,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "railEntries › is empty for an empty log",
-      "line": 304,
+      "line": 334,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2012,7 +2201,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "railEntries › renders a full exchange as one line per act",
-      "line": 275,
+      "line": 305,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2192,7 +2381,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "runLength › extends across consecutive same-kind, same-origin events",
-      "line": 101,
+      "line": 102,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2201,7 +2390,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "runLength › never groups a kind that carries its own text",
-      "line": 122,
+      "line": 123,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2210,7 +2399,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "runLength › returns 1 past the end",
-      "line": 132,
+      "line": 133,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2219,7 +2408,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "runLength › stops at a change of side",
-      "line": 112,
+      "line": 113,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2521,6 +2710,14 @@
       "runner": "tests"
     },
     {
+      "description": "",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "the shared tool catalog › marks the two read-only tools as read-only",
+      "registeredAt": "2026-09-01T15:20:39Z",
+      "runner": "tests"
+    },
+    {
       "description": "The cap is what stops a confused agent pinning a connection open forever.",
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
@@ -2651,7 +2848,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "visibleEvents › hides the node.updated that an answer closed",
-      "line": 58,
+      "line": 59,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2660,7 +2857,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "visibleEvents › hides the question nodes that a question.asked announced",
-      "line": 35,
+      "line": 36,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2669,7 +2866,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "visibleEvents › keeps a question node that nothing announced",
-      "line": 49,
+      "line": 50,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2678,7 +2875,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "visibleEvents › keeps a user update that is not the answer close",
-      "line": 86,
+      "line": 87,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -2687,7 +2884,7 @@
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
       "key": "visibleEvents › keeps an agent update to a node the person answered",
-      "line": 72,
+      "line": 73,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },

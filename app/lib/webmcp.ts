@@ -34,11 +34,34 @@ interface RegisterToolDescriptor {
   execute(args: unknown): Promise<McpToolResponse>;
 }
 
+interface RegisterResourceDescriptor {
+  uri: string;
+  name: string;
+  description: string;
+  mimeType?: string;
+  read(): Promise<{ contents: { uri: string; text: string }[] }>;
+}
+
 interface ModelContextLike {
   registerTool?(descriptor: RegisterToolDescriptor): unknown;
   unregisterTool?(name: string): unknown;
   /** The pre-March-2026 convention the polyfill still ships. */
   provideContext?(context: { tools: RegisterToolDescriptor[] }): unknown;
+  /** Resources and their change notification are an OPEN PROPOSAL
+   *  (webmachinelearning/webmcp issue 151), not shipped in any browser today.
+   *  Both are optional for that reason: the page registers the log and tries to
+   *  announce its movement, and every one of those calls is a no-op until a
+   *  browser grows the method. Nothing here is load-bearing — the log is still
+   *  readable through the tools, and the page still polls. */
+  registerResource?(descriptor: RegisterResourceDescriptor): unknown;
+  unregisterResource?(uri: string): unknown;
+  notifyResourceUpdated?(uri: string): unknown;
+}
+
+/** The log's resource URI. One per map, so a subscriber is subscribed to a
+ *  specific map rather than to "the exchange" in the abstract. */
+function exchangeUri(mapId: string): string {
+  return `webmcp://thinking-map/${mapId}/exchange`;
 }
 
 function modelContext(): ModelContextLike | null {
@@ -94,7 +117,7 @@ async function forward(
 
 async function postUserEvent(
   mapId: string,
-  kind: 'user.answer' | 'user.note' | 'user.node',
+  kind: 'user.answer' | 'user.note' | 'user.node' | 'user.question',
   payload: unknown,
 ): Promise<void> {
   await fetch(`/api/maps/${mapId}/exchange`, {
@@ -202,6 +225,77 @@ export function bindTools(ctx: {
   }
 
   return () => {};
+}
+
+/**
+ * Offer the exchange log as a subscribable resource.
+ *
+ * Deliberately speculative: resource subscriptions are an open proposal, and no
+ * browser implements `registerResource` today, so this returns a no-op disposer
+ * on every browser that currently exists. It is written now because the whole
+ * point of the proposal's framing — "the page owns reactive state but has no way
+ * to publish it" — is exactly this page's problem, and keeping the binding here
+ * means the day it ships costs nothing.
+ *
+ * Same feature-detection shape as `bindTools`: ask whether the method exists,
+ * use it if it does, degrade silently if it does not.
+ */
+export function bindExchangeResource(ctx: {
+  mapId: string;
+  read: () => Promise<unknown>;
+}): Disposer {
+  const mc = modelContext();
+  if (!mc || typeof mc.registerResource !== 'function') return () => {};
+
+  const uri = exchangeUri(ctx.mapId);
+  try {
+    mc.registerResource({
+      uri,
+      name: 'Exchange log',
+      description:
+        'The append-only record of everything that has happened to this map, ' +
+        'from both sides, in revision order.',
+      mimeType: 'application/json',
+      read: async () => ({
+        contents: [{ uri, text: JSON.stringify(await ctx.read()) }],
+      }),
+    });
+  } catch {
+    // A registration that fails leaves the page exactly as capable as it was.
+    return () => {};
+  }
+
+  return () => {
+    try {
+      mc.unregisterResource?.(uri);
+    } catch {
+      // Already gone — disposal is idempotent by contract.
+    }
+  };
+}
+
+/**
+ * Tell a subscribed agent the log moved.
+ *
+ * Read from `navigator.modelContext` at CALL time rather than captured once at
+ * module load, so a browser that gains the capability mid-session is picked up
+ * without a reload — the difference between a capability check and a startup
+ * snapshot.
+ *
+ * A notification is NOT a turn. Even once this ships it tells a *subscribed*
+ * client that a resource changed; it cannot make an idle agent start reasoning.
+ * The honest ceiling is unchanged: you can wake an agent that is waiting on you,
+ * and you cannot start a turn in one that is not attached.
+ */
+export function notifyExchangeUpdated(mapId: string): void {
+  const mc = modelContext();
+  if (!mc || typeof mc.notifyResourceUpdated !== 'function') return;
+  try {
+    mc.notifyResourceUpdated(exchangeUri(mapId));
+  } catch {
+    // Purely an optimisation that removes polling latency. Nothing depends on
+    // it, so a throw here must not reach the caller's write path.
+  }
 }
 
 /** The headless driver's shape, published on `window` for tests and previews. */

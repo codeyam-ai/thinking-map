@@ -24,6 +24,8 @@ export default function MapNodePill({
   onDragMove,
   onNudge,
   onToggleCollapse,
+  onAsk,
+  asked = false,
 }: {
   node: LaidOutNode;
   /** The plane's zoom, so pointer travel on screen becomes travel in map
@@ -38,6 +40,13 @@ export default function MapNodePill({
   /** A committed drag, as a delta in map pixels. */
   onNudge?: (id: string, dx: number, dy: number) => void;
   onToggleCollapse?: (id: string) => void;
+  /** A click (not a drag) on this node — the person wants to ask about it.
+   *  The pill stays presentational: what a question IS, and whether anyone is
+   *  listening, is the caller's business. */
+  onAsk?: (id: string) => void;
+  /** Something has already been asked about this node, so it can be seen at a
+   *  glance without opening anything. */
+  asked?: boolean;
 }) {
   const isRoot = node.kind === 'idea' && node.depth === 0;
   const accent = ACCENT_KINDS[node.kind];
@@ -52,6 +61,7 @@ export default function MapNodePill({
     scale,
     onDragMove,
     onNudge,
+    onTap: onAsk,
   });
 
   // `hiddenCount` is the whole subtree, counted before any folding, so it stays
@@ -74,10 +84,19 @@ export default function MapNodePill({
         // A dragged node rides above its neighbours, so it is never lost behind
         // one on the way to where it is going.
         zIndex: dragging ? 20 : undefined,
-        cursor: onNudge ? (dragging ? 'grabbing' : 'grab') : undefined,
+        // A node that can be moved advertises the drag; one that can only be
+        // asked about advertises the click. Both is still the drag, because
+        // that is the gesture the person has to commit to.
+        cursor: onNudge
+          ? dragging
+            ? 'grabbing'
+            : 'grab'
+          : onAsk
+            ? 'pointer'
+            : undefined,
         // Otherwise the browser claims the gesture as a scroll or a selection
         // and the drag dies a few pixels in.
-        touchAction: onNudge ? 'none' : undefined,
+        touchAction: onNudge || onAsk ? 'none' : undefined,
       }}
       onPointerDown={onPointerDown}
     >
@@ -93,6 +112,10 @@ export default function MapNodePill({
             is the same fact the tools read to avoid re-ingesting their own
             writes — badge and tool contract agree by construction. */}
         {node.origin === 'user' ? ' · yours' : ''}
+        {/* Seeing what you have already asked about, without opening anything.
+            It sits in the eyebrow beside the other two facts about the node
+            rather than on the pill, because it is provenance, not status. */}
+        {asked ? ' · asked' : ''}
       </span>
       <div
         className={`relative flex items-center justify-center rounded-full border px-4 text-center ${shell}`}

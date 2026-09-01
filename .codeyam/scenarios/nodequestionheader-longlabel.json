@@ -1,0 +1,12 @@
+{
+  "name": "NodeQuestionHeader - LongLabel",
+  "id": "a6cb0434-a95e-48ba-bcf2-f57ba96bb150",
+  "url": "/isolated-components/NodeQuestionHeader?s=LongLabel",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "NodeQuestionHeader",
+  "scenarioType": "component",
+  "description": "The truncation, on its own. A real state rather than a hypothetical one, because nothing constrains how long an agent writes a node label."
+}

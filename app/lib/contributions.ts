@@ -134,8 +134,11 @@ async function addUserNode(
 /**
  * Turn one contribution into the events that should be recorded for it.
  *
- * `user.note` is only ever an event — a note is something said about the map,
- * not a change to it. The other two change the map first and then say so.
+ * `user.note` and `user.question` are only ever events — something said about
+ * the map rather than a change to it. A question deliberately does NOT touch
+ * the node it names: asking about a pill should not mark it, reorder it, or
+ * reopen it, because the person asking has not decided anything yet. The other
+ * two change the map first and then say so.
  */
 export async function contributionEvents(
   mapId: string,

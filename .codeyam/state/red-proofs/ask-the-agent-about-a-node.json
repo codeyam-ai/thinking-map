@@ -1,0 +1,55 @@
+{
+  "provenAt": "2026-09-01T14:56:40Z",
+  "slug": "ask-the-agent-about-a-node",
+  "paths": [
+    "app/lib/exchangeRail.ts"
+  ],
+  "runScope": [
+    "app/lib/exchangeRail.ts"
+  ],
+  "tests": {
+    "askedNodeIds": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "collects the node a question names": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "describeEvent": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "ignores every other kind of event": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "names the node a question was about": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "collects the node a question names",
+      "names the node a question was about",
+      "ignores every other kind of event"
+    ]
+  }
+}

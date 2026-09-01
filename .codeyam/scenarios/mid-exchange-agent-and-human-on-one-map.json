@@ -119,6 +119,14 @@
         "origin": "agent",
         "payload": "{\"phase\":\"explore\"}",
         "revision": 14
+      },
+      {
+        "id": "xe-15",
+        "kind": "user.question",
+        "mapId": "map-exchange",
+        "origin": "user",
+        "payload": "{\"nodeId\":\"xn-appr\",\"label\":\"Capture the thought, not the book\",\"text\":\"Does this mean I stop logging titles altogether, or keep them as a fallback when I can't articulate the thought yet?\"}",
+        "revision": 15
       }
     ],
     "mapNode": [
@@ -224,7 +232,7 @@
       {
         "id": "map-exchange",
         "phase": "explore",
-        "revision": 14,
+        "revision": 15,
         "seedIdea": "I want to build something that helps me keep track of what I read, but every app I've tried I abandon after a week.",
         "title": "Tool for tracking reading"
       }
@@ -232,5 +240,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "A map both sides have worked: agent notes and human contributions interleaved in the log, revision 14, and two questions the agent asked that nobody has answered yet."
+  "description": "A map both sides have worked: agent notes and human contributions interleaved in the log, revision 15, and two questions the agent asked that nobody has answered yet. It also runs the other direction - the person has asked about a node, so 'Capture the thought, not the book' carries its ASKED mark and the rail names the node the question was about."
 }

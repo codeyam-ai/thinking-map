@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - YoursAndAsked",
+  "id": "29712c3d-1447-4eed-bb9d-653a19eb00b3",
+  "url": "/isolated-components/MapNodePill?s=YoursAndAsked",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "Both marks at once - a node the person wrote and has since asked about - so the eyebrow is carrying everything it can and still has to read cleanly."
+}

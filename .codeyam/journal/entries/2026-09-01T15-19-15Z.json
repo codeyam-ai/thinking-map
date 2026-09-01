@@ -1,0 +1,919 @@
+{
+  "timestamp": "2026-09-01T15:19:15Z",
+  "title": "Ask the Agent About a Node",
+  "type": "feature",
+  "userRequest": "## Summary\n\nLet a person click a node and ask the agent about it, and make that question\nreach the agent as directly as WebMCP currently allows. The exchange spine\nalready has most of what this needs: a user contribution wakes an agent parked\non `await_user_activity` near-instantly, so an asked question is not merely\nqueued when someone is listening. What is missing is a question that knows\nwhich node it is about — today the only way to ask is a free-text note, leaving\nthe agent to work out from prose which of twenty pills you meant. This adds a\nnode-scoped question to the event vocabulary, an affordance on the pill, and\nhonest UI about whether anyone is actually there to hear it.\n\nIt also prepares for real push. WebMCP is pull-only today — the page can expose\ntools and nothing else — but `notifyResourceUpdated()` and resource\nsubscriptions are an open proposal (webmachinelearning/webmcp issue 151), whose\nown framing is that \"the page owns reactive state but has no way to publish it\".\nThis plan exposes the exchange log as a subscribable resource and calls the\nnotify hook behind a capability check, so the page starts pushing the day the\nbrowser ships it and behaves exactly as it does now until then.\n\n## Key Decisions\n\n- **A node-scoped question is its own event kind, not a note with a name in it.**\n  \"user.question\" carries the `nodeId` as data. Parsing a node out of prose is\n  the kind of thing that works in a demo and fails on the map where two nodes\n  are called \"Vocabulary\". The kinds list in `app/lib/exchange.ts` is a closed\n  vocabulary with a guard, so adding one is a deliberate, checked act.\n- **It rides the existing wake path rather than inventing a channel.**\n  \"user.question\" joins `USER_EVENT_KINDS`, which is the set\n  `waitForUserActivity` filters on — so a click wakes a waiting agent through\n  machinery that already exists and is already tested, with no second mechanism\n  to keep in sync.\n- **The UI must say which case you are in.** The bridge already knows whether an\n  agent is attached (`unavailable` / `connected` / `working`) and which\n  questions are pending. Asking must render differently when an agent is\n  listening versus when the question is going into the log for later. Implying\n  an answer is coming when nothing is attached is the one genuinely misleading\n  thing this feature could do.\n- **Push is built behind a capability check, and is not load-bearing.** The page\n  registers the exchange log as an MCP resource and calls\n  `notifyResourceUpdated()` when a user event lands — but only if the method\n  exists. Everything works identically without it; the notification is an\n  optimisation that removes polling latency, never a path anything depends on.\n  This is deliberately speculative work against an unshipped proposal, and it is\n  scoped so that the proposal changing shape costs one function in\n  `app/lib/webmcp.ts`, which is already the only file allowed to name\n  navigator.modelContext.\n- **A notification is not a turn.** Even once issue 151 ships, a notification\n  tells a *subscribed* client that a resource changed; it cannot make an idle\n  agent start reasoning. The honest ceiling stays: you can wake an agent that is\n  waiting on you, and you cannot start a turn in one that is not attached. The\n  UI copy must not overpromise past that.\n- **Depends on the manipulation plan.** Click-to-ask and drag-to-nudge live on\n  the same pill, and the click-versus-drag threshold has to exist before a click\n  handler is meaningful. Building this first would mean writing pointer handling\n  the other plan then rewrites.\n\n## Implementation\n\n### 1. Add the node-scoped question to the vocabulary\n\n**File**: `app/lib/exchange.ts`\n\nAdd \"user.question\" to `EVENT_KINDS` and to `USER_EVENT_KINDS` — the second is\nwhat makes it wake a waiter, and omitting it is the silent failure mode here.\nIts payload carries `nodeId` and `text`. Document the shape beside the others.\n\n### 2. Accept it at the exchange endpoint\n\n**File**: `app/api/maps/[id]/exchange/route.ts`\n\nWiden the accepted kinds to include \"user.question\", and validate that the\n`nodeId` names a node on this map — the same belongs-to-this-map check the route\nalready performs, extended to the payload.\n\n### 3. Ask from the pill\n\n**File**: `app/components/MapNodePill.tsx`\n\nA click (as distinguished from a drag by the threshold the manipulation plan\nestablishes) opens a small composer anchored to the node. The pill stays\npresentational: it takes an `onAsk` callback.\n\n**New file**: `app/components/NodeQuestionComposer.tsx`\n\nThe composer itself — the node it is about, a text field, and a send control\nwhose label states the real situation: asking an attached agent, or leaving it\nin the log. It reads agent presence from the bridge rather than being told.\n\n### 4. Route it through the bridge\n\n**File**: `app/components/WebMcpBridge.tsx`\n\nWiden `contribute`'s kind union to include \"user.question\". This is the existing\npath a contribution already takes, so nothing else about the bridge changes.\n\n**File**: `app/lib/webmcp.ts`\n\nWiden `postUserEvent`'s kind union to match.\n\n### 5. Render questions in the rail\n\n**File**: `app/lib/exchangeRail.ts`\n\nGive \"user.question\" a rail rendering naming the node it is about, so the\nactivity record reads as an exchange rather than an unattributed note. Check the\nexisting formatter for how the other seven kinds phrase themselves and match it.\n\n### 6. Expose the log as a resource, and notify when it moves\n\n**File**: `app/lib/webmcp.ts`\n\nRegister the exchange log as an MCP resource alongside the tools, and add a\n`notifyExchangeUpdated(mapId)` that calls the browser's notifyResourceUpdated() hook on navigator.modelContext\nwhen the method exists and no-ops when it does not — the same\nfeature-detection shape the file already uses for `registerTool` versus\n`provideContext`. Keep it in this file: it is the only place allowed to name\nnavigator.modelContext, and that boundary is what made the March 2026 spec\nchange a one-file edit.\n\n**File**: `app/hooks/useExchangeLog.ts`\n\nCall the notify hook when a user event is posted. It already owns the cursor and\nsees every local contribution, so it is the natural site; no new subscription\nbookkeeping is needed.\n\n## Reused existing code\n\n- `recordEvents`, `readSince`, `waitForUserActivity`, `USER_EVENT_KINDS` and\n  `isUserEventKind` from `app/lib/exchange.ts` — the whole wake path is reused\n  unchanged; this plan only widens the vocabulary it operates on.\n- `WebMcpBridge` and its `contribute` from `app/components/WebMcpBridge.tsx`\n  (glossary entry: `WebMcpBridge`) — the existing contribution path.\n- `bindTools` and the feature-detection pattern in `app/lib/webmcp.ts` — the\n  `registerTool` / `provideContext` fallback is the precedent the notify\n  capability check should copy.\n- `MapNodePill` from `app/components/MapNodePill.tsx` (glossary entry:\n  `MapNodePill`) — the affordance's host.\n- `mapExists` from `app/api/maps/[id]/exchange/route.ts` (glossary entry:\n  `mapExists`) — the ownership check the new payload validation extends.\n- `useExchangeLog` from `app/hooks/useExchangeLog.ts` — already polls the log\n  forward and sees every local contribution.\n\n**Existing-implementation survey.** There is no node-scoped user event today:\n`EVENT_KINDS` in `app/lib/exchange.ts` holds exactly \"node.added\",\n\"node.updated\", \"phase.set\", \"agent.note\", \"question.asked\", \"user.answer\",\n\"user.note\" and \"user.node\", and only \"question.asked\" carries a question — in\nthe agent-to-person direction, which is the opposite of this one. \"user.note\" is\nthe closest existing thing and is deliberately unstructured, so extending it\nwould mean giving an untyped kind a typed meaning. No resource registration or\nnotification code exists anywhere: `app/lib/webmcp.ts` names only\n`registerTool`, `unregisterTool` and `provideContext`, and nothing in the app\ncalls `notifyResourceUpdated`.\n\n**Mechanism feasibility.** The notify hook is read at call time from\nnavigator.modelContext, not captured once at module load, so a browser that\ngains the capability mid-session is picked up without a reload. This matters\nbecause it is the difference between a capability check and a startup snapshot.\n\n## Scenarios to Demonstrate\n\n- Asking with an agent attached — the composer open on a node, its send control\n  saying an agent is listening\n- Asking with nothing attached — the same composer, honestly stating the\n  question will sit in the log until an agent reads it\n- The question in the rail — a \"user.question\" row naming the node it is about,\n  beside the other event kinds\n- A node with a question already asked — the pill marked, so you can see what\n  you have already asked about without opening anything\n- Empty composer — the send control disabled, matching how the contribution bar\n  already behaves",
+  "description": "Made a question about a specific node its own thing. Clicking a pill opens a composer scoped to that node, and sending it records a 'user.question' carrying the node's id — so the agent is no longer handed prose and left to work out which of twenty pills was meant. The kind joins USER_EVENT_KINDS, which is the set waitForUserActivity filters on, so an asked question wakes an agent parked on await_user_activity through machinery that already existed rather than a second channel to keep in sync. The rail names the node the question was about, and a node already asked about is marked in its eyebrow, so you can see what you have asked without opening anything.\n\nThe honest-copy rule is the load-bearing part and is pinned by tests rather than left to a screenshot. WebMCP is pull-only: a contribution reaches an agent that is already waiting and reaches nobody at all otherwise. So askPresence owns both halves of the wording, the send control and the note beneath it change together, and neither branch promises a reply when nothing is attached — the one thing this feature could genuinely mislead about. The tap-versus-drag split stays inside useNodeDrag, where the 4px threshold already lived, and exactly one of nudge or tap fires, so a pill moved by accident never opens a composer on top of itself.\n\nDeliberate limits, recorded as decisions rather than gaps: asking does NOT touch the node it names — no mark, no reorder, no reopen — because the person has not decided anything yet, and the route would otherwise invent an act they never performed. The label is denormalised into the payload at write time, so a question about a node later renamed or deleted still reads as it did when it was asked. And the exchange log is registered as a subscribable MCP resource with a notifyResourceUpdated hook behind a capability check: resource subscriptions are an open proposal (webmachinelearning/webmcp issue 151) that no browser implements, so every path there is a no-op today, nothing depends on it, and it stays inside app/lib/webmcp.ts — the only file allowed to name navigator.modelContext. A notification is not a turn: even once it ships it tells a subscribed client that a resource changed, so the ceiling is unchanged — you can wake an agent that is waiting on you and you cannot start a turn in one that is not attached.\n\nSCOPE VERDICT — this cycle delivered no project deliverable and deferred none. All 10 were already resolved before it began (9 delivered, 1 deferred), so this is a feature on top of a complete deliverable set rather than a claim against it. The single standing deferral is unchanged and was decided by the USER at a plan gate, not by an agent: registering the MCP server in a client such as Claude Desktop, which is machine configuration on the assist track. No agent-decided deferrals exist on this project.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/ask-the-agent-about-a-node.md\t.codeyam/plans/completed/ask-the-agent-about-a-node.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/thinkingmapview.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/mid-exchange-agent-and-human-on-one-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-bigturn--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-empty--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentadded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentaddedmany--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentnote--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-youranswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-foldable--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-folded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-gap--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-justupdated--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-openquestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-pro--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-research--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-risk--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-rootidea--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/thinkingmapview-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c266d56346ed8abaf474e022f2018d85e25a14cd6a24676ca7f872f860ce88e6.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e287b75740ca66515c0302a8b65fe59f4c1fad1718724d3ac51bef9b36461b01.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/exchange/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapNodePill.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/ThinkingMapView.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/WebMcpBridge.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useExchangeLog.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useNodeDrag.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapNodePill/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/contributions.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchange.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchangeRail.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchangeRail.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/webmcp.ts",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/editor.local.json.bak",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/askpresencenote-listening.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/askpresencenote-noagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/askpresencenote.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/mapnodepill.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/nodequestioncomposer.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/nodequestionheader.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-asked.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-yoursandasked.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodequestioncomposer-agentworking.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodequestioncomposer-listening.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodequestioncomposer-longlabel.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodequestioncomposer-noagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodequestionheader-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodequestionheader-longlabel.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askpresencenote-listening--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askpresencenote-listening--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askpresencenote-noagent--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askpresencenote-noagent--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-asked--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-asked--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursandasked--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursandasked--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestionheader-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestionheader-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestionheader-longlabel--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestionheader-longlabel--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/ask-the-agent-about-a-node.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3111e4c51d01b121f7e882234f86d32479c0d45cd9eccc4c2cac26acf9f165b2.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b1d513fa5bede7e79fe591fbc57e30e378b9081ed1c798bf25f4720efd9e3d93.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f4da1c9ce6fd0a7674c276eefde79ce02dc8c725411114cf185b9c2f9037493e.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f6eda582e6fd8decbad1b4c402a91ec7dbf6df8129cab67f9399557c6168bdfb.json",
+      "status": "added"
+    },
+    {
+      "path": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AskPresenceNote.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/NodeQuestionComposer.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/NodeQuestionHeader.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AskPresenceNote/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/NodeQuestionComposer/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/NodeQuestionHeader/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/askPresence.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/askPresence.ts",
+      "status": "added"
+    },
+    {
+      "path": "core",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "Arranged - a map tidied by hand",
+      "screenshotPath": "arranged-a-map-tidied-by-hand--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--desktop.png"
+    },
+    {
+      "name": "AskPresenceNote - Listening",
+      "screenshotPath": "askpresencenote-listening--desktop.png"
+    },
+    {
+      "name": "AskPresenceNote - NoAgent",
+      "screenshotPath": "askpresencenote-noagent--desktop.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--desktop.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Default",
+      "screenshotPath": "exchangecolumn-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - NothingWaiting",
+      "screenshotPath": "exchangecolumn-nothingwaiting--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Quiet",
+      "screenshotPath": "exchangecolumn-quiet--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - BigTurn",
+      "screenshotPath": "exchangerail-bigturn--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - Default",
+      "screenshotPath": "exchangerail-default--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - Empty",
+      "screenshotPath": "exchangerail-empty--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered",
+      "screenshotPath": "exchangerail-justanswered--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded",
+      "screenshotPath": "exchangerow-agentadded--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany",
+      "screenshotPath": "exchangerow-agentaddedmany--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - AgentNote",
+      "screenshotPath": "exchangerow-agentnote--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer",
+      "screenshotPath": "exchangerow-youranswer--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Asked",
+      "screenshotPath": "mapnodepill-asked--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Default",
+      "screenshotPath": "mapnodepill-default--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Foldable",
+      "screenshotPath": "mapnodepill-foldable--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Folded",
+      "screenshotPath": "mapnodepill-folded--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Gap",
+      "screenshotPath": "mapnodepill-gap--desktop.png"
+    },
+    {
+      "name": "MapNodePill - JustUpdated",
+      "screenshotPath": "mapnodepill-justupdated--desktop.png"
+    },
+    {
+      "name": "MapNodePill - OpenQuestion",
+      "screenshotPath": "mapnodepill-openquestion--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Pro",
+      "screenshotPath": "mapnodepill-pro--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Research",
+      "screenshotPath": "mapnodepill-research--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Risk",
+      "screenshotPath": "mapnodepill-risk--desktop.png"
+    },
+    {
+      "name": "MapNodePill - RootIdea",
+      "screenshotPath": "mapnodepill-rootidea--desktop.png"
+    },
+    {
+      "name": "MapNodePill - YoursAndAsked",
+      "screenshotPath": "mapnodepill-yoursandasked--desktop.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--desktop.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--desktop.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--desktop.png"
+    },
+    {
+      "name": "NodeQuestionHeader - Default",
+      "screenshotPath": "nodequestionheader-default--desktop.png"
+    },
+    {
+      "name": "NodeQuestionHeader - LongLabel",
+      "screenshotPath": "nodequestionheader-longlabel--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Many",
+      "screenshotPath": "openquestions-many--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - One",
+      "screenshotPath": "openquestions-one--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Two",
+      "screenshotPath": "openquestions-two--desktop.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Nudged",
+      "screenshotPath": "thinkingmapview-nudged--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 288,
+    "passed": 288,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 288,
+        "passed": 288
+      }
+    ]
+  }
+}

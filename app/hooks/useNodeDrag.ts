@@ -25,17 +25,25 @@ export function useNodeDrag({
   scale,
   onDragMove,
   onNudge,
+  onTap,
 }: {
   id: string;
   scale: number;
   onDragMove?: (id: string, dx: number, dy: number) => void;
   onNudge?: (id: string, dx: number, dy: number) => void;
+  /** The gesture ended without passing the threshold — a click, not a drag.
+   *  Kept on this side of the split because the threshold is the only thing
+   *  that can tell the two apart, and duplicating it would let a nudge and a
+   *  tap disagree about which one just happened. */
+  onTap?: (id: string) => void;
 }) {
   const [dragging, setDragging] = useState(false);
   const past = useRef(false);
 
   const onPointerDown = (event: React.PointerEvent<HTMLElement>) => {
-    if (!onNudge || event.button !== 0) return;
+    // A pill that can only be asked about still has to claim the gesture, so
+    // the test is "does this node do anything at all", not "can it be nudged".
+    if ((!onNudge && !onTap) || event.button !== 0) return;
     // The frame beneath pans on pointerdown. A pointer that lands on a node is
     // moving the node, so it must not also move the map.
     event.stopPropagation();
@@ -64,7 +72,12 @@ export function useNodeDrag({
       past.current = false;
       setDragging(false);
       if (wasDragging) {
-        onNudge(id, (up.clientX - startX) / scale, (up.clientY - startY) / scale);
+        onNudge?.(id, (up.clientX - startX) / scale, (up.clientY - startY) / scale);
+      } else {
+        // Exactly one of the two fires. A gesture that nudged a node was not
+        // also a request to ask about it, and a person who moved a pill by
+        // accident should not have a composer open on top of it.
+        onTap?.(id);
       }
     };
 

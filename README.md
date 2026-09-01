@@ -68,6 +68,16 @@ The page's half of the exchange is a narrow column beside the map:
   agent re-ingesting its own writes.
 - **Activity** — what has happened to the map, from both sides, oldest first.
 
+There is also one affordance on the map itself rather than in the column:
+
+- **Ask about a node** — click any pill to ask a question about *that* node. The question
+  carries the node's id, so the agent is not left working out from prose which of twenty
+  pills you meant, and a node you have asked about is marked *asked* in its eyebrow. The
+  composer says which case you are in: with an agent attached, asking wakes it; with none
+  attached, it says so plainly and the question waits in the log. It never implies a reply
+  is coming when nobody is listening — WebMCP is pull-only, so you can wake an agent that
+  is waiting on you and you cannot start a turn in one that is not attached.
+
 ### Handling the map
 
 The map is directly manipulable, and each of the three answers a different problem:
@@ -252,6 +262,10 @@ codeyam-editor start
 
 States captured as runnable scenarios with codeyam-editor:
 
+### Arranged - a map tidied by hand
+
+<img src=".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png" alt="Arranged - a map tidied by hand" width="280">
+
 ### Complete - what to do next
 
 <img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
@@ -279,8 +293,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Mid-exchange - agent and human on one map
 
 <img src=".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png" alt="Mid-exchange - agent and human on one map" width="280">
-
-### One saved map
-
-<img src=".codeyam/scenarios/screenshots/one-saved-map--desktop.png" alt="One saved map" width="280">
 <!-- codeyam:scenario-gallery:end -->

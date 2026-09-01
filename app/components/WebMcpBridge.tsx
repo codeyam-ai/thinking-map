@@ -19,6 +19,7 @@ import {
   useState,
 } from 'react';
 import {
+  bindExchangeResource,
   bindTools,
   publishAgentDriver,
   webMcpUnavailableReason,
@@ -65,7 +66,7 @@ export interface BridgeState {
   ): Promise<void>;
   /** Record something the person did, so a waiting agent wakes up. */
   contribute(
-    kind: 'user.answer' | 'user.note' | 'user.node',
+    kind: 'user.answer' | 'user.note' | 'user.node' | 'user.question',
     payload: unknown,
   ): Promise<void>;
 }
@@ -81,6 +82,19 @@ export function useWebMcpBridge(): BridgeState {
     throw new Error('useWebMcpBridge must be used inside <WebMcpBridge>.');
   }
   return ctx;
+}
+
+/**
+ * The bridge if there is one, `null` if there is not.
+ *
+ * For a component that renders in BOTH the app and an isolated scenario, where
+ * the throwing version would make the second case a crash rather than a state.
+ * The rule stays the same though: something that genuinely needs the exchange
+ * must use `useWebMcpBridge` and say so by throwing. This is for the parts that
+ * degrade honestly — a map you cannot ask about is still a map.
+ */
+export function useOptionalWebMcpBridge(): BridgeState | null {
+  return useContext(BridgeContext);
 }
 
 export function WebMcpBridge({
@@ -110,7 +124,7 @@ export function WebMcpBridge({
 
   const contribute = useCallback(
     async (
-      kind: 'user.answer' | 'user.note' | 'user.node',
+      kind: 'user.answer' | 'user.note' | 'user.node' | 'user.question',
       payload: unknown,
     ) => {
       const res = await fetch(`/api/maps/${mapId}/exchange`, {
@@ -185,11 +199,23 @@ export function WebMcpBridge({
     // in a preview or a captured scenario it is the ONLY way these tools can be
     // driven, because WebMCP is unreachable inside the capture iframe.
     const disposeDriver = publishAgentDriver(ctx);
+    // Registers the log as something an agent can subscribe to, on the day a
+    // browser can. Reads through the same HTTP route everything else does, so
+    // there is one notion of what the log says.
+    const disposeResource = bindExchangeResource({
+      mapId,
+      read: async () => {
+        const res = await fetch(`/api/maps/${mapId}/exchange`);
+        if (!res.ok) throw new Error(`Could not read the log (${res.status}).`);
+        return res.json();
+      },
+    });
 
     return () => {
       settle(null);
       disposeTools();
       disposeDriver();
+      disposeResource();
     };
   }, [mapId, ask, settle]);
 

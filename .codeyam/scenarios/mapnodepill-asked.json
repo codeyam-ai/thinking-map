@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - Asked",
+  "id": "204dc452-3abb-4bd7-91c3-da21cd2067a8",
+  "url": "/isolated-components/MapNodePill?s=Asked",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "A node something has already been asked about. The mark sits in the eyebrow beside the kind, so you can see what you have asked about without opening anything."
+}

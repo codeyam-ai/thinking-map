@@ -18,6 +18,42 @@
       "dimension": "nodes",
       "value": "many",
       "rationale": "source-derived state nodes=many",
+      "status": "covered"
+    },
+    {
+      "dimension": "askedNode",
+      "value": "true",
+      "rationale": "source-derived state askedNode=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "askedNode",
+      "value": "false",
+      "rationale": "source-derived state askedNode=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "bridge",
+      "value": "true",
+      "rationale": "source-derived state bridge=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "bridge",
+      "value": "false",
+      "rationale": "source-derived state bridge=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "panning",
+      "value": "true",
+      "rationale": "source-derived state panning=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "panning",
+      "value": "false",
+      "rationale": "source-derived state panning=false",
       "status": "planned"
     },
     {
@@ -30,6 +66,18 @@
       "dimension": "caption",
       "value": "false",
       "rationale": "source-derived state caption=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "asking",
+      "value": "true",
+      "rationale": "source-derived state asking=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "asking",
+      "value": "false",
+      "rationale": "source-derived state asking=false",
       "status": "planned"
     }
   ]

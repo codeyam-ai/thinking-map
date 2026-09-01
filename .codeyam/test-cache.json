@@ -1,1 +1,1 @@
-{"schemaVersion":5,"partitions":{"all":{"version":52,"hash":"ecfae7f6a6987e7b","green":true,"lastRunAt":"2026-09-01T14:53:38.021787378+00:00","cacheFile":".codeyam/test-cache/all.json","registryDigest":"f34656b8ea9b07391f90934671372fe1da521ba0da4d438abfb32eaaaff7faa5"}}}
+{"schemaVersion":5,"partitions":{"all":{"version":56,"hash":"c4f4b14dc82d90b7","green":true,"lastRunAt":"2026-09-01T14:59:27.371759380+00:00","cacheFile":".codeyam/test-cache/all.json","registryDigest":"a3f97e7caac86fe0c12036d57ea03eb9cb1b5baae75084bc4590c835ef8d6b44"}}}

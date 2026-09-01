@@ -84,6 +84,15 @@
     ]
   },
   {
+    "description": "The line that says what sending this question will actually do. Its own component because it is the part of the composer that has to be honest: an asked question reaches an agent already waiting and reaches nobody otherwise. The wording itself lives in askPresence, where tests pin it.",
+    "filePath": "app/components/AskPresenceNote.tsx",
+    "name": "AskPresenceNote",
+    "scenarios": [
+      "askpresencenote-listening",
+      "askpresencenote-noagent"
+    ]
+  },
+  {
     "description": "Renders what the bridge knows - whether an agent is attached, why not when it is not, the tools the page exposes, the questions an agent is waiting on, and the pending count. Exists so the bridge has something to show: WebMcpBridge renders only a context provider, so an isolated capture of it alone would be a blank frame. Its two buttons drive the REAL ask_user path through the headless driver and the real answer path back, so the AwaitingAnswer scenario captures the state the code actually produces rather than one staged to look like it.",
     "filePath": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
     "name": "BridgeReadout",
@@ -396,6 +405,26 @@
     ]
   },
   {
+    "description": "Asking the agent about one specific node. Carries the node id, so the question arrives already attached to the thing it is about rather than leaving the agent to work out from prose which pill was meant. The send control and the note beneath it state whether an agent is actually listening, because WebMCP is pull-only and implying a reply is coming when nothing is attached is the one thing this feature could genuinely mislead about.",
+    "filePath": "app/components/NodeQuestionComposer.tsx",
+    "name": "NodeQuestionComposer",
+    "scenarios": [
+      "nodequestioncomposer-noagent",
+      "nodequestioncomposer-listening",
+      "nodequestioncomposer-agentworking",
+      "nodequestioncomposer-longlabel"
+    ]
+  },
+  {
+    "description": "What the composer is about, and the way out of it. The node's own words are repeated from the pill because the composer covers part of the map, and someone mid-sentence should not have to move it to remember which node they clicked. The label truncates rather than wrapping, since nothing constrains how long an agent writes one.",
+    "filePath": "app/components/NodeQuestionHeader.tsx",
+    "name": "NodeQuestionHeader",
+    "scenarios": [
+      "nodequestionheader-default",
+      "nodequestionheader-longlabel"
+    ]
+  },
+  {
     "description": "One question with an inline answer field. The row owns its own draft, since each row answers exactly one question, and its send control names that question — several sit in the panel at once, and one repeated label leaves a screen reader unable to tell them apart.",
     "filePath": "app/components/OpenQuestionRow.tsx",
     "name": "OpenQuestionRow",
@@ -572,6 +601,27 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "The copy that says what sending a node question will actually do. WebMCP is pull-only, so asking wakes an agent already parked on await_user_activity and reaches nobody otherwise; this returns the send label and the note for each case, so the one thing the feature could mislead about is pinned by tests rather than read off a screenshot.",
+    "filePath": "app/lib/askPresence.ts",
+    "name": "askPresence",
+    "testFile": "app/lib/askPresence.test.ts"
+  },
+  {
+    "description": "The nodes the person has asked about, derived from the log rather than tracked beside it, so the marks survive a reload and count questions asked from any front door. A malformed or missing nodeId is skipped rather than throwing.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "askedNodeIds",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Offers the exchange log as a subscribable MCP resource. Deliberately speculative: resource subscriptions are an open proposal, so this no-ops on every browser that exists today. Same feature-detection shape as bindTools, and kept in the only file allowed to name navigator.modelContext.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "bindExchangeResource",
+    "untestabilityReason": {
+      "justification": "branches entirely on navigator.modelContext.registerResource, an unshipped W3C proposal no browser or polyfill implements; every reachable path today is the no-op, so a test could only assert against a hand-built fake of an API whose shape is not yet settled",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Registers the catalog with the browser agent for one map and returns a disposer. The WebMCP draft has already moved once - provideContext was removed in the March 2026 revision in favour of registerTool/unregisterTool, while the polyfill still ships the older shape - so both conventions are handled here, the one file that names navigator.modelContext. Re-registering a live name throws InvalidStateError, which is why unregister-then-register is the only safe update path and why the disposer exists.",
     "filePath": "app/lib/webmcp.ts",
     "name": "bindTools",
@@ -679,6 +729,15 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "errorResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The exchange log's MCP resource URI, one per map, so a subscriber is subscribed to a specific map rather than to 'the exchange' in the abstract. Kept in the file that owns every navigator.modelContext name, so the registration and the notification cannot drift to different URIs.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "exchangeUri",
+    "untestabilityReason": {
+      "justification": "a single template string with no branching or input handling; the URI shape is exercised through its only two callers, bindExchangeResource and notifyExchangeUpdated, whose own behaviour is platform-glue against an unshipped browser API",
+      "kind": "trivial-wrapper"
+    }
   },
   {
     "description": "The lower-cased extension of a filename, or empty when it has none. Needed because browsers are inconsistent about the media type they attach to a .md - several send application/octet-stream - so the extension is the fallback the type dispatch falls back to.",
@@ -919,6 +978,12 @@
     "testFile": "app/lib/conflict.test.ts"
   },
   {
+    "description": "The node a question is about, if it is genuinely on this map. The same ownership check mapExists makes, pushed down to the payload so a caller cannot ask about a node belonging to someone else's map; returns the label too, because the rail names the node.",
+    "filePath": "app/api/maps/[id]/exchange/route.ts",
+    "name": "nodeOnMap",
+    "testFile": "app/api/maps/[id]/exchange/route.integration.test.ts"
+  },
+  {
     "description": "Picks the shell classes for a map node, encoding the design system's status-precedence rule: root beats updated beats open beats accent kind beats plain answered. Gaps deliberately fall through to plain, because a gap is the research phase's most valuable finding rather than a warning.",
     "filePath": "app/lib/nodeAppearance.ts",
     "name": "nodeShellClasses",
@@ -929,6 +994,15 @@
     "filePath": "app/lib/briefFormat.ts",
     "name": "normalizeBriefText",
     "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "Tells a subscribed agent the log moved. Reads the hook at call time rather than capturing it at module load, so a browser that gains the capability mid-session is picked up without a reload. Purely an optimisation that removes polling latency; a notification is not a turn and nothing depends on it.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "notifyExchangeUpdated",
+    "untestabilityReason": {
+      "justification": "branches entirely on navigator.modelContext.notifyResourceUpdated, an unshipped W3C proposal no browser implements; the only reachable path today is the no-op",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Reads a brief off an untrusted request body. A brief with no text in it is not a brief, and every way of expressing that - missing, empty, whitespace, wrongly typed, not an object - reduces to undefined so the caller has one case rather than five. The text is kept verbatim; a missing source name or media type falls back to the pasted defaults.",
@@ -1133,6 +1207,15 @@
     "filePath": "app/hooks/useNodeDrag.ts",
     "name": "useNodeDrag",
     "testFile": "app/components/MapNodePill.render.test.tsx"
+  },
+  {
+    "description": "The bridge if there is one, null if there is not. For a component that renders in both the app and an isolated scenario, where the throwing accessor would make the second case a crash rather than a state. Anything that genuinely needs the exchange still uses useWebMcpBridge and says so by throwing.",
+    "filePath": "app/components/WebMcpBridge.tsx",
+    "name": "useOptionalWebMcpBridge",
+    "untestabilityReason": {
+      "justification": "a single useContext read with no branching logic; the state it returns is exercised through the components that consume it",
+      "kind": "trivial-wrapper"
+    }
   },
   {
     "description": "Reads the bridge state - connection status, the questions an agent is waiting on, the current revision, and the two writers - from context. Throws outside a provider rather than returning a null the caller would have to guard at every use site.",

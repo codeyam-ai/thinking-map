@@ -33,6 +33,7 @@ export const EVENT_KINDS = [
   'user.answer',
   'user.note',
   'user.node',
+  'user.question',
 ] as const;
 export type EventKind = (typeof EVENT_KINDS)[number];
 
@@ -41,11 +42,23 @@ export function isEventKind(value: string): value is EventKind {
 }
 
 /** Kinds a page-side caller is allowed to write. The agent's own kinds are
- *  minted by the tools, never accepted from the browser. */
+ *  minted by the tools, never accepted from the browser.
+ *
+ * `user.question` is here rather than only in `EVENT_KINDS` on purpose: this is
+ * the list `waitForUserActivity` filters on, so membership is what makes asking
+ * about a node wake an agent parked on `await_user_activity`. Adding the kind
+ * above and forgetting it here would leave the question in the log and the
+ * agent asleep — the silent failure this pairing exists to prevent.
+ *
+ * Its payload is `{ nodeId, label, text }`. The label is denormalised at write
+ * time so the rail can name the node without a second read; `nodeId` is what
+ * makes the question about a specific pill rather than prose an agent has to
+ * guess a target out of. */
 export const USER_EVENT_KINDS = [
   'user.answer',
   'user.note',
   'user.node',
+  'user.question',
 ] as const;
 
 export function isUserEventKind(value: string): value is EventKind {

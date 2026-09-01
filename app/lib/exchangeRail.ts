@@ -50,6 +50,25 @@ export function answeredIds(event: ExchangeEvent): string[] {
     .filter((id): id is string => typeof id === 'string');
 }
 
+/**
+ * The nodes the person has asked about, across the whole log.
+ *
+ * Read off the log rather than tracked separately, so it stays true across a
+ * reload and counts questions asked from any front door — not just the ones the
+ * current tab happens to have sent. A malformed or missing `nodeId` is skipped
+ * rather than throwing: a question that cannot be attributed should not take
+ * the marks off every other node.
+ */
+export function askedNodeIds(events: ExchangeEvent[]): Set<string> {
+  const ids = new Set<string>();
+  for (const event of events) {
+    if (event.kind !== 'user.question') continue;
+    const nodeId = (event.payload as { nodeId?: unknown } | null)?.nodeId;
+    if (typeof nodeId === 'string' && nodeId.length > 0) ids.add(nodeId);
+  }
+  return ids;
+}
+
 /** The first answer's text, which is what a one-question reply should show. */
 function firstAnswer(event: ExchangeEvent): string | null {
   const payload = event.payload as { answers?: { answer?: unknown }[] } | null;
@@ -203,6 +222,19 @@ export function describeEvent(event: ExchangeEvent): RailEntry {
     case 'user.node': {
       const label = field(event.payload, 'label');
       text = label ? `${side} added “${label}”` : `${side} added a node`;
+      break;
+    }
+    case 'user.question': {
+      // Naming the node is the entire difference between this and a note — it
+      // is what makes the row read as an exchange about something rather than
+      // an unattributed remark. The label is denormalised into the payload at
+      // write time, so a node later renamed or deleted still reads as it did
+      // when the question was asked.
+      const label = field(event.payload, 'label');
+      text = label
+        ? `${side} asked about “${label}”`
+        : `${side} asked about a node`;
+      note = field(event.payload, 'text');
       break;
     }
     default:

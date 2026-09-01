@@ -8,5 +8,11 @@
   "mocks": {},
   "componentName": "MapNodePill",
   "scenarioType": "component",
-  "description": "A settled fact: plain ink pill under its kind eyebrow."
+  "demonstratesState": {
+    "asked": "false",
+    "onAsk": "false",
+    "onNudge": "false",
+    "dragging": "false"
+  },
+  "description": "A settled fact: plain ink pill under its kind eyebrow. Also the pill with none of its affordances attached - nothing asked about it, no drag in flight - which is the resting state the marked and dragged scenarios are read against."
 }
