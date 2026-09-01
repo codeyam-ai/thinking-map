@@ -61,6 +61,30 @@ The page's half of the exchange is a narrow column beside the map:
   agent re-ingesting its own writes.
 - **Activity** — what has happened to the map, from both sides, oldest first.
 
+### Handling the map
+
+The map is directly manipulable, and each of the three answers a different problem:
+
+- **Zoom and pan** — scroll or pinch over the map to zoom toward the pointer, drag empty
+  canvas to pan, and press **Fit** to hand the viewport back. Auto-fit is how the map
+  *opens*, not a standing rule: once you have set a scale it stays where you put it,
+  including across the window resizes that would otherwise re-fit underneath you.
+- **Nudge a node** — drag a pill somewhere more useful. What is stored is an *offset*
+  from the node's computed position, not a coordinate, so the tidy tree stays
+  authoritative: siblings still never overlap, parents still centre over their children,
+  and a node the agent adds tomorrow still places itself sensibly instead of landing on
+  something you moved last week. Offsets persist, so an arrangement survives a reload.
+- **Fold a branch** — click the control on a parent's bottom edge to collapse it; it
+  reports how many nodes it is holding. Folding removes the subtree from the layout
+  rather than hiding it after the fact, so the remaining tree genuinely re-tidies and
+  gets narrower — which is what rescues a map that has outgrown its panel.
+
+Two deliberate limits. Folding is per-viewer and unpersisted: it is a reading posture,
+not a property of the map, and an agent has no business seeing a subtree disappear.
+And moving a node is not an exchange event — the activity rail records what the two
+sides *thought*, so a move does not appear there and does not bump the map's revision,
+which means a second viewer picks it up on their next load rather than immediately.
+
 ### Driving it without an agent
 
 WebMCP binds only in a top-level secure page in a browser with an agent (Chrome 146+),

@@ -127,6 +127,79 @@ describe('layoutMap', () => {
   });
 });
 
+describe('layoutMap arrangement offsets', () => {
+  // The offset is a nudge away from the tidy position, so what it must NOT do
+  // is replace it: the tree stays authoritative and the offset rides on top.
+  it('adds the offset to the tidy position rather than replacing it', () => {
+    const plain = layoutMap([n('root', null), n('a', 'root')]);
+    const nudged = layoutMap([
+      n('root', null),
+      { ...n('a', 'root'), offsetX: 40, offsetY: 25 },
+    ]);
+
+    const before = plain.nodes.find((node) => node.id === 'a')!;
+    const after = nudged.nodes.find((node) => node.id === 'a')!;
+    expect(after.x).toBe(before.x + 40);
+    expect(after.y).toBe(before.y + 25);
+  });
+
+  // Absent offsets are the overwhelmingly common case and must change nothing.
+  it('lays out identically when no node carries an offset', () => {
+    const withoutField = layoutMap([n('root', null), n('a', 'root')]);
+    const withZero = layoutMap([
+      n('root', null),
+      { ...n('a', 'root'), offsetX: 0, offsetY: 0 },
+    ]);
+    expect(withZero.nodes).toEqual(withoutField.nodes);
+    expect(withZero.width).toBe(withoutField.width);
+  });
+
+  // Nulls arrive from the database on a caller that selects the column but has
+  // never had it set; they must read as "no nudge", not NaN.
+  it('treats a null offset as no offset', () => {
+    const nulled = layoutMap([
+      n('root', null),
+      { ...n('a', 'root'), offsetX: null, offsetY: null },
+    ]);
+    for (const node of nulled.nodes) {
+      expect(Number.isFinite(node.x)).toBe(true);
+      expect(Number.isFinite(node.y)).toBe(true);
+    }
+  });
+
+  // The bounds are measured AFTER offsets are applied. Measuring first would
+  // clip a node dragged past the widest column out of the scrollable extent.
+  it('grows the bounds to contain a node nudged past them', () => {
+    const plain = layoutMap([n('root', null), n('a', 'root')]);
+    const nudged = layoutMap([
+      n('root', null),
+      { ...n('a', 'root'), offsetX: 500, offsetY: 400 },
+    ]);
+
+    expect(nudged.width).toBeGreaterThan(plain.width);
+    expect(nudged.height).toBeGreaterThan(plain.height);
+    for (const node of nudged.nodes) {
+      expect(node.x + node.width).toBeLessThanOrEqual(nudged.width);
+      expect(node.y + node.height).toBeLessThanOrEqual(nudged.height);
+    }
+  });
+
+  // Nudging one node must not move its siblings — the tidy pass runs first and
+  // the offset applies only to the node that carries it.
+  it('moves only the node that carries the offset', () => {
+    const tree = [n('root', null), n('a', 'root', 0), n('b', 'root', 1)];
+    const plain = layoutMap(tree);
+    const nudged = layoutMap(
+      tree.map((node) => (node.id === 'a' ? { ...node, offsetX: 60 } : node)),
+    );
+
+    const before = plain.nodes.find((node) => node.id === 'b')!;
+    const after = nudged.nodes.find((node) => node.id === 'b')!;
+    expect(after.x).toBe(before.x);
+    expect(after.y).toBe(before.y);
+  });
+});
+
 describe('connectorPath', () => {
   const parent = { x: 100, y: 0, width: 100, height: 50 } as never;
   const child = { x: 300, y: 150, width: 100, height: 50 } as never;

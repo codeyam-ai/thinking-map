@@ -1,10 +1,15 @@
 {
   "DEMO_SEQUENCE › explains every step it runs": {
     "file": "app/lib/agentDemo.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -19,10 +24,15 @@
   },
   "DEMO_SEQUENCE › walks a full turn including the question that waits on the person": {
     "file": "app/lib/agentDemo.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -35,12 +45,316 @@
       }
     ]
   },
-  "WebMcpBridge - NoAgent › renders every catalog tool rather than an empty list": {
-    "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+  "MapNodePill drag › converts screen travel into map pixels using the scale": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill drag › does not report a nudge for movement under the threshold": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill drag › is inert when no nudge handler is given": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill drag › reports movement continuously while the drag is in flight": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill drag › reports the total delta once on release": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill drag › stops the pointerdown from reaching the panning canvas": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill fold affordance › does not start a node drag when the fold control is pressed": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill fold affordance › offers to fold a node that has descendants": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill fold affordance › reports the hidden count once folded": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill fold affordance › reports the toggle for its own node id": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "MapNodePill fold affordance › shows no fold control for a node with nothing under it": {
+    "file": "app/components/MapNodePill.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView folding › brings the branch back when unfolded": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView folding › leaves other branches alone": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView folding › removes a folded branch’s descendants from the map": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView folding › reports how much a folded branch is holding": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView nudges › persists a committed nudge to the positions endpoint": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView nudges › stays manipulable with no map id, without attempting a write": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView viewport › disables fit until the viewport is the person’s": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView viewport › lowers the scale when zoom out is pressed": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView viewport › offers no viewport controls on an empty map": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView viewport › offers zoom and fit once there is a map to manipulate": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView viewport › raises the scale when zoom in is pressed": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "ThinkingMapView viewport › returns to the auto-fit scale when fit is pressed": {
+    "file": "app/components/ThinkingMapView.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "WebMcpBridge - NoAgent › renders every catalog tool rather than an empty list": {
+    "file": "app/components/WebMcpBridge.render.test.tsx",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -85,10 +399,15 @@
   },
   "WebMcpBridge - NoAgent › reports that no agent is attached, with a reason": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -133,10 +452,15 @@
   },
   "WebMcpBridge - NoAgent › shows nothing awaiting an answer": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -181,10 +505,15 @@
   },
   "WebMcpBridge - pending states › clears the questions and records the answer once the person replies": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -229,10 +558,15 @@
   },
   "WebMcpBridge - pending states › renders a single outstanding question": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -277,10 +611,15 @@
   },
   "WebMcpBridge - pending states › renders both questions and marks the agent as working": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -325,10 +664,15 @@
   },
   "WebMcpBridge - pending states › renders every question when an agent asks several at once": {
     "file": "app/components/WebMcpBridge.render.test.tsx",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -373,10 +717,15 @@
   },
   "answeredResponse › marks the result answered and is not an error": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -419,11 +768,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -431,10 +775,15 @@
   },
   "answeredResponse › reports each question with the answer it received": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -479,20 +828,20 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "bindTools › does nothing and returns a safe disposer with no browser agent": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -542,10 +891,15 @@
   },
   "bindTools › falls back to provideContext when only the older convention exists": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -595,10 +949,15 @@
   },
   "bindTools › keeps binding the rest when one registration throws": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -648,10 +1007,15 @@
   },
   "bindTools › registers every tool through registerTool when that convention is present": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -701,10 +1065,15 @@
   },
   "bindTools › unregisters everything it registered when disposed": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -754,10 +1123,15 @@
   },
   "buildToolDescriptors › attaches annotations only to the tools that declare them": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -801,21 +1175,21 @@
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:28:02.147000376+00:00",
-        "kind": "full",
         "status": "pass"
       }
     ]
   },
   "buildToolDescriptors › binds each descriptor to its own tool name": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -859,21 +1233,21 @@
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:28:02.147000376+00:00",
-        "kind": "full",
         "status": "pass"
       }
     ]
   },
   "buildToolDescriptors › carries each tool’s description and schema through": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -917,21 +1291,21 @@
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:28:02.147000376+00:00",
-        "kind": "full",
         "status": "pass"
       }
     ]
   },
   "buildToolDescriptors › describes every catalog tool": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -976,9 +1350,69 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "collapsedDescendantCount › counts a single-child branch": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-09-01T01:28:02.147000376+00:00",
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "collapsedDescendantCount › counts every descendant, not just direct children": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "collapsedDescendantCount › counts everything below the root": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "collapsedDescendantCount › is zero for a leaf": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "collapsedDescendantCount › is zero for an id that is not on the map": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
         "kind": "full",
         "status": "pass"
       }
@@ -986,10 +1420,25 @@
   },
   "connectorPath › drops straight down when parent and child share a centre": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1023,31 +1472,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "connectorPath › routes through a horizontal bus midway between the two levels": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1081,31 +1530,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "connectorPath › starts at the parent bottom edge and ends at the child top edge": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1140,30 +1589,20 @@
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "contributionEvents — adding a node › attaches to the root when no parent is named": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1178,10 +1617,15 @@
   },
   "contributionEvents — adding a node › creates the node and logs it with the real id": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1196,10 +1640,15 @@
   },
   "contributionEvents — adding a node › falls back to a drawable kind when the requested one is not real": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1214,10 +1663,15 @@
   },
   "contributionEvents — adding a node › honours an explicit parent": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1232,10 +1686,15 @@
   },
   "contributionEvents — adding a node › marks the node as the person’s": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1250,10 +1709,15 @@
   },
   "contributionEvents — adding a node › orders a new sibling after the existing ones": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1268,10 +1732,15 @@
   },
   "contributionEvents — adding a node › writes nothing for an empty label": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1286,10 +1755,15 @@
   },
   "contributionEvents — answering › closes the answered question and logs both halves": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1304,10 +1778,15 @@
   },
   "contributionEvents — answering › does not report a second close when the question is already answered": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1322,10 +1801,15 @@
   },
   "contributionEvents — answering › keeps the answer when the question node is gone": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1340,10 +1824,15 @@
   },
   "contributionEvents — answering › tolerates a malformed answers payload": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1358,10 +1847,15 @@
   },
   "contributionEvents — leaving a note › logs the note and changes nothing on the map": {
     "file": "app/lib/contributions.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1376,10 +1870,15 @@
   },
   "currentRevision › reports the map’s revision without reading the log": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1422,11 +1921,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1434,10 +1928,15 @@
   },
   "currentRevision › throws for a map that does not exist": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1480,11 +1979,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1492,10 +1986,15 @@
   },
   "decodeEvent › degrades to a null payload rather than throwing on bad JSON": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1538,11 +2037,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1550,10 +2044,15 @@
   },
   "decodeEvent › handles an empty payload string the same way": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1596,11 +2095,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1608,10 +2102,15 @@
   },
   "decodeEvent › parses the stored payload back into an object": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1656,20 +2155,20 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "describeEvent › carries a note through as text": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1684,10 +2183,15 @@
   },
   "describeEvent › drops the phase number when reporting a phase change": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1702,10 +2206,15 @@
   },
   "describeEvent › falls back when the payload carries no label": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1720,10 +2229,15 @@
   },
   "describeEvent › names a node the person added": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1738,10 +2252,15 @@
   },
   "describeEvent › shows the answer text only when a single question was answered": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1756,10 +2275,15 @@
   },
   "describeEvent › singularises one question and counts several": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1774,10 +2298,15 @@
   },
   "describeRun › carries the last revision in the run": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1792,10 +2321,15 @@
   },
   "describeRun › counts them once there is more than one": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1810,10 +2344,15 @@
   },
   "describeRun › names the node when the run is a single add": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1828,10 +2367,15 @@
   },
   "describeRun › says \"You\" for the person and distinguishes an update": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1846,10 +2390,15 @@
   },
   "errorResponse › marks the response as an error carrying the message": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1892,11 +2441,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1904,10 +2448,15 @@
   },
   "event kinds › accepts every kind the log can record": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -1950,11 +2499,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1962,10 +2506,15 @@
   },
   "event kinds › rejects a kind the log does not define": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2008,11 +2557,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2020,10 +2564,15 @@
   },
   "findConflictingChanges › ignores the agent’s own changes to that node": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2066,11 +2615,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2078,10 +2622,15 @@
   },
   "findConflictingChanges › ignores user changes to a different node": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2124,11 +2673,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2136,10 +2680,15 @@
   },
   "findConflictingChanges › ignores user events that name no node": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2182,11 +2731,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2194,10 +2738,15 @@
   },
   "findConflictingChanges › reports a user change to the same node": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2240,11 +2789,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2252,10 +2796,15 @@
   },
   "findConflictingChanges › reports every user change to the node, in order": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2298,11 +2847,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2310,10 +2854,15 @@
   },
   "findConflictingChanges › reports nothing on an empty delta": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2356,11 +2905,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2368,10 +2912,15 @@
   },
   "findConflictingChanges › survives an event whose payload could not be decoded": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2414,11 +2963,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2426,10 +2970,15 @@
   },
   "formatMapDetail › includes the title, phase and verbatim seed idea": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2472,11 +3021,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2484,10 +3028,15 @@
   },
   "formatMapDetail › marks an empty conversation explicitly": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2530,11 +3079,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2542,10 +3086,15 @@
   },
   "formatMapDetail › renders a map with no nodes": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2588,11 +3137,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2600,10 +3144,15 @@
   },
   "formatMapDetail › renders the conversation and the node tree under their own headings": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2646,11 +3195,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2658,10 +3202,15 @@
   },
   "formatMapList › leads each row with the id in brackets": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2704,11 +3253,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2716,10 +3260,15 @@
   },
   "formatMapList › puts each map on its own line": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2762,11 +3311,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2774,10 +3318,15 @@
   },
   "formatMapList › reports the phase and the node and message counts": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2820,11 +3369,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2832,10 +3376,15 @@
   },
   "formatMapList › says so plainly when there are no maps": {
     "file": "app/lib/mcpFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2878,11 +3427,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -2890,10 +3434,15 @@
   },
   "groupSummaryNodes › ignores kinds that do not belong on the summary screen": {
     "file": "app/lib/summaryGroups.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2937,21 +3486,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "groupSummaryNodes › returns four empty buckets for an empty map": {
     "file": "app/lib/summaryGroups.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -2995,21 +3544,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "groupSummaryNodes › sorts each bucket by order, not by input position": {
     "file": "app/lib/summaryGroups.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3053,21 +3602,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "groupSummaryNodes › splits nodes into the four summary buckets": {
     "file": "app/lib/summaryGroups.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3112,20 +3661,20 @@
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
         "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "isWebMcpAvailable › is available in a top-level secure page with a browser agent": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3168,11 +3717,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -3180,10 +3724,15 @@
   },
   "isWebMcpAvailable › is unavailable inside an iframe": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3226,11 +3775,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -3238,10 +3782,15 @@
   },
   "isWebMcpAvailable › is unavailable outside a secure context": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3284,11 +3833,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -3296,10 +3840,15 @@
   },
   "isWebMcpAvailable › is unavailable without a browser agent": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3344,20 +3893,95 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "layoutMap arrangement offsets › adds the offset to the tidy position rather than replacing it": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap arrangement offsets › grows the bounds to contain a node nudged past them": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap arrangement offsets › lays out identically when no node carries an offset": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap arrangement offsets › moves only the node that carries the offset": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap arrangement offsets › treats a null offset as no offset": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
         "status": "pass"
       }
     ]
   },
   "layoutMap › assigns depth by ancestry": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3391,31 +4015,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › centres a parent over its children": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3449,31 +4073,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › never overlaps siblings": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3507,31 +4131,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › orders siblings by their order field, not insertion order": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3565,31 +4189,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › puts each level on its own row": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3623,31 +4247,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › reports bounds that contain every node": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3681,31 +4305,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › returns an empty layout for no nodes": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3739,31 +4363,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › terminates on a parent cycle instead of hanging": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3797,31 +4421,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › treats a node whose parent is missing as a root rather than dropping it": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3855,31 +4479,31 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "layoutMap › widens a node to fit a longer label, up to a cap": {
     "file": "app/lib/mapLayout.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:17:07.312121595+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T13:15:18.429462929+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3913,31 +4537,21 @@
       {
         "at": "2026-09-01T01:48:40.931765033+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:08:20.898200280+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T00:02:13.647896384+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "map vocabulary guards › accepts every phase in the loop": {
     "file": "app/lib/mapKinds.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -3981,21 +4595,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "map vocabulary guards › accepts the node kinds the map can draw": {
     "file": "app/lib/mapKinds.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4039,21 +4653,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "map vocabulary guards › accepts the three node statuses": {
     "file": "app/lib/mapKinds.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4097,21 +4711,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "map vocabulary guards › rejects a node kind the map has no treatment for": {
     "file": "app/lib/mapKinds.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4155,21 +4769,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "map vocabulary guards › rejects a phase that is not part of the loop": {
     "file": "app/lib/mapKinds.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4213,21 +4827,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "map vocabulary guards › rejects an unknown node status": {
     "file": "app/lib/mapKinds.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4271,21 +4885,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › counts open questions while nothing has been answered": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4329,21 +4943,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › describes a bare seed when only the idea exists": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4387,21 +5001,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › describes an empty map as a bare seed too": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4445,21 +5059,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › does not count the root idea as an answered node": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4503,21 +5117,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › prefers the just-updated line over the answered/open split": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4561,21 +5175,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › reports that nothing was lost when something was just updated": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4619,21 +5233,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › reports the answered/open split once both exist": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4677,21 +5291,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "mapCaption › singularises a lone open question": {
     "file": "app/lib/mapCaption.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4736,20 +5350,20 @@
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
         "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "needsConflictCheck › checks when the map moved past what the agent read": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4792,11 +5406,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -4804,10 +5413,15 @@
   },
   "needsConflictCheck › skips the check when the agent did not guard the write": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4850,11 +5464,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -4862,10 +5471,15 @@
   },
   "needsConflictCheck › skips the check when the map has not moved": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4908,11 +5522,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -4920,10 +5529,15 @@
   },
   "needsConflictCheck › skips the check when the map is somehow behind the agent": {
     "file": "app/lib/conflict.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -4968,20 +5582,20 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "nodeShellClasses › accents risk and pro nodes, and only those": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5025,21 +5639,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › draws an unanswered question dashed and unfilled": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5083,21 +5697,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5141,21 +5755,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › fills the root idea solid, the one dark shape on the page": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5199,21 +5813,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › gives the just-changed node the lime border": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5257,21 +5871,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › leaves a gap node neutral": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5315,21 +5929,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › lets \"updated\" win over an accent kind": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5373,21 +5987,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › lets the root treatment win over every other rule": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5431,21 +6045,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "nodeShellClasses › marks a research node as a find": {
     "file": "app/lib/nodeAppearance.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5490,20 +6104,163 @@
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "parseNudges › accepts a lone object as a batch of one": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › accepts negative and fractional offsets": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › parses a batch of nudges": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects NaN and Infinity": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects a missing node id": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects a missing offset": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects an empty batch": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects an empty node id": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects an offset sent as a string": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects null and non-object entries": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "parseNudges › rejects the whole batch when any entry is malformed": {
+    "file": "app/lib/nodePositions.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
         "status": "pass"
       }
     ]
   },
   "payload readers › tolerate a missing, wrong-typed, or absent payload": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5518,10 +6275,15 @@
   },
   "pendingQuestions › asks nothing when the call failed": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5564,11 +6326,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -5576,10 +6333,15 @@
   },
   "pendingQuestions › asks nothing when the result carries no questions": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5622,11 +6384,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -5634,10 +6391,15 @@
   },
   "pendingQuestions › drops entries that are not a well-formed question": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5680,11 +6442,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -5692,10 +6449,15 @@
   },
   "pendingQuestions › reads the questions out of a pending ask_user result": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5740,20 +6502,20 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "planMapMutations › drops a node whose kind the map cannot draw": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5797,21 +6559,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › drops a node with a blank label": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5855,21 +6617,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › falls back to answered for an unknown status": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5913,21 +6675,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › handles adds, updates and a phase change in one turn": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -5971,21 +6733,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › ignores a phase that is not part of the loop": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6029,21 +6791,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › ignores an update that carries no valid fields": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6087,21 +6849,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › ignores an update with no id": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6145,21 +6907,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › keeps a valid status": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6203,21 +6965,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › leaves parentRef null when none is given": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6261,21 +7023,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › numbers siblings in the order they arrive": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6319,21 +7081,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › plans an insert for a valid node": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6377,21 +7139,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › plans an update with only the fields supplied": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6435,21 +7197,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › preserves insert order so parents precede their children": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6493,21 +7255,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › records a valid phase change": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6551,21 +7313,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › returns an empty plan for no calls": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6609,21 +7371,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "planMapMutations › survives a call with a missing or malformed input": {
     "file": "app/lib/nodePlan.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6668,20 +7430,20 @@
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
         "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "publishAgentDriver › leaves a newer map’s driver alone when an older disposer runs": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6731,10 +7493,15 @@
   },
   "publishAgentDriver › publishes a driver listing every catalog tool": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6784,10 +7551,15 @@
   },
   "publishAgentDriver › removes its own driver on disposal": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6837,10 +7609,15 @@
   },
   "railEntries › gives every entry a distinct id": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6855,10 +7632,15 @@
   },
   "railEntries › is empty for an empty log": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6873,10 +7655,15 @@
   },
   "railEntries › renders a full exchange as one line per act": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6891,10 +7678,15 @@
   },
   "readSince › decodes stored payloads back into objects": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6937,11 +7729,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -6949,10 +7736,15 @@
   },
   "readSince › reports the current revision even when the delta is empty": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -6995,11 +7787,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7007,10 +7794,15 @@
   },
   "readSince › returns only what happened after the cursor": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7053,11 +7845,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7065,10 +7852,15 @@
   },
   "readSince › returns the whole log when given no cursor": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7111,11 +7903,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7123,10 +7910,15 @@
   },
   "recordEvents › leaves the map at the revision of its last event": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7169,11 +7961,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7181,10 +7968,15 @@
   },
   "recordEvents › mints one revision per event and returns them in order": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7227,11 +8019,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7239,10 +8026,15 @@
   },
   "recordEvents › records nothing and holds the revision for an empty batch": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7285,11 +8077,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7297,10 +8084,15 @@
   },
   "recordEvents › refuses to write against an unknown map": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7343,11 +8135,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7355,10 +8142,15 @@
   },
   "recordEvents › returns every event the original call wrote on a retry": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7401,11 +8193,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7413,10 +8200,15 @@
   },
   "recordEvents › treats a repeated requestId as a no-op and returns the original revision": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7459,11 +8251,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7471,10 +8258,15 @@
   },
   "renderEvents › keeps events in the order given, one per line": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7517,11 +8309,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7529,10 +8316,15 @@
   },
   "renderEvents › leads every line with the revision, kind and origin": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7575,11 +8367,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7587,10 +8374,15 @@
   },
   "renderEvents › omits the dash when the readable field is empty": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7633,11 +8425,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7645,10 +8432,15 @@
   },
   "renderEvents › prefers the label when an event carries several readable fields": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7691,11 +8483,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7703,10 +8490,15 @@
   },
   "renderEvents › says so when nothing happened": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7749,11 +8541,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7761,10 +8548,15 @@
   },
   "renderEvents › shows the gist from whichever field the kind uses": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7807,11 +8599,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -7819,10 +8606,15 @@
   },
   "renderEvents › still renders an event whose payload is null or empty": {
     "file": "app/lib/exchangeFormat.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7867,20 +8659,20 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "resultText › falls back to raw JSON when there is no text block": {
     "file": "app/lib/agentDemo.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7890,10 +8682,15 @@
   },
   "resultText › reads the first text block of an MCP response": {
     "file": "app/lib/agentDemo.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7903,10 +8700,15 @@
   },
   "runLength › extends across consecutive same-kind, same-origin events": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7921,10 +8723,15 @@
   },
   "runLength › never groups a kind that carries its own text": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7939,10 +8746,15 @@
   },
   "runLength › returns 1 past the end": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7957,10 +8769,15 @@
   },
   "runLength › stops at a change of side": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -7975,10 +8792,15 @@
   },
   "splitAssistantLines › does not treat a mid-line question mark as a question line": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8022,21 +8844,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "splitAssistantLines › drops blank lines rather than rendering empty paragraphs": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8080,21 +8902,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "splitAssistantLines › leaves a statement unmarked": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8138,21 +8960,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "splitAssistantLines › marks a line ending in a question mark as a question": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8196,21 +9018,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "splitAssistantLines › returns nothing for empty or whitespace-only content": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8254,21 +9076,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "splitAssistantLines › splits a multi-line reply and marks only the questions": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8312,21 +9134,21 @@
       {
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "splitAssistantLines › trims surrounding whitespace on each line": {
     "file": "app/lib/messageLines.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8371,20 +9193,20 @@
         "at": "2026-09-01T00:02:13.647896384+00:00",
         "kind": "full",
         "status": "pass"
-      },
-      {
-        "at": "2026-08-31T23:30:30.039305746+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "summarizeMap › includes each node id in brackets": {
     "file": "app/lib/summarizeMap.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8427,11 +9249,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8439,10 +9256,15 @@
   },
   "summarizeMap › indents children beneath their parent": {
     "file": "app/lib/summarizeMap.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8485,11 +9307,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8497,10 +9314,15 @@
   },
   "summarizeMap › indents deeper for a grandchild": {
     "file": "app/lib/summarizeMap.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8543,11 +9365,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8555,10 +9372,15 @@
   },
   "summarizeMap › names each node kind and status": {
     "file": "app/lib/summarizeMap.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8601,11 +9423,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8613,10 +9430,15 @@
   },
   "summarizeMap › renders every node exactly once, whatever order they arrive in": {
     "file": "app/lib/summarizeMap.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8659,11 +9481,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8671,10 +9488,15 @@
   },
   "summarizeMap › says so explicitly when the map is empty": {
     "file": "app/lib/summarizeMap.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8719,20 +9541,85 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "suppressTextSelection › clears any selection the browser already started": {
+    "file": "app/lib/textSelection.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "suppressTextSelection › is safe to restore twice": {
+    "file": "app/lib/textSelection.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "suppressTextSelection › restores selection when the gesture ends": {
+    "file": "app/lib/textSelection.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "suppressTextSelection › restores the previous value rather than clearing it": {
+    "file": "app/lib/textSelection.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "suppressTextSelection › turns selection off for the duration of the gesture": {
+    "file": "app/lib/textSelection.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
         "status": "pass"
       }
     ]
   },
   "the shared tool catalog › exposes exactly the tools every front door shares": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8775,11 +9662,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8787,10 +9669,15 @@
   },
   "the shared tool catalog › finds a tool by name and reports nothing for an unknown one": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8833,11 +9720,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8845,10 +9727,15 @@
   },
   "the shared tool catalog › gives every tool a title and a description": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8891,11 +9778,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8903,10 +9785,15 @@
   },
   "the shared tool catalog › leaves the whole-collection tools out of the shared set": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -8949,11 +9836,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -8961,10 +9843,15 @@
   },
   "the shared tool catalog › marks the two read-only tools as read-only": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9007,11 +9894,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9019,10 +9901,15 @@
   },
   "timeoutMsFrom › caps a timeout longer than the ceiling": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9065,11 +9952,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9077,10 +9959,15 @@
   },
   "timeoutMsFrom › falls back to the default when the agent names no timeout": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9123,11 +10010,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9135,10 +10017,15 @@
   },
   "timeoutMsFrom › floors a zero or negative timeout at one second": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9181,11 +10068,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9193,10 +10075,15 @@
   },
   "timeoutMsFrom › uses the agent’s timeout when it is reasonable": {
     "file": "app/lib/toolCatalog.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9239,11 +10126,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9251,10 +10133,15 @@
   },
   "toolSummaries › summarises every catalog tool with a name, title and description": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9297,11 +10184,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9309,10 +10191,15 @@
   },
   "user-writable event kinds › accepts the three kinds a person can contribute": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9355,11 +10242,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9367,10 +10249,15 @@
   },
   "user-writable event kinds › refuses the kinds only an agent may write": {
     "file": "app/lib/exchange.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9413,11 +10300,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9425,10 +10307,15 @@
   },
   "validateToolInput › accepts a missing payload for a tool that needs no arguments": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9471,11 +10358,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9483,10 +10365,15 @@
   },
   "validateToolInput › accepts input that fits the tool and hands back the parsed value": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9529,11 +10416,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9541,10 +10423,15 @@
   },
   "validateToolInput › names the field that did not fit": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9587,11 +10474,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9599,10 +10481,15 @@
   },
   "validateToolInput › rejects a call missing a required field": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9645,11 +10532,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9657,10 +10539,15 @@
   },
   "validateToolInput › rejects a node kind the map cannot draw": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9703,11 +10590,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9715,10 +10597,15 @@
   },
   "validateToolInput › rejects a phase outside the loop": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9761,11 +10648,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9773,10 +10655,15 @@
   },
   "validateToolInput › rejects a tool the catalog does not define": {
     "file": "app/lib/toolInvocation.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9821,20 +10708,20 @@
         "at": "2026-09-01T01:28:47.456848975+00:00",
         "kind": "changed",
         "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
-        "kind": "changed",
-        "status": "pass"
       }
     ]
   },
   "visibleEvents › hides the node.updated that an answer closed": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9849,10 +10736,15 @@
   },
   "visibleEvents › hides the question nodes that a question.asked announced": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9867,10 +10759,15 @@
   },
   "visibleEvents › keeps a question node that nothing announced": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9885,10 +10782,15 @@
   },
   "visibleEvents › keeps a user update that is not the answer close": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9903,10 +10805,15 @@
   },
   "visibleEvents › keeps an agent update to a node the person answered": {
     "file": "app/lib/exchangeRail.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9919,12 +10826,134 @@
       }
     ]
   },
-  "waitForUserActivity › does not wake on the agent’s own writes": {
-    "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+  "visibleNodes › drops descendants at every depth, not just direct children": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › handles several collapsed branches at once": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › ignores a collapsed id that matches no node": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › is a no-op for a node with no children": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › keeps the collapsed node and drops only what is under it": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › leaves just the root when the root is collapsed": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › returns an empty list for an empty map": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › returns every node when nothing is collapsed": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "visibleNodes › terminates on a parentId cycle": {
+    "file": "app/lib/collapse.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "waitForUserActivity › does not wake on the agent’s own writes": {
+    "file": "app/lib/exchange.integration.test.ts",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -9967,11 +10996,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -9979,10 +11003,15 @@
   },
   "waitForUserActivity › returns immediately when the person already acted": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10025,11 +11054,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10037,10 +11061,15 @@
   },
   "waitForUserActivity › times out cleanly with a resume cursor when nobody acts": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10083,11 +11112,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10095,10 +11119,15 @@
   },
   "waitForUserActivity › wakes and returns the user’s events when they act during the wait": {
     "file": "app/lib/exchange.integration.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10141,11 +11170,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10153,10 +11177,15 @@
   },
   "webMcpUnavailableReason › names the iframe": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10199,11 +11228,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10211,10 +11235,15 @@
   },
   "webMcpUnavailableReason › names the insecure context": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10257,11 +11286,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10269,10 +11293,15 @@
   },
   "webMcpUnavailableReason › names the missing browser agent": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10315,11 +11344,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10327,10 +11351,15 @@
   },
   "webMcpUnavailableReason › reports nothing to explain when the page is bound": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10373,11 +11402,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -10385,10 +11409,15 @@
   },
   "webMcpUnavailableReason › reports the security problem first when several apply": {
     "file": "app/lib/webmcp.test.ts",
-    "lastRunAt": "2026-09-01T12:11:28.755724913+00:00",
+    "lastRunAt": "2026-09-01T13:47:22.618357768+00:00",
     "lastRunKind": "full",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T13:47:22.618357768+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T12:11:28.755724913+00:00",
         "kind": "full",
@@ -10431,11 +11460,6 @@
       },
       {
         "at": "2026-09-01T01:28:47.456848975+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T01:27:45.784123976+00:00",
         "kind": "changed",
         "status": "pass"
       }

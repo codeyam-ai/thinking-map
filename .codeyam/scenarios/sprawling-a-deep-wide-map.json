@@ -425,5 +425,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "Layout under stress: four levels deep, long node labels, twenty-one nodes. The map scales to fit rather than scrolling."
+  "description": "Layout under stress: four levels deep, long node labels, twenty-one nodes. Auto-fit bottoms out at the legibility floor, so the map opens scrolling rather than whole — the case direct manipulation exists to answer, by zooming in on a part or folding branches until the rest fits."
 }

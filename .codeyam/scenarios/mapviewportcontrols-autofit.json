@@ -1,0 +1,12 @@
+{
+  "name": "MapViewportControls - AutoFit",
+  "id": "a7e42e23-d624-4ffc-a230-9e828222be6b",
+  "url": "/isolated-components/MapViewportControls?s=AutoFit",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapViewportControls",
+  "scenarioType": "component",
+  "description": "How the map opens: the automatic fit at the legibility floor, with Fit greyed out because there is nothing yet to reset."
+}

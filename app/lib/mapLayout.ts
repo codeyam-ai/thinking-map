@@ -19,6 +19,11 @@ export interface FlatNode {
   /** Which side of the exchange authored the node. Optional because a caller
    *  that only draws geometry has no reason to carry it. */
   origin?: string | null;
+  /** A nudge away from the tidy position this layout computes — not a
+   *  position. Optional for the same reason `origin` is: a caller that only
+   *  wants geometry should not have to carry an arrangement it never set. */
+  offsetX?: number | null;
+  offsetY?: number | null;
 }
 
 export interface LaidOutNode {
@@ -163,8 +168,11 @@ export function layoutMap(flat: FlatNode[]): MapLayout {
   let maxX = 0;
   let maxY = 0;
   for (const tn of byId.values()) {
-    const x = tn.x + PAD;
-    const y = tn.depth * LEVEL_HEIGHT + PAD;
+    // The nudge is applied on top of the tidy placement, and the bounds below
+    // are measured after it. Measuring first would clip a node dragged past the
+    // widest column straight out of the scrollable extent.
+    const x = tn.x + PAD + (tn.node.offsetX ?? 0);
+    const y = tn.depth * LEVEL_HEIGHT + PAD + (tn.node.offsetY ?? 0);
     maxX = Math.max(maxX, x + tn.width);
     maxY = Math.max(maxY, y + tn.height);
     nodes.push({

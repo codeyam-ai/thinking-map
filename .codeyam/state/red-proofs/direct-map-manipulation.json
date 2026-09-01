@@ -1,0 +1,33 @@
+{
+  "provenAt": "2026-09-01T13:18:02Z",
+  "slug": "direct-map-manipulation",
+  "paths": [
+    "app/lib/mapLayout.ts"
+  ],
+  "runScope": [
+    "app/lib/mapLayout.ts"
+  ],
+  "tests": {
+    "layoutMap arrangement offsets › adds the offset to the tidy position rather than replacing it": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "layoutMap arrangement offsets › grows the bounds to contain a node nudged past them": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "layoutMap arrangement offsets › adds the offset to the tidy position rather than replacing it",
+      "layoutMap arrangement offsets › grows the bounds to contain a node nudged past them"
+    ]
+  }
+}

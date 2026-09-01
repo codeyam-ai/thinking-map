@@ -53,6 +53,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Tailwind v4's preflight resets buttons to the default arrow cursor. Anything
+   you can click should say so under the pointer, so put it back — app-wide,
+   because the reset is app-wide. A component that means something more specific
+   (a draggable node pill wants `grab`) overrides this with its own rule. */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 /* The eyebrow that sits above every node and panel heading. */
 .eyebrow {
   font-size: 11px;

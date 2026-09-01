@@ -1,0 +1,197 @@
+{
+  "name": "Arranged - a map tidied by hand",
+  "id": "99a46d62-9fa7-4e84-8e0b-8e9621c1ddee",
+  "url": "/map/map-arranged",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-arranged-1",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "user",
+        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-arranged-2",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-age\", \"parentId\": \"n-idea\", \"kind\": \"assumption\", \"label\": \"Ages 6-8\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-arranged-3",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-prob\", \"parentId\": \"n-idea\", \"kind\": \"problem\", \"label\": \"Vocabulary\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-arranged-4",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"goal\", \"label\": \"Not yet explored\", \"status\": \"open\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-arranged-5",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-res\", \"parentId\": \"n-prob\", \"kind\": \"research\", \"label\": \"3 existing apps found\", \"status\": \"answered\"}",
+        "revision": 5
+      },
+      {
+        "id": "ev-map-arranged-6",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-gap1\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"No parent involvement\", \"status\": \"answered\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-map-arranged-7",
+        "kind": "node.added",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-gap2\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"Fixed difficulty level\", \"status\": \"answered\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-map-arranged-8",
+        "kind": "phase.set",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "payload": "{\"phase\": \"research\"}",
+        "revision": 8
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "n-idea",
+        "kind": "idea",
+        "label": "Educational game for kids",
+        "mapId": "map-arranged",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "n-age",
+        "kind": "assumption",
+        "label": "Ages 6-8",
+        "mapId": "map-arranged",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-prob",
+        "kind": "problem",
+        "label": "Vocabulary",
+        "mapId": "map-arranged",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-goal",
+        "kind": "goal",
+        "label": "Not yet explored",
+        "mapId": "map-arranged",
+        "offsetX": 52,
+        "offsetY": -34,
+        "order": 2,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open"
+      },
+      {
+        "id": "n-res",
+        "kind": "research",
+        "label": "3 existing apps found",
+        "mapId": "map-arranged",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-prob",
+        "status": "answered"
+      },
+      {
+        "detail": "All three treat the child as the only user. Nobody surfaces what was learned to the adult who bought the app.",
+        "id": "n-gap1",
+        "kind": "gap",
+        "label": "No parent involvement",
+        "mapId": "map-arranged",
+        "offsetX": -104,
+        "offsetY": 70,
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-res",
+        "status": "answered"
+      },
+      {
+        "detail": "Word lists are age-banded, not ability-banded, so a strong reader is bored within a week.",
+        "id": "n-gap2",
+        "kind": "gap",
+        "label": "Fixed difficulty level",
+        "mapId": "map-arranged",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "n-res",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "I want to build an educational game for kids, but I don't know what it should be.",
+        "id": "msg-1",
+        "mapId": "map-arranged",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Before we think about the game itself: who is this actually for, what should they learn, and what are they doing today instead?",
+        "id": "msg-2",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "role": "assistant"
+      },
+      {
+        "content": "Probably kids around 6 to 8, and I want them to learn vocabulary.",
+        "id": "msg-3",
+        "mapId": "map-arranged",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Got it. I looked at what already exists for that age and skill, found three apps worth knowing about, and added them to the map. Two gaps stood out right away.",
+        "id": "msg-4",
+        "mapId": "map-arranged",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-arranged",
+        "phase": "research",
+        "revision": 8,
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "A map someone has rearranged: two nodes carried off their tidy positions and left there, with the offsets persisted so the arrangement survives a reload and is the same for the next viewer. The tidy tree still owns everything else - the siblings have not moved and every dotted connector still meets its node - because a drag stores a nudge away from the computed position, never a coordinate."
+}

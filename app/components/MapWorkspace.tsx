@@ -13,13 +13,17 @@ import type { FlatNode } from '../lib/mapLayout';
 export default function MapWorkspace({
   nodes,
   caption,
+  mapId,
 }: {
   nodes: FlatNode[];
   caption: string;
+  /** Passed through so a nudged node can be written back. Optional the whole
+   *  way down, so an isolated scenario mounts the map without inventing one. */
+  mapId?: string;
 }) {
   return (
     <div className="flex min-h-0 flex-1 gap-6">
-      <ThinkingMapView nodes={nodes} caption={caption} />
+      <ThinkingMapView nodes={nodes} caption={caption} mapId={mapId} />
       <ExchangeColumn nodes={nodes} />
     </div>
   );

@@ -99,6 +99,21 @@ model MapNode {
   /// own writes from the person's, and will re-ingest its own output as new
   /// information. It is also what lets the UI mark what the person contributed.
   origin    String  @default("agent")
+  /// A nudge away from the node's computed tidy position, in layout pixels —
+  /// not a position. The tidy tree stays authoritative: siblings still never
+  /// overlap by default, parents still centre over their children, and a node
+  /// added tomorrow still places itself sensibly instead of landing on top of
+  /// something moved last week. Drop these and the map is exactly what it was.
+  ///
+  /// Deliberately absent from the agent's rendering of the map. `read_map`
+  /// describes the thinking; pixel offsets are arrangement, and feeding an
+  /// agent coordinates it cannot act on is noise in a context window better
+  /// spent on the map's content.
+  ///
+  /// Defaulted rather than nullable so every existing row is already valid and
+  /// no backfill is needed.
+  offsetX   Float   @default(0)
+  offsetY   Float   @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

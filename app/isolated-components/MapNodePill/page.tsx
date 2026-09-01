@@ -1,5 +1,11 @@
+"use client";
+
+// A client harness, because the fold states need callback props and a function
+// cannot cross the server-component boundary.
+
+import { Suspense, useState, type ComponentProps } from "react";
+import { useSearchParams } from "next/navigation";
 import Component from "../../components/MapNodePill";
-import type { ComponentProps } from "react";
 
 type Props = ComponentProps<typeof Component>;
 
@@ -17,16 +23,28 @@ const scenarios: Record<string, Props> = {
   // The map is co-authored now, so a node the person wrote says so in its
   // eyebrow — the same fact the tools read to avoid re-ingesting their own writes.
   Yours: { node: { id: "n", parentId: null, kind: "goal", label: "Refind a half-remembered idea", detail: null, status: "answered", sourceUrl: null, origin: "user", depth: 1, x: 0, y: 0, width: 240, height: 56 } },
+  // A node with a branch under it: the fold control sits on the bottom edge,
+  // where the branch leaves the pill.
+  Foldable: { node: { id: "n", parentId: null, kind: "research", label: "7 existing tools found", detail: null, status: "answered", sourceUrl: null, origin: "agent", depth: 1, x: 0, y: 0, width: 240, height: 56 }, hiddenCount: 5 },
+  // Folded, the control reports what it is holding — and the pill's own status
+  // treatment is untouched, which is the rule nodeShellClasses owns.
+  Folded: { node: { id: "n", parentId: null, kind: "research", label: "7 existing tools found", detail: null, status: "answered", sourceUrl: null, origin: "agent", depth: 1, x: 0, y: 0, width: 240, height: 56 }, collapsed: true, hiddenCount: 5 },
 };
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ s?: string }>;
-}) {
-  const { s = "Default" } = await searchParams;
+function Harness() {
+  const s = useSearchParams().get("s") ?? "Default";
   const props = scenarios[s];
+  const [collapsed, setCollapsed] = useState(props?.collapsed ?? false);
   if (!props) return <div>Unknown scenario: {s}</div>;
+
+  // Only the fold scenarios take a toggle — the rest are the pure status
+  // treatments, and giving them a control they never have in context would
+  // document a pill that does not exist.
+  const foldProps =
+    props.hiddenCount === undefined
+      ? {}
+      : { collapsed, onToggleCollapse: () => setCollapsed((c) => !c) };
+
   // The pill positions itself absolutely inside the map plane, so the host
   // reproduces a plane of the right size rather than letting it collapse.
   return (
@@ -35,8 +53,16 @@ export default async function Page({
         className="relative"
         style={{ width: props.node.width, height: props.node.height + 24 }}
       >
-        <Component {...props} />
+        <Component {...props} {...foldProps} />
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div />}>
+      <Harness />
+    </Suspense>
   );
 }

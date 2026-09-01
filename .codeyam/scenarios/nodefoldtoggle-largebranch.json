@@ -1,0 +1,12 @@
+{
+  "name": "NodeFoldToggle - LargeBranch",
+  "id": "a708ef14-13c8-4aaa-ba0c-f09a6a9b1677",
+  "url": "/isolated-components/NodeFoldToggle?s=LargeBranch",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "NodeFoldToggle",
+  "scenarioType": "component",
+  "description": "A whole phase of thinking folded away behind a two-digit count, showing the control grows rather than clipping the number."
+}

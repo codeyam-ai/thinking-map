@@ -33,7 +33,7 @@ export default async function MapPage({
       initialEvents={events}
       initialRevision={revision}
     >
-      <MapScreen phase={phase} nodes={map.nodes} />
+      <MapScreen phase={phase} nodes={map.nodes} mapId={map.id} />
       {process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}
     </WebMcpBridge>
   );

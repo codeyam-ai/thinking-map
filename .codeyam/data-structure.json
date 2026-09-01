@@ -45,7 +45,7 @@
   },
   {
     "name": "Message",
-    "description": "One turn of the conversation, in order. Nothing in the page renders these any more — the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
+    "description": "One turn of the conversation, in order. Nothing in the page renders these any more \u2014 the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
     "category": "datastore",
     "order": 2,
     "fields": [
@@ -84,7 +84,7 @@
   },
   {
     "name": "MapNode",
-    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step) and 'status' drives the dashed / solid / highlighted treatment from the mockups. 'origin' says whether the person or the agent contributed it, which is what stops an agent re-ingesting its own writes as new information. Self-referencing, so parents must precede children in seed input order.",
+    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step) and 'status' drives the dashed / solid / highlighted treatment from the mockups. 'origin' says whether the person or the agent contributed it, which is what stops an agent re-ingesting its own writes as new information. Self-referencing, so parents must precede children in seed input order. 'offsetX' / 'offsetY' are an arrangement nudge away from the node's computed tidy position, not a position: the tidy layout stays authoritative, so siblings still never overlap and a node added later still places itself sensibly. They default to 0, and they are deliberately absent from the agent's rendering of the map \u2014 arrangement is not thinking.",
     "category": "datastore",
     "order": 3,
     "fields": [
@@ -137,6 +137,16 @@
       {
         "name": "origin",
         "type": "string",
+        "required": true
+      },
+      {
+        "name": "offsetX",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "offsetY",
+        "type": "number",
         "required": true
       },
       {

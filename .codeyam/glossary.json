@@ -294,6 +294,16 @@
     ]
   },
   {
+    "description": "The zoom cluster over the bottom-right of the map panel: zoom out, the current scale as a percentage, zoom in, and a fit-to-map reset. It states the scale as a number because the map has no other way to say where it is — the same tree fills the panel at 66% and at 136%, and only the readout distinguishes the whole shape from a detail. Fit is disabled while the viewport is already the automatic fit.",
+    "filePath": "app/components/MapViewportControls.tsx",
+    "name": "MapViewportControls",
+    "scenarios": [
+      "mapviewportcontrols-autofit",
+      "mapviewportcontrols-zoomedin",
+      "mapviewportcontrols-zoomedout"
+    ]
+  },
+  {
     "description": "The working view - conversation left, map right - the two views of the same thinking placed side by side.",
     "filePath": "app/components/MapWorkspace.tsx",
     "name": "MapWorkspace",
@@ -308,6 +318,16 @@
     "scenarios": [
       "nextstepstrack-default",
       "nextstepstrack-empty"
+    ]
+  },
+  {
+    "description": "The fold control straddling a node pill's bottom edge, where its branch leaves it. Folded, it shows what folding cost as a count rather than a bare chevron, because the count is what tells you whether the branch is worth reopening. It is its own element rather than a change to the pill's shell, so the status-precedence rule nodeShellClasses owns is left undisturbed.",
+    "filePath": "app/components/NodeFoldToggle.tsx",
+    "name": "NodeFoldToggle",
+    "scenarios": [
+      "nodefoldtoggle-default",
+      "nodefoldtoggle-folded",
+      "nodefoldtoggle-largebranch"
     ]
   },
   {
@@ -519,6 +539,24 @@
     ]
   },
   {
+    "description": "Groups nodes by parent id so a subtree can be walked downward. The map stores only parentId, so this is the edge index both collapse operations need.",
+    "filePath": "app/lib/collapse.ts",
+    "name": "childIndex",
+    "testFile": "app/lib/collapse.test.ts"
+  },
+  {
+    "description": "Holds a zoom level between the viewport's minimum and maximum, so no wheel flick or repeated button press can drive the map to an unreadable or unusable scale.",
+    "filePath": "app/hooks/useMapViewport.ts",
+    "name": "clamp",
+    "testFile": "app/components/ThinkingMapView.render.test.tsx"
+  },
+  {
+    "description": "How many nodes sit beneath a given node, at any depth, so a folded pill can say what it is holding. Counted over the whole map rather than the visible slice, so the number stays truthful once the branch it describes has gone.",
+    "filePath": "app/lib/collapse.ts",
+    "name": "collapsedDescendantCount",
+    "testFile": "app/lib/collapse.test.ts"
+  },
+  {
     "description": "Builds the orthogonal SVG path from a parent's bottom edge to a child's top edge, routed through a horizontal bus midway between the levels so siblings share it and the tree reads as one structure. Emits a straight line when the two are already aligned.",
     "filePath": "app/lib/mapLayout.ts",
     "name": "connectorPath",
@@ -549,6 +587,12 @@
     "filePath": "app/lib/exchange.ts",
     "name": "decodeEvent",
     "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Every node beneath a starting node, at any depth, excluding the starting node itself. Guards against a parentId cycle the same way the layout does, so a malformed map still folds rather than hanging.",
+    "filePath": "app/lib/collapse.ts",
+    "name": "descendants",
+    "testFile": "app/lib/collapse.test.ts"
   },
   {
     "description": "The rail line for one event that does not collapse — a note, an answer, a question, a phase change. The wording is the interface: it is the only account a person gets of what an agent did to their map, so it lives in one place and is pinned by tests.",
@@ -750,6 +794,12 @@
     "testFile": "app/lib/nodeAppearance.test.ts"
   },
   {
+    "description": "Validates a node-arrangement batch off a request body, returning the parsed nudges or the message explaining what was wrong. Lives apart from the route so what counts as a well-formed nudge is checkable without an HTTP request; offsets must be finite, because NaN and Infinity are both typeof number and either one would put a node nowhere.",
+    "filePath": "app/lib/nodePositions.ts",
+    "name": "parseNudges",
+    "testFile": "app/lib/nodePositions.test.ts"
+  },
+  {
     "description": "The questions a pending ask_user is waiting on. The server writes them onto the map and returns this pending shape; only the page can perform the middle step of asking a person. Returns empty for an errored call or a result carrying none, which is the signal to hand the server's response straight back - putting a prompt on screen off the back of a failure would be worse than showing nothing.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "pendingQuestions",
@@ -857,6 +907,12 @@
     "testFile": "app/lib/summarizeMap.test.ts"
   },
   {
+    "description": "Holds text selection off for the duration of a drag and returns the restore function. Scoped to the gesture rather than the map, because selecting a node's label is worth keeping — it is how you copy one out.",
+    "filePath": "app/lib/textSelection.ts",
+    "name": "suppressTextSelection",
+    "testFile": "app/lib/textSelection.test.ts"
+  },
+  {
     "description": "Wraps a string in the content envelope every MCP tool response takes. A one-line shape adapter with no branches; the strings it wraps are built by mcpFormat.",
     "filePath": "app/lib/mcpServer.ts",
     "name": "textResult",
@@ -900,6 +956,18 @@
     ]
   },
   {
+    "description": "The person's control of the map plane: zoom about the pointer, drag-to-pan, and a fit-to-map reset. It wraps useFitToFrame rather than sitting beside it, reporting the automatic fit until someone touches the viewport and their own scale from then on; fitToMap hands control back rather than recomputing a scale, which is what makes the reset exact.",
+    "filePath": "app/hooks/useMapViewport.ts",
+    "name": "useMapViewport",
+    "testFile": "app/components/ThinkingMapView.render.test.tsx"
+  },
+  {
+    "description": "The click-or-drag gesture on a map node, reporting movement as a delta in map pixels rather than screen pixels so a node does not drift from the pointer as you zoom in. Deltas go to the caller on every move, because only the layout can carry the node's dotted connector along with it.",
+    "filePath": "app/hooks/useNodeDrag.ts",
+    "name": "useNodeDrag",
+    "testFile": "app/components/MapNodePill.render.test.tsx"
+  },
+  {
     "description": "Reads the bridge state - connection status, the questions an agent is waiting on, the current revision, and the two writers - from context. Throws outside a provider rather than returning a null the caller would have to guard at every use site.",
     "filePath": "app/components/WebMcpBridge.tsx",
     "name": "useWebMcpBridge",
@@ -919,6 +987,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "visibleEvents",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "The nodes still on the map once the given branches are folded, keeping each collapsed node itself and dropping only its descendants. It filters the layout's INPUT, which is what lets the remaining tree genuinely re-tidy and get narrower rather than leaving holes where the hidden nodes were.",
+    "filePath": "app/lib/collapse.ts",
+    "name": "visibleNodes",
+    "testFile": "app/lib/collapse.test.ts"
   },
   {
     "description": "Blocks until the person contributes, or until the caller's timeout expires. Re-reads the log first because an event may already be waiting and a waiter that subscribed before checking would sleep through it; then races an in-process emitter against a ~500ms poll. The poll is what lets a write from the separate stdio process wake a waiter living in the web process - an emitter alone would be silently correct in dev and silently wrong across front doors. Always resolves: a timeout is a normal result carrying the cursor, never a hang.",

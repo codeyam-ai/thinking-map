@@ -17,9 +17,12 @@ import type { SummaryNode } from '../lib/summaryGroups';
 export default function MapScreen({
   phase,
   nodes,
+  mapId,
 }: {
   phase: Phase;
   nodes: FlatNode[] & SummaryNode[];
+  /** Only the working view needs it — the summary has no map to arrange. */
+  mapId?: string;
 }) {
   return (
     <main className="flex h-screen flex-col gap-6 px-10 py-8">
@@ -27,7 +30,7 @@ export default function MapScreen({
       {phase === 'next-steps' ? (
         <SummaryScreen nodes={nodes} />
       ) : (
-        <MapWorkspace nodes={nodes} caption={mapCaption(nodes)} />
+        <MapWorkspace nodes={nodes} caption={mapCaption(nodes)} mapId={mapId} />
       )}
     </main>
   );

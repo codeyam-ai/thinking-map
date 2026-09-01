@@ -1,0 +1,12 @@
+{
+  "name": "NodeFoldToggle - Default",
+  "id": "7d1b1ade-ba78-4acb-9b96-125076e70f05",
+  "url": "/isolated-components/NodeFoldToggle?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "NodeFoldToggle",
+  "scenarioType": "component",
+  "description": "Unfolded on a node with three descendants: the control says what it will do rather than what it is hiding."
+}

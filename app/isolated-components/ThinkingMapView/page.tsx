@@ -43,6 +43,13 @@ const SPRAWLING: FlatNode[] = [
     { id: "appr2", parentId: "appr", kind: "approach", label: "Nothing software - a paper protocol", detail: null, status: "answered", sourceUrl: null, order: 2 },
   ];
 
+// The researched map with one node nudged clear of its tidy position. It moves
+// down and to the LEFT deliberately: nudging the rightmost node instead put it
+// under the zoom cluster, where the arrangement was the thing you could not see.
+const NUDGED: FlatNode[] = RESEARCHED.map((node) =>
+  node.id === "n-g1" ? { ...node, offsetX: -96, offsetY: 62 } : node,
+);
+
 const scenarios: Record<string, Props> = {
   Default: { nodes: RESEARCHED, caption: "5 answered, 1 still open" },
   // Day one: the panel has to invite the next answer, not show a void.
@@ -52,6 +59,11 @@ const scenarios: Record<string, Props> = {
   // The caption is optional; without it the header shows only the LIVE MAP
   // eyebrow and must not collapse or leave a gap.
   NoCaption: { nodes: RESEARCHED },
+  // One node carried away from where the tidy tree put it. The offset is a
+  // nudge, not a coordinate — its siblings do not move, and the dotted
+  // connector still meets it, which is the whole claim of applying offsets
+  // inside the layout rather than after it.
+  Nudged: { nodes: NUDGED, caption: "5 answered, 1 still open" },
 };
 
 export default async function Page({
