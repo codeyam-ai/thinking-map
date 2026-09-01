@@ -1,0 +1,12 @@
+{
+  "name": "BriefMenu - Busy",
+  "id": "2f1228c5-854a-4205-9d2f-943f1a3d823d",
+  "url": "/isolated-components/BriefMenu?s=Busy",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefMenu",
+  "scenarioType": "component",
+  "description": "While a file is being read the trigger dims and will not open, because offering to attach a second document mid-extraction is a way to lose the first."
+}

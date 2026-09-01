@@ -152,16 +152,6 @@
     ]
   },
   {
-    "description": "The resting state of the intake: drop a document, choose one, or paste. Dashed rather than solid, in the same language the map uses for a thought that is not finished yet - nothing has been committed, and the whole panel disappears the moment a brief is in hand.",
-    "filePath": "app/components/BriefDropTarget.tsx",
-    "name": "BriefDropTarget",
-    "scenarios": [
-      "briefdroptarget-default",
-      "briefdroptarget-reading",
-      "briefdroptarget-failed"
-    ]
-  },
-  {
     "description": "The opening lines of the brief, exactly as extracted. Verbatim on purpose, markdown marks and all: the claim being made is this is what we got out of your file, and prettifying it would undermine the one thing it is here to prove. A file that yielded nothing shows nothing, which is the signal.",
     "filePath": "app/components/BriefExcerpt.tsx",
     "name": "BriefExcerpt",
@@ -169,6 +159,21 @@
       "briefexcerpt-default",
       "briefexcerpt-nothingextracted"
     ]
+  },
+  {
+    "description": "The brief intake with its dashed panel removed: a hidden file picker its parent opens plus the one error line an upload can produce, and the ACCEPT list keeping the picker and the extractor in step. Renders nothing at rest.",
+    "filePath": "app/components/BriefFileInput.tsx",
+    "name": "BriefFileInput",
+    "untestabilityReason": {
+      "justification": "A headless forwardRef wrapper around a hidden file input plus one conditional error line - it renders nothing at rest, so an isolated capture would be a blank frame. The picker it opens is driven by BriefMenu (covered by BriefMenu.render.test.tsx) and the upload path is exercised by the landing application scenarios.",
+      "kind": "scaffold"
+    }
+  },
+  {
+    "description": "The whole brief intake stated in 28px of width instead of 140px of height: a + button inside the input frame opening a two-item menu (Upload a file / Paste a brief), which becomes a chip naming the document once one is attached. Closes on outside click, Escape, and selection.",
+    "filePath": "app/components/BriefMenu.tsx",
+    "name": "BriefMenu",
+    "testFile": "app/components/BriefMenu.render.test.tsx"
   },
   {
     "description": "The client's brief beside the map, marked with what has been accounted for. A client who hands over a twenty-page spec wants evidence you read all of it; the map is the evidence for the sections it cites, and this panel exists for the ones it does not - the difference between reading a brief and inferring it. Pure composition over a header, a headline, the section list and a dangling-reference note. Its one piece of behaviour is the untouched-section prompt, which rides the existing user.note channel so it wakes a waiting agent with no new mechanism.",

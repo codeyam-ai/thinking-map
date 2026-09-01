@@ -1,0 +1,12 @@
+{
+  "name": "BriefMenu - LongFilename",
+  "id": "6b967930-43ec-4fc1-b5f3-ffa48f9403ff",
+  "url": "/isolated-components/BriefMenu?s=LongFilename",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefMenu",
+  "scenarioType": "component",
+  "description": "A filename far longer than the chip. It truncates at 160px rather than growing and pushing the prompt's own text out of the frame - the edge case that decides whether the chip can live inside the input at all."
+}

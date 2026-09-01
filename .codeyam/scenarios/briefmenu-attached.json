@@ -1,0 +1,12 @@
+{
+  "name": "BriefMenu - Attached",
+  "id": "a5dca8c6-aa79-4843-872d-7f2ea611ad00",
+  "url": "/isolated-components/BriefMenu?s=Attached",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefMenu",
+  "scenarioType": "component",
+  "description": "A document in hand. The + becomes a bordered chip naming the file, so the attached state stays visible in the input frame without the panel that used to announce it."
+}

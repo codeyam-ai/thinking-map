@@ -1,0 +1,12 @@
+{
+  "name": "BriefMenu - Default",
+  "id": "e5a46888-2bf6-4bed-aa67-3493d0064a36",
+  "url": "/isolated-components/BriefMenu?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefMenu",
+  "scenarioType": "component",
+  "description": "The resting state, and what almost every arrival sees: a single + at the left of the prompt frame. This is the entire brief intake now - it replaced a dashed panel three lines tall carrying its own sentence, two buttons and a format hint."
+}

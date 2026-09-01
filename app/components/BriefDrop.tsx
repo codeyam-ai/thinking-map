@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import BriefDropTarget from './BriefDropTarget';
 import BriefPasteBox from './BriefPasteBox';
 import BriefReadout from './BriefReadout';
 
@@ -17,50 +15,30 @@ export interface AttachedBrief {
 /**
  * The way a twenty-page spec gets into a map.
  *
- * Owns one question — what document, if any, is attached — and shows exactly
- * one of three things depending on the answer: the readout of an attached
- * brief, the paste box, or the drop target. Extraction happens over the wire
- * because reading a PDF is a server's job; nothing is persisted by it, so a
- * brief the person discards leaves nothing behind.
+ * Still answers one question — what document, if any, is attached — and shows
+ * exactly one of three things depending on the answer. The third thing used to
+ * be a dashed panel advertising drag-and-drop; it is now NOTHING, because the
+ * advertisement moved into the `+` menu inside the input frame and the drop
+ * target became the form itself. At rest this component renders nothing at all,
+ * which is what gives the question the screen.
+ *
+ * The upload and the intake state live in `IdeaPrompt`, the nearest parent that
+ * also renders the input the menu sits inside — the menu and the readout are
+ * siblings, so their shared state cannot live in either one.
  */
 export default function BriefDrop({
   brief,
+  pasting,
   onAttach,
   onClear,
+  onCancelPaste,
 }: {
   brief: AttachedBrief | null;
+  pasting: boolean;
   onAttach: (brief: AttachedBrief) => void;
   onClear: () => void;
+  onCancelPaste: () => void;
 }) {
-  const [pasting, setPasting] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function upload(file: File) {
-    setBusy(true);
-    setError(null);
-    try {
-      const form = new FormData();
-      form.append('file', file);
-      const response = await fetch('/api/briefs/extract', {
-        method: 'POST',
-        body: form,
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? 'Could not read that file.');
-      onAttach({
-        text: data.text,
-        sourceName: data.sourceName,
-        mediaType: data.mediaType,
-        warning: data.warning,
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not read that file.');
-    } finally {
-      setBusy(false);
-    }
-  }
-
   if (brief) return <BriefReadout brief={brief} onClear={onClear} />;
 
   if (pasting) {
@@ -75,19 +53,11 @@ export default function BriefDrop({
             mediaType: 'text/plain',
             warning: null,
           });
-          setPasting(false);
         }}
-        onCancel={() => setPasting(false)}
+        onCancel={onCancelPaste}
       />
     );
   }
 
-  return (
-    <BriefDropTarget
-      busy={busy}
-      error={error}
-      onFile={(file) => void upload(file)}
-      onPaste={() => setPasting(true)}
-    />
-  );
+  return null;
 }

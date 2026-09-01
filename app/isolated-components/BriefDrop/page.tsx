@@ -25,8 +25,9 @@ cardholder still lives in the district.`;
 function Harness() {
   const s = useSearchParams().get('s') ?? 'Default';
   const preset: Record<string, AttachedBrief | null> = {
-    // Nothing attached yet — the whole intake is the drop target, and this is
-    // what the landing screen shows on arrival.
+    // Nothing attached and not pasting. This state now renders NOTHING — the
+    // dashed panel that used to live here moved into the `+` menu inside the
+    // input frame, which is the whole point of the landing-focus change.
     Default: null,
     // A document in hand. The intake switches wholesale: the drop target is
     // gone and the readout takes its place, because there is one brief per map
@@ -37,6 +38,9 @@ function Harness() {
       mediaType: 'application/pdf',
       warning: null,
     },
+    // Mid-paste: the person chose "Paste a brief" from the `+` menu and the box
+    // is open. This is the state the menu's second item leads to.
+    Pasting: null,
   };
   // The hook runs unconditionally — an early return above it would break the
   // rules of hooks — so an unknown scenario is caught after state is set up.
@@ -47,8 +51,10 @@ function Harness() {
       <div style={{ width: '100%', maxWidth: 930 }}>
         <Component
           brief={brief}
+          pasting={s === 'Pasting'}
           onAttach={setBrief}
           onClear={() => setBrief(null)}
+          onCancelPaste={() => {}}
         />
       </div>
     </div>

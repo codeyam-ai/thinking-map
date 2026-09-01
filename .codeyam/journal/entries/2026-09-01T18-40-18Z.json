@@ -1,0 +1,487 @@
+{
+  "timestamp": "2026-09-01T18:40:18Z",
+  "title": "A Landing Screen That Asks One Question",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe landing screen is supposed to ask one question, and instead it asks one\nquestion surrounded by five other things. Below the oversized hero sit the input,\na dashed brief-intake panel three lines tall carrying its own sentence, two\nbuttons and a format hint, four suggestion chips that wrap onto two rows, and the\nsaved-map list — so the question the whole product opens with competes for\nattention with the machinery around it. At half-screen width, which is where this\nwill mostly be read, it is worse: the chips break to two rows and the intake panel\ntakes a quarter of the fold. Give the question the screen. Shrink the hero to fit\nits frame, collapse the entire brief intake behind a single `+` button beside the\ninput that opens a small menu, cut the chips to one row, and demote the saved-map\nlist to a quiet strip.\n\n![The landing screen today at half width — the question is one of six things competing](assets/a-landing-screen-that-asks-one-question/landing-half-screen.png)\n\n## Key Decisions\n\n- **`+` opens a menu, not an inline panel.** The intake is a *capability*, not a\n  step: most arrivals type a sentence and never touch it. A `+` button inside the\n  input's own frame, opening a two-item popover — *Upload a file* / *Paste a\n  brief* — states the capability in 28px of width instead of 140px of height.\n  This is what the user asked for directly.\n- **Drag-and-drop survives the collapse.** The whole form region stays a drop\n  target: dropping a `.pdf` anywhere over it highlights the frame and attaches the\n  document exactly as today. The dashed panel was the *advertisement* for drag and\n  drop, not the mechanism, so removing it costs discoverability, not function —\n  and the `+` menu is the replacement advertisement. A one-line hint under the\n  input (`PDF, Word, Markdown or plain text — or drop one here`) keeps the file\n  types stated without a panel.\n- **The hero shrinks by fixing its clamp, not by cutting words.** `clamp(40px,\n  5.6vw, 72px)` floors at 40px, so a 760px window renders the hero at its\n  *minimum* — 40px over two lines plus a 17px subtitle plus 44px of margin. Retune\n  to `clamp(28px, 4.6vw, 64px)` and cut the subtitle's bottom margin from `mb-11`\n  to a fluid `mb-6 lg:mb-11`. The question keeps its showcase treatment on a\n  desktop and stops dominating a half screen.\n- **Chips go to one row and stay one row.** Four chips wrap at half width. Show\n  three under `lg` and all four above it, in a single `flex-nowrap` row that\n  scrolls horizontally if it must — a wrapped second row of chips is the single\n  biggest source of the crowding in the screenshot.\n- **Saved maps become a strip, not a section.** `mt-16` plus a centred eyebrow\n  plus full-width rows is a section heading's worth of ceremony for a list that is\n  usually empty and never the reason someone opened the page. Tighten to `mt-8`,\n  cap at three visible rows with a `Show all N` disclosure, and keep the rows\n  themselves as they are.\n- **Nothing is removed from the product.** Every capability on this screen — file\n  upload, paste, suggestions, resuming a map — is still one click away. This plan\n  changes how much space each one claims when nobody is using it.\n\n## Implementation\n\n### 1. A `+` menu inside the input frame\n\n**New file**: `app/components/BriefMenu.tsx`\n\nA client component rendering a `+` button and, when open, a small popover with two\nitems: **Upload a file** (opens the hidden file input) and **Paste a brief**\n(switches the intake into paste mode). Props: `busy`, `onChooseFile`, `onPaste`,\nand the attached brief's name when one is in hand, so the button can render as a\nfilled chip showing the attachment instead of a `+`.\n\nShape follows the design system: `border-radius: 999px` on the button, `20px` on\nthe popover, `--line` hairline, no shadow beyond the one already used on\n`NodeQuestionComposer`. Close on outside click, on `Escape`, and on selection.\n`aria-haspopup=\"menu\"` / `aria-expanded`, and the items are real `button`s in a\n`role=\"menu\"`, so it is reachable by keyboard — the current two buttons are, and\nthis must not regress that.\n\n### 2. The input frame hosts the menu, the send button, and the drop target\n\n**File**: `app/components/IdeaForm.tsx`\n\nThe input already reserves `pl-8 pr-24` for a large `SendButton` on the right.\nReserve the left as well — `pl-16` — and absolutely position `BriefMenu` at\n`left-3`, mirroring how `SendButton` is positioned at `right-4`. Add the\ndrag-over handlers to the `form` element itself (they currently live on\n`BriefDropTarget`'s panel) and a `border-ink bg-surface` treatment while a file is\nover it, so the whole prompt reads as the drop zone.\n\nBelow the input, replace nothing and add one muted line:\n`PDF, Word, Markdown or plain text — or drop one here`, `text-[12.5px] text-muted`,\nshown only when no brief is attached.\n\n### 3. Rewire the intake around the menu\n\n**Files**: `app/components/BriefDrop.tsx`, `app/components/BriefDropTarget.tsx`\n\n`BriefDrop` keeps every responsibility it has today — it owns whether a document\nis attached, performs the `POST /api/briefs/extract` upload, and shows one of\nthree things — but the third thing changes. `BriefDropTarget` is reduced from a\ndashed panel to a headless piece: the hidden `<input type=\"file\">`, the `ACCEPT`\nlist, and the error line. Its panel markup, its two buttons and its format hint\nall move out (to `BriefMenu` and to change 2). Rename it to `BriefFileInput.tsx`\nif that reads better once the panel is gone — the `ACCEPT` constant and its\ncomment about the picker and the extractor staying in step must travel with it.\n\n`BriefPasteBox` and `BriefReadout` are unchanged. `BriefReadout` already renders\ncompactly when a document is in hand, which is the state that earns the space.\n\n### 4. Retune the hero\n\n**File**: `app/components/IdeaHero.tsx`\n\n`text-[clamp(40px,5.6vw,72px)]` → `text-[clamp(28px,4.6vw,64px)]`, and\n`max-w-[13ch]` → `max-w-[15ch]` so the smaller type still breaks after \"you\".\nSubtitle margin `mt-5 mb-11` → `mt-3 mb-6 lg:mt-5 lg:mb-11`, and its size\n`text-[17px]` → `text-[15px] lg:text-[17px]`.\n\n### 5. One row of chips\n\n**File**: `app/components/SuggestionChips.tsx`\n\n`flex-wrap` → `flex-nowrap overflow-x-auto no-scrollbar` (the utility added in the\nhalf-screen chrome plan), `gap-2.5` → `gap-2 lg:gap-2.5`, and render\n`SUGGESTIONS.slice(0, 3)` under `lg` with all four above it. Chips keep their\ncurrent `px-4 py-2.5`; they are already the right size.\n\n### 6. Saved maps as a strip\n\n**File**: `app/components/SavedMapList.tsx`\n\n`mt-16` → `mt-8 lg:mt-12`. Cap the rendered rows at three with a\n`Show all {maps.length}` text button beneath when there are more, holding the\nexpanded state locally (this makes the component a client component). Keep the\neyebrow and keep `SavedMapRow` exactly as it is.\n\n### 7. Let the column breathe rather than centre in a void\n\n**File**: `app/components/LandingScreen.tsx`\n\n`justify-center pb-24` centres the stack vertically and then pushes it up by 96px,\nwhich at half-screen height leaves the hero floating with the saved maps pressed\ntoward the bottom. Change to `justify-start pt-8 pb-10 lg:justify-center lg:pt-0\nlg:pb-24` — anchored to the top where height is scarce, centred where it is not.\n\n## Reused existing code\n\n- `BriefDrop` from `app/components/BriefDrop.tsx` (glossary entry: `BriefDrop`) —\n  keeps ownership of the attached-brief question and the upload; only its resting\n  presentation changes.\n- `ACCEPT` from `app/components/BriefDropTarget.tsx` — the picker/extractor\n  agreement moves intact rather than being restated in the new menu.\n- `BriefPasteBox` and `BriefReadout` (glossary entries: `BriefPasteBox`,\n  `BriefReadout`) — unchanged; the menu's *Paste a brief* item routes into the\n  existing `pasting` state.\n- `SendButton` from `app/components/SendButton.tsx` (glossary entry: `SendButton`)\n  — the precedent for a control absolutely positioned inside the input's frame\n  (`right-4 h-[52px] w-[52px]` in its `large` size). `BriefMenu` mirrors it on the\n  left rather than inventing a second pattern.\n- `NodeQuestionComposer` from `app/components/NodeQuestionComposer.tsx` (glossary\n  entry: `NodeQuestionComposer`) — the existing small floating panel in this app\n  (`rounded-2xl border border-line bg-surface p-3 shadow-lg`); the popover matches\n  it so the two read as one component family.\n- `SUGGESTIONS` from `app/lib/suggestions.ts` (glossary entry: `SUGGESTIONS`) —\n  the chip content is untouched; only how many render at a given width changes.\n- `.no-scrollbar` from `app/globals.css` — introduced by the half-screen chrome\n  plan for the phase track; the chip row is its second consumer. If this plan\n  lands first, add the utility here instead.\n- **Existing-implementation survey (attachment menus).** Grepped `app/` for an\n  existing popover, dropdown, or menu component: there is none. `NodeKindPicker`\n  is a native `<select>`, and `ContributionTabs` is a two-button segmented\n  control — neither is a menu and neither is reusable here. The `+` menu\n  introduced by change 1 is genuinely new (new file), not a duplicate.\n\n## Scenarios to Demonstrate\n\n- **Day one at half screen (760×1000)** — no saved maps, nothing attached: hero,\n  input with `+` and send, one line of file-type hint, three chips. The whole\n  screen is the question.\n- **Day one at Desktop (1440×900)** — the showcase hero at its full size, four\n  chips, unchanged in character from today.\n- **The `+` menu open** — two items, keyboard-focusable, over the landing ground.\n- **A brief attached** — the `+` renders as a chip naming the file, the hint line\n  and the chips are gone, and `BriefReadout` shows the source. The input's label\n  and placeholder switch to the brief wording `IdeaForm` already implements.\n- **Dragging a file over the prompt** — the form frame highlights; no dashed panel\n  anywhere on screen.\n- **A scanned PDF that extracts nothing** — the existing `BriefWarning` path still\n  renders under the compact intake, so a document that came back empty still says\n  so.\n- **Eleven saved maps** — three rows plus `Show all 11`, at both widths.\n- **Extraction failed** — the error line renders under the input rather than\n  inside a panel that no longer exists.",
+  "description": "The landing screen asked one question surrounded by five other things; now it asks one question. The whole brief intake — a dashed panel three lines tall carrying its own sentence, two buttons and a format hint — collapsed into a `+` button inside the input frame that opens a two-item menu (Upload a file / Paste a brief), stating the capability in 28px of width instead of 140px of height. Drag-and-drop survives the collapse: the form element itself is now the drop target and highlights while a file is over it, so removing the panel cost discoverability rather than function, and one muted line under the input keeps the file types stated. The hero's clamp was retuned from clamp(40px,5.6vw,72px) to clamp(28px,4.6vw,64px) because the old floor meant a 760px window rendered it at its MINIMUM across two oversized lines; suggestion chips went from wrapping onto two rows to a single non-wrapping row showing three under lg and four above; and the saved-map list was demoted from a section (mt-16, full list) to a strip (mt-8, three rows plus a 'Show all N' disclosure). Nothing was removed from the product — every capability is still one click away. SCOPE VERDICT: this cycle delivered the plan in full and DEFERRED none of the project's deliverables; all 10 remain resolved (9 delivered, 1 previously deferred by the user for the assist track) and this cycle opened no new one. STRUCTURAL DEVIATION FROM PLAN: the plan said BriefDrop keeps ownership of the upload. It could not: the `+` menu now lives INSIDE IdeaForm, which makes it a sibling of BriefDrop's readout, and sibling components cannot share state held by either one. The intake state (pasting, reading, error, the file-input ref and the upload itself) therefore moved up to IdeaPrompt, the nearest common parent. BriefDrop keeps its role as the what-to-show switch and now renders NOTHING at rest, which is the point of the change. BriefDropTarget was reduced to a headless file input and renamed BriefFileInput as the plan permitted; the old component and its isolation route were deleted. SCENARIO CONSEQUENCES: three scenarios were retired because their subject no longer exists or no longer renders — briefdroptarget-default, briefdroptarget-failed and briefdroptarget-reading (the component is deleted), and briefdrop-default (BriefDrop's resting state is now an empty render, which would have been a blank frame rather than a state). briefdrop-pasting replaces the last of these with the state BriefDrop actually shows. Four new BriefMenu component scenarios cover Default, Attached, LongFilename and Busy. TESTING: 13 new tests. BriefMenu gets nine covering that it renders no menu until opened, offers both ways in, reports and closes behind each choice, closes on Escape and on an outside click, names an attached brief instead of inviting another, refuses to open while a file is being read, and states aria-expanded on its trigger. SavedMapList gets four covering the empty case, the under-cap case, the three-row cap with its count, and the reveal — the last of these is the one that matters, because a cap that silently swallowed the fourth map would be data loss wearing a layout change's clothes.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/a-landing-screen-that-asks-one-question.md\t.codeyam/plans/completed/a-landing-screen-that-asks-one-question.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-landing-screen-that-asks-one-question/landing-half-screen.png\t.codeyam/plans/completed/assets/a-landing-screen-that-asks-one-question/landing-half-screen.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdrop-default.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdroptarget-default.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdroptarget-failed.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdroptarget-reading.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-attached--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-default--desktop.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-default--desktop.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-default--desktop.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-default--desktop.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-failed--desktop.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-failed--desktop.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-reading--desktop.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-reading--desktop.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-pasted--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-scannedpdf--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideahero-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideahero-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaplist-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaplist-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/suggestionchips-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3505029340dd5b9634a209465aa3df702593e59ca0151370088725b6c75ef894.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5e061f120cabbfc942ef8684064aef9b527f1ae7e2e5eb84e6b2147a297ff2ac.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/65ccee7a6aabf0301328208553430faf969daef5e6323cefb2f7256c08741183.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/fcae79e05173800812a20ce833d52cb3d92e90b122b963a9253090015703b1cb.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefDrop.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefDropTarget.tsx",
+      "status": "deleted"
+    },
+    {
+      "path": "app/components/IdeaForm.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaHero.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaPrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/LandingScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/SavedMapList.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/SuggestionChips.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BriefDrop/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BriefDropTarget/page.tsx",
+      "status": "deleted"
+    },
+    {
+      "path": "app/isolated-components/IdeaForm/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdrop-pasting.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefmenu-attached.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefmenu-busy.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefmenu-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefmenu-longfilename.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-pasting--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-pasting--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-attached--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-attached--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-busy--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-busy--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-longfilename--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-longfilename--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/4260ddb605593dc46b7ad54b723600bb7ec9310f791be16f5539cb4916c3caa7.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/9bc2749066f3525385806dc9b5aad27f78a3cf343c46b7101d1d5512480ca3ff.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a24fb2c9d181a77b55d3a0dd9e9ffedc106b3d3405c8661651fed8aa2a74a12b.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e23ce27c00f4e865bc780cbc0f978e9efb7891c32db9897fbe6fecb28f2988dd.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefFileInput.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefMenu.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefMenu.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/SavedMapList.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefMenu/page.tsx",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "BriefDrop - Attached",
+      "screenshotPath": "briefdrop-attached--desktop.png"
+    },
+    {
+      "name": "BriefDrop - Pasting",
+      "screenshotPath": "briefdrop-pasting--desktop.png"
+    },
+    {
+      "name": "BriefMenu - Attached",
+      "screenshotPath": "briefmenu-attached--desktop.png"
+    },
+    {
+      "name": "BriefMenu - Busy",
+      "screenshotPath": "briefmenu-busy--desktop.png"
+    },
+    {
+      "name": "BriefMenu - Default",
+      "screenshotPath": "briefmenu-default--desktop.png"
+    },
+    {
+      "name": "BriefMenu - LongFilename",
+      "screenshotPath": "briefmenu-longfilename--desktop.png"
+    },
+    {
+      "name": "BriefReadout - Default",
+      "screenshotPath": "briefreadout-default--desktop.png"
+    },
+    {
+      "name": "BriefReadout - Pasted",
+      "screenshotPath": "briefreadout-pasted--desktop.png"
+    },
+    {
+      "name": "BriefReadout - ScannedPdf",
+      "screenshotPath": "briefreadout-scannedpdf--desktop.png"
+    },
+    {
+      "name": "IdeaForm - Busy",
+      "screenshotPath": "ideaform-busy--desktop.png"
+    },
+    {
+      "name": "IdeaForm - Default",
+      "screenshotPath": "ideaform-default--desktop.png"
+    },
+    {
+      "name": "IdeaForm - Filled",
+      "screenshotPath": "ideaform-filled--desktop.png"
+    },
+    {
+      "name": "IdeaForm - WithBrief",
+      "screenshotPath": "ideaform-withbrief--desktop.png"
+    },
+    {
+      "name": "IdeaHero - Default",
+      "screenshotPath": "ideahero-default--desktop.png"
+    },
+    {
+      "name": "IdeaPrompt - Default",
+      "screenshotPath": "ideaprompt-default--desktop.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--desktop.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--desktop.png"
+    },
+    {
+      "name": "SavedMapList - Default",
+      "screenshotPath": "savedmaplist-default--desktop.png"
+    },
+    {
+      "name": "SuggestionChips - Default",
+      "screenshotPath": "suggestionchips-default--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 385,
+    "passed": 9,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 385,
+        "passed": 9
+      }
+    ]
+  }
+}
