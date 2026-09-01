@@ -1,138 +1,37 @@
 {
   "files": {
-    "app/scenario/[slug]/page.tsx": {
-      "imports": [],
+    "app/isolated-components/SummaryScreen/page.tsx": {
+      "imports": [
+        "app/components/SummaryScreen.tsx"
+      ],
       "importedBy": []
     },
-    "app/api/maps/[id]/exchange/route.ts": {
+    "app/components/SavedMapList.tsx": {
       "imports": [
+        "app/components/SavedMapRow.tsx"
+      ],
+      "importedBy": [
+        "app/isolated-components/SavedMapList/page.tsx",
+        "app/components/LandingScreen.tsx"
+      ]
+    },
+    "app/lib/exchange.integration.test.ts": {
+      "imports": [
+        "app/lib/exchange.ts",
+        "app/lib/prisma.ts",
         "app/lib/exchange.ts",
         "app/lib/prisma.ts"
       ],
       "importedBy": []
     },
-    "app/api/maps/[id]/route.ts": {
+    "app/lib/mcpFormat.ts": {
       "imports": [
         "app/lib/mapStore.ts"
       ],
-      "importedBy": []
-    },
-    ".claude/hooks/editor-pretool-hook.py": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/isolated-components/WebMcpBridge/page.tsx": {
-      "imports": [
-        "app/components/WebMcpBridge.tsx",
-        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodeAppearance.test.ts": {
-      "imports": [
-        "app/lib/nodeAppearance.ts"
-      ],
-      "importedBy": []
-    },
-    "app/api/mcp/route.ts": {
-      "imports": [
-        "app/lib/mcpServer.ts"
-      ],
-      "importedBy": []
-    },
-    "app/components/UserBubble.tsx": {
-      "imports": [],
       "importedBy": [
-        "app/isolated-components/UserBubble/page.tsx",
-        "app/components/ConversationPanel.tsx"
-      ]
-    },
-    "app/components/SendButton.tsx": {
-      "imports": [],
-      "importedBy": [
-        "app/isolated-components/SendButton/page.tsx",
-        "app/components/ReplyForm.tsx",
-        "app/components/IdeaForm.tsx"
-      ]
-    },
-    "app/components/AppHeader.tsx": {
-      "imports": [
-        "app/components/PhaseNav.tsx",
-        "app/components/Wordmark.tsx",
-        "app/lib/mapKinds.ts"
-      ],
-      "importedBy": [
-        "app/page.tsx",
-        "app/map/[id]/page.tsx",
-        "app/isolated-components/AppHeader/page.tsx"
-      ]
-    },
-    "app/lib/webmcp.ts": {
-      "imports": [
-        "app/lib/toolCatalog.ts",
-        "app/lib/toolInvocation.ts"
-      ],
-      "importedBy": [
-        "app/lib/webmcp.test.ts",
-        "app/components/WebMcpBridge.tsx"
-      ]
-    },
-    "app/isolated-components/AgentAvatar/page.tsx": {
-      "imports": [
-        "app/components/AgentAvatar.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/lib/prisma.ts": {
-      "imports": [],
-      "importedBy": [
-        "app/api/maps/[id]/tools/route.ts",
-        "app/api/maps/[id]/messages/route.ts",
-        "app/api/maps/[id]/exchange/route.ts",
-        "app/lib/exchange.ts",
-        "app/lib/exchange.integration.test.ts",
-        "app/lib/exchange.integration.test.ts",
-        "app/lib/mapStore.ts"
-      ]
-    },
-    "app/components/MapNodePill.tsx": {
-      "imports": [
-        "app/lib/mapKinds.ts",
-        "app/lib/nodeAppearance.ts",
-        "app/lib/mapLayout.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/MapNodePill/page.tsx",
-        "app/components/ThinkingMapView.tsx"
-      ]
-    },
-    "next.config.ts": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/components/AssistantBubble.tsx": {
-      "imports": [
-        "app/components/AgentAvatar.tsx",
-        "app/lib/messageLines.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/AssistantBubble/page.tsx",
-        "app/components/ConversationPanel.tsx"
-      ]
-    },
-    ".next/dev/types/root-params.d.ts": {
-      "imports": [],
-      "importedBy": [
-        "next-env.d.ts"
-      ]
-    },
-    "app/lib/loadEnv.ts": {
-      "imports": [],
-      "importedBy": [
-        "prisma/seed.ts",
-        "prisma.config.ts",
-        "vitest.config.ts",
-        "mcp/stdio.ts"
+        "app/lib/toolRuntime.ts",
+        "app/lib/mcpServer.ts",
+        "app/lib/mcpFormat.test.ts"
       ]
     },
     "app/lib/mapStore.ts": {
@@ -155,6 +54,152 @@
         "app/map/[id]/page.tsx"
       ]
     },
+    "app/lib/prisma.ts": {
+      "imports": [],
+      "importedBy": [
+        "app/api/maps/[id]/tools/route.ts",
+        "app/api/maps/[id]/messages/route.ts",
+        "app/api/maps/[id]/exchange/route.ts",
+        "app/lib/exchange.ts",
+        "app/lib/exchange.integration.test.ts",
+        "app/lib/exchange.integration.test.ts",
+        "app/lib/mapStore.ts"
+      ]
+    },
+    "app/components/SavedMapRow.tsx": {
+      "imports": [
+        "app/lib/mapKinds.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/SavedMapRow/page.tsx",
+        "app/components/LandingScreen.tsx",
+        "app/components/SavedMapList.tsx"
+      ]
+    },
+    "app/lib/turnInterpreter.test.ts": {
+      "imports": [
+        "app/lib/turnInterpreter.ts"
+      ],
+      "importedBy": []
+    },
+    "app/components/SuggestionChips.tsx": {
+      "imports": [
+        "app/lib/suggestions.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/SuggestionChips/page.tsx",
+        "app/components/IdeaPrompt.tsx"
+      ]
+    },
+    "app/lib/mapKinds.test.ts": {
+      "imports": [
+        "app/lib/mapKinds.ts"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/layout.tsx": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/lib/exchange.test.ts": {
+      "imports": [
+        "app/lib/exchange.ts"
+      ],
+      "importedBy": []
+    },
+    "app/scenario/[slug]/page.tsx": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/lib/messageLines.test.ts": {
+      "imports": [
+        "app/lib/messageLines.ts"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SavedMapRow/page.tsx": {
+      "imports": [
+        "app/components/SavedMapRow.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/components/AgentAvatar.tsx": {
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/AgentAvatar/page.tsx",
+        "app/components/AssistantBubble.tsx"
+      ]
+    },
+    "app/components/Wordmark.tsx": {
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/Wordmark/page.tsx",
+        "app/components/AppHeader.tsx"
+      ]
+    },
+    "app/isolated-components/UserBubble/page.tsx": {
+      "imports": [
+        "app/components/UserBubble.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SuggestionChips/page.tsx": {
+      "imports": [
+        "app/components/SuggestionChips.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/api/maps/[id]/messages/route.ts": {
+      "imports": [
+        "app/lib/prisma.ts",
+        "app/lib/mapStore.ts",
+        "app/lib/thinkingPartner.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/conflict.test.ts": {
+      "imports": [
+        "app/lib/conflict.ts",
+        "app/lib/exchange.ts"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SavedMapList/page.tsx": {
+      "imports": [
+        "app/components/SavedMapList.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpFormat.test.ts": {
+      "imports": [
+        "app/lib/mcpFormat.ts"
+      ],
+      "importedBy": []
+    },
+    "app/components/AppHeader.tsx": {
+      "imports": [
+        "app/components/PhaseNav.tsx",
+        "app/components/Wordmark.tsx",
+        "app/lib/mapKinds.ts"
+      ],
+      "importedBy": [
+        "app/page.tsx",
+        "app/map/[id]/page.tsx",
+        "app/isolated-components/AppHeader/page.tsx"
+      ]
+    },
+    "app/isolated-components/MapWorkspace/page.tsx": {
+      "imports": [
+        "app/components/MapWorkspace.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/lib/toolCatalog.test.ts": {
+      "imports": [
+        "app/lib/toolCatalog.ts"
+      ],
+      "importedBy": []
+    },
     "app/components/SummaryHeadline.tsx": {
       "imports": [],
       "importedBy": [
@@ -162,17 +207,346 @@
         "app/components/SummaryView.tsx"
       ]
     },
-    "app/map/[id]/page.tsx": {
+    "app/lib/exchange.ts": {
       "imports": [
-        "app/components/AppHeader.tsx",
-        "app/components/MapWorkspace.tsx",
-        "app/components/SummaryScreen.tsx",
-        "app/components/WebMcpBridge.tsx",
+        "app/lib/prisma.ts"
+      ],
+      "importedBy": [
+        "app/api/maps/[id]/exchange/route.ts",
+        "app/lib/exchangeFormat.test.ts",
+        "app/lib/exchangeFormat.ts",
+        "app/lib/conflict.test.ts",
+        "app/lib/conflict.ts",
+        "app/lib/exchange.integration.test.ts",
+        "app/lib/exchange.integration.test.ts",
+        "app/lib/toolRuntime.ts",
+        "app/lib/exchange.test.ts",
         "app/lib/mapStore.ts",
-        "app/lib/mapCaption.ts",
+        "app/lib/toolCatalog.ts"
+      ]
+    },
+    "app/lib/nodePlan.ts": {
+      "imports": [
         "app/lib/mapKinds.ts"
       ],
+      "importedBy": [
+        "app/lib/nodePlan.test.ts",
+        "app/lib/mapStore.ts"
+      ]
+    },
+    "app/lib/thinkingPartner.test.ts": {
+      "imports": [
+        "app/lib/thinkingPartner.ts"
+      ],
       "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/extract-session.mjs": {
+      "imports": [
+        ".claude/skills/review-session/scripts/extract-session-helpers.mjs"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/ThinkingMapView/page.tsx": {
+      "imports": [
+        "app/components/ThinkingMapView.tsx",
+        "app/lib/mapLayout.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/summaryGroups.test.ts": {
+      "imports": [
+        "app/lib/summaryGroups.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/webmcp.ts": {
+      "imports": [
+        "app/lib/toolCatalog.ts",
+        "app/lib/toolInvocation.ts"
+      ],
+      "importedBy": [
+        "app/lib/webmcp.test.ts",
+        "app/components/WebMcpBridge.tsx"
+      ]
+    },
+    "app/lib/turnInterpreter.ts": {
+      "imports": [],
+      "importedBy": [
+        "app/lib/turnInterpreter.test.ts",
+        "app/lib/thinkingPartner.ts",
+        "app/lib/thinkingPartner.ts"
+      ]
+    },
+    "app/isolated-components/WebMcpBridge/page.tsx": {
+      "imports": [
+        "app/components/WebMcpBridge.tsx",
+        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx"
+      ],
+      "importedBy": []
+    },
+    "next-env.d.ts": {
+      "imports": [
+        ".next/dev/types/routes.d.ts",
+        ".next/dev/types/root-params.d.ts"
+      ],
+      "importedBy": []
+    },
+    "app/api/mcp/route.ts": {
+      "imports": [
+        "app/lib/mcpServer.ts"
+      ],
+      "importedBy": []
+    },
+    "next.config.ts": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/isolated-components/AgentAvatar/page.tsx": {
+      "imports": [
+        "app/components/AgentAvatar.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpServer.ts": {
+      "imports": [
+        "app/lib/mapStore.ts",
+        "app/lib/mcpFormat.ts",
+        "app/lib/toolCatalog.ts",
+        "app/lib/toolRuntime.ts"
+      ],
+      "importedBy": [
+        "app/api/mcp/route.ts",
+        "mcp/stdio.ts"
+      ]
+    },
+    "prisma/seed.ts": {
+      "imports": [
+        "app/lib/loadEnv.ts"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/find-last-session-helpers.mjs": {
+      "imports": [],
+      "importedBy": [
+        ".claude/skills/review-session/scripts/find-last-session.mjs"
+      ]
+    },
+    "app/isolated-components/AppHeader/page.tsx": {
+      "imports": [
+        "app/components/AppHeader.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/components/AssistantBubble.tsx": {
+      "imports": [
+        "app/components/AgentAvatar.tsx",
+        "app/lib/messageLines.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/AssistantBubble/page.tsx",
+        "app/components/ConversationPanel.tsx"
+      ]
+    },
+    "app/lib/summarizeMap.test.ts": {
+      "imports": [
+        "app/lib/mapStore.ts"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/WebMcpBridge/BridgeReadout.tsx": {
+      "imports": [
+        "app/components/WebMcpBridge.tsx"
+      ],
+      "importedBy": [
+        "app/isolated-components/WebMcpBridge/page.tsx",
+        "app/components/WebMcpBridge.render.test.tsx"
+      ]
+    },
+    "app/components/MapConnectors.tsx": {
+      "imports": [
+        "app/lib/mapLayout.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/MapConnectors/page.tsx",
+        "app/components/ThinkingMapView.tsx"
+      ]
+    },
+    "app/components/EmptyHint.tsx": {
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/EmptyHint/page.tsx",
+        "app/components/NextStepsTrack.tsx",
+        "app/components/DirectionsCard.tsx",
+        "app/components/BulletCard.tsx"
+      ]
+    },
+    "mcp/stdio.ts": {
+      "imports": [
+        "app/lib/loadEnv.ts",
+        "app/lib/mcpServer.ts"
+      ],
+      "importedBy": []
+    },
+    "app/components/ReplyForm.tsx": {
+      "imports": [
+        "app/components/SendButton.tsx"
+      ],
+      "importedBy": [
+        "app/isolated-components/ReplyForm/page.tsx",
+        "app/components/ConversationPanel.tsx"
+      ]
+    },
+    "app/components/UserBubble.tsx": {
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/UserBubble/page.tsx",
+        "app/components/ConversationPanel.tsx"
+      ]
+    },
+    "postcss.config.mjs": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/isolated-components/BulletCard/page.tsx": {
+      "imports": [
+        "app/components/BulletCard.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapCaption.ts": {
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapCaption.test.ts",
+        "app/map/[id]/page.tsx"
+      ]
+    },
+    ".next/dev/types/root-params.d.ts": {
+      "imports": [],
+      "importedBy": [
+        "next-env.d.ts"
+      ]
+    },
+    "app/isolated-components/NextStepsTrack/page.tsx": {
+      "imports": [
+        "app/components/NextStepsTrack.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/components/DirectionsCard.tsx": {
+      "imports": [
+        "app/components/EmptyHint.tsx",
+        "app/lib/summaryGroups.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/DirectionsCard/page.tsx",
+        "app/components/SummaryView.tsx"
+      ]
+    },
+    "app/components/WebMcpBridge.render.test.tsx": {
+      "imports": [
+        "app/components/WebMcpBridge.tsx",
+        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/components/SendButton.tsx": {
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/SendButton/page.tsx",
+        "app/components/ReplyForm.tsx",
+        "app/components/IdeaForm.tsx"
+      ]
+    },
+    "app/lib/toolInvocation.test.ts": {
+      "imports": [
+        "app/lib/toolInvocation.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/suggestions.ts": {
+      "imports": [],
+      "importedBy": [
+        "app/components/SuggestionChips.tsx"
+      ]
+    },
+    "app/lib/mapLayout.test.ts": {
+      "imports": [
+        "app/lib/mapLayout.ts"
+      ],
+      "importedBy": []
+    },
+    "app/components/NextStepsTrack.tsx": {
+      "imports": [
+        "app/components/EmptyHint.tsx",
+        "app/lib/summaryGroups.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/NextStepsTrack/page.tsx",
+        "app/components/SummaryView.tsx"
+      ]
+    },
+    "app/lib/webmcp.test.ts": {
+      "imports": [
+        "app/lib/webmcp.ts"
+      ],
+      "importedBy": []
+    },
+    "app/components/IdeaPrompt.tsx": {
+      "imports": [
+        "app/components/IdeaForm.tsx",
+        "app/components/SuggestionChips.tsx"
+      ],
+      "importedBy": [
+        "app/isolated-components/IdeaPrompt/page.tsx",
+        "app/components/LandingScreen.tsx"
+      ]
+    },
+    ".claude/hooks/editor-step-hook.py": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/components/PhaseNav.tsx": {
+      "imports": [
+        "app/lib/mapKinds.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/PhaseNav/page.tsx",
+        "app/components/AppHeader.tsx"
+      ]
+    },
+    "app/isolated-components/MapNodePill/page.tsx": {
+      "imports": [
+        "app/components/MapNodePill.tsx"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/find-last-session.mjs": {
+      "imports": [
+        ".claude/skills/review-session/scripts/find-last-session-helpers.mjs"
+      ],
+      "importedBy": []
+    },
+    "app/api/maps/[id]/route.ts": {
+      "imports": [
+        "app/lib/mapStore.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchangeFormat.ts": {
+      "imports": [
+        "app/lib/exchange.ts"
+      ],
+      "importedBy": [
+        "app/lib/exchangeFormat.test.ts",
+        "app/lib/toolRuntime.ts"
+      ]
+    },
+    "app/components/IdeaHero.tsx": {
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/IdeaHero/page.tsx",
+        "app/components/LandingScreen.tsx"
+      ]
     },
     "app/lib/mapKinds.ts": {
       "imports": [],
@@ -197,19 +571,28 @@
       ],
       "importedBy": []
     },
-    ".claude/hooks/_step_metadata.py": {
+    "app/lib/loadEnv.ts": {
       "imports": [],
-      "importedBy": []
+      "importedBy": [
+        "prisma/seed.ts",
+        "prisma.config.ts",
+        "mcp/stdio.ts",
+        "vitest.config.ts"
+      ]
     },
-    "app/isolated-components/IdeaForm/page.tsx": {
+    "app/isolated-components/ConversationPanel/page.tsx": {
       "imports": [
-        "app/components/IdeaForm.tsx"
+        "app/components/ConversationPanel.tsx"
       ],
       "importedBy": []
     },
-    "app/isolated-components/IdeaHero/page.tsx": {
+    "app/codeyam-isolate/layout.tsx": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/isolated-components/IdeaPrompt/page.tsx": {
       "imports": [
-        "app/components/IdeaHero.tsx"
+        "app/components/IdeaPrompt.tsx"
       ],
       "importedBy": []
     },
@@ -220,100 +603,32 @@
       ],
       "importedBy": []
     },
-    "app/api/maps/[id]/tools/route.ts": {
+    "app/map/[id]/page.tsx": {
       "imports": [
-        "app/lib/prisma.ts",
-        "app/lib/toolCatalog.ts",
-        "app/lib/toolRuntime.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/messageLines.test.ts": {
-      "imports": [
-        "app/lib/messageLines.ts"
-      ],
-      "importedBy": []
-    },
-    "app/codeyam-isolate/layout.tsx": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/isolated-components/NextStepsTrack/page.tsx": {
-      "imports": [
-        "app/components/NextStepsTrack.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/lib/toolInvocation.test.ts": {
-      "imports": [
-        "app/lib/toolInvocation.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/toolCatalog.ts": {
-      "imports": [
-        "app/lib/mapKinds.ts",
-        "app/lib/exchange.ts"
-      ],
-      "importedBy": [
-        "app/api/maps/[id]/tools/route.ts",
-        "app/lib/webmcp.ts",
-        "app/lib/toolInvocation.ts",
-        "app/lib/toolRuntime.ts",
-        "app/lib/mcpServer.ts",
-        "app/lib/toolCatalog.test.ts",
-        "app/components/WebMcpBridge.tsx"
-      ]
-    },
-    "app/components/LandingScreen.tsx": {
-      "imports": [
-        "app/components/IdeaHero.tsx",
-        "app/components/IdeaPrompt.tsx",
-        "app/components/SavedMapList.tsx",
-        "app/components/SavedMapRow.tsx"
-      ],
-      "importedBy": [
-        "app/page.tsx",
-        "app/isolated-components/LandingScreen/page.tsx"
-      ]
-    },
-    "eslint.config.mjs": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/lib/webmcp.test.ts": {
-      "imports": [
-        "app/lib/webmcp.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodePlan.test.ts": {
-      "imports": [
-        "app/lib/nodePlan.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/conflict.test.ts": {
-      "imports": [
-        "app/lib/conflict.ts",
-        "app/lib/exchange.ts"
-      ],
-      "importedBy": []
-    },
-    ".next/dev/types/routes.d.ts": {
-      "imports": [],
-      "importedBy": [
-        "next-env.d.ts"
-      ]
-    },
-    "app/lib/nodePlan.ts": {
-      "imports": [
+        "app/components/AppHeader.tsx",
+        "app/components/MapWorkspace.tsx",
+        "app/components/SummaryScreen.tsx",
+        "app/components/WebMcpBridge.tsx",
+        "app/lib/mapStore.ts",
+        "app/lib/mapCaption.ts",
         "app/lib/mapKinds.ts"
       ],
+      "importedBy": []
+    },
+    "app/lib/conflict.ts": {
+      "imports": [
+        "app/lib/exchange.ts"
+      ],
       "importedBy": [
-        "app/lib/nodePlan.test.ts",
-        "app/lib/mapStore.ts"
+        "app/lib/conflict.test.ts",
+        "app/lib/toolRuntime.ts"
       ]
+    },
+    "app/isolated-components/PhaseNav/page.tsx": {
+      "imports": [
+        "app/components/PhaseNav.tsx"
+      ],
+      "importedBy": []
     },
     "app/lib/thinkingPartner.ts": {
       "imports": [
@@ -327,117 +642,70 @@
         "app/lib/mapStore.ts"
       ]
     },
-    "next-env.d.ts": {
+    "app/components/ConversationPanel.tsx": {
       "imports": [
-        ".next/dev/types/routes.d.ts",
-        ".next/dev/types/root-params.d.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapKinds.test.ts": {
-      "imports": [
-        "app/lib/mapKinds.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mcpFormat.ts": {
-      "imports": [
-        "app/lib/mapStore.ts"
+        "app/components/AssistantBubble.tsx",
+        "app/components/ReplyForm.tsx",
+        "app/components/UserBubble.tsx"
       ],
       "importedBy": [
-        "app/lib/toolRuntime.ts",
-        "app/lib/mcpServer.ts",
-        "app/lib/mcpFormat.test.ts"
+        "app/isolated-components/ConversationPanel/page.tsx",
+        "app/components/MapWorkspace.tsx",
+        "app/components/SummaryScreen.tsx"
       ]
     },
-    ".claude/skills/review-session/scripts/extract-session.mjs": {
-      "imports": [
-        ".claude/skills/review-session/scripts/extract-session-helpers.mjs"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SummaryHeadline/page.tsx": {
-      "imports": [
-        "app/components/SummaryHeadline.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SummaryView/page.tsx": {
-      "imports": [
-        "app/components/SummaryView.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/components/DirectionsCard.tsx": {
-      "imports": [
-        "app/components/EmptyHint.tsx",
-        "app/lib/summaryGroups.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/DirectionsCard/page.tsx",
-        "app/components/SummaryView.tsx"
-      ]
-    },
-    "app/lib/messageLines.ts": {
+    "eslint.config.mjs": {
       "imports": [],
+      "importedBy": []
+    },
+    "app/isolated-components/IdeaHero/page.tsx": {
+      "imports": [
+        "app/components/IdeaHero.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/components/IdeaForm.tsx": {
+      "imports": [
+        "app/components/SendButton.tsx"
+      ],
       "importedBy": [
-        "app/lib/messageLines.test.ts",
-        "app/components/AssistantBubble.tsx"
-      ]
-    },
-    "app/lib/thinkingPartner.test.ts": {
-      "imports": [
-        "app/lib/thinkingPartner.ts"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/ReplyForm/page.tsx": {
-      "imports": [
-        "app/components/ReplyForm.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/IdeaPrompt/page.tsx": {
-      "imports": [
+        "app/isolated-components/IdeaForm/page.tsx",
         "app/components/IdeaPrompt.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/layout.tsx": {
-      "imports": [],
-      "importedBy": []
-    },
-    ".claude/skills/review-session/scripts/find-last-session.mjs": {
-      "imports": [
-        ".claude/skills/review-session/scripts/find-last-session-helpers.mjs"
-      ],
-      "importedBy": []
-    },
-    "app/components/ThinkingMapView.tsx": {
-      "imports": [
-        "app/components/MapConnectors.tsx",
-        "app/components/MapNodePill.tsx",
-        "app/hooks/useFitToFrame.ts",
-        "app/lib/mapLayout.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/ThinkingMapView/page.tsx",
-        "app/components/MapWorkspace.tsx"
       ]
     },
-    "app/isolated-components/MapWorkspace/page.tsx": {
+    "app/isolated-components/EmptyHint/page.tsx": {
       "imports": [
-        "app/components/MapWorkspace.tsx"
+        "app/components/EmptyHint.tsx"
       ],
       "importedBy": []
     },
-    "app/lib/conflict.ts": {
+    "app/lib/mapCaption.test.ts": {
       "imports": [
-        "app/lib/exchange.ts"
+        "app/lib/mapCaption.ts"
       ],
+      "importedBy": []
+    },
+    "app/isolated-components/Wordmark/page.tsx": {
+      "imports": [
+        "app/components/Wordmark.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/lib/summaryGroups.ts": {
+      "imports": [],
       "importedBy": [
-        "app/lib/conflict.test.ts",
-        "app/lib/toolRuntime.ts"
+        "app/lib/summaryGroups.test.ts",
+        "app/components/SummaryScreen.tsx",
+        "app/components/NextStepsTrack.tsx",
+        "app/components/DirectionsCard.tsx",
+        "app/components/SummaryView.tsx",
+        "app/components/BulletCard.tsx"
+      ]
+    },
+    ".next/dev/types/routes.d.ts": {
+      "imports": [],
+      "importedBy": [
+        "next-env.d.ts"
       ]
     },
     "app/components/MapWorkspace.tsx": {
@@ -451,502 +719,9 @@
         "app/isolated-components/MapWorkspace/page.tsx"
       ]
     },
-    "app/components/SavedMapList.tsx": {
-      "imports": [
-        "app/components/SavedMapRow.tsx"
-      ],
-      "importedBy": [
-        "app/isolated-components/SavedMapList/page.tsx",
-        "app/components/LandingScreen.tsx"
-      ]
-    },
-    "app/isolated-components/PhaseNav/page.tsx": {
-      "imports": [
-        "app/components/PhaseNav.tsx"
-      ],
-      "importedBy": []
-    },
-    ".claude/skills/review-session/scripts/find-last-session-helpers.mjs": {
-      "imports": [],
-      "importedBy": [
-        ".claude/skills/review-session/scripts/find-last-session.mjs"
-      ]
-    },
-    "app/components/Wordmark.tsx": {
-      "imports": [],
-      "importedBy": [
-        "app/isolated-components/Wordmark/page.tsx",
-        "app/components/AppHeader.tsx"
-      ]
-    },
-    "postcss.config.mjs": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/isolated-components/Wordmark/page.tsx": {
-      "imports": [
-        "app/components/Wordmark.tsx"
-      ],
-      "importedBy": []
-    },
-    "vitest.config.ts": {
-      "imports": [
-        "app/lib/loadEnv.ts"
-      ],
-      "importedBy": []
-    },
-    "app/components/WebMcpBridge.tsx": {
-      "imports": [
-        "app/lib/webmcp.ts",
-        "app/lib/toolInvocation.ts",
-        "app/lib/toolCatalog.ts"
-      ],
-      "importedBy": [
-        "app/map/[id]/page.tsx",
-        "app/isolated-components/WebMcpBridge/page.tsx",
-        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx"
-      ]
-    },
-    "app/components/IdeaPrompt.tsx": {
-      "imports": [
-        "app/components/IdeaForm.tsx",
-        "app/components/SuggestionChips.tsx"
-      ],
-      "importedBy": [
-        "app/isolated-components/IdeaPrompt/page.tsx",
-        "app/components/LandingScreen.tsx"
-      ]
-    },
-    "app/lib/mapCaption.ts": {
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapCaption.test.ts",
-        "app/map/[id]/page.tsx"
-      ]
-    },
-    "app/components/AgentAvatar.tsx": {
-      "imports": [],
-      "importedBy": [
-        "app/isolated-components/AgentAvatar/page.tsx",
-        "app/components/AssistantBubble.tsx"
-      ]
-    },
-    "app/lib/mcpServer.ts": {
-      "imports": [
-        "app/lib/mapStore.ts",
-        "app/lib/mcpFormat.ts",
-        "app/lib/toolCatalog.ts",
-        "app/lib/toolRuntime.ts"
-      ],
-      "importedBy": [
-        "app/api/mcp/route.ts",
-        "mcp/stdio.ts"
-      ]
-    },
-    "app/hooks/useFitToFrame.ts": {
-      "imports": [],
-      "importedBy": [
-        "app/components/ThinkingMapView.tsx"
-      ]
-    },
-    "app/isolated-components/SendButton/page.tsx": {
-      "imports": [
-        "app/components/SendButton.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodeAppearance.ts": {
-      "imports": [
-        "app/lib/mapKinds.ts"
-      ],
-      "importedBy": [
-        "app/lib/nodeAppearance.test.ts",
-        "app/components/MapNodePill.tsx"
-      ]
-    },
-    "app/components/SuggestionChips.tsx": {
-      "imports": [
-        "app/lib/suggestions.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/SuggestionChips/page.tsx",
-        "app/components/IdeaPrompt.tsx"
-      ]
-    },
-    "app/isolated-components/SavedMapRow/page.tsx": {
-      "imports": [
-        "app/components/SavedMapRow.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/globals.css": {
-      "imports": [],
-      "importedBy": [
-        "app/layout.tsx"
-      ]
-    },
-    "prisma/seed.ts": {
-      "imports": [
-        "app/lib/loadEnv.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/summaryGroups.test.ts": {
-      "imports": [
-        "app/lib/summaryGroups.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapLayout.ts": {
-      "imports": [
-        "app/lib/mapKinds.ts"
-      ],
-      "importedBy": [
-        "app/lib/mapLayout.test.ts",
-        "app/isolated-components/ThinkingMapView/page.tsx",
-        "app/isolated-components/MapConnectors/page.tsx",
-        "app/components/MapWorkspace.tsx",
-        "app/components/MapConnectors.tsx",
-        "app/components/ThinkingMapView.tsx",
-        "app/components/MapNodePill.tsx"
-      ]
-    },
-    "app/components/IdeaForm.tsx": {
-      "imports": [
-        "app/components/SendButton.tsx"
-      ],
-      "importedBy": [
-        "app/isolated-components/IdeaForm/page.tsx",
-        "app/components/IdeaPrompt.tsx"
-      ]
-    },
-    "app/lib/mcpFormat.test.ts": {
-      "imports": [
-        "app/lib/mcpFormat.ts"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/WebMcpBridge/BridgeReadout.tsx": {
-      "imports": [
-        "app/components/WebMcpBridge.tsx"
-      ],
-      "importedBy": [
-        "app/isolated-components/WebMcpBridge/page.tsx"
-      ]
-    },
-    "app/lib/exchange.integration.test.ts": {
-      "imports": [
-        "app/lib/exchange.ts",
-        "app/lib/prisma.ts",
-        "app/lib/exchange.ts",
-        "app/lib/prisma.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/turnInterpreter.test.ts": {
-      "imports": [
-        "app/lib/turnInterpreter.ts"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/ConversationPanel/page.tsx": {
-      "imports": [
-        "app/components/ConversationPanel.tsx"
-      ],
-      "importedBy": []
-    },
-    "prisma.config.ts": {
-      "imports": [
-        "app/lib/loadEnv.ts"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/AppHeader/page.tsx": {
-      "imports": [
-        "app/components/AppHeader.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/components/MapConnectors.tsx": {
-      "imports": [
-        "app/lib/mapLayout.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/MapConnectors/page.tsx",
-        "app/components/ThinkingMapView.tsx"
-      ]
-    },
-    "app/lib/exchangeFormat.ts": {
-      "imports": [
-        "app/lib/exchange.ts"
-      ],
-      "importedBy": [
-        "app/lib/exchangeFormat.test.ts",
-        "app/lib/toolRuntime.ts"
-      ]
-    },
-    "app/lib/summaryGroups.ts": {
-      "imports": [],
-      "importedBy": [
-        "app/lib/summaryGroups.test.ts",
-        "app/components/SummaryScreen.tsx",
-        "app/components/NextStepsTrack.tsx",
-        "app/components/DirectionsCard.tsx",
-        "app/components/SummaryView.tsx",
-        "app/components/BulletCard.tsx"
-      ]
-    },
-    "app/lib/suggestions.ts": {
-      "imports": [],
-      "importedBy": [
-        "app/components/SuggestionChips.tsx"
-      ]
-    },
-    "app/isolated-components/UserBubble/page.tsx": {
-      "imports": [
-        "app/components/UserBubble.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/BulletCard/page.tsx": {
-      "imports": [
-        "app/components/BulletCard.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/components/ReplyForm.tsx": {
-      "imports": [
-        "app/components/SendButton.tsx"
-      ],
-      "importedBy": [
-        "app/isolated-components/ReplyForm/page.tsx",
-        "app/components/ConversationPanel.tsx"
-      ]
-    },
-    "app/isolated-components/SuggestionChips/page.tsx": {
-      "imports": [
-        "app/components/SuggestionChips.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/components/ConversationPanel.tsx": {
-      "imports": [
-        "app/components/AssistantBubble.tsx",
-        "app/components/ReplyForm.tsx",
-        "app/components/UserBubble.tsx"
-      ],
-      "importedBy": [
-        "app/isolated-components/ConversationPanel/page.tsx",
-        "app/components/MapWorkspace.tsx",
-        "app/components/SummaryScreen.tsx"
-      ]
-    },
-    "app/lib/toolCatalog.test.ts": {
-      "imports": [
-        "app/lib/toolCatalog.ts"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/MapConnectors/page.tsx": {
-      "imports": [
-        "app/components/MapConnectors.tsx",
-        "app/lib/mapLayout.ts"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/MapNodePill/page.tsx": {
-      "imports": [
-        "app/components/MapNodePill.tsx"
-      ],
-      "importedBy": []
-    },
-    ".claude/hooks/editor-step-hook.py": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/isolated-components/DirectionsCard/page.tsx": {
-      "imports": [
-        "app/components/DirectionsCard.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SavedMapList/page.tsx": {
-      "imports": [
-        "app/components/SavedMapList.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/lib/toolRuntime.ts": {
-      "imports": [
-        "app/lib/mapStore.ts",
-        "app/lib/mcpFormat.ts",
-        "app/lib/exchange.ts",
-        "app/lib/conflict.ts",
-        "app/lib/exchangeFormat.ts",
-        "app/lib/toolCatalog.ts"
-      ],
-      "importedBy": [
-        "app/api/maps/[id]/tools/route.ts",
-        "app/lib/mcpServer.ts"
-      ]
-    },
-    "app/lib/mapLayout.test.ts": {
-      "imports": [
-        "app/lib/mapLayout.ts"
-      ],
-      "importedBy": []
-    },
-    "app/api/maps/[id]/messages/route.ts": {
-      "imports": [
-        "app/lib/prisma.ts",
-        "app/lib/mapStore.ts",
-        "app/lib/thinkingPartner.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/summarizeMap.test.ts": {
-      "imports": [
-        "app/lib/mapStore.ts"
-      ],
-      "importedBy": []
-    },
-    "app/page.tsx": {
-      "imports": [
-        "app/components/AppHeader.tsx",
-        "app/components/LandingScreen.tsx",
-        "app/lib/mapStore.ts"
-      ],
-      "importedBy": []
-    },
-    "app/components/SavedMapRow.tsx": {
-      "imports": [
-        "app/lib/mapKinds.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/SavedMapRow/page.tsx",
-        "app/components/LandingScreen.tsx",
-        "app/components/SavedMapList.tsx"
-      ]
-    },
-    ".claude/skills/review-session/scripts/extract-session-helpers.mjs": {
-      "imports": [],
-      "importedBy": [
-        ".claude/skills/review-session/scripts/extract-session.mjs"
-      ]
-    },
-    "app/isolated-components/ThinkingMapView/page.tsx": {
-      "imports": [
-        "app/components/ThinkingMapView.tsx",
-        "app/lib/mapLayout.ts"
-      ],
-      "importedBy": []
-    },
-    "app/components/BulletCard.tsx": {
-      "imports": [
-        "app/components/EmptyHint.tsx",
-        "app/lib/summaryGroups.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/BulletCard/page.tsx",
-        "app/components/SummaryView.tsx"
-      ]
-    },
-    "app/lib/toolInvocation.ts": {
-      "imports": [
-        "app/lib/toolCatalog.ts"
-      ],
-      "importedBy": [
-        "app/lib/webmcp.ts",
-        "app/lib/toolInvocation.test.ts",
-        "app/components/WebMcpBridge.tsx"
-      ]
-    },
-    "app/isolated-components/LandingScreen/page.tsx": {
-      "imports": [
-        "app/components/LandingScreen.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchange.ts": {
-      "imports": [
-        "app/lib/prisma.ts"
-      ],
-      "importedBy": [
-        "app/api/maps/[id]/exchange/route.ts",
-        "app/lib/exchangeFormat.test.ts",
-        "app/lib/exchangeFormat.ts",
-        "app/lib/conflict.test.ts",
-        "app/lib/conflict.ts",
-        "app/lib/exchange.integration.test.ts",
-        "app/lib/exchange.integration.test.ts",
-        "app/lib/toolRuntime.ts",
-        "app/lib/exchange.test.ts",
-        "app/lib/mapStore.ts",
-        "app/lib/toolCatalog.ts"
-      ]
-    },
-    "app/components/NextStepsTrack.tsx": {
-      "imports": [
-        "app/components/EmptyHint.tsx",
-        "app/lib/summaryGroups.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/NextStepsTrack/page.tsx",
-        "app/components/SummaryView.tsx"
-      ]
-    },
-    "app/isolated-components/EmptyHint/page.tsx": {
-      "imports": [
-        "app/components/EmptyHint.tsx"
-      ],
-      "importedBy": []
-    },
-    "mcp/stdio.ts": {
-      "imports": [
-        "app/lib/loadEnv.ts",
-        "app/lib/mcpServer.ts"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapCaption.test.ts": {
-      "imports": [
-        "app/lib/mapCaption.ts"
-      ],
-      "importedBy": []
-    },
     "app/isolated-components/AssistantBubble/page.tsx": {
       "imports": [
         "app/components/AssistantBubble.tsx"
-      ],
-      "importedBy": []
-    },
-    "app/api/__codeyam_revalidate/route.ts": {
-      "imports": [],
-      "importedBy": []
-    },
-    "app/components/SummaryView.tsx": {
-      "imports": [
-        "app/components/BulletCard.tsx",
-        "app/components/DirectionsCard.tsx",
-        "app/components/NextStepsTrack.tsx",
-        "app/components/SummaryHeadline.tsx",
-        "app/lib/summaryGroups.ts"
-      ],
-      "importedBy": [
-        "app/isolated-components/SummaryView/page.tsx",
-        "app/components/SummaryScreen.tsx"
-      ]
-    },
-    "app/components/IdeaHero.tsx": {
-      "imports": [],
-      "importedBy": [
-        "app/isolated-components/IdeaHero/page.tsx",
-        "app/components/LandingScreen.tsx"
-      ]
-    },
-    "app/lib/exchange.test.ts": {
-      "imports": [
-        "app/lib/exchange.ts"
       ],
       "importedBy": []
     },
@@ -967,88 +742,303 @@
       ],
       "importedBy": []
     },
-    "app/components/EmptyHint.tsx": {
-      "imports": [],
+    "app/components/MapNodePill.tsx": {
+      "imports": [
+        "app/lib/mapKinds.ts",
+        "app/lib/nodeAppearance.ts",
+        "app/lib/mapLayout.ts"
+      ],
       "importedBy": [
-        "app/isolated-components/EmptyHint/page.tsx",
-        "app/components/NextStepsTrack.tsx",
-        "app/components/DirectionsCard.tsx",
-        "app/components/BulletCard.tsx"
+        "app/isolated-components/MapNodePill/page.tsx",
+        "app/components/ThinkingMapView.tsx"
       ]
     },
-    "app/components/PhaseNav.tsx": {
+    "app/api/maps/[id]/exchange/route.ts": {
+      "imports": [
+        "app/lib/exchange.ts",
+        "app/lib/prisma.ts"
+      ],
+      "importedBy": []
+    },
+    ".claude/hooks/_step_metadata.py": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/isolated-components/SummaryView/page.tsx": {
+      "imports": [
+        "app/components/SummaryView.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SendButton/page.tsx": {
+      "imports": [
+        "app/components/SendButton.tsx"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/extract-session-helpers.mjs": {
+      "imports": [],
+      "importedBy": [
+        ".claude/skills/review-session/scripts/extract-session.mjs"
+      ]
+    },
+    "app/components/BulletCard.tsx": {
+      "imports": [
+        "app/components/EmptyHint.tsx",
+        "app/lib/summaryGroups.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/BulletCard/page.tsx",
+        "app/components/SummaryView.tsx"
+      ]
+    },
+    "app/lib/messageLines.ts": {
+      "imports": [],
+      "importedBy": [
+        "app/lib/messageLines.test.ts",
+        "app/components/AssistantBubble.tsx"
+      ]
+    },
+    "app/api/__codeyam_revalidate/route.ts": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/lib/toolInvocation.ts": {
+      "imports": [
+        "app/lib/toolCatalog.ts"
+      ],
+      "importedBy": [
+        "app/lib/webmcp.ts",
+        "app/lib/toolInvocation.test.ts",
+        "app/components/WebMcpBridge.tsx"
+      ]
+    },
+    "app/isolated-components/IdeaForm/page.tsx": {
+      "imports": [
+        "app/components/IdeaForm.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/globals.css": {
+      "imports": [],
+      "importedBy": [
+        "app/layout.tsx"
+      ]
+    },
+    "app/lib/toolRuntime.ts": {
+      "imports": [
+        "app/lib/mapStore.ts",
+        "app/lib/mcpFormat.ts",
+        "app/lib/exchange.ts",
+        "app/lib/conflict.ts",
+        "app/lib/exchangeFormat.ts",
+        "app/lib/toolCatalog.ts"
+      ],
+      "importedBy": [
+        "app/api/maps/[id]/tools/route.ts",
+        "app/lib/mcpServer.ts"
+      ]
+    },
+    "app/api/maps/[id]/tools/route.ts": {
+      "imports": [
+        "app/lib/prisma.ts",
+        "app/lib/toolCatalog.ts",
+        "app/lib/toolRuntime.ts"
+      ],
+      "importedBy": []
+    },
+    "app/components/LandingScreen.tsx": {
+      "imports": [
+        "app/components/IdeaHero.tsx",
+        "app/components/IdeaPrompt.tsx",
+        "app/components/SavedMapList.tsx",
+        "app/components/SavedMapRow.tsx"
+      ],
+      "importedBy": [
+        "app/page.tsx",
+        "app/isolated-components/LandingScreen/page.tsx"
+      ]
+    },
+    "app/isolated-components/SummaryHeadline/page.tsx": {
+      "imports": [
+        "app/components/SummaryHeadline.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/page.tsx": {
+      "imports": [
+        "app/components/AppHeader.tsx",
+        "app/components/LandingScreen.tsx",
+        "app/lib/mapStore.ts"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/ReplyForm/page.tsx": {
+      "imports": [
+        "app/components/ReplyForm.tsx"
+      ],
+      "importedBy": []
+    },
+    "vitest.config.ts": {
+      "imports": [
+        "app/lib/loadEnv.ts"
+      ],
+      "importedBy": []
+    },
+    "app/hooks/useFitToFrame.ts": {
+      "imports": [],
+      "importedBy": [
+        "app/components/ThinkingMapView.tsx"
+      ]
+    },
+    "prisma.config.ts": {
+      "imports": [
+        "app/lib/loadEnv.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapLayout.ts": {
       "imports": [
         "app/lib/mapKinds.ts"
       ],
       "importedBy": [
-        "app/isolated-components/PhaseNav/page.tsx",
-        "app/components/AppHeader.tsx"
+        "app/lib/mapLayout.test.ts",
+        "app/isolated-components/ThinkingMapView/page.tsx",
+        "app/isolated-components/MapConnectors/page.tsx",
+        "app/components/MapWorkspace.tsx",
+        "app/components/MapConnectors.tsx",
+        "app/components/ThinkingMapView.tsx",
+        "app/components/MapNodePill.tsx"
       ]
     },
-    "app/lib/turnInterpreter.ts": {
-      "imports": [],
-      "importedBy": [
-        "app/lib/turnInterpreter.test.ts",
-        "app/lib/thinkingPartner.ts",
-        "app/lib/thinkingPartner.ts"
-      ]
-    },
-    "app/isolated-components/SummaryScreen/page.tsx": {
+    "app/components/ThinkingMapView.tsx": {
       "imports": [
+        "app/components/MapConnectors.tsx",
+        "app/components/MapNodePill.tsx",
+        "app/hooks/useFitToFrame.ts",
+        "app/lib/mapLayout.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/ThinkingMapView/page.tsx",
+        "app/components/MapWorkspace.tsx"
+      ]
+    },
+    "app/components/SummaryView.tsx": {
+      "imports": [
+        "app/components/BulletCard.tsx",
+        "app/components/DirectionsCard.tsx",
+        "app/components/NextStepsTrack.tsx",
+        "app/components/SummaryHeadline.tsx",
+        "app/lib/summaryGroups.ts"
+      ],
+      "importedBy": [
+        "app/isolated-components/SummaryView/page.tsx",
         "app/components/SummaryScreen.tsx"
+      ]
+    },
+    "app/lib/toolCatalog.ts": {
+      "imports": [
+        "app/lib/mapKinds.ts",
+        "app/lib/exchange.ts"
+      ],
+      "importedBy": [
+        "app/api/maps/[id]/tools/route.ts",
+        "app/lib/webmcp.ts",
+        "app/lib/toolInvocation.ts",
+        "app/lib/toolRuntime.ts",
+        "app/lib/mcpServer.ts",
+        "app/lib/toolCatalog.test.ts",
+        "app/components/WebMcpBridge.tsx"
+      ]
+    },
+    "app/isolated-components/DirectionsCard/page.tsx": {
+      "imports": [
+        "app/components/DirectionsCard.tsx"
+      ],
+      "importedBy": []
+    },
+    "app/components/WebMcpBridge.tsx": {
+      "imports": [
+        "app/lib/webmcp.ts",
+        "app/lib/toolInvocation.ts",
+        "app/lib/toolCatalog.ts"
+      ],
+      "importedBy": [
+        "app/map/[id]/page.tsx",
+        "app/isolated-components/WebMcpBridge/page.tsx",
+        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
+        "app/components/WebMcpBridge.render.test.tsx"
+      ]
+    },
+    "app/isolated-components/MapConnectors/page.tsx": {
+      "imports": [
+        "app/components/MapConnectors.tsx",
+        "app/lib/mapLayout.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/nodeAppearance.ts": {
+      "imports": [
+        "app/lib/mapKinds.ts"
+      ],
+      "importedBy": [
+        "app/lib/nodeAppearance.test.ts",
+        "app/components/MapNodePill.tsx"
+      ]
+    },
+    ".claude/hooks/editor-pretool-hook.py": {
+      "imports": [],
+      "importedBy": []
+    },
+    "app/lib/nodeAppearance.test.ts": {
+      "imports": [
+        "app/lib/nodeAppearance.ts"
+      ],
+      "importedBy": []
+    },
+    "app/lib/nodePlan.test.ts": {
+      "imports": [
+        "app/lib/nodePlan.ts"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/LandingScreen/page.tsx": {
+      "imports": [
+        "app/components/LandingScreen.tsx"
       ],
       "importedBy": []
     }
   },
   "entities": {
-    "app/lib/turnInterpreter.ts::ToolInvocation": {
-      "filePath": "app/lib/turnInterpreter.ts",
-      "name": "ToolInvocation",
+    "app/lib/mapLayout.ts::layoutMap": {
+      "filePath": "app/lib/mapLayout.ts",
+      "name": "layoutMap",
       "imports": [],
       "importedBy": [
-        "app/lib/thinkingPartner.ts::__file_root__"
+        "app/components/ThinkingMapView.tsx::__file_root__"
       ]
     },
-    "app/components/SavedMapRow.tsx::SavedMapRow": {
-      "filePath": "app/components/SavedMapRow.tsx",
-      "name": "SavedMapRow",
-      "imports": [],
-      "importedBy": [
-        "app/components/SavedMapList.tsx::__file_root__"
-      ]
-    },
-    "prisma/seed.ts::__file_root__": {
-      "filePath": "prisma/seed.ts",
+    "app/isolated-components/IdeaForm/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/IdeaForm/page.tsx",
       "name": "__file_root__",
       "imports": [
-        "app/lib/loadEnv.ts::__file_root__"
+        "app/components/IdeaForm.tsx::__file_root__"
       ],
       "importedBy": []
     },
-    "app/components/MapWorkspace.tsx::__file_root__": {
-      "filePath": "app/components/MapWorkspace.tsx",
+    ".next/dev/types/root-params.d.ts::__file_root__": {
+      "filePath": ".next/dev/types/root-params.d.ts",
       "name": "__file_root__",
-      "imports": [
-        "app/components/ConversationPanel.tsx::ChatMessage",
-        "app/components/ConversationPanel.tsx::ConversationPanel",
-        "app/components/ThinkingMapView.tsx::ThinkingMapView",
-        "app/lib/mapLayout.ts::FlatNode"
-      ],
-      "importedBy": []
+      "imports": [],
+      "importedBy": [
+        "next-env.d.ts::__file_root__"
+      ]
     },
-    "app/lib/webmcp.ts::__file_root__": {
-      "filePath": "app/lib/webmcp.ts",
+    "app/isolated-components/DirectionsCard/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/DirectionsCard/page.tsx",
       "name": "__file_root__",
       "imports": [
-        "app/lib/toolCatalog.ts::McpToolResponse",
-        "app/lib/toolCatalog.ts::ToolClient",
-        "app/lib/toolCatalog.ts::timeoutMsFrom",
-        "app/lib/toolInvocation.ts::answeredResponse",
-        "app/lib/toolInvocation.ts::buildToolDescriptors",
-        "app/lib/toolInvocation.ts::errorResponse",
-        "app/lib/toolInvocation.ts::pendingQuestions",
-        "app/lib/toolInvocation.ts::toolSummaries",
-        "app/lib/toolInvocation.ts::validateToolInput"
+        "app/components/DirectionsCard.tsx::__file_root__"
       ],
       "importedBy": []
     },
@@ -1059,377 +1049,6 @@
       "importedBy": [
         "app/lib/toolRuntime.ts::__file_root__"
       ]
-    },
-    "app/lib/mapKinds.test.ts::__file_root__": {
-      "filePath": "app/lib/mapKinds.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapKinds.ts::isNodeKind",
-        "app/lib/mapKinds.ts::isNodeStatus",
-        "app/lib/mapKinds.ts::isPhase"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodeAppearance.ts::__file_root__": {
-      "filePath": "app/lib/nodeAppearance.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapKinds.ts::NodeKind",
-        "app/lib/mapKinds.ts::NodeStatus",
-        "app/lib/mapKinds.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/globals.css::__file_root__": {
-      "filePath": "app/globals.css",
-      "name": "__file_root__",
-      "imports": [],
-      "importedBy": [
-        "app/layout.tsx::__file_root__"
-      ]
-    },
-    "app/lib/mapKinds.ts::isPhase": {
-      "filePath": "app/lib/mapKinds.ts",
-      "name": "isPhase",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapKinds.test.ts::__file_root__",
-        "app/lib/nodePlan.ts::__file_root__",
-        "app/map/[id]/page.tsx::__file_root__",
-        "app/components/SavedMapRow.tsx::__file_root__"
-      ]
-    },
-    "app/isolated-components/EmptyHint/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/EmptyHint/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/EmptyHint.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapKinds.ts::Phase": {
-      "filePath": "app/lib/mapKinds.ts",
-      "name": "Phase",
-      "imports": [],
-      "importedBy": [
-        "app/lib/nodePlan.ts::__file_root__",
-        "app/map/[id]/page.tsx::__file_root__",
-        "app/components/AppHeader.tsx::__file_root__",
-        "app/components/PhaseNav.tsx::__file_root__"
-      ]
-    },
-    "app/isolated-components/IdeaHero/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/IdeaHero/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/IdeaHero.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/IdeaPrompt/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/IdeaPrompt/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/IdeaPrompt.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchange.ts::currentRevision": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "currentRevision",
-      "imports": [],
-      "importedBy": [
-        "app/lib/toolRuntime.ts::__file_root__"
-      ]
-    },
-    "app/lib/toolCatalog.test.ts::__file_root__": {
-      "filePath": "app/lib/toolCatalog.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/toolCatalog.ts::__file_root__",
-        "app/lib/toolCatalog.ts::findTool",
-        "app/lib/toolCatalog.ts::timeoutMsFrom"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SummaryScreen/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SummaryScreen/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SummaryScreen.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchange.ts::isEventKind": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "isEventKind",
-      "imports": [],
-      "importedBy": [
-        "app/lib/exchange.test.ts::__file_root__"
-      ]
-    },
-    "app/components/IdeaPrompt.tsx::__file_root__": {
-      "filePath": "app/components/IdeaPrompt.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/IdeaForm.tsx::IdeaForm",
-        "app/components/SuggestionChips.tsx::SuggestionChips"
-      ],
-      "importedBy": []
-    },
-    "app/components/ThinkingMapView.tsx::__file_root__": {
-      "filePath": "app/components/ThinkingMapView.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/MapConnectors.tsx::MapConnectors",
-        "app/components/MapNodePill.tsx::MapNodePill",
-        "app/hooks/useFitToFrame.ts::useFitToFrame",
-        "app/lib/mapLayout.ts::FlatNode",
-        "app/lib/mapLayout.ts::layoutMap"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/NextStepsTrack/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/NextStepsTrack/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/NextStepsTrack.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    ".claude/skills/review-session/scripts/extract-session-helpers.mjs::buildConversationTurns": {
-      "filePath": ".claude/skills/review-session/scripts/extract-session-helpers.mjs",
-      "name": "buildConversationTurns",
-      "imports": [],
-      "importedBy": [
-        ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__"
-      ]
-    },
-    "app/components/NextStepsTrack.tsx::NextStepsTrack": {
-      "filePath": "app/components/NextStepsTrack.tsx",
-      "name": "NextStepsTrack",
-      "imports": [],
-      "importedBy": [
-        "app/components/SummaryView.tsx::__file_root__"
-      ]
-    },
-    "app/lib/conflict.test.ts::__file_root__": {
-      "filePath": "app/lib/conflict.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/conflict.ts::findConflictingChanges",
-        "app/lib/conflict.ts::needsConflictCheck",
-        "app/lib/exchange.ts::ExchangeEvent"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchange.ts::decodeEvent": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "decodeEvent",
-      "imports": [],
-      "importedBy": [
-        "app/lib/exchange.test.ts::__file_root__"
-      ]
-    },
-    "app/lib/suggestions.ts::__file_root__": {
-      "filePath": "app/lib/suggestions.ts",
-      "name": "__file_root__",
-      "imports": [],
-      "importedBy": [
-        "app/components/SuggestionChips.tsx::__file_root__"
-      ]
-    },
-    "app/components/DirectionsCard.tsx::DirectionsCard": {
-      "filePath": "app/components/DirectionsCard.tsx",
-      "name": "DirectionsCard",
-      "imports": [],
-      "importedBy": [
-        "app/components/SummaryView.tsx::__file_root__"
-      ]
-    },
-    "app/lib/turnInterpreter.ts::interpretTurnResponse": {
-      "filePath": "app/lib/turnInterpreter.ts",
-      "name": "interpretTurnResponse",
-      "imports": [],
-      "importedBy": [
-        "app/lib/thinkingPartner.ts::__file_root__"
-      ]
-    },
-    "app/lib/toolRuntime.ts::runTool": {
-      "filePath": "app/lib/toolRuntime.ts",
-      "name": "runTool",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mcpServer.ts::__file_root__"
-      ]
-    },
-    "app/lib/exchangeFormat.test.ts::__file_root__": {
-      "filePath": "app/lib/exchangeFormat.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/exchangeFormat.ts::renderEvents",
-        "app/lib/exchange.ts::ExchangeEvent"
-      ],
-      "importedBy": []
-    },
-    ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__": {
-      "filePath": ".claude/skills/review-session/scripts/extract-session.mjs",
-      "name": "__file_root__",
-      "imports": [
-        ".claude/skills/review-session/scripts/extract-session-helpers.mjs::buildConversationTurns",
-        ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormat",
-        ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormatFromPath"
-      ],
-      "importedBy": []
-    },
-    "app/components/AgentAvatar.tsx::AgentAvatar": {
-      "filePath": "app/components/AgentAvatar.tsx",
-      "name": "AgentAvatar",
-      "imports": [],
-      "importedBy": [
-        "app/components/AssistantBubble.tsx::__file_root__"
-      ]
-    },
-    "app/components/ConversationPanel.tsx::__file_root__": {
-      "filePath": "app/components/ConversationPanel.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/AssistantBubble.tsx::AssistantBubble",
-        "app/components/ReplyForm.tsx::ReplyForm",
-        "app/components/UserBubble.tsx::UserBubble"
-      ],
-      "importedBy": []
-    },
-    "app/api/maps/[id]/route.ts::__file_root__": {
-      "filePath": "app/api/maps/[id]/route.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapStore.ts::getMap"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchange.ts::Origin": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "Origin",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapStore.ts::__file_root__",
-        "app/lib/toolCatalog.ts::__file_root__"
-      ]
-    },
-    "app/lib/webmcp.ts::bindTools": {
-      "filePath": "app/lib/webmcp.ts",
-      "name": "bindTools",
-      "imports": [],
-      "importedBy": [
-        "app/lib/webmcp.test.ts::__file_root__",
-        "app/components/WebMcpBridge.tsx::__file_root__"
-      ]
-    },
-    "mcp/stdio.ts::__file_root__": {
-      "filePath": "mcp/stdio.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/loadEnv.ts::__file_root__",
-        "app/lib/mcpServer.ts::buildMcpServer"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodePlan.ts::planMapMutations": {
-      "filePath": "app/lib/nodePlan.ts",
-      "name": "planMapMutations",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapStore.ts::__file_root__"
-      ]
-    },
-    "app/lib/toolInvocation.ts::toolSummaries": {
-      "filePath": "app/lib/toolInvocation.ts",
-      "name": "toolSummaries",
-      "imports": [],
-      "importedBy": [
-        "app/components/WebMcpBridge.tsx::__file_root__"
-      ]
-    },
-    "app/components/UserBubble.tsx::UserBubble": {
-      "filePath": "app/components/UserBubble.tsx",
-      "name": "UserBubble",
-      "imports": [],
-      "importedBy": [
-        "app/components/ConversationPanel.tsx::__file_root__"
-      ]
-    },
-    "app/layout.tsx::__file_root__": {
-      "filePath": "app/layout.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/globals.css::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mcpFormat.ts::__file_root__": {
-      "filePath": "app/lib/mcpFormat.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapStore.ts::summarizeMap"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapLayout.ts::LaidOutNode": {
-      "filePath": "app/lib/mapLayout.ts",
-      "name": "LaidOutNode",
-      "imports": [],
-      "importedBy": [
-        "app/isolated-components/MapConnectors/page.tsx::__file_root__",
-        "app/components/MapConnectors.tsx::__file_root__",
-        "app/components/MapNodePill.tsx::__file_root__"
-      ]
-    },
-    "app/lib/webmcp.ts::isWebMcpAvailable": {
-      "filePath": "app/lib/webmcp.ts",
-      "name": "isWebMcpAvailable",
-      "imports": [],
-      "importedBy": [
-        "app/lib/webmcp.test.ts::__file_root__"
-      ]
-    },
-    "app/isolated-components/WebMcpBridge/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/WebMcpBridge/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/WebMcpBridge.tsx::__file_root__",
-        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx::BridgeReadout"
-      ],
-      "importedBy": []
-    },
-    "app/lib/prisma.ts::__file_root__": {
-      "filePath": "app/lib/prisma.ts",
-      "name": "__file_root__",
-      "imports": [],
-      "importedBy": [
-        "app/lib/exchange.ts::__file_root__",
-        "app/lib/exchange.integration.test.ts::__file_root__",
-        "app/lib/exchange.integration.test.ts::__file_root__",
-        "app/lib/mapStore.ts::__file_root__"
-      ]
-    },
-    "app/components/AppHeader.tsx::__file_root__": {
-      "filePath": "app/components/AppHeader.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/PhaseNav.tsx::PhaseNav",
-        "app/components/Wordmark.tsx::Wordmark",
-        "app/lib/mapKinds.ts::Phase"
-      ],
-      "importedBy": []
-    },
-    "app/api/mcp/route.ts::__file_root__": {
-      "filePath": "app/api/mcp/route.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mcpServer.ts::buildMcpServer"
-      ],
-      "importedBy": []
     },
     "app/components/SummaryScreen.tsx::__file_root__": {
       "filePath": "app/components/SummaryScreen.tsx",
@@ -1442,47 +1061,191 @@
       ],
       "importedBy": []
     },
-    "app/lib/nodePlan.test.ts::__file_root__": {
-      "filePath": "app/lib/nodePlan.test.ts",
+    "app/components/IdeaForm.tsx::__file_root__": {
+      "filePath": "app/components/IdeaForm.tsx",
       "name": "__file_root__",
       "imports": [
-        "app/lib/nodePlan.ts::planMapMutations"
+        "app/components/SendButton.tsx::SendButton"
       ],
       "importedBy": []
     },
-    "app/lib/mapStore.ts::getMap": {
-      "filePath": "app/lib/mapStore.ts",
-      "name": "getMap",
+    ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormatFromPath": {
+      "filePath": ".claude/skills/review-session/scripts/extract-session-helpers.mjs",
+      "name": "detectFormatFromPath",
       "imports": [],
       "importedBy": [
-        "app/map/[id]/page.tsx::__file_root__"
+        ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__"
       ]
     },
-    "app/lib/toolInvocation.ts::__file_root__": {
-      "filePath": "app/lib/toolInvocation.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/toolCatalog.ts::McpToolResponse",
-        "app/lib/toolCatalog.ts::ToolSpec",
-        "app/lib/toolCatalog.ts::__file_root__",
-        "app/lib/toolCatalog.ts::findTool"
-      ],
-      "importedBy": []
+    "app/components/WebMcpBridge.tsx::WebMcpBridge": {
+      "filePath": "app/components/WebMcpBridge.tsx",
+      "name": "WebMcpBridge",
+      "imports": [],
+      "importedBy": [
+        "app/components/WebMcpBridge.render.test.tsx::__file_root__"
+      ]
     },
-    "app/isolated-components/BulletCard/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/BulletCard/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/BulletCard.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/turnInterpreter.ts::toMessageParams": {
+    "app/lib/turnInterpreter.ts::interpretTurnResponse": {
       "filePath": "app/lib/turnInterpreter.ts",
-      "name": "toMessageParams",
+      "name": "interpretTurnResponse",
       "imports": [],
       "importedBy": [
         "app/lib/thinkingPartner.ts::__file_root__"
+      ]
+    },
+    "app/lib/conflict.test.ts::__file_root__": {
+      "filePath": "app/lib/conflict.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/conflict.ts::findConflictingChanges",
+        "app/lib/conflict.ts::needsConflictCheck",
+        "app/lib/exchange.ts::ExchangeEvent"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapKinds.ts::NodeKind": {
+      "filePath": "app/lib/mapKinds.ts",
+      "name": "NodeKind",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapLayout.ts::__file_root__",
+        "app/lib/nodeAppearance.ts::__file_root__",
+        "app/lib/nodePlan.ts::__file_root__"
+      ]
+    },
+    "app/lib/mapKinds.ts::isNodeStatus": {
+      "filePath": "app/lib/mapKinds.ts",
+      "name": "isNodeStatus",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapKinds.test.ts::__file_root__",
+        "app/lib/nodePlan.ts::__file_root__"
+      ]
+    },
+    "app/components/ConversationPanel.tsx::__file_root__": {
+      "filePath": "app/components/ConversationPanel.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/AssistantBubble.tsx::AssistantBubble",
+        "app/components/ReplyForm.tsx::ReplyForm",
+        "app/components/UserBubble.tsx::UserBubble"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapKinds.ts::isNodeKind": {
+      "filePath": "app/lib/mapKinds.ts",
+      "name": "isNodeKind",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapKinds.test.ts::__file_root__",
+        "app/lib/nodePlan.ts::__file_root__"
+      ]
+    },
+    "app/lib/turnInterpreter.ts::ToolInvocation": {
+      "filePath": "app/lib/turnInterpreter.ts",
+      "name": "ToolInvocation",
+      "imports": [],
+      "importedBy": [
+        "app/lib/thinkingPartner.ts::__file_root__"
+      ]
+    },
+    "app/lib/exchange.test.ts::__file_root__": {
+      "filePath": "app/lib/exchange.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/exchange.ts::decodeEvent",
+        "app/lib/exchange.ts::isEventKind",
+        "app/lib/exchange.ts::isUserEventKind"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapCaption.test.ts::__file_root__": {
+      "filePath": "app/lib/mapCaption.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapCaption.ts::mapCaption"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchangeFormat.test.ts::__file_root__": {
+      "filePath": "app/lib/exchangeFormat.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/exchangeFormat.ts::renderEvents",
+        "app/lib/exchange.ts::ExchangeEvent"
+      ],
+      "importedBy": []
+    },
+    "app/components/MapNodePill.tsx::__file_root__": {
+      "filePath": "app/components/MapNodePill.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapKinds.ts::__file_root__",
+        "app/lib/nodeAppearance.ts::nodeShellClasses",
+        "app/lib/mapLayout.ts::LaidOutNode"
+      ],
+      "importedBy": []
+    },
+    "app/components/SavedMapList.tsx::__file_root__": {
+      "filePath": "app/components/SavedMapList.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SavedMapRow.tsx::SavedMap",
+        "app/components/SavedMapRow.tsx::SavedMapRow"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapLayout.test.ts::__file_root__": {
+      "filePath": "app/lib/mapLayout.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapLayout.ts::FlatNode",
+        "app/lib/mapLayout.ts::connectorPath",
+        "app/lib/mapLayout.ts::layoutMap"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/ReplyForm/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/ReplyForm/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/ReplyForm.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/turnInterpreter.ts::followUpMessages": {
+      "filePath": "app/lib/turnInterpreter.ts",
+      "name": "followUpMessages",
+      "imports": [],
+      "importedBy": [
+        "app/lib/thinkingPartner.ts::__file_root__"
+      ]
+    },
+    "app/lib/prisma.ts::__file_root__": {
+      "filePath": "app/lib/prisma.ts",
+      "name": "__file_root__",
+      "imports": [],
+      "importedBy": [
+        "app/lib/exchange.ts::__file_root__",
+        "app/lib/exchange.integration.test.ts::__file_root__",
+        "app/lib/exchange.integration.test.ts::__file_root__",
+        "app/lib/mapStore.ts::__file_root__"
+      ]
+    },
+    "app/isolated-components/SendButton/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SendButton/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SendButton.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/webmcp.ts::isWebMcpAvailable": {
+      "filePath": "app/lib/webmcp.ts",
+      "name": "isWebMcpAvailable",
+      "imports": [],
+      "importedBy": [
+        "app/lib/webmcp.test.ts::__file_root__"
       ]
     },
     "app/lib/mapKinds.ts::__file_root__": {
@@ -1499,191 +1262,14 @@
         "app/components/PhaseNav.tsx::__file_root__"
       ]
     },
-    "app/lib/webmcp.ts::webMcpUnavailableReason": {
+    "app/lib/webmcp.ts::bindTools": {
       "filePath": "app/lib/webmcp.ts",
-      "name": "webMcpUnavailableReason",
+      "name": "bindTools",
       "imports": [],
       "importedBy": [
         "app/lib/webmcp.test.ts::__file_root__",
         "app/components/WebMcpBridge.tsx::__file_root__"
       ]
-    },
-    "app/lib/messageLines.ts::splitAssistantLines": {
-      "filePath": "app/lib/messageLines.ts",
-      "name": "splitAssistantLines",
-      "imports": [],
-      "importedBy": [
-        "app/components/AssistantBubble.tsx::__file_root__"
-      ]
-    },
-    "app/isolated-components/SendButton/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SendButton/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SendButton.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/webmcp.ts::publishAgentDriver": {
-      "filePath": "app/lib/webmcp.ts",
-      "name": "publishAgentDriver",
-      "imports": [],
-      "importedBy": [
-        "app/lib/webmcp.test.ts::__file_root__",
-        "app/components/WebMcpBridge.tsx::__file_root__"
-      ]
-    },
-    "app/lib/messageLines.test.ts::__file_root__": {
-      "filePath": "app/lib/messageLines.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/messageLines.ts::splitAssistantLines"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mcpFormat.test.ts::__file_root__": {
-      "filePath": "app/lib/mcpFormat.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mcpFormat.ts::formatMapDetail",
-        "app/lib/mcpFormat.ts::formatMapList"
-      ],
-      "importedBy": []
-    },
-    "app/lib/conflict.ts::findConflictingChanges": {
-      "filePath": "app/lib/conflict.ts",
-      "name": "findConflictingChanges",
-      "imports": [],
-      "importedBy": [
-        "app/lib/toolRuntime.ts::__file_root__"
-      ]
-    },
-    "app/isolated-components/LandingScreen/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/LandingScreen/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/LandingScreen.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/MapWorkspace/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/MapWorkspace/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/MapWorkspace.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchangeFormat.ts::renderEvents": {
-      "filePath": "app/lib/exchangeFormat.ts",
-      "name": "renderEvents",
-      "imports": [],
-      "importedBy": [
-        "app/lib/toolRuntime.ts::__file_root__"
-      ]
-    },
-    "app/lib/loadEnv.ts::__file_root__": {
-      "filePath": "app/lib/loadEnv.ts",
-      "name": "__file_root__",
-      "imports": [],
-      "importedBy": [
-        "prisma.config.ts::__file_root__",
-        "vitest.config.ts::__file_root__",
-        "mcp/stdio.ts::__file_root__"
-      ]
-    },
-    "app/lib/mapKinds.ts::NodeStatus": {
-      "filePath": "app/lib/mapKinds.ts",
-      "name": "NodeStatus",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapLayout.ts::__file_root__",
-        "app/lib/nodeAppearance.ts::__file_root__",
-        "app/lib/nodePlan.ts::__file_root__"
-      ]
-    },
-    ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormat": {
-      "filePath": ".claude/skills/review-session/scripts/extract-session-helpers.mjs",
-      "name": "detectFormat",
-      "imports": [],
-      "importedBy": [
-        ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__"
-      ]
-    },
-    "app/components/SuggestionChips.tsx::__file_root__": {
-      "filePath": "app/components/SuggestionChips.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/suggestions.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/api/maps/route.ts::__file_root__": {
-      "filePath": "app/api/maps/route.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapStore.ts::createMap",
-        "app/lib/mapStore.ts::listMaps"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/MapConnectors/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/MapConnectors/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/MapConnectors.tsx::__file_root__",
-        "app/lib/mapLayout.ts::LaidOutNode"
-      ],
-      "importedBy": []
-    },
-    "app/components/PhaseNav.tsx::__file_root__": {
-      "filePath": "app/components/PhaseNav.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapKinds.ts::Phase",
-        "app/lib/mapKinds.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/components/EmptyHint.tsx::EmptyHint": {
-      "filePath": "app/components/EmptyHint.tsx",
-      "name": "EmptyHint",
-      "imports": [],
-      "importedBy": [
-        "app/components/NextStepsTrack.tsx::__file_root__",
-        "app/components/DirectionsCard.tsx::__file_root__",
-        "app/components/BulletCard.tsx::__file_root__"
-      ]
-    },
-    "app/lib/exchange.ts::recordEvents": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "recordEvents",
-      "imports": [],
-      "importedBy": [
-        "app/lib/toolRuntime.ts::__file_root__",
-        "app/lib/mapStore.ts::__file_root__"
-      ]
-    },
-    "app/components/ReplyForm.tsx::ReplyForm": {
-      "filePath": "app/components/ReplyForm.tsx",
-      "name": "ReplyForm",
-      "imports": [],
-      "importedBy": [
-        "app/components/ConversationPanel.tsx::__file_root__"
-      ]
-    },
-    "app/api/maps/[id]/messages/route.ts::__file_root__": {
-      "filePath": "app/api/maps/[id]/messages/route.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/prisma.ts::__file_root__",
-        "app/lib/mapStore.ts::applyToolCalls",
-        "app/lib/mapStore.ts::getMap",
-        "app/lib/mapStore.ts::summarizeMap",
-        "app/lib/thinkingPartner.ts::MissingCredentialsError",
-        "app/lib/thinkingPartner.ts::runTurn"
-      ],
-      "importedBy": []
     },
     "app/lib/turnInterpreter.test.ts::__file_root__": {
       "filePath": "app/lib/turnInterpreter.test.ts",
@@ -1695,282 +1281,70 @@
       ],
       "importedBy": []
     },
-    "prisma.config.ts::__file_root__": {
-      "filePath": "prisma.config.ts",
+    "app/lib/messageLines.test.ts::__file_root__": {
+      "filePath": "app/lib/messageLines.test.ts",
       "name": "__file_root__",
       "imports": [
-        "app/lib/loadEnv.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapLayout.ts::layoutMap": {
-      "filePath": "app/lib/mapLayout.ts",
-      "name": "layoutMap",
-      "imports": [],
-      "importedBy": [
-        "app/components/ThinkingMapView.tsx::__file_root__"
-      ]
-    },
-    "app/components/BulletCard.tsx::__file_root__": {
-      "filePath": "app/components/BulletCard.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/EmptyHint.tsx::EmptyHint",
-        "app/lib/summaryGroups.ts::SummaryNode"
-      ],
-      "importedBy": []
-    },
-    "app/lib/exchange.ts::ExchangeEvent": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "ExchangeEvent",
-      "imports": [],
-      "importedBy": [
-        "app/lib/conflict.ts::__file_root__",
-        "app/lib/toolRuntime.ts::__file_root__"
-      ]
-    },
-    "app/lib/mcpServer.ts::__file_root__": {
-      "filePath": "app/lib/mcpServer.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapStore.ts::createMap",
-        "app/lib/mapStore.ts::listMaps",
-        "app/lib/mcpFormat.ts::formatMapList",
-        "app/lib/toolCatalog.ts::__file_root__",
-        "app/lib/toolRuntime.ts::runTool"
-      ],
-      "importedBy": []
-    },
-    "app/lib/webmcp.test.ts::__file_root__": {
-      "filePath": "app/lib/webmcp.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/webmcp.ts::bindTools",
-        "app/lib/webmcp.ts::isWebMcpAvailable",
-        "app/lib/webmcp.ts::publishAgentDriver",
-        "app/lib/webmcp.ts::webMcpUnavailableReason"
-      ],
-      "importedBy": []
-    },
-    "app/api/maps/[id]/tools/route.ts::__file_root__": {
-      "filePath": "app/api/maps/[id]/tools/route.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/prisma.ts::__file_root__",
-        "app/lib/toolCatalog.ts::__file_root__",
-        "app/lib/toolRuntime.ts::runTool"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SavedMapRow/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SavedMapRow/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SavedMapRow.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/ThinkingMapView/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/ThinkingMapView/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/ThinkingMapView.tsx::__file_root__",
-        "app/lib/mapLayout.ts::FlatNode"
-      ],
-      "importedBy": []
-    },
-    "app/hooks/useFitToFrame.ts::useFitToFrame": {
-      "filePath": "app/hooks/useFitToFrame.ts",
-      "name": "useFitToFrame",
-      "imports": [],
-      "importedBy": [
-        "app/components/ThinkingMapView.tsx::__file_root__"
-      ]
-    },
-    "app/isolated-components/DirectionsCard/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/DirectionsCard/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/DirectionsCard.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mcpFormat.ts::formatMapDetail": {
-      "filePath": "app/lib/mcpFormat.ts",
-      "name": "formatMapDetail",
-      "imports": [],
-      "importedBy": [
-        "app/lib/toolRuntime.ts::__file_root__",
-        "app/lib/mcpFormat.test.ts::__file_root__"
-      ]
-    },
-    "app/lib/mapCaption.ts::mapCaption": {
-      "filePath": "app/lib/mapCaption.ts",
-      "name": "mapCaption",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapCaption.test.ts::__file_root__",
-        "app/map/[id]/page.tsx::__file_root__"
-      ]
-    },
-    "vitest.config.ts::__file_root__": {
-      "filePath": "vitest.config.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/loadEnv.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/components/MapConnectors.tsx::MapConnectors": {
-      "filePath": "app/components/MapConnectors.tsx",
-      "name": "MapConnectors",
-      "imports": [],
-      "importedBy": [
-        "app/components/ThinkingMapView.tsx::__file_root__"
-      ]
-    },
-    ".claude/skills/review-session/scripts/find-last-session-helpers.mjs::claudeProjectHashFromPath": {
-      "filePath": ".claude/skills/review-session/scripts/find-last-session-helpers.mjs",
-      "name": "claudeProjectHashFromPath",
-      "imports": [],
-      "importedBy": [
-        ".claude/skills/review-session/scripts/find-last-session.mjs::__file_root__"
-      ]
-    },
-    "app/lib/thinkingPartner.test.ts::__file_root__": {
-      "filePath": "app/lib/thinkingPartner.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/thinkingPartner.ts::MissingCredentialsError",
-        "app/lib/thinkingPartner.ts::runTurn"
-      ],
-      "importedBy": []
-    },
-    "app/components/NextStepsTrack.tsx::__file_root__": {
-      "filePath": "app/components/NextStepsTrack.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/EmptyHint.tsx::EmptyHint",
-        "app/lib/summaryGroups.ts::SummaryNode"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodeAppearance.test.ts::__file_root__": {
-      "filePath": "app/lib/nodeAppearance.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/nodeAppearance.ts::nodeShellClasses"
-      ],
-      "importedBy": []
-    },
-    "app/lib/turnInterpreter.ts::followUpMessages": {
-      "filePath": "app/lib/turnInterpreter.ts",
-      "name": "followUpMessages",
-      "imports": [],
-      "importedBy": [
-        "app/lib/thinkingPartner.ts::__file_root__"
-      ]
-    },
-    "app/lib/exchange.integration.test.ts::__file_root__": {
-      "filePath": "app/lib/exchange.integration.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/exchange.ts::__file_root__",
-        "app/lib/prisma.ts::__file_root__",
-        "app/lib/exchange.ts::__file_root__",
-        "app/lib/prisma.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapKinds.ts::NodeKind": {
-      "filePath": "app/lib/mapKinds.ts",
-      "name": "NodeKind",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapLayout.ts::__file_root__",
-        "app/lib/nodeAppearance.ts::__file_root__",
-        "app/lib/nodePlan.ts::__file_root__"
-      ]
-    },
-    "app/lib/toolCatalog.ts::__file_root__": {
-      "filePath": "app/lib/toolCatalog.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapKinds.ts::__file_root__",
-        "app/lib/exchange.ts::Origin"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/AppHeader/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/AppHeader/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/AppHeader.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapKinds.ts::isNodeKind": {
-      "filePath": "app/lib/mapKinds.ts",
-      "name": "isNodeKind",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapKinds.test.ts::__file_root__",
-        "app/lib/nodePlan.ts::__file_root__"
-      ]
-    },
-    "app/lib/summaryGroups.ts::SummaryNode": {
-      "filePath": "app/lib/summaryGroups.ts",
-      "name": "SummaryNode",
-      "imports": [],
-      "importedBy": [
-        "app/components/SummaryScreen.tsx::__file_root__",
-        "app/components/NextStepsTrack.tsx::__file_root__",
-        "app/components/DirectionsCard.tsx::__file_root__",
-        "app/components/SummaryView.tsx::__file_root__",
-        "app/components/BulletCard.tsx::__file_root__"
-      ]
-    },
-    "app/lib/mapCaption.test.ts::__file_root__": {
-      "filePath": "app/lib/mapCaption.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapCaption.ts::mapCaption"
-      ],
-      "importedBy": []
-    },
-    "app/components/AssistantBubble.tsx::__file_root__": {
-      "filePath": "app/components/AssistantBubble.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/AgentAvatar.tsx::AgentAvatar",
         "app/lib/messageLines.ts::splitAssistantLines"
       ],
       "importedBy": []
     },
-    "app/lib/exchange.ts::__file_root__": {
-      "filePath": "app/lib/exchange.ts",
+    "app/lib/nodePlan.ts::__file_root__": {
+      "filePath": "app/lib/nodePlan.ts",
       "name": "__file_root__",
       "imports": [
-        "app/lib/prisma.ts::__file_root__"
-      ],
-      "importedBy": [
-        "app/lib/exchange.integration.test.ts::__file_root__",
-        "app/lib/exchange.integration.test.ts::__file_root__"
-      ]
-    },
-    "app/components/IdeaForm.tsx::__file_root__": {
-      "filePath": "app/components/IdeaForm.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SendButton.tsx::SendButton"
+        "app/lib/mapKinds.ts::NodeKind",
+        "app/lib/mapKinds.ts::NodeStatus",
+        "app/lib/mapKinds.ts::Phase",
+        "app/lib/mapKinds.ts::isNodeKind",
+        "app/lib/mapKinds.ts::isNodeStatus",
+        "app/lib/mapKinds.ts::isPhase"
       ],
       "importedBy": []
     },
-    "app/isolated-components/UserBubble/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/UserBubble/page.tsx",
+    "app/lib/mapKinds.test.ts::__file_root__": {
+      "filePath": "app/lib/mapKinds.test.ts",
       "name": "__file_root__",
       "imports": [
-        "app/components/UserBubble.tsx::__file_root__"
+        "app/lib/mapKinds.ts::isNodeKind",
+        "app/lib/mapKinds.ts::isNodeStatus",
+        "app/lib/mapKinds.ts::isPhase"
+      ],
+      "importedBy": []
+    },
+    "app/lib/summarizeMap.test.ts::__file_root__": {
+      "filePath": "app/lib/summarizeMap.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapStore.ts::summarizeMap"
+      ],
+      "importedBy": []
+    },
+    "app/components/MapWorkspace.tsx::__file_root__": {
+      "filePath": "app/components/MapWorkspace.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/ConversationPanel.tsx::ChatMessage",
+        "app/components/ConversationPanel.tsx::ConversationPanel",
+        "app/components/ThinkingMapView.tsx::ThinkingMapView",
+        "app/lib/mapLayout.ts::FlatNode"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpFormat.ts::formatMapList": {
+      "filePath": "app/lib/mcpFormat.ts",
+      "name": "formatMapList",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mcpServer.ts::__file_root__",
+        "app/lib/mcpFormat.test.ts::__file_root__"
+      ]
+    },
+    "app/components/SuggestionChips.tsx::__file_root__": {
+      "filePath": "app/components/SuggestionChips.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/suggestions.ts::__file_root__"
       ],
       "importedBy": []
     },
@@ -1986,113 +1360,29 @@
       ],
       "importedBy": []
     },
-    "app/lib/toolCatalog.ts::ToolClient": {
-      "filePath": "app/lib/toolCatalog.ts",
-      "name": "ToolClient",
+    "app/lib/exchange.ts::Origin": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "Origin",
       "imports": [],
       "importedBy": [
-        "app/components/WebMcpBridge.tsx::__file_root__"
+        "app/lib/mapStore.ts::__file_root__",
+        "app/lib/toolCatalog.ts::__file_root__"
       ]
     },
-    "app/lib/mcpServer.ts::buildMcpServer": {
-      "filePath": "app/lib/mcpServer.ts",
-      "name": "buildMcpServer",
+    "app/components/MapConnectors.tsx::MapConnectors": {
+      "filePath": "app/components/MapConnectors.tsx",
+      "name": "MapConnectors",
       "imports": [],
       "importedBy": [
-        "mcp/stdio.ts::__file_root__"
+        "app/components/ThinkingMapView.tsx::__file_root__"
       ]
     },
-    ".next/dev/types/routes.d.ts::__file_root__": {
-      "filePath": ".next/dev/types/routes.d.ts",
-      "name": "__file_root__",
+    "app/lib/exchange.ts::waitForUserActivity": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "waitForUserActivity",
       "imports": [],
       "importedBy": [
-        "next-env.d.ts::__file_root__"
-      ]
-    },
-    "app/lib/mapKinds.ts::isNodeStatus": {
-      "filePath": "app/lib/mapKinds.ts",
-      "name": "isNodeStatus",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mapKinds.test.ts::__file_root__",
-        "app/lib/nodePlan.ts::__file_root__"
-      ]
-    },
-    "app/isolated-components/SummaryHeadline/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SummaryHeadline/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SummaryHeadline.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/components/WebMcpBridge.tsx::__file_root__": {
-      "filePath": "app/components/WebMcpBridge.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/webmcp.ts::bindTools",
-        "app/lib/webmcp.ts::publishAgentDriver",
-        "app/lib/webmcp.ts::webMcpUnavailableReason",
-        "app/lib/toolInvocation.ts::toolSummaries",
-        "app/lib/toolCatalog.ts::ToolClient"
-      ],
-      "importedBy": []
-    },
-    ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormatFromPath": {
-      "filePath": ".claude/skills/review-session/scripts/extract-session-helpers.mjs",
-      "name": "detectFormatFromPath",
-      "imports": [],
-      "importedBy": [
-        ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__"
-      ]
-    },
-    "app/isolated-components/PhaseNav/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/PhaseNav/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/PhaseNav.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/WebMcpBridge/BridgeReadout.tsx::__file_root__": {
-      "filePath": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/WebMcpBridge.tsx::useWebMcpBridge"
-      ],
-      "importedBy": []
-    },
-    "app/lib/toolInvocation.test.ts::__file_root__": {
-      "filePath": "app/lib/toolInvocation.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/toolInvocation.ts::answeredResponse",
-        "app/lib/toolInvocation.ts::buildToolDescriptors",
-        "app/lib/toolInvocation.ts::errorResponse",
-        "app/lib/toolInvocation.ts::pendingQuestions",
-        "app/lib/toolInvocation.ts::toolSummaries",
-        "app/lib/toolInvocation.ts::validateToolInput"
-      ],
-      "importedBy": []
-    },
-    "app/components/MapNodePill.tsx::__file_root__": {
-      "filePath": "app/components/MapNodePill.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapKinds.ts::__file_root__",
-        "app/lib/nodeAppearance.ts::nodeShellClasses",
-        "app/lib/mapLayout.ts::LaidOutNode"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mcpFormat.ts::formatMapList": {
-      "filePath": "app/lib/mcpFormat.ts",
-      "name": "formatMapList",
-      "imports": [],
-      "importedBy": [
-        "app/lib/mcpServer.ts::__file_root__",
-        "app/lib/mcpFormat.test.ts::__file_root__"
+        "app/lib/toolRuntime.ts::__file_root__"
       ]
     },
     "app/lib/toolRuntime.ts::__file_root__": {
@@ -2118,6 +1408,104 @@
       ],
       "importedBy": []
     },
+    "app/lib/toolCatalog.test.ts::__file_root__": {
+      "filePath": "app/lib/toolCatalog.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/toolCatalog.ts::__file_root__",
+        "app/lib/toolCatalog.ts::findTool",
+        "app/lib/toolCatalog.ts::timeoutMsFrom"
+      ],
+      "importedBy": []
+    },
+    "mcp/stdio.ts::__file_root__": {
+      "filePath": "mcp/stdio.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/loadEnv.ts::__file_root__",
+        "app/lib/mcpServer.ts::buildMcpServer"
+      ],
+      "importedBy": []
+    },
+    "app/lib/nodeAppearance.test.ts::__file_root__": {
+      "filePath": "app/lib/nodeAppearance.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/nodeAppearance.ts::nodeShellClasses"
+      ],
+      "importedBy": []
+    },
+    "app/lib/webmcp.ts::publishAgentDriver": {
+      "filePath": "app/lib/webmcp.ts",
+      "name": "publishAgentDriver",
+      "imports": [],
+      "importedBy": [
+        "app/lib/webmcp.test.ts::__file_root__",
+        "app/components/WebMcpBridge.tsx::__file_root__"
+      ]
+    },
+    "app/lib/nodePlan.test.ts::__file_root__": {
+      "filePath": "app/lib/nodePlan.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/nodePlan.ts::planMapMutations"
+      ],
+      "importedBy": []
+    },
+    "app/lib/summaryGroups.ts::groupSummaryNodes": {
+      "filePath": "app/lib/summaryGroups.ts",
+      "name": "groupSummaryNodes",
+      "imports": [],
+      "importedBy": [
+        "app/lib/summaryGroups.test.ts::__file_root__",
+        "app/components/SummaryView.tsx::__file_root__"
+      ]
+    },
+    "app/lib/toolInvocation.test.ts::__file_root__": {
+      "filePath": "app/lib/toolInvocation.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/toolInvocation.ts::answeredResponse",
+        "app/lib/toolInvocation.ts::buildToolDescriptors",
+        "app/lib/toolInvocation.ts::errorResponse",
+        "app/lib/toolInvocation.ts::pendingQuestions",
+        "app/lib/toolInvocation.ts::toolSummaries",
+        "app/lib/toolInvocation.ts::validateToolInput"
+      ],
+      "importedBy": []
+    },
+    "app/lib/conflict.ts::findConflictingChanges": {
+      "filePath": "app/lib/conflict.ts",
+      "name": "findConflictingChanges",
+      "imports": [],
+      "importedBy": [
+        "app/lib/toolRuntime.ts::__file_root__"
+      ]
+    },
+    "prisma.config.ts::__file_root__": {
+      "filePath": "prisma.config.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/loadEnv.ts::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "vitest.config.ts::__file_root__": {
+      "filePath": "vitest.config.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/loadEnv.ts::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/AppHeader/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/AppHeader/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/AppHeader.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
     "app/components/SummaryView.tsx::__file_root__": {
       "filePath": "app/components/SummaryView.tsx",
       "name": "__file_root__",
@@ -2131,46 +1519,220 @@
       ],
       "importedBy": []
     },
-    "app/lib/exchange.ts::readSince": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "readSince",
-      "imports": [],
-      "importedBy": [
-        "app/lib/toolRuntime.ts::__file_root__"
-      ]
-    },
-    "app/lib/mapLayout.ts::connectorPath": {
-      "filePath": "app/lib/mapLayout.ts",
-      "name": "connectorPath",
-      "imports": [],
-      "importedBy": [
-        "app/components/MapConnectors.tsx::__file_root__"
-      ]
-    },
-    "app/lib/summarizeMap.test.ts::__file_root__": {
-      "filePath": "app/lib/summarizeMap.test.ts",
+    "app/lib/webmcp.ts::__file_root__": {
+      "filePath": "app/lib/webmcp.ts",
       "name": "__file_root__",
       "imports": [
-        "app/lib/mapStore.ts::summarizeMap"
+        "app/lib/toolCatalog.ts::McpToolResponse",
+        "app/lib/toolCatalog.ts::ToolClient",
+        "app/lib/toolCatalog.ts::timeoutMsFrom",
+        "app/lib/toolInvocation.ts::answeredResponse",
+        "app/lib/toolInvocation.ts::buildToolDescriptors",
+        "app/lib/toolInvocation.ts::errorResponse",
+        "app/lib/toolInvocation.ts::pendingQuestions",
+        "app/lib/toolInvocation.ts::toolSummaries",
+        "app/lib/toolInvocation.ts::validateToolInput"
       ],
       "importedBy": []
     },
-    "app/components/SavedMapRow.tsx::__file_root__": {
-      "filePath": "app/components/SavedMapRow.tsx",
+    "app/components/PhaseNav.tsx::__file_root__": {
+      "filePath": "app/components/PhaseNav.tsx",
       "name": "__file_root__",
       "imports": [
-        "app/lib/mapKinds.ts::__file_root__",
-        "app/lib/mapKinds.ts::isPhase"
+        "app/lib/mapKinds.ts::Phase",
+        "app/lib/mapKinds.ts::__file_root__"
       ],
       "importedBy": []
     },
-    "app/lib/exchange.ts::isUserEventKind": {
-      "filePath": "app/lib/exchange.ts",
-      "name": "isUserEventKind",
+    "app/isolated-components/NextStepsTrack/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/NextStepsTrack/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/NextStepsTrack.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/components/AgentAvatar.tsx::AgentAvatar": {
+      "filePath": "app/components/AgentAvatar.tsx",
+      "name": "AgentAvatar",
       "imports": [],
       "importedBy": [
-        "app/lib/exchange.test.ts::__file_root__"
+        "app/components/AssistantBubble.tsx::__file_root__"
       ]
+    },
+    "app/api/maps/[id]/tools/route.ts::__file_root__": {
+      "filePath": "app/api/maps/[id]/tools/route.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/prisma.ts::__file_root__",
+        "app/lib/toolCatalog.ts::__file_root__",
+        "app/lib/toolRuntime.ts::runTool"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/extract-session-helpers.mjs::buildConversationTurns": {
+      "filePath": ".claude/skills/review-session/scripts/extract-session-helpers.mjs",
+      "name": "buildConversationTurns",
+      "imports": [],
+      "importedBy": [
+        ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__"
+      ]
+    },
+    ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__": {
+      "filePath": ".claude/skills/review-session/scripts/extract-session.mjs",
+      "name": "__file_root__",
+      "imports": [
+        ".claude/skills/review-session/scripts/extract-session-helpers.mjs::buildConversationTurns",
+        ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormat",
+        ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormatFromPath"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/AgentAvatar/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/AgentAvatar/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/AgentAvatar.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SummaryView/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SummaryView/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SummaryView.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/components/WebMcpBridge.render.test.tsx::__file_root__": {
+      "filePath": "app/components/WebMcpBridge.render.test.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/WebMcpBridge.tsx::WebMcpBridge",
+        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx::BridgeReadout"
+      ],
+      "importedBy": []
+    },
+    "app/lib/suggestions.ts::__file_root__": {
+      "filePath": "app/lib/suggestions.ts",
+      "name": "__file_root__",
+      "imports": [],
+      "importedBy": [
+        "app/components/SuggestionChips.tsx::__file_root__"
+      ]
+    },
+    "app/components/DirectionsCard.tsx::DirectionsCard": {
+      "filePath": "app/components/DirectionsCard.tsx",
+      "name": "DirectionsCard",
+      "imports": [],
+      "importedBy": [
+        "app/components/SummaryView.tsx::__file_root__"
+      ]
+    },
+    "app/lib/mapKinds.ts::Phase": {
+      "filePath": "app/lib/mapKinds.ts",
+      "name": "Phase",
+      "imports": [],
+      "importedBy": [
+        "app/lib/nodePlan.ts::__file_root__",
+        "app/map/[id]/page.tsx::__file_root__",
+        "app/components/AppHeader.tsx::__file_root__",
+        "app/components/PhaseNav.tsx::__file_root__"
+      ]
+    },
+    "app/lib/mapCaption.ts::mapCaption": {
+      "filePath": "app/lib/mapCaption.ts",
+      "name": "mapCaption",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapCaption.test.ts::__file_root__",
+        "app/map/[id]/page.tsx::__file_root__"
+      ]
+    },
+    "app/isolated-components/ThinkingMapView/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/ThinkingMapView/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/ThinkingMapView.tsx::__file_root__",
+        "app/lib/mapLayout.ts::FlatNode"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/LandingScreen/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/LandingScreen/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/LandingScreen.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/summaryGroups.ts::SummaryNode": {
+      "filePath": "app/lib/summaryGroups.ts",
+      "name": "SummaryNode",
+      "imports": [],
+      "importedBy": [
+        "app/components/SummaryScreen.tsx::__file_root__",
+        "app/components/NextStepsTrack.tsx::__file_root__",
+        "app/components/DirectionsCard.tsx::__file_root__",
+        "app/components/SummaryView.tsx::__file_root__",
+        "app/components/BulletCard.tsx::__file_root__"
+      ]
+    },
+    "app/isolated-components/Wordmark/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/Wordmark/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/Wordmark.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/nodePlan.ts::planMapMutations": {
+      "filePath": "app/lib/nodePlan.ts",
+      "name": "planMapMutations",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapStore.ts::__file_root__"
+      ]
+    },
+    "app/isolated-components/WebMcpBridge/BridgeReadout.tsx::__file_root__": {
+      "filePath": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/WebMcpBridge.tsx::useWebMcpBridge"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/find-last-session-helpers.mjs::claudeProjectHashFromPath": {
+      "filePath": ".claude/skills/review-session/scripts/find-last-session-helpers.mjs",
+      "name": "claudeProjectHashFromPath",
+      "imports": [],
+      "importedBy": [
+        ".claude/skills/review-session/scripts/find-last-session.mjs::__file_root__"
+      ]
+    },
+    "app/isolated-components/SummaryHeadline/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SummaryHeadline/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SummaryHeadline.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/toolRuntime.ts::runTool": {
+      "filePath": "app/lib/toolRuntime.ts",
+      "name": "runTool",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mcpServer.ts::__file_root__"
+      ]
+    },
+    "app/api/mcp/route.ts::__file_root__": {
+      "filePath": "app/api/mcp/route.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mcpServer.ts::buildMcpServer"
+      ],
+      "importedBy": []
     },
     "app/lib/exchange.ts::EventInput": {
       "filePath": "app/lib/exchange.ts",
@@ -2180,54 +1742,137 @@
         "app/lib/mapStore.ts::__file_root__"
       ]
     },
-    "app/lib/exchange.test.ts::__file_root__": {
-      "filePath": "app/lib/exchange.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/exchange.ts::decodeEvent",
-        "app/lib/exchange.ts::isEventKind",
-        "app/lib/exchange.ts::isUserEventKind"
-      ],
-      "importedBy": []
-    },
-    ".next/dev/types/root-params.d.ts::__file_root__": {
-      "filePath": ".next/dev/types/root-params.d.ts",
-      "name": "__file_root__",
+    "app/lib/mapLayout.ts::FlatNode": {
+      "filePath": "app/lib/mapLayout.ts",
+      "name": "FlatNode",
       "imports": [],
       "importedBy": [
-        "next-env.d.ts::__file_root__"
+        "app/isolated-components/ThinkingMapView/page.tsx::__file_root__",
+        "app/components/MapWorkspace.tsx::__file_root__",
+        "app/components/ThinkingMapView.tsx::__file_root__"
       ]
     },
-    "app/lib/turnInterpreter.ts::__file_root__": {
-      "filePath": "app/lib/turnInterpreter.ts",
+    "app/lib/mapStore.ts::__file_root__": {
+      "filePath": "app/lib/mapStore.ts",
       "name": "__file_root__",
-      "imports": [],
-      "importedBy": [
+      "imports": [
+        "app/lib/prisma.ts::__file_root__",
+        "app/lib/mapKinds.ts::__file_root__",
+        "app/lib/nodePlan.ts::planMapMutations",
+        "app/lib/exchange.ts::EventInput",
+        "app/lib/exchange.ts::Origin",
+        "app/lib/exchange.ts::recordEvents",
         "app/lib/thinkingPartner.ts::__file_root__"
-      ]
-    },
-    "app/isolated-components/ReplyForm/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/ReplyForm/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/ReplyForm.tsx::__file_root__"
       ],
       "importedBy": []
     },
-    "app/components/SavedMapRow.tsx::SavedMap": {
-      "filePath": "app/components/SavedMapRow.tsx",
-      "name": "SavedMap",
+    "app/lib/mapStore.ts::getMap": {
+      "filePath": "app/lib/mapStore.ts",
+      "name": "getMap",
       "imports": [],
       "importedBy": [
-        "app/components/LandingScreen.tsx::__file_root__",
-        "app/components/SavedMapList.tsx::__file_root__"
+        "app/map/[id]/page.tsx::__file_root__"
       ]
     },
-    "app/isolated-components/SavedMapList/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SavedMapList/page.tsx",
+    "app/lib/exchangeFormat.ts::renderEvents": {
+      "filePath": "app/lib/exchangeFormat.ts",
+      "name": "renderEvents",
+      "imports": [],
+      "importedBy": [
+        "app/lib/toolRuntime.ts::__file_root__"
+      ]
+    },
+    "app/components/ThinkingMapView.tsx::__file_root__": {
+      "filePath": "app/components/ThinkingMapView.tsx",
       "name": "__file_root__",
       "imports": [
-        "app/components/SavedMapList.tsx::__file_root__"
+        "app/components/MapConnectors.tsx::MapConnectors",
+        "app/components/MapNodePill.tsx::MapNodePill",
+        "app/hooks/useFitToFrame.ts::useFitToFrame",
+        "app/lib/mapLayout.ts::FlatNode",
+        "app/lib/mapLayout.ts::layoutMap"
+      ],
+      "importedBy": []
+    },
+    "app/components/DirectionsCard.tsx::__file_root__": {
+      "filePath": "app/components/DirectionsCard.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/EmptyHint.tsx::EmptyHint",
+        "app/lib/summaryGroups.ts::SummaryNode"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/WebMcpBridge/BridgeReadout.tsx::BridgeReadout": {
+      "filePath": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
+      "name": "BridgeReadout",
+      "imports": [],
+      "importedBy": [
+        "app/components/WebMcpBridge.render.test.tsx::__file_root__"
+      ]
+    },
+    "app/lib/webmcp.test.ts::__file_root__": {
+      "filePath": "app/lib/webmcp.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/webmcp.ts::bindTools",
+        "app/lib/webmcp.ts::isWebMcpAvailable",
+        "app/lib/webmcp.ts::publishAgentDriver",
+        "app/lib/webmcp.ts::webMcpUnavailableReason"
+      ],
+      "importedBy": []
+    },
+    "app/lib/toolCatalog.ts::ToolClient": {
+      "filePath": "app/lib/toolCatalog.ts",
+      "name": "ToolClient",
+      "imports": [],
+      "importedBy": [
+        "app/components/WebMcpBridge.tsx::__file_root__"
+      ]
+    },
+    "app/lib/loadEnv.ts::__file_root__": {
+      "filePath": "app/lib/loadEnv.ts",
+      "name": "__file_root__",
+      "imports": [],
+      "importedBy": [
+        "prisma.config.ts::__file_root__",
+        "mcp/stdio.ts::__file_root__",
+        "vitest.config.ts::__file_root__"
+      ]
+    },
+    "app/lib/exchange.ts::recordEvents": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "recordEvents",
+      "imports": [],
+      "importedBy": [
+        "app/lib/toolRuntime.ts::__file_root__",
+        "app/lib/mapStore.ts::__file_root__"
+      ]
+    },
+    "app/components/EmptyHint.tsx::EmptyHint": {
+      "filePath": "app/components/EmptyHint.tsx",
+      "name": "EmptyHint",
+      "imports": [],
+      "importedBy": [
+        "app/components/NextStepsTrack.tsx::__file_root__",
+        "app/components/DirectionsCard.tsx::__file_root__",
+        "app/components/BulletCard.tsx::__file_root__"
+      ]
+    },
+    "app/isolated-components/WebMcpBridge/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/WebMcpBridge/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/WebMcpBridge.tsx::__file_root__",
+        "app/isolated-components/WebMcpBridge/BridgeReadout.tsx::BridgeReadout"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/PhaseNav/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/PhaseNav/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/PhaseNav.tsx::__file_root__"
       ],
       "importedBy": []
     },
@@ -2246,63 +1891,39 @@
       ],
       "importedBy": []
     },
-    "next-env.d.ts::__file_root__": {
-      "filePath": "next-env.d.ts",
-      "name": "__file_root__",
-      "imports": [
-        ".next/dev/types/routes.d.ts::__file_root__",
-        ".next/dev/types/root-params.d.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/components/SavedMapList.tsx::__file_root__": {
-      "filePath": "app/components/SavedMapList.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SavedMapRow.tsx::SavedMap",
-        "app/components/SavedMapRow.tsx::SavedMapRow"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SuggestionChips/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SuggestionChips/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SuggestionChips.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/IdeaForm/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/IdeaForm/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/IdeaForm.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/summaryGroups.ts::groupSummaryNodes": {
-      "filePath": "app/lib/summaryGroups.ts",
-      "name": "groupSummaryNodes",
+    "app/components/SavedMapRow.tsx::SavedMapRow": {
+      "filePath": "app/components/SavedMapRow.tsx",
+      "name": "SavedMapRow",
       "imports": [],
       "importedBy": [
-        "app/lib/summaryGroups.test.ts::__file_root__",
-        "app/components/SummaryView.tsx::__file_root__"
+        "app/components/SavedMapList.tsx::__file_root__"
       ]
     },
-    "app/isolated-components/Wordmark/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/Wordmark/page.tsx",
+    "app/layout.tsx::__file_root__": {
+      "filePath": "app/layout.tsx",
       "name": "__file_root__",
       "imports": [
-        "app/components/Wordmark.tsx::__file_root__"
+        "app/globals.css::__file_root__"
       ],
       "importedBy": []
     },
-    "app/lib/mapLayout.ts::__file_root__": {
-      "filePath": "app/lib/mapLayout.ts",
+    "app/lib/mcpServer.ts::__file_root__": {
+      "filePath": "app/lib/mcpServer.ts",
       "name": "__file_root__",
       "imports": [
-        "app/lib/mapKinds.ts::NodeKind",
-        "app/lib/mapKinds.ts::NodeStatus"
+        "app/lib/mapStore.ts::createMap",
+        "app/lib/mapStore.ts::listMaps",
+        "app/lib/mcpFormat.ts::formatMapList",
+        "app/lib/toolCatalog.ts::__file_root__",
+        "app/lib/toolRuntime.ts::runTool"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SavedMapList/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SavedMapList/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SavedMapList.tsx::__file_root__"
       ],
       "importedBy": []
     },
@@ -2311,75 +1932,6 @@
       "name": "__file_root__",
       "imports": [
         "app/components/ConversationPanel.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/components/DirectionsCard.tsx::__file_root__": {
-      "filePath": "app/components/DirectionsCard.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/EmptyHint.tsx::EmptyHint",
-        "app/lib/summaryGroups.ts::SummaryNode"
-      ],
-      "importedBy": []
-    },
-    "app/page.tsx::__file_root__": {
-      "filePath": "app/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/AppHeader.tsx::AppHeader",
-        "app/components/LandingScreen.tsx::LandingScreen",
-        "app/lib/mapStore.ts::listMaps"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapLayout.ts::FlatNode": {
-      "filePath": "app/lib/mapLayout.ts",
-      "name": "FlatNode",
-      "imports": [],
-      "importedBy": [
-        "app/isolated-components/ThinkingMapView/page.tsx::__file_root__",
-        "app/components/MapWorkspace.tsx::__file_root__",
-        "app/components/ThinkingMapView.tsx::__file_root__"
-      ]
-    },
-    "app/lib/exchangeFormat.ts::__file_root__": {
-      "filePath": "app/lib/exchangeFormat.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/exchange.ts::ExchangeEvent"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodeAppearance.ts::nodeShellClasses": {
-      "filePath": "app/lib/nodeAppearance.ts",
-      "name": "nodeShellClasses",
-      "imports": [],
-      "importedBy": [
-        "app/components/MapNodePill.tsx::__file_root__"
-      ]
-    },
-    "app/isolated-components/AssistantBubble/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/AssistantBubble/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/AssistantBubble.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/conflict.ts::__file_root__": {
-      "filePath": "app/lib/conflict.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/exchange.ts::ExchangeEvent"
-      ],
-      "importedBy": []
-    },
-    "app/lib/summaryGroups.test.ts::__file_root__": {
-      "filePath": "app/lib/summaryGroups.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/summaryGroups.ts::groupSummaryNodes"
       ],
       "importedBy": []
     },
@@ -2394,81 +1946,69 @@
       ],
       "importedBy": []
     },
+    "app/api/maps/route.ts::__file_root__": {
+      "filePath": "app/api/maps/route.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapStore.ts::createMap",
+        "app/lib/mapStore.ts::listMaps"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/MapConnectors/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/MapConnectors/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/MapConnectors.tsx::__file_root__",
+        "app/lib/mapLayout.ts::LaidOutNode"
+      ],
+      "importedBy": []
+    },
+    "app/lib/toolCatalog.ts::__file_root__": {
+      "filePath": "app/lib/toolCatalog.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapKinds.ts::__file_root__",
+        "app/lib/exchange.ts::Origin"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/IdeaHero/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/IdeaHero/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/IdeaHero.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/toolInvocation.ts::__file_root__": {
+      "filePath": "app/lib/toolInvocation.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/toolCatalog.ts::McpToolResponse",
+        "app/lib/toolCatalog.ts::ToolSpec",
+        "app/lib/toolCatalog.ts::__file_root__",
+        "app/lib/toolCatalog.ts::findTool"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchange.integration.test.ts::__file_root__": {
+      "filePath": "app/lib/exchange.integration.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/exchange.ts::__file_root__",
+        "app/lib/prisma.ts::__file_root__",
+        "app/lib/exchange.ts::__file_root__",
+        "app/lib/prisma.ts::__file_root__"
+      ],
+      "importedBy": []
+    },
     "app/components/MapConnectors.tsx::__file_root__": {
       "filePath": "app/components/MapConnectors.tsx",
       "name": "__file_root__",
       "imports": [
         "app/lib/mapLayout.ts::LaidOutNode",
         "app/lib/mapLayout.ts::connectorPath"
-      ],
-      "importedBy": []
-    },
-    "app/lib/nodePlan.ts::__file_root__": {
-      "filePath": "app/lib/nodePlan.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapKinds.ts::NodeKind",
-        "app/lib/mapKinds.ts::NodeStatus",
-        "app/lib/mapKinds.ts::Phase",
-        "app/lib/mapKinds.ts::isNodeKind",
-        "app/lib/mapKinds.ts::isNodeStatus",
-        "app/lib/mapKinds.ts::isPhase"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/SummaryView/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/SummaryView/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SummaryView.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapLayout.test.ts::__file_root__": {
-      "filePath": "app/lib/mapLayout.test.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/mapLayout.ts::FlatNode",
-        "app/lib/mapLayout.ts::connectorPath",
-        "app/lib/mapLayout.ts::layoutMap"
-      ],
-      "importedBy": []
-    },
-    "app/isolated-components/MapNodePill/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/MapNodePill/page.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/MapNodePill.tsx::__file_root__"
-      ],
-      "importedBy": []
-    },
-    "app/lib/mapStore.ts::__file_root__": {
-      "filePath": "app/lib/mapStore.ts",
-      "name": "__file_root__",
-      "imports": [
-        "app/lib/prisma.ts::__file_root__",
-        "app/lib/mapKinds.ts::__file_root__",
-        "app/lib/nodePlan.ts::planMapMutations",
-        "app/lib/exchange.ts::EventInput",
-        "app/lib/exchange.ts::Origin",
-        "app/lib/exchange.ts::recordEvents",
-        "app/lib/thinkingPartner.ts::__file_root__"
-      ],
-      "importedBy": []
-    },
-    ".claude/skills/review-session/scripts/find-last-session.mjs::__file_root__": {
-      "filePath": ".claude/skills/review-session/scripts/find-last-session.mjs",
-      "name": "__file_root__",
-      "imports": [
-        ".claude/skills/review-session/scripts/find-last-session-helpers.mjs::claudeProjectHashFromPath"
-      ],
-      "importedBy": []
-    },
-    "app/components/ReplyForm.tsx::__file_root__": {
-      "filePath": "app/components/ReplyForm.tsx",
-      "name": "__file_root__",
-      "imports": [
-        "app/components/SendButton.tsx::SendButton"
       ],
       "importedBy": []
     },
@@ -2485,22 +2025,516 @@
       ],
       "importedBy": []
     },
-    "app/isolated-components/AgentAvatar/page.tsx::__file_root__": {
-      "filePath": "app/isolated-components/AgentAvatar/page.tsx",
+    "app/hooks/useFitToFrame.ts::useFitToFrame": {
+      "filePath": "app/hooks/useFitToFrame.ts",
+      "name": "useFitToFrame",
+      "imports": [],
+      "importedBy": [
+        "app/components/ThinkingMapView.tsx::__file_root__"
+      ]
+    },
+    "app/components/ReplyForm.tsx::ReplyForm": {
+      "filePath": "app/components/ReplyForm.tsx",
+      "name": "ReplyForm",
+      "imports": [],
+      "importedBy": [
+        "app/components/ConversationPanel.tsx::__file_root__"
+      ]
+    },
+    "app/lib/nodeAppearance.ts::__file_root__": {
+      "filePath": "app/lib/nodeAppearance.ts",
       "name": "__file_root__",
       "imports": [
-        "app/components/AgentAvatar.tsx::__file_root__"
+        "app/lib/mapKinds.ts::NodeKind",
+        "app/lib/mapKinds.ts::NodeStatus",
+        "app/lib/mapKinds.ts::__file_root__"
       ],
       "importedBy": []
     },
-    "app/lib/exchange.ts::waitForUserActivity": {
+    "app/lib/exchange.ts::currentRevision": {
       "filePath": "app/lib/exchange.ts",
-      "name": "waitForUserActivity",
+      "name": "currentRevision",
       "imports": [],
       "importedBy": [
         "app/lib/toolRuntime.ts::__file_root__"
       ]
+    },
+    "app/lib/exchange.ts::readSince": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "readSince",
+      "imports": [],
+      "importedBy": [
+        "app/lib/toolRuntime.ts::__file_root__"
+      ]
+    },
+    "app/isolated-components/EmptyHint/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/EmptyHint/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/EmptyHint.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchange.ts::ExchangeEvent": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "ExchangeEvent",
+      "imports": [],
+      "importedBy": [
+        "app/lib/conflict.ts::__file_root__",
+        "app/lib/toolRuntime.ts::__file_root__"
+      ]
+    },
+    "app/isolated-components/MapNodePill/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/MapNodePill/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/MapNodePill.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchange.ts::__file_root__": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/prisma.ts::__file_root__"
+      ],
+      "importedBy": [
+        "app/lib/exchange.integration.test.ts::__file_root__",
+        "app/lib/exchange.integration.test.ts::__file_root__"
+      ]
+    },
+    "app/lib/mapKinds.ts::isPhase": {
+      "filePath": "app/lib/mapKinds.ts",
+      "name": "isPhase",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapKinds.test.ts::__file_root__",
+        "app/lib/nodePlan.ts::__file_root__",
+        "app/map/[id]/page.tsx::__file_root__",
+        "app/components/SavedMapRow.tsx::__file_root__"
+      ]
+    },
+    "app/lib/mapLayout.ts::LaidOutNode": {
+      "filePath": "app/lib/mapLayout.ts",
+      "name": "LaidOutNode",
+      "imports": [],
+      "importedBy": [
+        "app/isolated-components/MapConnectors/page.tsx::__file_root__",
+        "app/components/MapConnectors.tsx::__file_root__",
+        "app/components/MapNodePill.tsx::__file_root__"
+      ]
+    },
+    "app/isolated-components/MapWorkspace/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/MapWorkspace/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/MapWorkspace.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpFormat.ts::formatMapDetail": {
+      "filePath": "app/lib/mcpFormat.ts",
+      "name": "formatMapDetail",
+      "imports": [],
+      "importedBy": [
+        "app/lib/toolRuntime.ts::__file_root__",
+        "app/lib/mcpFormat.test.ts::__file_root__"
+      ]
+    },
+    "app/lib/turnInterpreter.ts::toMessageParams": {
+      "filePath": "app/lib/turnInterpreter.ts",
+      "name": "toMessageParams",
+      "imports": [],
+      "importedBy": [
+        "app/lib/thinkingPartner.ts::__file_root__"
+      ]
+    },
+    "app/isolated-components/SummaryScreen/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SummaryScreen/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SummaryScreen.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/components/SavedMapRow.tsx::SavedMap": {
+      "filePath": "app/components/SavedMapRow.tsx",
+      "name": "SavedMap",
+      "imports": [],
+      "importedBy": [
+        "app/components/LandingScreen.tsx::__file_root__",
+        "app/components/SavedMapList.tsx::__file_root__"
+      ]
+    },
+    "app/lib/exchangeFormat.ts::__file_root__": {
+      "filePath": "app/lib/exchangeFormat.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/exchange.ts::ExchangeEvent"
+      ],
+      "importedBy": []
+    },
+    "prisma/seed.ts::__file_root__": {
+      "filePath": "prisma/seed.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/loadEnv.ts::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/nodeAppearance.ts::nodeShellClasses": {
+      "filePath": "app/lib/nodeAppearance.ts",
+      "name": "nodeShellClasses",
+      "imports": [],
+      "importedBy": [
+        "app/components/MapNodePill.tsx::__file_root__"
+      ]
+    },
+    "app/lib/turnInterpreter.ts::__file_root__": {
+      "filePath": "app/lib/turnInterpreter.ts",
+      "name": "__file_root__",
+      "imports": [],
+      "importedBy": [
+        "app/lib/thinkingPartner.ts::__file_root__"
+      ]
+    },
+    "app/lib/conflict.ts::__file_root__": {
+      "filePath": "app/lib/conflict.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/exchange.ts::ExchangeEvent"
+      ],
+      "importedBy": []
+    },
+    "app/components/ReplyForm.tsx::__file_root__": {
+      "filePath": "app/components/ReplyForm.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SendButton.tsx::SendButton"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchange.ts::isEventKind": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "isEventKind",
+      "imports": [],
+      "importedBy": [
+        "app/lib/exchange.test.ts::__file_root__"
+      ]
+    },
+    "app/lib/exchange.ts::decodeEvent": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "decodeEvent",
+      "imports": [],
+      "importedBy": [
+        "app/lib/exchange.test.ts::__file_root__"
+      ]
+    },
+    "app/isolated-components/IdeaPrompt/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/IdeaPrompt/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/IdeaPrompt.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpServer.ts::buildMcpServer": {
+      "filePath": "app/lib/mcpServer.ts",
+      "name": "buildMcpServer",
+      "imports": [],
+      "importedBy": [
+        "mcp/stdio.ts::__file_root__"
+      ]
+    },
+    "next-env.d.ts::__file_root__": {
+      "filePath": "next-env.d.ts",
+      "name": "__file_root__",
+      "imports": [
+        ".next/dev/types/routes.d.ts::__file_root__",
+        ".next/dev/types/root-params.d.ts::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/components/BulletCard.tsx::__file_root__": {
+      "filePath": "app/components/BulletCard.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/EmptyHint.tsx::EmptyHint",
+        "app/lib/summaryGroups.ts::SummaryNode"
+      ],
+      "importedBy": []
+    },
+    "app/components/WebMcpBridge.tsx::__file_root__": {
+      "filePath": "app/components/WebMcpBridge.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/webmcp.ts::bindTools",
+        "app/lib/webmcp.ts::publishAgentDriver",
+        "app/lib/webmcp.ts::webMcpUnavailableReason",
+        "app/lib/toolInvocation.ts::toolSummaries",
+        "app/lib/toolCatalog.ts::ToolClient"
+      ],
+      "importedBy": []
+    },
+    "app/api/maps/[id]/messages/route.ts::__file_root__": {
+      "filePath": "app/api/maps/[id]/messages/route.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/prisma.ts::__file_root__",
+        "app/lib/mapStore.ts::applyToolCalls",
+        "app/lib/mapStore.ts::getMap",
+        "app/lib/mapStore.ts::summarizeMap",
+        "app/lib/thinkingPartner.ts::MissingCredentialsError",
+        "app/lib/thinkingPartner.ts::runTurn"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SavedMapRow/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SavedMapRow/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SavedMapRow.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/BulletCard/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/BulletCard/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/BulletCard.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/components/IdeaPrompt.tsx::__file_root__": {
+      "filePath": "app/components/IdeaPrompt.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/IdeaForm.tsx::IdeaForm",
+        "app/components/SuggestionChips.tsx::SuggestionChips"
+      ],
+      "importedBy": []
+    },
+    "app/lib/exchange.ts::isUserEventKind": {
+      "filePath": "app/lib/exchange.ts",
+      "name": "isUserEventKind",
+      "imports": [],
+      "importedBy": [
+        "app/lib/exchange.test.ts::__file_root__"
+      ]
+    },
+    "app/globals.css::__file_root__": {
+      "filePath": "app/globals.css",
+      "name": "__file_root__",
+      "imports": [],
+      "importedBy": [
+        "app/layout.tsx::__file_root__"
+      ]
+    },
+    "app/page.tsx::__file_root__": {
+      "filePath": "app/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/AppHeader.tsx::AppHeader",
+        "app/components/LandingScreen.tsx::LandingScreen",
+        "app/lib/mapStore.ts::listMaps"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/find-last-session.mjs::__file_root__": {
+      "filePath": ".claude/skills/review-session/scripts/find-last-session.mjs",
+      "name": "__file_root__",
+      "imports": [
+        ".claude/skills/review-session/scripts/find-last-session-helpers.mjs::claudeProjectHashFromPath"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/AssistantBubble/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/AssistantBubble/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/AssistantBubble.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapKinds.ts::NodeStatus": {
+      "filePath": "app/lib/mapKinds.ts",
+      "name": "NodeStatus",
+      "imports": [],
+      "importedBy": [
+        "app/lib/mapLayout.ts::__file_root__",
+        "app/lib/nodeAppearance.ts::__file_root__",
+        "app/lib/nodePlan.ts::__file_root__"
+      ]
+    },
+    "app/lib/thinkingPartner.test.ts::__file_root__": {
+      "filePath": "app/lib/thinkingPartner.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/thinkingPartner.ts::MissingCredentialsError",
+        "app/lib/thinkingPartner.ts::runTurn"
+      ],
+      "importedBy": []
+    },
+    ".next/dev/types/routes.d.ts::__file_root__": {
+      "filePath": ".next/dev/types/routes.d.ts",
+      "name": "__file_root__",
+      "imports": [],
+      "importedBy": [
+        "next-env.d.ts::__file_root__"
+      ]
+    },
+    "app/components/AppHeader.tsx::__file_root__": {
+      "filePath": "app/components/AppHeader.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/PhaseNav.tsx::PhaseNav",
+        "app/components/Wordmark.tsx::Wordmark",
+        "app/lib/mapKinds.ts::Phase"
+      ],
+      "importedBy": []
+    },
+    "app/api/maps/[id]/route.ts::__file_root__": {
+      "filePath": "app/api/maps/[id]/route.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapStore.ts::getMap"
+      ],
+      "importedBy": []
+    },
+    "app/components/AssistantBubble.tsx::__file_root__": {
+      "filePath": "app/components/AssistantBubble.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/AgentAvatar.tsx::AgentAvatar",
+        "app/lib/messageLines.ts::splitAssistantLines"
+      ],
+      "importedBy": []
+    },
+    "app/isolated-components/SuggestionChips/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/SuggestionChips/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/SuggestionChips.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/summaryGroups.test.ts::__file_root__": {
+      "filePath": "app/lib/summaryGroups.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/summaryGroups.ts::groupSummaryNodes"
+      ],
+      "importedBy": []
+    },
+    ".claude/skills/review-session/scripts/extract-session-helpers.mjs::detectFormat": {
+      "filePath": ".claude/skills/review-session/scripts/extract-session-helpers.mjs",
+      "name": "detectFormat",
+      "imports": [],
+      "importedBy": [
+        ".claude/skills/review-session/scripts/extract-session.mjs::__file_root__"
+      ]
+    },
+    "app/components/NextStepsTrack.tsx::__file_root__": {
+      "filePath": "app/components/NextStepsTrack.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/EmptyHint.tsx::EmptyHint",
+        "app/lib/summaryGroups.ts::SummaryNode"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpFormat.test.ts::__file_root__": {
+      "filePath": "app/lib/mcpFormat.test.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mcpFormat.ts::formatMapDetail",
+        "app/lib/mcpFormat.ts::formatMapList"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mcpFormat.ts::__file_root__": {
+      "filePath": "app/lib/mcpFormat.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapStore.ts::summarizeMap"
+      ],
+      "importedBy": []
+    },
+    "app/components/SavedMapRow.tsx::__file_root__": {
+      "filePath": "app/components/SavedMapRow.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapKinds.ts::__file_root__",
+        "app/lib/mapKinds.ts::isPhase"
+      ],
+      "importedBy": []
+    },
+    "app/lib/mapLayout.ts::__file_root__": {
+      "filePath": "app/lib/mapLayout.ts",
+      "name": "__file_root__",
+      "imports": [
+        "app/lib/mapKinds.ts::NodeKind",
+        "app/lib/mapKinds.ts::NodeStatus"
+      ],
+      "importedBy": []
+    },
+    "app/components/UserBubble.tsx::UserBubble": {
+      "filePath": "app/components/UserBubble.tsx",
+      "name": "UserBubble",
+      "imports": [],
+      "importedBy": [
+        "app/components/ConversationPanel.tsx::__file_root__"
+      ]
+    },
+    "app/lib/toolInvocation.ts::toolSummaries": {
+      "filePath": "app/lib/toolInvocation.ts",
+      "name": "toolSummaries",
+      "imports": [],
+      "importedBy": [
+        "app/components/WebMcpBridge.tsx::__file_root__"
+      ]
+    },
+    "app/components/NextStepsTrack.tsx::NextStepsTrack": {
+      "filePath": "app/components/NextStepsTrack.tsx",
+      "name": "NextStepsTrack",
+      "imports": [],
+      "importedBy": [
+        "app/components/SummaryView.tsx::__file_root__"
+      ]
+    },
+    "app/lib/webmcp.ts::webMcpUnavailableReason": {
+      "filePath": "app/lib/webmcp.ts",
+      "name": "webMcpUnavailableReason",
+      "imports": [],
+      "importedBy": [
+        "app/lib/webmcp.test.ts::__file_root__",
+        "app/components/WebMcpBridge.tsx::__file_root__"
+      ]
+    },
+    "app/isolated-components/UserBubble/page.tsx::__file_root__": {
+      "filePath": "app/isolated-components/UserBubble/page.tsx",
+      "name": "__file_root__",
+      "imports": [
+        "app/components/UserBubble.tsx::__file_root__"
+      ],
+      "importedBy": []
+    },
+    "app/lib/messageLines.ts::splitAssistantLines": {
+      "filePath": "app/lib/messageLines.ts",
+      "name": "splitAssistantLines",
+      "imports": [],
+      "importedBy": [
+        "app/components/AssistantBubble.tsx::__file_root__"
+      ]
+    },
+    "app/lib/mapLayout.ts::connectorPath": {
+      "filePath": "app/lib/mapLayout.ts",
+      "name": "connectorPath",
+      "imports": [],
+      "importedBy": [
+        "app/components/MapConnectors.tsx::__file_root__"
+      ]
     }
   },
-  "lastUpdated": "2026-09-01T01:48:54Z"
+  "lastUpdated": "2026-09-01T09:51:12Z"
 }

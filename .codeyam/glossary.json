@@ -29,6 +29,7 @@
     "description": "Renders what the bridge knows - whether an agent is attached, why not when it is not, the tools the page exposes, the questions an agent is waiting on, and the pending count. Exists so the bridge has something to show: WebMcpBridge renders only a context provider, so an isolated capture of it alone would be a blank frame. Its two buttons drive the REAL ask_user path through the headless driver and the real answer path back, so the AwaitingAnswer scenario captures the state the code actually produces rather than one staged to look like it.",
     "filePath": "app/isolated-components/WebMcpBridge/BridgeReadout.tsx",
     "name": "BridgeReadout",
+    "testFile": "app/components/WebMcpBridge.render.test.tsx",
     "untestabilityReason": {
       "justification": "Lives under app/isolated-components/ and exists only to give that isolation route something to render. It is a presentational read of the bridge context; the state it displays is produced by WebMcpBridge, covered by the webmcpbridge-noagent scenario.",
       "kind": "scaffold"

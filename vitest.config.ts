@@ -8,6 +8,10 @@ import path from 'path';
 export default defineConfig({
   test: {
     globals: true,
+    // Node by default — most of this suite is pure logic or talks to SQLite,
+    // and a DOM for those would be dead weight. A rendering test opts in with
+    // a `// @vitest-environment jsdom` docblock, so it gets a real DOM without
+    // changing how anything else runs.
     exclude: [...configDefaults.exclude, '.codeyam/**', 'target/**'],
   },
   resolve: {
