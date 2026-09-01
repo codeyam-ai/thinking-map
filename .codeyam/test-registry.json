@@ -5,8 +5,17 @@
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
       "key": "DEMO_SEQUENCE › explains every step it runs",
-      "line": 42,
+      "line": 52,
       "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "read_brief comes BEFORE read_map: an agent handed a long document orients on its outline before deciding what to pull, and the scripted turn is the only place that ordering is written down.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "DEMO_SEQUENCE › orients on the brief before reading the map",
+      "line": 45,
+      "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
     {
@@ -14,7 +23,7 @@
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
       "key": "DEMO_SEQUENCE › walks a full turn including the question that waits on the person",
-      "line": 30,
+      "line": 31,
       "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
       "runner": "tests"
     },
@@ -307,11 +316,47 @@
       "runner": "tests"
     },
     {
+      "description": "Nothing is genuinely nothing.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "approxPages › counts an empty document as zero pages",
+      "line": 71,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A short brief is still one page, never zero.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "approxPages › counts any non-empty document as at least one page",
+      "line": 65,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A negative count is nonsense input; it must not produce a negative page.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "approxPages › never returns a negative page count",
+      "line": 76,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Roughly 1,800 characters to the page, rounded.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "approxPages › scales with length",
+      "line": 81,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "No agent at all — the common case, including every codeyam capture. It must be a silent no-op with a disposer that is safe to call.",
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › does nothing and returns a safe disposer with no browser agent",
-      "line": 174,
+      "line": 181,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -320,7 +365,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › falls back to provideContext when only the older convention exists",
-      "line": 160,
+      "line": 167,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -329,7 +374,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › keeps binding the rest when one registration throws",
-      "line": 143,
+      "line": 150,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -338,7 +383,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › registers every tool through registerTool when that convention is present",
-      "line": 112,
+      "line": 119,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -347,7 +392,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › unregisters everything it registered when disposed",
-      "line": 128,
+      "line": 135,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -356,7 +401,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › attaches annotations only to the tools that declare them",
-      "line": 200,
+      "line": 201,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -365,7 +410,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › binds each descriptor to its own tool name",
-      "line": 208,
+      "line": 209,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -374,7 +419,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › carries each tool’s description and schema through",
-      "line": 190,
+      "line": 191,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -383,7 +428,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › describes every catalog tool",
-      "line": 182,
+      "line": 183,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -613,6 +658,78 @@
       "runner": "tests"
     },
     {
+      "description": "Any heading level, and any leading blank space before it.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › accepts a deeper heading level and leading blank lines",
+      "line": 22,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A long heading is clipped with an ellipsis so the pill stays readable.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › clips a long brief heading to 60 characters",
+      "line": 36,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The same clipping rule as before, unchanged.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › clips a long seed idea to 60 characters",
+      "line": 51,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief with no headings still has a first line worth naming it after.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › falls back to the first non-empty line of a headless brief",
+      "line": 29,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief with nothing but blank lines cannot name anything, so the seed idea takes over rather than the map being titled an empty string.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › falls back to the seed idea when the brief has no usable line",
+      "line": 64,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A short seed idea is left exactly as it is.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › leaves a short seed idea untouched",
+      "line": 58,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief's own first heading is the document's title, and almost always right.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › prefers the first markdown heading of a brief",
+      "line": 15,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Without a brief this is the behaviour every existing map was named by, and it must not have changed.",
+      "file": "app/lib/deriveTitle.test.ts",
+      "format": "vitest",
+      "key": "deriveTitle › uses the seed idea when there is no brief",
+      "line": 44,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "A note's whole value is its text, so it comes through as the note field the row renders with question emphasis.",
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
@@ -707,7 +824,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "errorResponse › marks the response as an error carrying the message",
-      "line": 224,
+      "line": 225,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -727,6 +844,60 @@
       "key": "event kinds › rejects a kind the log does not define",
       "line": 27,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unknown or unreadable size must not, on its own, make an empty extraction look healthy. This is the half of the detached-buffer bug that IS decidable here: with a zero size the thin-text rule cannot fire, so the empty-text rule has to stand on its own. The other half — that the size is measured BEFORE extraction, since pdfjs transfers the buffer to its worker and detaches it — lives at the call site in briefText.ts and cannot be reached from a pure function. It was verified against the runnin",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "extractionWarning › does not treat a zero byte length as a healthy empty extraction",
+      "line": 158,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A file with no name still needs a readable sentence.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "extractionWarning › names an unnamed file readably",
+      "line": 169,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A genuinely short brief is small on disk too, and warning about it would be noise — someone who pasted two sentences meant to.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "extractionWarning › stays quiet about a short document that is also a small file",
+      "line": 164,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A healthy extraction says nothing at all.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "extractionWarning › stays quiet when a real document came out",
+      "line": 129,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A big file that yielded a handful of characters is the same failure wearing a hat — a scan with one stray caption picked up.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "extractionWarning › warns when a large file yielded almost no text",
+      "line": 142,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing at all came out — the unambiguous scan.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "extractionWarning › warns when no text came out",
+      "line": 134,
+      "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
     {
@@ -790,6 +961,51 @@
       "key": "findConflictingChanges › survives an event whose payload could not be decoded",
       "line": 85,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty document previews as nothing — which is the signal itself.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "firstLines › returns an empty string for a document with no text",
+      "line": 110,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A zero or negative count asks for nothing and gets nothing.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "firstLines › returns an empty string when asked for no lines",
+      "line": 116,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Asking for more lines than exist returns what there is.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "firstLines › returns everything when asked for more lines than the document has",
+      "line": 105,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: the opening lines, in order.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "firstLines › returns the first n lines",
+      "line": 92,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Blank lines are skipped rather than counted — a brief that opens with a heading and two blank lines would otherwise preview as one line.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "firstLines › skips blank lines instead of counting them",
+      "line": 98,
+      "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
     {
@@ -905,7 +1121,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is available in a top-level secure page with a browser agent",
-      "line": 42,
+      "line": 49,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -914,7 +1130,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is unavailable inside an iframe",
-      "line": 61,
+      "line": 68,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -923,7 +1139,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is unavailable outside a secure context",
-      "line": 55,
+      "line": 62,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -932,7 +1148,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is unavailable without a browser agent",
-      "line": 48,
+      "line": 55,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -1315,6 +1531,150 @@
       "runner": "tests"
     },
     {
+      "description": "Runs of blank lines collapse to one, so a document padded out by its author does not read to the splitter as a dozen empty paragraphs.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › collapses three or more newlines to a paragraph break",
+      "line": 26,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Windows line endings become newlines, so a .docx and a paste split the same.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › converts CRLF to LF",
+      "line": 15,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Old Mac-style bare CR too — some exports still emit them.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › converts a bare CR to LF",
+      "line": 20,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Leading indentation inside the document is content — a code block, a quoted clause, a nested list — and only trailing whitespace is stripped. The document's own outer edges are trimmed separately, below.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › keeps leading whitespace on a line",
+      "line": 44,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A single blank line IS a paragraph break and must survive.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › leaves a single blank line alone",
+      "line": 31,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A file that extracted to nothing normalises to the empty string rather than to whitespace, which is what lets the caller detect a failed scan.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › reduces a whitespace-only document to an empty string",
+      "line": 55,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": ".docx conversions leave trailing spaces on most lines; they inflate the character count the person is shown for no content at all.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › strips trailing spaces and tabs from every line",
+      "line": 37,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Surrounding blank space is packaging, not document.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "normalizeBriefText › trims the whole document",
+      "line": 49,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Wrongly-typed metadata falls back rather than failing the whole brief — the document is what matters, and its packaging is recoverable.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › falls back on wrongly typed source and type",
+      "line": 73,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A pasted brief genuinely has no filename, so the fallbacks are the normal path rather than a repair.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › falls back to pasted defaults when source and type are missing",
+      "line": 24,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Blank strings are as good as absent.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › falls back when source and type are blank",
+      "line": 33,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The text is the client's document; its leading structure is theirs to keep.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › keeps the text verbatim rather than trimming it",
+      "line": 44,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: a brief that came out of a file.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › reads a complete brief",
+      "line": 8,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief with no text in it is not a brief — and every way of expressing that has to reduce to the same single answer.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › rejects a brief with no text",
+      "line": 50,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A non-string text field is not text, whatever it is.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › rejects a non-string text field",
+      "line": 66,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything that is not an object shaped like a brief is no brief at all.",
+      "file": "app/lib/briefInput.test.ts",
+      "format": "vitest",
+      "key": "parseBriefInput › rejects values that are not brief objects",
+      "line": 57,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "A single move should not have to wrap itself in an array.",
       "file": "app/lib/nodePositions.test.ts",
       "format": "vitest",
@@ -1607,7 +1967,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "publishAgentDriver › leaves a newer map’s driver alone when an older disposer runs",
-      "line": 207,
+      "line": 214,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -1616,7 +1976,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "publishAgentDriver › publishes a driver listing every catalog tool",
-      "line": 183,
+      "line": 190,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -1625,7 +1985,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "publishAgentDriver › removes its own driver on disposal",
-      "line": 198,
+      "line": 205,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -1927,6 +2287,96 @@
       "runner": "tests"
     },
     {
+      "description": "One long paragraph is left whole rather than cut mid-sentence.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › does not split a single oversized paragraph",
+      "line": 88,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A plain-prose brief has no headings at all; it must still come back as a readable handful of passages rather than one enormous block.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › groups paragraphs when the document has no headings",
+      "line": 69,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A heading with nothing under it is still part of the document's shape — a section the client left empty is worth an agent seeing.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › keeps a heading that has no body under it",
+      "line": 54,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Prose before the first heading is usually the summary, and must not vanish.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › keeps the text that appears before the first heading",
+      "line": 61,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A headingless section still needs something to recognise it by, so the opening words stand in for a heading.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › names a headingless section after its opening words",
+      "line": 82,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Ids are sequential from s1 and carry the matching index.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › numbers sections from s1 in document order",
+      "line": 31,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole design rests on this: no table, so the ids must be reproducible.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › produces identical ids and text on a repeated run",
+      "line": 38,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "charCount describes the section body, so the outline can be trusted without reading any passage.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › reports each section body length",
+      "line": 44,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "\"No sections\" and \"one empty section\" are different facts, and an agent should be told the first one plainly.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › returns no sections for an empty document",
+      "line": 96,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief with markdown headings splits on them, one section per heading.",
+      "file": "app/lib/briefSections.test.ts",
+      "format": "vitest",
+      "key": "splitIntoSections › splits a headed document on its headings",
+      "line": 21,
+      "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "Without the id, the model cannot target a node with update_node.",
       "file": "app/lib/summarizeMap.test.ts",
       "format": "vitest",
@@ -2039,7 +2489,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › finds a tool by name and reports nothing for an unknown one",
-      "line": 46,
+      "line": 50,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2048,7 +2498,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › gives every tool a title and a description",
-      "line": 53,
+      "line": 57,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2057,17 +2507,17 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › leaves the whole-collection tools out of the shared set",
-      "line": 31,
+      "line": 32,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
     {
-      "description": "An agent decides whether it may call a tool speculatively from this hint.",
+      "description": "An agent decides whether it may call a tool speculatively from this hint. read_brief is one of them: an agent should feel free to call it on any turn, which is the whole reason it answers with an outline by default.",
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
-      "key": "the shared tool catalog › marks the two read-only tools as read-only",
-      "line": 38,
-      "registeredAt": "2026-09-01T01:16:02Z",
+      "key": "the shared tool catalog › marks the three read-only tools as read-only",
+      "line": 41,
+      "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
     {
@@ -2075,7 +2525,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › caps a timeout longer than the ceiling",
-      "line": 74,
+      "line": 78,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2084,7 +2534,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › falls back to the default when the agent names no timeout",
-      "line": 64,
+      "line": 68,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2093,7 +2543,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › floors a zero or negative timeout at one second",
-      "line": 79,
+      "line": 83,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2102,7 +2552,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
-      "line": 69,
+      "line": 73,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2363,7 +2813,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › names the iframe",
-      "line": 84,
+      "line": 91,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2372,7 +2822,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › names the insecure context",
-      "line": 77,
+      "line": 84,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2381,7 +2831,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › names the missing browser agent",
-      "line": 91,
+      "line": 98,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2390,7 +2840,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › reports nothing to explain when the page is bound",
-      "line": 70,
+      "line": 77,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -2399,7 +2849,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › reports the security problem first when several apply",
-      "line": 98,
+      "line": 105,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     }

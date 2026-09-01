@@ -25,16 +25,26 @@ describe('resultText', () => {
 
 describe('DEMO_SEQUENCE', () => {
   // The sequence is the closest thing here to a written description of one
-  // agent turn: say what you are about to do, read, add, ask, report back.
-  // Losing the ask would make it a demo of writes rather than an exchange.
+  // agent turn: say what you are about to do, orient on the brief, read, add,
+  // ask, report back. Losing the ask would make it a demo of writes rather
+  // than an exchange.
   it('walks a full turn including the question that waits on the person', () => {
     expect(DEMO_SEQUENCE.map((s) => s.name)).toEqual([
       'post_note',
+      'read_brief',
       'read_map',
       'add_nodes',
       'ask_user',
       'post_note',
     ]);
+  });
+
+  // read_brief comes BEFORE read_map: an agent handed a long document orients
+  // on its outline before deciding what to pull, and the scripted turn is the
+  // only place that ordering is written down.
+  it('orients on the brief before reading the map', () => {
+    const names = DEMO_SEQUENCE.map((s) => s.name);
+    expect(names.indexOf('read_brief')).toBeLessThan(names.indexOf('read_map'));
   });
 
   // Every step is a REAL call against the bound catalog, so a step with no

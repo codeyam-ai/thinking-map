@@ -1,0 +1,12 @@
+{
+  "name": "BriefExcerpt - Default",
+  "id": "8e7bcb2e-fd21-4655-9347-462730dd790f",
+  "url": "/isolated-components/BriefExcerpt?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefExcerpt",
+  "scenarioType": "component",
+  "description": "The opening lines exactly as extracted, markdown marks and all. Tidying them would undermine the only thing this block is here to prove."
+}

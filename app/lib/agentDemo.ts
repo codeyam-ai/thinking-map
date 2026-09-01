@@ -21,6 +21,11 @@ export const DEMO_SEQUENCE: DemoStep[] = [
     note: 'says what it is about to do',
   },
   {
+    name: 'read_brief',
+    input: {},
+    note: 'orients on the brief’s outline before deciding what to pull',
+  },
+  {
     name: 'read_map',
     input: {},
     note: 'reads the map',

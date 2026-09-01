@@ -1,0 +1,12 @@
+{
+  "name": "BriefWarning - Default",
+  "id": "5016d934-465d-445a-8713-38528385fdde",
+  "url": "/isolated-components/BriefWarning?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefWarning",
+  "scenarioType": "component",
+  "description": "The line this whole safety net exists for: a big file that yielded almost nothing, which is what a photographed document looks like from here."
+}

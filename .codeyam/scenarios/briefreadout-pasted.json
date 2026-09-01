@@ -1,0 +1,12 @@
+{
+  "name": "BriefReadout - Pasted",
+  "id": "f8a09315-730e-40be-8ae0-d67fa2268a80",
+  "url": "/isolated-components/BriefReadout?s=Pasted",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefReadout",
+  "scenarioType": "component",
+  "description": "Pasted rather than uploaded, so there is no filename to show and the source says pasted rather than inventing one."
+}

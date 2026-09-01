@@ -1,0 +1,12 @@
+{
+  "name": "BriefPasteBox - Default",
+  "id": "d3e631d4-1965-4201-aac0-7098bc0fd1d3",
+  "url": "/isolated-components/BriefPasteBox?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefPasteBox",
+  "scenarioType": "component",
+  "description": "The other way in, empty and waiting. Attach it is correctly dead until there is something to attach, and the placeholder says length is the point rather than a problem."
+}

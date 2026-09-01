@@ -19,6 +19,13 @@ deliberate consequence of how WebMCP works rather than a missing feature — the
 no access to the agent's conversation and under WebMCP never will, so it shows the half
 it genuinely owns instead of faking the other.
 
+**A brief is read, not swallowed.** When the thing you arrive with is a twenty-page
+spec rather than a sentence, the document is stored whole as the map's source and the
+partner reads it the way anyone reads a long document — an outline first, then the
+passages that matter — through a `read_brief` tool that hands back a section list by
+default and one passage on request. It never rides along inside a map read, so a long
+brief cannot quietly fill the context window that ought to be spent thinking about it.
+
 The central principle: **don't just give me an answer — help me understand the problem
 well enough to find a better answer.**
 
@@ -26,7 +33,7 @@ well enough to find a better answer.**
 
 | Phase | What happens |
 | --- | --- |
-| 01 Idea | You type something vague into one free-text input. No structured fields. |
+| 01 Idea | You type something vague into one free-text input. No structured fields. Or you arrive with a client's brief — paste it, or drop the `.pdf` / `.docx` / `.md` / `.txt` — and the document comes in whole. |
 | 02 Deconstruct | The partner asks a small number of high-value questions instead of answering. |
 | 03 Map | Your answers become nodes: users, problems, goals, assumptions, open questions. |
 | 04 Research | A live web search grounds the map in what already exists, and in the gaps. |

@@ -209,5 +209,49 @@
         "required": true
       }
     ]
+  },
+  {
+    "name": "MapBrief",
+    "description": "The client's own document, kept whole as the map's source. Written once when the map is created and never overwritten \u2014 a revised brief is a new map, not an edit to this one \u2014 which is what makes section ids derivable from the text rather than stored as rows. Held in its own model so listMaps and getMap never drag tens of thousands of characters into memory; the text has exactly one reader, the agent's read_brief tool, which returns an outline by default and a single passage on request. 'sourceName' is the uploaded filename or \"pasted\"; only the extracted text is persisted, never the file it arrived in.",
+    "category": "datastore",
+    "order": 5,
+    "fields": [
+      {
+        "name": "id",
+        "type": "string",
+        "isId": true,
+        "required": true
+      },
+      {
+        "name": "mapId",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sourceName",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "mediaType",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "text",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "charCount",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "datetime",
+        "required": true
+      }
+    ]
   }
 ]

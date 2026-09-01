@@ -114,6 +114,21 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     annotations: { readOnlyHint: true },
   },
   {
+    name: 'read_brief',
+    title: 'Read the client brief',
+    description:
+      "Read the client's own document, when the map was started from one. With no section, returns the OUTLINE — one line per section with its id, heading and length — which is cheap enough to call on any turn. With a section id, returns that passage in full. Read the outline first and pull only the passages you actually need; walking every section of a long spec into your context is how you run out of room to think. The client did not send this to have it summarised back at them — read it to find what it does NOT say, and ask about that.",
+    inputSchema: z.object({
+      section: z
+        .string()
+        .optional()
+        .describe(
+          'A section id from the outline, e.g. "s3". Omit to get the outline.',
+        ),
+    }),
+    annotations: { readOnlyHint: true },
+  },
+  {
     name: 'add_nodes',
     title: 'Add nodes to the map',
     description:

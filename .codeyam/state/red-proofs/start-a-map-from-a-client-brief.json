@@ -1,0 +1,24 @@
+{
+  "provenAt": "2026-09-01T14:26:35Z",
+  "slug": "start-a-map-from-a-client-brief",
+  "paths": [],
+  "tests": {
+    "extractionWarning does not treat a zero byte length as a healthy empty extraction": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "The fix is an ORDERING at a call site in a server-only module (app/lib/briefText.ts reads bytes.byteLength before calling the extractor, because pdfjs transfers the ArrayBuffer to its worker and detaches it). No unit test can reach it: briefText.ts imports server-only plus unpdf and mammoth, so it does not load under vitest. Redness was established empirically against the running dev server by POSTing two real PDFs to /api/briefs/extract with the size read AFTER extraction (the buggy order) and then BEFORE it (the fix).",
+        "evidence": "Buggy order, 80,597-byte PDF stripped of all but one text line: {\"text\":\"Background\",\"charCount\":10,\"warning\":null} — the scanned-PDF warning did not fire for the exact file type it exists for. After moving the read before extraction, same file: warning = 'Only 10 characters came out of a 79KB file. It is probably a scan...'. Control, healthy 924-byte PDF: charCount 299, warning null both before and after, so the fix did not just turn the warning on for everything."
+      }
+    }
+  },
+  "proof": {
+    "verdict": "provenByHand",
+    "attested": [
+      "extractionWarning does not treat a zero byte length as a healthy empty extraction"
+    ],
+    "method": "The fix is an ORDERING at a call site in a server-only module (app/lib/briefText.ts reads bytes.byteLength before calling the extractor, because pdfjs transfers the ArrayBuffer to its worker and detaches it). No unit test can reach it: briefText.ts imports server-only plus unpdf and mammoth, so it does not load under vitest. Redness was established empirically against the running dev server by POSTing two real PDFs to /api/briefs/extract with the size read AFTER extraction (the buggy order) and then BEFORE it (the fix).",
+    "evidence": "Buggy order, 80,597-byte PDF stripped of all but one text line: {\"text\":\"Background\",\"charCount\":10,\"warning\":null} — the scanned-PDF warning did not fire for the exact file type it exists for. After moving the read before extraction, same file: warning = 'Only 10 characters came out of a 79KB file. It is probably a scan...'. Control, healthy 924-byte PDF: charCount 299, warning null both before and after, so the fix did not just turn the warning on for everything."
+  }
+}

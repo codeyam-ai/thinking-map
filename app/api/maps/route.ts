@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createMap, listMaps } from '@/app/lib/mapStore';
+import { parseBriefInput } from '@/app/lib/briefInput';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,12 +11,19 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const seedIdea = typeof body.seedIdea === 'string' ? body.seedIdea.trim() : '';
-  if (!seedIdea) {
+  // The brief arrives as text the browser already has, because extraction
+  // happened in its own request.
+  const brief = parseBriefInput(body.brief);
+
+  // A brief is enough on its own — the document says what the person wants
+  // thought through. What is not allowed is arriving with neither.
+  if (!seedIdea && !brief) {
     return NextResponse.json(
       { error: 'Tell me what you want to figure out first.' },
       { status: 400 },
     );
   }
-  const map = await createMap(seedIdea);
+
+  const map = await createMap(seedIdea, brief);
   return NextResponse.json({ id: map.id }, { status: 201 });
 }

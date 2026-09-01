@@ -19,6 +19,9 @@ export interface MapDetail {
     label: string;
     status: string;
   }[];
+  /** Metadata only, never the text. `read_map` is called constantly; the brief
+   *  is read deliberately, through its own tool. */
+  brief?: { sourceName: string; charCount: number } | null;
 }
 
 /**
@@ -48,10 +51,20 @@ export function formatMapDetail(map: MapDetail): string {
     .map((m) => `${m.role}: ${m.content}`)
     .join('\n');
 
+  // One line, not the document. A brief can be forty thousand characters and
+  // this rendering is read on every full read_map — so the map says the brief
+  // is THERE and names the tool that opens it, and stops.
+  const brief = map.brief
+    ? [
+        `brief: ${map.brief.sourceName} — ${map.brief.charCount} characters. Read it with read_brief (outline first).`,
+      ]
+    : [];
+
   return [
     `# ${map.title}`,
     `phase: ${map.phase}`,
-    `seed idea: ${map.seedIdea}`,
+    `seed idea: ${map.seedIdea || '(none — this map started from the brief)'}`,
+    ...brief,
     '',
     '## Conversation',
     conversation || '(none)',

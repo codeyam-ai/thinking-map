@@ -1,5 +1,35 @@
 {
   "views": {
+    "BriefDrop": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "A map has exactly one brief or none - it is written once at creation and never replaced - so there is no list here and no empty-to-many boundary. The one-item case IS the typical case, captured as BriefDrop - Attached."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "One brief per map is a schema-level rule: MapBrief.mapId is unique and the row is never overwritten. Attaching a second brief is not an action this surface offers, so a many state cannot occur."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The in-flight upload state is internal to this component - it is set when the fetch starts and cleared when it returns, with no prop seam to preset it - so it cannot be captured at this level. The pixels it produces ARE captured one level down, where the state is a prop: BriefDropTarget - Reading."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "Both failure states are held below this component and captured there: an upload that failed is BriefDropTarget - Failed, and a file that extracted to almost nothing is BriefReadout - ScannedPdf. This component owns the error string but renders none of it itself."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
     "Home": {
       "empty": {
         "status": "covered"

@@ -1,0 +1,12 @@
+{
+  "name": "BriefExcerpt - NothingExtracted",
+  "id": "cc09de36-c85f-41bc-8da1-836e0b605d27",
+  "url": "/isolated-components/BriefExcerpt?s=NothingExtracted",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefExcerpt",
+  "scenarioType": "component",
+  "description": "A scan. The empty preview IS the finding, and it is why this block is shown before a map exists rather than three questions later."
+}

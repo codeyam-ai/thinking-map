@@ -1,0 +1,12 @@
+{
+  "name": "BriefDropTarget - Failed",
+  "id": "1c75234f-a878-41b4-8c29-b831732ee9b1",
+  "url": "/isolated-components/BriefDropTarget?s=Failed",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefDropTarget",
+  "scenarioType": "component",
+  "description": "The upload itself failed on a protected or damaged file. Recoverable, and the sentence says how - paste it instead."
+}

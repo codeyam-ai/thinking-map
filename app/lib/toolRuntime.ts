@@ -9,7 +9,8 @@ import 'server-only';
 // a tool means the same thing whichever way it was called.
 
 import type { z } from 'zod';
-import { applyToolCalls, getMap } from './mapStore';
+import { applyToolCalls, getBrief, getMap } from './mapStore';
+import { splitIntoSections } from './briefSections';
 import { formatMapDetail } from './mcpFormat';
 import {
   currentRevision,
@@ -44,6 +45,69 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     return {
       text: `revision: ${map.revision}\n${formatMapDetail(map)}`,
       structured: { revision: map.revision, delta: false },
+    };
+  },
+
+  async read_brief(ctx, input: { section?: string }) {
+    const brief = await getBrief(ctx.mapId);
+
+    // No brief is a perfectly ordinary state — most maps start from a sentence.
+    // Saying so plainly, without `isError`, is the difference between an agent
+    // moving on and an agent retrying a tool that will never succeed.
+    if (!brief) {
+      return {
+        text: 'This map was not started from a brief — there is no document to read. The seed idea in read_map is all there is.',
+        structured: { hasBrief: false },
+      };
+    }
+
+    const sections = splitIntoSections(brief.text);
+    const outline = [
+      `# ${brief.sourceName}`,
+      `${brief.charCount} characters, ${sections.length} section(s).`,
+      '',
+      ...sections.map(
+        (s) => `[${s.id}] ${s.heading} — ${s.charCount} characters`,
+      ),
+      '',
+      'Call read_brief again with a section id to read one in full.',
+    ].join('\n');
+
+    if (!input.section) {
+      return {
+        text: outline,
+        structured: {
+          hasBrief: true,
+          sourceName: brief.sourceName,
+          charCount: brief.charCount,
+          sections: sections.map(({ id, heading, charCount }) => ({
+            id,
+            heading,
+            charCount,
+          })),
+        },
+      };
+    }
+
+    const found = sections.find((s) => s.id === input.section);
+    // An unknown id gets the outline back rather than an error: the agent's
+    // next move is to pick a real section, and the outline is exactly what it
+    // needs to do that.
+    if (!found) {
+      return {
+        text: `There is no section ${input.section} in this brief.\n\n${outline}`,
+        structured: { hasBrief: true, unknownSection: input.section },
+      };
+    }
+
+    return {
+      text: `# ${found.heading}\n(${found.id}, ${found.charCount} characters, from ${brief.sourceName})\n\n${found.text}`,
+      structured: {
+        hasBrief: true,
+        section: found.id,
+        heading: found.heading,
+        charCount: found.charCount,
+      },
     };
   },
 

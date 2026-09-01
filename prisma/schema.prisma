@@ -51,6 +51,7 @@ model ThinkingMap {
   messages Message[]
   nodes    MapNode[]
   events   MapEvent[]
+  brief    MapBrief?
 }
 
 model Message {
@@ -171,4 +172,48 @@ model MapEvent {
   @@unique([mapId, requestId, revision])
   @@index([mapId, revision])
   @@index([mapId, requestId])
+}
+
+// ──────────────────────────────────────────────
+// The client's brief
+//
+// Some maps do not start from a sentence. They start from a twenty-page spec,
+// and the whole point of this model is that the document arrives WHOLE rather
+// than squeezed through a one-line input.
+//
+// Write-once, exactly like `seedIdea`: a brief is attached when the map is
+// created and never overwritten. A revised brief is a NEW map, because a v2
+// spec is a different conversation — not an edit to this one. That immutability
+// is load-bearing: it is what lets section ids be derived from the text by a
+// pure splitter (app/lib/briefSections.ts) instead of stored as rows that would
+// have to be kept in sync.
+//
+// Its own model rather than columns on ThinkingMap so that `listMaps` and every
+// `getMap` do not drag tens of thousands of characters into memory on every
+// page render. The text has exactly one reader — the agent's `read_brief` tool.
+//
+// Only the extracted TEXT is persisted. The .pdf or .docx it arrived in is
+// packaging, and is thrown away once the words are out of it.
+// ──────────────────────────────────────────────
+
+model MapBrief {
+  id    String      @id @default(cuid())
+  /// Unique: one brief per map. Attaching or replacing a brief on a running
+  /// map is deliberately not possible — it would need a document-version model
+  /// and a story for references pointing into a passage that no longer exists.
+  mapId String      @unique
+  map   ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+
+  /// The uploaded filename, or "pasted" when the client pasted the text in.
+  sourceName String
+  /// The media type it arrived as, kept so a reader can say what kind of
+  /// document this was without re-sniffing the text.
+  mediaType  String
+  /// The extracted text, verbatim beyond line-ending normalisation.
+  text       String
+  /// Denormalised length, so the brief can announce its own size without the
+  /// text being read. This is what keeps `read_map` cheap.
+  charCount  Int
+
+  createdAt DateTime @default(now())
 }

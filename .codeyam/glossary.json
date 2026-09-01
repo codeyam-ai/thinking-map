@@ -94,6 +94,62 @@
     }
   },
   {
+    "description": "The way a twenty-page spec gets into a map. Owns one question - what document, if any, is attached - and shows exactly one of three things depending on the answer: the readout of an attached brief, the paste box, or the drop target. Extraction goes over the wire because reading a PDF is a server's job, and nothing is persisted by it, so a brief the person discards leaves nothing behind.",
+    "filePath": "app/components/BriefDrop.tsx",
+    "name": "BriefDrop",
+    "scenarios": [
+      "briefdrop-default",
+      "briefdrop-attached"
+    ]
+  },
+  {
+    "description": "The resting state of the intake: drop a document, choose one, or paste. Dashed rather than solid, in the same language the map uses for a thought that is not finished yet - nothing has been committed, and the whole panel disappears the moment a brief is in hand.",
+    "filePath": "app/components/BriefDropTarget.tsx",
+    "name": "BriefDropTarget",
+    "scenarios": [
+      "briefdroptarget-default",
+      "briefdroptarget-reading",
+      "briefdroptarget-failed"
+    ]
+  },
+  {
+    "description": "The opening lines of the brief, exactly as extracted. Verbatim on purpose, markdown marks and all: the claim being made is this is what we got out of your file, and prettifying it would undermine the one thing it is here to prove. A file that yielded nothing shows nothing, which is the signal.",
+    "filePath": "app/components/BriefExcerpt.tsx",
+    "name": "BriefExcerpt",
+    "scenarios": [
+      "briefexcerpt-default",
+      "briefexcerpt-nothingextracted"
+    ]
+  },
+  {
+    "description": "The other way in: paste the words. Not a fallback for when upload fails but a first-class door, because a client who cannot get their document out of the system it lives in still has the text, and the text is all this product ever wanted from the file.",
+    "filePath": "app/components/BriefPasteBox.tsx",
+    "name": "BriefPasteBox",
+    "scenarios": [
+      "briefpastebox-default",
+      "briefpastebox-filled"
+    ]
+  },
+  {
+    "description": "What we are holding, before any map exists. Says where the document came from, how much of it there is, and - through BriefExcerpt - what actually came out of the file, so a client finds out their PDF was a scan here rather than three questions into a map built on nothing.",
+    "filePath": "app/components/BriefReadout.tsx",
+    "name": "BriefReadout",
+    "scenarios": [
+      "briefreadout-default",
+      "briefreadout-pasted",
+      "briefreadout-scannedpdf"
+    ]
+  },
+  {
+    "description": "What extraction wanted the person to know, in the risk colour. The safety net of the whole intake: where someone who uploaded a photograph of a document finds out no words came out of it. A warning rather than an error because nothing failed - their file is simply not what they thought, and they can still paste.",
+    "filePath": "app/components/BriefWarning.tsx",
+    "name": "BriefWarning",
+    "scenarios": [
+      "briefwarning-default",
+      "briefwarning-unsupported"
+    ]
+  },
+  {
     "description": "A what-we-know or what-we-don't-know card on the summary screen, falling back to the keep-talking hint when its bucket is empty.",
     "filePath": "app/components/BulletCard.tsx",
     "name": "BulletCard",
@@ -510,6 +566,12 @@
     ]
   },
   {
+    "description": "Turns a character count into an approximate page count at roughly 1,800 characters per page, so a person is shown a unit they think in. Anything with text in it is at least one page; an empty document is zero.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "approxPages",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
     "description": "Registers the catalog with the browser agent for one map and returns a disposer. The WebMCP draft has already moved once - provideContext was removed in the March 2026 revision in favour of registerTool/unregisterTool, while the polyfill still ships the older shape - so both conventions are handled here, the one file that names navigator.modelContext. Re-registering a live name throws InvalidStateError, which is why unregister-then-register is the only safe update path and why the disposer exists.",
     "filePath": "app/lib/webmcp.ts",
     "name": "bindTools",
@@ -589,6 +651,12 @@
     "testFile": "app/lib/exchange.test.ts"
   },
   {
+    "description": "Names a new map from whatever the person gave us. With a brief, prefers its first markdown heading, then its first non-empty line - so the root pill reads as a title instead of a 57-character slice of a twenty-page spec. Without a brief it is the original behaviour unchanged: the seed idea, clipped to 60 characters.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "deriveTitle",
+    "testFile": "app/lib/deriveTitle.test.ts"
+  },
+  {
     "description": "Every node beneath a starting node, at any depth, excluding the starting node itself. Guards against a parentId cycle the same way the layout does, so a malformed map still folds rather than hanging.",
     "filePath": "app/lib/collapse.ts",
     "name": "descendants",
@@ -611,6 +679,48 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "errorResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The lower-cased extension of a filename, or empty when it has none. Needed because browsers are inconsistent about the media type they attach to a .md - several send application/octet-stream - so the extension is the fallback the type dispatch falls back to.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extensionOf",
+    "untestabilityReason": {
+      "justification": "Private to a module that imports server-only plus unpdf and mammoth, so the file cannot load under vitest to reach it. Exercised end to end instead: real .pdf, .docx, .md and .txt uploads were extracted through the running app, including a .md sent as application/octet-stream, which is the case this helper exists for.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Gets the words out of whatever the client sent - PDF via unpdf, .docx via mammoth, markdown and plain text decoded directly - dispatching on media type and falling back to the file extension, because browsers are inconsistent about the type they attach to a .md. Server-only, and the single place any format-specific dependency is reached. Reads the buffer's size before extracting, since pdfjs detaches it.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extractBriefText",
+    "untestabilityReason": {
+      "justification": "The module imports server-only plus unpdf and mammoth, so it does not load under vitest at all. Its decision logic is extracted into the pure, tested extractionWarning and normalizeBriefText; what remains is dispatch and two library calls. The format paths were verified end to end against the running app with real .pdf, .docx, .md and .txt uploads, including a scanned-PDF case.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Pulls the raw text out of a .docx through mammoth, discarding the formatting. A brief is words; the Word file it arrived in is packaging.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extractDocx",
+    "untestabilityReason": {
+      "justification": "A wrapper around mammoth inside a server-only module that does not load under vitest. Verified against the running app with a real .docx upload, which extracted its four paragraphs intact.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Pulls the text out of a PDF through unpdf, merging pages into one string. unpdf rather than pdf-parse because pdf-parse runs a debug branch at import that reads a fixture off disk and fails in a bundled server runtime. Note that pdfjs transfers the buffer to its worker and detaches it, so the caller must read the size first.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extractPdf",
+    "untestabilityReason": {
+      "justification": "A wrapper around unpdf inside a server-only module that does not load under vitest. Verified against the running app with two real PDFs: a healthy 924-byte document extracted 299 characters, and an 80KB document stripped of its text extracted 10 and correctly raised the scanned-PDF warning.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Decides whether an extraction failed and says so in a sentence the person can act on: nothing at all came out, or a large file yielded almost no text - the scanned-PDF signature. Pure and separate from the extractor so the safety net of the whole intake is testable, and because the size it takes must be measured before extraction: pdfjs transfers the upload buffer to its worker and detaches it.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "extractionWarning",
+    "testFile": "app/lib/briefFormat.test.ts"
   },
   {
     "description": "Read one non-empty string field off an event payload, or null. The single guard every rail reader goes through, so an unparseable row degrades to a plainer line rather than throwing.",
@@ -637,6 +747,12 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
+    "description": "The first n non-empty lines of a document, for the intake's proof-of-extraction preview. Blank lines are skipped rather than counted, so a brief that opens with a heading and two blank lines still previews as three real lines.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "firstLines",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
     "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, and the indented node tree - so a client sees both views of the thinking the way the UI shows them side by side.",
     "filePath": "app/lib/mcpFormat.ts",
     "name": "formatMapDetail",
@@ -655,6 +771,15 @@
     "untestabilityReason": {
       "justification": "A single fetch plus a non-2xx guard that turns a transport failure into a readable message. What it sends is decided by validateToolInput and what it receives is produced by runTool, both covered by their own entries.",
       "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Loads a map's brief including its text - the one reader allowed to want it. Everything else takes the metadata that getMap selects, so tens of thousands of characters never reach a page render or a full read_map.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "getBrief",
+    "untestabilityReason": {
+      "justification": "A one-line Prisma findUnique with no branching. The behaviour actually worth pinning is that getMap excludes the brief text while read_map still announces it, which mcpFormat.test.ts covers.",
+      "kind": "trivial-wrapper"
     }
   },
   {
@@ -681,6 +806,12 @@
       "justification": "Four straight-line statements with no branching: construct server, construct transport, connect, delegate. The tools underneath are covered by their own entries, and the endpoint was verified end to end against a live MCP client - initialize, tools/list, and a create/add-node/read round trip.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Stands in for a heading when a passage has none: the first nine words of its opening line, elided if there were more. A person scanning the outline needs to recognise the passage, not read it.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "impliedHeading",
+    "testFile": "app/lib/briefSections.test.ts"
   },
   {
     "description": "Guard for the eight kinds the exchange log can record. A kind outside the set would become a row that nothing knows how to render or resume past.",
@@ -794,6 +925,18 @@
     "testFile": "app/lib/nodeAppearance.test.ts"
   },
   {
+    "description": "Normalises a freshly extracted brief: CRLF and bare CR become newlines, trailing spaces and tabs are stripped from every line, runs of three or more newlines collapse to one paragraph break, and the document's own outer whitespace is trimmed. Everything downstream assumes this has run, so a .docx and a paste split into the same sections.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "normalizeBriefText",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "Reads a brief off an untrusted request body. A brief with no text in it is not a brief, and every way of expressing that - missing, empty, whitespace, wrongly typed, not an object - reduces to undefined so the caller has one case rather than five. The text is kept verbatim; a missing source name or media type falls back to the pasted defaults.",
+    "filePath": "app/lib/briefInput.ts",
+    "name": "parseBriefInput",
+    "testFile": "app/lib/briefInput.test.ts"
+  },
+  {
     "description": "Validates a node-arrangement batch off a request body, returning the parsed nudges or the message explaining what was wrong. Lives apart from the route so what counts as a well-formed nudge is checkable without an HTTP request; offsets must be finite, because NaN and Infinity are both typeof number and either one would put a node nowhere.",
     "filePath": "app/lib/nodePositions.ts",
     "name": "parseNudges",
@@ -889,10 +1032,34 @@
     ]
   },
   {
+    "description": "Builds one BriefSection from an index, a heading and a body - trimming the body and deriving its character count so the outline can be trusted without any passage being read.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "section",
+    "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
     "filePath": "app/lib/messageLines.ts",
     "name": "splitAssistantLines",
     "testFile": "app/lib/messageLines.test.ts"
+  },
+  {
+    "description": "Cuts a brief into stable, addressable sections - s1..sN with a heading, body and character count each. Splits on markdown headings where the document has them and groups paragraphs to a target size where it does not. Pure, so the same immutable text always yields the same ids without a table to keep in sync; an empty document returns no sections rather than one empty one.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "splitIntoSections",
+    "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "Splits a document on its markdown headings, one section per heading. Prose before the first heading becomes its own section rather than being dropped - it is usually the summary - and a heading with nothing under it is kept, because a section the client left empty is part of the document's shape.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "splitOnHeadings",
+    "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "Groups paragraphs up to a target size when a document has no headings, so plain prose still comes back as a readable handful of passages. A single paragraph over the maximum is left whole: an oversized passage beats one severed mid-argument.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "splitOnParagraphs",
+    "testFile": "app/lib/briefSections.test.ts"
   },
   {
     "description": "Picks the one readable field worth showing for an event, in preference order - label, then text, then phase, then answer. Each event kind carries its human-readable part under a different name, and an agent reading a wall of bare kinds learns nothing about what changed.",

@@ -3,6 +3,7 @@
 // implementation rather than drifting apart.
 
 import { prisma } from './prisma';
+import type { BriefInput } from './briefInput';
 import { KIND_EYEBROW } from './mapKinds';
 import { planMapMutations, type ToolInvocation } from './nodePlan';
 import { recordEvents, type EventInput, type Origin } from './exchange';
@@ -27,16 +28,53 @@ export async function getMap(id: string) {
     include: {
       messages: { orderBy: { createdAt: 'asc' } },
       nodes: { orderBy: [{ createdAt: 'asc' }, { order: 'asc' }] },
+      // Metadata only. The brief's text has exactly one reader — `read_brief` —
+      // and pulling it in here would put tens of thousands of characters into
+      // every page render and every full `read_map`.
+      brief: { select: { sourceName: true, mediaType: true, charCount: true } },
     },
   });
 }
 
+/** The brief's text, for the one caller that is allowed to want it. */
+export async function getBrief(mapId: string) {
+  return prisma.mapBrief.findUnique({ where: { mapId } });
+}
+
+/**
+ * Name the map from whatever the person gave us.
+ *
+ * A brief's first markdown heading is the document's own title and is almost
+ * always the right answer; its first non-empty line is the next best guess.
+ * Without a brief this is the original behaviour, unchanged: the seed idea,
+ * clipped — which is how every map that already exists was named.
+ */
+export function deriveTitle(seedIdea: string, brief?: BriefInput): string {
+  const clip = (text: string) =>
+    text.length > 60 ? `${text.slice(0, 57)}…` : text;
+
+  if (brief) {
+    const lines = brief.text.split('\n');
+    const heading = lines.find((line) => /^#{1,6}\s+\S/.test(line));
+    if (heading) return clip(heading.replace(/^#{1,6}\s+/, '').trim());
+    const firstLine = lines.find((line) => line.trim().length > 0);
+    if (firstLine) return clip(firstLine.trim());
+  }
+
+  return clip(seedIdea.trim());
+}
+
 /** Start a new map from an unstructured idea. The seed idea becomes both the
  *  root node and the person's first message — the conversation and the map are
- *  two views of the same thing from the very first turn. */
-export async function createMap(seedIdea: string) {
+ *  two views of the same thing from the very first turn.
+ *
+ *  A brief, when there is one, is written in the SAME transaction: it is the
+ *  map's source, so a map existing without the document it was started from is
+ *  a state nothing downstream should have to handle. It is written once here
+ *  and never again — a revised brief is a new map. */
+export async function createMap(seedIdea: string, brief?: BriefInput) {
   const trimmed = seedIdea.trim();
-  const title = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+  const title = deriveTitle(trimmed, brief);
 
   // The seed idea is the person's, so the root node and the opening message are
   // user-origin. An agent reading the log must not mistake the human's starting
@@ -46,7 +84,28 @@ export async function createMap(seedIdea: string) {
       title,
       seedIdea: trimmed,
       phase: 'deconstruct',
-      messages: { create: [{ role: 'user', origin: 'user', content: trimmed }] },
+      ...(brief
+        ? {
+            brief: {
+              create: {
+                text: brief.text,
+                sourceName: brief.sourceName,
+                mediaType: brief.mediaType,
+                charCount: brief.text.length,
+              },
+            },
+          }
+        : {}),
+      // A brief can arrive with no sentence beside it, and an empty opening
+      // message would read to an agent as a person who said nothing — worse
+      // than a conversation that has not started yet.
+      ...(trimmed
+        ? {
+            messages: {
+              create: [{ role: 'user', origin: 'user', content: trimmed }],
+            },
+          }
+        : {}),
       nodes: {
         create: [
           {

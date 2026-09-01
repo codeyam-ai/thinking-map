@@ -1,0 +1,12 @@
+{
+  "name": "BriefDrop - Attached",
+  "id": "db5d4cd0-442b-48c0-a203-438af2e74273",
+  "url": "/isolated-components/BriefDrop?s=Attached",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefDrop",
+  "scenarioType": "component",
+  "description": "A document in hand. The intake switches wholesale - the drop target is gone and the readout takes its place, because there is one brief per map and attaching a second is not a thing you can do."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BriefDrop - Default",
+  "id": "57f47e03-7c6e-494c-a16d-6bcd4922fd44",
+  "url": "/isolated-components/BriefDrop?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefDrop",
+  "scenarioType": "component",
+  "description": "Nothing attached yet, so the whole intake is the drop target. This is what sits under the idea line on every arrival at the landing screen."
+}

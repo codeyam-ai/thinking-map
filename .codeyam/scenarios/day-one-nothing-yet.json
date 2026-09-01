@@ -14,5 +14,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/page.tsx",
-  "description": "The production default. No maps exist yet, so the landing page is just the question and the starter chips - this is what a brand-new install actually looks like."
+  "description": "The production default. No maps exist yet, so the landing page is just the question, the two ways in - a sentence or a whole brief - and the starter chips. This is what a brand-new install actually looks like."
 }

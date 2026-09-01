@@ -1,0 +1,12 @@
+{
+  "name": "BriefReadout - ScannedPdf",
+  "id": "4ba1fe95-03ad-405f-ad6f-edf06083db1e",
+  "url": "/isolated-components/BriefReadout?s=ScannedPdf",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefReadout",
+  "scenarioType": "component",
+  "description": "The state this readout is really for. A photographed document: two megabytes of file, one stray caption of text, and the warning plus the near-empty preview both saying so before any map exists."
+}
