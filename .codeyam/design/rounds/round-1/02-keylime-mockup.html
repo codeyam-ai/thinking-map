@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brief panel — coverage ledger (anchored)</title>
+<style>
+  :root{
+    --paper:#f1efea; --surface:#ffffff; --ink:#0f0f0f; --ink-soft:#4a4a45;
+    --muted:#8a8a85; --line:#e2e0d9; --lime:#d5f560; --lime-deep:#c6ec44;
+    --thread:#8b8bc8; --risk:#c4736a; --pro:#6b9e84;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; padding:36px; min-height:100vh;
+  }
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta{font-size:12.5px;color:var(--muted)}
+  .workspace{display:flex;gap:24px;align-items:stretch;height:1010px}
+
+  /* ── the new third pane: a ledger you could hand a client ── */
+  .brief{flex:0 0 348px;background:var(--surface);border-radius:16px;padding:26px 24px;overflow:hidden}
+  .brief-head{display:flex;align-items:baseline;gap:10px}
+  .brief-src{font-size:13px;font-weight:600;color:var(--ink-soft);margin:5px 0 20px}
+
+  /* the headline is the whole point: state it as a sentence, not a number */
+  .verdict{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.25;margin-bottom:14px}
+  .verdict em{font-style:normal;border-bottom:2px solid var(--ink);padding-bottom:1px}
+  /* eleven blocks, one per section — filled where cited, hatched where not */
+  .strip{display:flex;gap:3px;margin-bottom:8px}
+  .strip i{flex:1;height:26px;border-radius:3px;background:var(--ink)}
+  .strip i.none{background:var(--paper);border:1px dashed var(--muted)}
+  .striplab{display:flex;justify-content:space-between;margin-bottom:24px}
+  .striplab span{font-size:11px;color:var(--muted);font-weight:600}
+
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th{text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);padding-bottom:9px;border-bottom:1.5px solid var(--ink)}
+  th.r,td.r{text-align:right}
+  td{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top}
+  td.sid{color:var(--muted);font-size:11px;font-weight:700;width:34px;padding-top:12px}
+  td.name{font-weight:600}
+  td.chars{color:var(--muted);font-size:12.5px;width:64px;padding-top:11px}
+  td.n{font-weight:700;width:34px}
+  tr.untouched td.name,tr.untouched td.n{color:var(--muted);font-weight:500}
+  tr.untouched td.name{font-weight:500}
+  .dash{display:inline-block;width:16px;border-bottom:1.5px dashed var(--muted);vertical-align:3px}
+  .foot{margin-top:18px;padding-top:16px;border-top:1.5px solid var(--ink)}
+  .foot p{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:11px}
+  .ask{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);
+    background:none;border:1px dashed var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer}
+
+  /* ── existing map card, unchanged ──────────────────── */
+  .map{flex:1;background:var(--surface);border-radius:16px;padding:26px 30px;position:relative;min-width:0}
+  .map-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .tree{position:relative;height:640px}
+  .node{position:absolute;transform:translateX(-50%);text-align:center}
+  .node .eyebrow{margin-bottom:7px;white-space:nowrap}
+  .pill{display:inline-block;padding:15px 26px;border-radius:999px;background:var(--surface);
+    border:1.5px solid var(--ink);font-size:14.5px;font-weight:600;white-space:nowrap}
+  .pill.root{background:var(--ink);color:#fff;border-color:var(--ink);padding:19px 30px;font-size:16px}
+  .pill.open{border:1.5px dashed var(--line);color:var(--muted);font-weight:500}
+  .sref{color:var(--muted)}
+  .link{position:absolute}
+  .v{border-left:1.5px dashed var(--thread)}
+  .h{border-top:1.5px dashed var(--thread)}
+  .dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--thread)}
+  .zoom{position:absolute;right:26px;bottom:22px;display:flex;align-items:center;gap:14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 16px;
+    font-size:12.5px;color:var(--muted)}
+  .zoom b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ── existing exchange column, unchanged ───────────── */
+  .rail{flex:0 0 290px;background:var(--surface);border-radius:16px;padding:26px 22px;overflow:hidden}
+  .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;
+    padding:9px 8px 9px 16px;margin:8px 0 16px;font-size:13.5px;color:var(--muted)}
+  .field span{flex:1}
+  .send{width:30px;height:30px;border-radius:50%;background:var(--lime);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .q{font-size:13.5px;font-weight:500}
+  .toggle{display:flex;align-items:center;gap:14px;margin:18px 0 4px}
+  .toggle .on{background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.1em;
+    padding:6px 13px;border-radius:999px}
+  .ev{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .av{flex:0 0 20px;height:20px;border-radius:50%;border:1.5px solid var(--line);margin-top:1px}
+  .av.agent{background:var(--ink);border-color:var(--ink)}
+  .ev p{font-size:13px;font-weight:600;line-height:1.4}
+  .ev small{display:block;font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px;line-height:1.45}
+</style>
+</head>
+<body>
+<div class="workspace">
+
+  <!-- NEW: brief panel as a ledger — aligned columns, a document of record -->
+  <aside class="brief">
+    <div class="brief-head"><span class="eyebrow">Brief</span><span class="meta">12,690 characters</span></div>
+    <div class="brief-src">Northwind Learning — platform brief</div>
+
+    <div class="verdict">The map accounts for <em>7 of 11</em> sections.</div>
+    <div class="strip">
+      <i></i><i></i><i></i><i></i><i class="none"></i><i></i>
+      <i class="none"></i><i></i><i class="none"></i><i class="none"></i><i></i>
+    </div>
+    <div class="striplab"><span>§1</span><span>§11</span></div>
+
+    <table>
+      <thead><tr><th colspan="2">Section</th><th class="r">Chars</th><th class="r">Nodes</th></tr></thead>
+      <tbody>
+        <tr><td class="sid">S1</td><td class="name">Overview</td><td class="chars r">1,240</td><td class="n r">3</td></tr>
+        <tr><td class="sid">S2</td><td class="name">Who this is for</td><td class="chars r">890</td><td class="n r">2</td></tr>
+        <tr><td class="sid">S3</td><td class="name">The problem today</td><td class="chars r">1,510</td><td class="n r">4</td></tr>
+        <tr><td class="sid">S4</td><td class="name">Goals for year one</td><td class="chars r">1,120</td><td class="n r">2</td></tr>
+        <tr class="untouched"><td class="sid">S5</td><td class="name">Out of scope</td><td class="chars r">640</td><td class="n r"><span class="dash"></span></td></tr>
+        <tr><td class="sid">S6</td><td class="name">Existing systems</td><td class="chars r">1,380</td><td class="n r">1</td></tr>
+        <tr class="untouched"><td class="sid">S7</td><td class="name">Accessibility requirements</td><td class="chars r">970</td><td class="n r"><span class="dash"></span></td></tr>
+        <tr><td class="sid">S8</td><td class="name">Data and privacy</td><td class="chars r">1,650</td><td class="n r">1</td></tr>
+        <tr class="untouched"><td class="sid">S9</td><td class="name">Timeline</td><td class="chars r">720</td><td class="n r"><span class="dash"></span></td></tr>
+        <tr class="untouched"><td class="sid">S10</td><td class="name">Budget envelope</td><td class="chars r">480</td><td class="n r"><span class="dash"></span></td></tr>
+        <tr><td class="sid">S11</td><td class="name">How we'll measure success</td><td class="chars r">1,090</td><td class="n r">2</td></tr>
+      </tbody>
+    </table>
+
+    <div class="foot">
+      <p>Nothing on the map cites §5, §7, §9 or §10 — 2,810 characters, a fifth of the document.</p>
+      <button class="ask">Ask about all four</button>
+    </div>
+  </aside>
+
+  <!-- unchanged map card -->
+  <main class="map">
+    <div class="map-head"><span class="eyebrow">Live map</span><span class="meta">5 answered, 2 still open</span></div>
+    <div class="tree">
+      <div class="node" style="left:50%;top:0"><div class="eyebrow">Idea · Yours</div>
+        <div class="pill root">Northwind learning platform</div></div>
+      <div class="link v" style="left:50%;top:88px;height:26px"></div>
+      <div class="link h" style="left:22%;top:114px;width:56%"></div>
+      <div class="dot" style="left:calc(22% - 3px);top:111px"></div>
+      <div class="dot" style="left:calc(78% - 3px);top:111px"></div>
+      <div class="link v" style="left:22%;top:114px;height:52px"></div>
+      <div class="link v" style="left:78%;top:114px;height:52px"></div>
+      <div class="node" style="left:22%;top:172px"><div class="eyebrow">Problem <span class="sref">· S3</span></div>
+        <div class="pill">Teachers rebuild the same lesson</div></div>
+      <div class="node" style="left:78%;top:172px"><div class="eyebrow">Goal · Yours <span class="sref">· S4</span></div>
+        <div class="pill">One place to plan a term</div></div>
+      <div class="link v" style="left:22%;top:250px;height:76px"></div>
+      <div class="link v" style="left:78%;top:250px;height:76px"></div>
+      <div class="dot" style="left:calc(22% - 3px);top:323px"></div>
+      <div class="dot" style="left:calc(78% - 3px);top:323px"></div>
+      <div class="node" style="left:22%;top:334px"><div class="eyebrow">Finding <span class="sref">· S6</span></div>
+        <div class="pill">Three systems already hold rosters</div></div>
+      <div class="node" style="left:78%;top:334px"><div class="eyebrow">Approach</div>
+        <div class="pill">Start from the teacher's week</div></div>
+      <div class="link v" style="left:78%;top:412px;height:26px"></div>
+      <div class="link h" style="left:50%;top:438px;width:54%"></div>
+      <div class="dot" style="left:calc(50% - 3px);top:435px"></div>
+      <div class="dot" style="left:calc(104% - 3px);top:435px"></div>
+      <div class="link v" style="left:50%;top:438px;height:52px"></div>
+      <div class="node" style="left:50%;top:496px"><div class="eyebrow">Open</div>
+        <div class="pill open">Who owns accessibility sign-off?</div></div>
+      <div class="node" style="left:20%;top:496px"><div class="eyebrow">Open</div>
+        <div class="pill open">Is the March date fixed?</div></div>
+    </div>
+    <div class="zoom">− <b>100%</b> + <span>Fit</span></div>
+  </main>
+
+  <!-- unchanged exchange column -->
+  <aside class="rail">
+    <div class="eyebrow">Waiting on you · 2</div>
+    <div class="q" style="margin-top:14px">Who owns accessibility sign-off?</div>
+    <div class="field"><span>Answer…</span><div class="send">↗</div></div>
+    <div class="q">Is the March date fixed?</div>
+    <div class="field"><span>Answer…</span><div class="send">↗</div></div>
+    <div class="toggle"><span class="on">NOTE</span><span class="eyebrow">Add node</span></div>
+    <div class="field"><span>Leave a note for the agent…</span><div class="send">↗</div></div>
+    <div class="eyebrow" style="margin-top:20px">Activity</div>
+    <div style="margin-top:8px">
+      <div class="ev"><div class="av agent"></div><p>Agent read the brief<small>Eleven sections, 12,690 characters.</small></p></div>
+      <div class="ev"><div class="av"></div><p>You added "One place to plan a term"</p></div>
+      <div class="ev"><div class="av agent"></div><p>Agent left a note<small>§3 is where the real problem is — the rest of page one is context.</small></p></div>
+      <div class="ev"><div class="av agent"></div><p>Agent asked 2 questions</p></div>
+    </div>
+  </aside>
+
+</div>
+</body>
+</html>

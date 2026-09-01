@@ -4,6 +4,8 @@
 
 import { prisma } from './prisma';
 import type { BriefInput } from './briefInput';
+import { computeBriefCoverage, type CoverageNode } from './briefCoverage';
+import { splitIntoSections } from './briefSections';
 import { KIND_EYEBROW } from './mapKinds';
 import { planMapMutations, type ToolInvocation } from './nodePlan';
 import { recordEvents, type EventInput, type Origin } from './exchange';
@@ -39,6 +41,32 @@ export async function getMap(id: string) {
 /** The brief's text, for the one caller that is allowed to want it. */
 export async function getBrief(mapId: string) {
   return prisma.mapBrief.findUnique({ where: { mapId } });
+}
+
+/**
+ * The brief's coverage by the nodes on the map, ready to render.
+ *
+ * Lives here rather than in `briefCoverage.ts` on purpose: that module is
+ * deliberately pure — sections and nodes in, counts out, no database — and it
+ * is the pure half that is worth testing. This is the thin part that reaches
+ * for the text.
+ *
+ * Note what does NOT come back: the brief's text. `getMap` fetches the brief's
+ * metadata without it precisely because a document can be tens of thousands of
+ * characters, and splitting into sections needs the text but yields only
+ * headings and lengths. So the panel can be rendered on the server without the
+ * document ever crossing to the client.
+ *
+ * Returns null when the map has no brief — the workspace renders that by
+ * mounting no panel at all, not by rendering an empty one.
+ */
+export async function getBriefCoverage(mapId: string, nodes: CoverageNode[]) {
+  const brief = await getBrief(mapId);
+  if (!brief) return null;
+  return {
+    sourceName: brief.sourceName,
+    coverage: computeBriefCoverage(splitIntoSections(brief.text), nodes),
+  };
 }
 
 /**
@@ -213,6 +241,7 @@ export async function applyToolCalls(
         status: node.status,
         sourceUrl: node.sourceUrl,
         testsNodeId,
+        sourceRef: node.sourceRef,
         order: node.order,
         origin,
       },
@@ -231,6 +260,11 @@ export async function applyToolCalls(
         // see which assumption a slice claimed to settle, not just that a
         // slice appeared.
         ...(testsNodeId ? { testsNodeId } : {}),
+        // Carried in the payload so a second front door reading the log learns
+        // where a claim came from, rather than that provenance existing only in
+        // the database where the log's readers cannot see it. Omitted entirely
+        // when absent, so an unreferenced node's event is unchanged.
+        ...(created.sourceRef ? { sourceRef: created.sourceRef } : {}),
       },
     });
   }

@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanelHeader - Default",
+  "id": "4facee17-c741-46b0-999e-b9935f425758",
+  "url": "/isolated-components/BriefPanelHeader?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanelHeader",
+  "scenarioType": "component",
+  "description": "What document this is and how much of it the map accounts for. The source name is the client's own filename, because a person recognises the thing they sent and a tidied-up title would break that."
+}

@@ -25,6 +25,11 @@ export interface PlannedInsert {
    * has to survive the same resolution pass rather than being written raw.
    */
   testsRef: string | null;
+  /** The brief section this node came from, when it came from one. Dropped
+   *  when absent, exactly as `sourceUrl` is. Unlike `testsRef` above it is
+   *  NOT a node ref, so it needs no resolution pass — it points out of the
+   *  map at the document, not at another node. */
+  sourceRef: string | null;
   order: number;
 }
 
@@ -37,6 +42,9 @@ export interface PlannedUpdate {
     kind: NodeKind;
     status: NodeStatus;
     testsNodeId: string;
+    /** Settable after the fact: an agent often only works out where a claim
+     *  came from on a later pass, once it has read more of the brief. */
+    sourceRef: string;
   }>;
 }
 
@@ -97,6 +105,7 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           status: isNodeStatus(status) ? status : 'answered',
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
           testsRef: node.tests ? String(node.tests) : null,
+          sourceRef: node.sourceRef ? String(node.sourceRef) : null,
           order: order++,
         });
       }
@@ -116,6 +125,7 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
         data.status = String(input.status) as NodeStatus;
       }
       if (input.tests) data.testsNodeId = String(input.tests);
+      if (input.sourceRef) data.sourceRef = String(input.sourceRef);
       if (Object.keys(data).length === 0) continue;
       updates.push({ id, data });
     }

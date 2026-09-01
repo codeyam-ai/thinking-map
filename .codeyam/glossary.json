@@ -84,6 +84,16 @@
     ]
   },
   {
+    "description": "The affordance on a brief section nobody has accounted for. Its visible label and its accessible name deliberately differ: the label is the section mark, because a heading can run to a full sentence and the spelled-out version wrapped to three lines in a 276px rail, while the accessible name keeps the heading, where length costs nothing and a bare section number would tell a screen-reader user nothing about what they are asking after.",
+    "filePath": "app/components/AskAboutSectionButton.tsx",
+    "name": "AskAboutSectionButton",
+    "scenarios": [
+      "askaboutsectionbutton-default",
+      "askaboutsectionbutton-longheading",
+      "askaboutsectionbutton-doubledigitsection"
+    ]
+  },
+  {
     "description": "The line that says what sending this question will actually do. Its own component because it is the part of the composer that has to be honest: an asked question reaches an agent already waiting and reaches nobody otherwise. The wording itself lives in askPresence, where tests pin it.",
     "filePath": "app/components/AskPresenceNote.tsx",
     "name": "AskPresenceNote",
@@ -101,6 +111,26 @@
       "justification": "Lives under app/isolated-components/ and exists only to give that isolation route something to render. It is a presentational read of the bridge context; the state it displays is produced by WebMcpBridge, covered by the webmcpbridge-noagent scenario.",
       "kind": "scaffold"
     }
+  },
+  {
+    "description": "The panel's one sentence, and the bar under it. It leads with what is UNTOUCHED rather than what is covered, because the covered sections already have their evidence sitting next to this. The character count gets its own line because a count of sections understates the finding on its own - four short sections and four long ones are not the same news for a client.",
+    "filePath": "app/components/BriefCoverageHeadline.tsx",
+    "name": "BriefCoverageHeadline",
+    "scenarios": [
+      "briefcoverageheadline-partlycovered",
+      "briefcoverageheadline-nothingcited",
+      "briefcoverageheadline-fullyaccountedfor",
+      "briefcoverageheadline-onesectionleft"
+    ]
+  },
+  {
+    "description": "Citations pointing at sections the brief does not have. Surfaced rather than swallowed: a dangling reference means the map and the document disagree about what the document contains, and a silently dropped citation would let the accounted-for count overstate itself - the one failure the whole panel exists to prevent. Renders nothing at all when there are none, so a healthy map pays nothing in space.",
+    "filePath": "app/components/BriefDanglingNote.tsx",
+    "name": "BriefDanglingNote",
+    "scenarios": [
+      "briefdanglingnote-onedangling",
+      "briefdanglingnote-severaldangling"
+    ]
   },
   {
     "description": "The way a twenty-page spec gets into a map. Owns one question - what document, if any, is attached - and shows exactly one of three things depending on the answer: the readout of an attached brief, the paste box, or the drop target. Extraction goes over the wire because reading a PDF is a server's job, and nothing is persisted by it, so a brief the person discards leaves nothing behind.",
@@ -131,6 +161,27 @@
     ]
   },
   {
+    "description": "The client's brief beside the map, marked with what has been accounted for. A client who hands over a twenty-page spec wants evidence you read all of it; the map is the evidence for the sections it cites, and this panel exists for the ones it does not - the difference between reading a brief and inferring it. Pure composition over a header, a headline, the section list and a dangling-reference note. Its one piece of behaviour is the untouched-section prompt, which rides the existing user.note channel so it wakes a waiting agent with no new mechanism.",
+    "filePath": "app/components/BriefPanel.tsx",
+    "name": "BriefPanel",
+    "scenarios": [
+      "briefpanel-middeconstruction",
+      "briefpanel-nothingcitedyet",
+      "briefpanel-fullyaccountedfor",
+      "briefpanel-danglingreference"
+    ]
+  },
+  {
+    "description": "What document this is and how much of it the map accounts for. The source name is the client's own filename rather than anything derived - a person recognises the thing they sent, and a tidied-up title would break that recognition for no gain. Truncated rather than wrapped, so a long filename cannot push the headline down the panel.",
+    "filePath": "app/components/BriefPanelHeader.tsx",
+    "name": "BriefPanelHeader",
+    "scenarios": [
+      "briefpanelheader-default",
+      "briefpanelheader-longsourcename",
+      "briefpanelheader-nothingaccountedfor"
+    ]
+  },
+  {
     "description": "The other way in: paste the words. Not a fallback for when upload fails but a first-class door, because a client who cannot get their document out of the system it lives in still has the text, and the text is all this product ever wanted from the file.",
     "filePath": "app/components/BriefPasteBox.tsx",
     "name": "BriefPasteBox",
@@ -147,6 +198,18 @@
       "briefreadout-default",
       "briefreadout-pasted",
       "briefreadout-scannedpdf"
+    ]
+  },
+  {
+    "description": "One section of the brief and what the map has to say about it. The weighting is deliberately the inverse of the obvious one: untouched sections carry the ink and accounted-for ones recede, because the covered sections already have their evidence beside the panel and rendering the one finding a client is owed as the quietest thing on screen would bury it. Not lime and not red on purpose - lime marks the one thing that just changed, and red would read as a defect rather than a prompt.",
+    "filePath": "app/components/BriefSectionRow.tsx",
+    "name": "BriefSectionRow",
+    "scenarios": [
+      "briefsectionrow-covered",
+      "briefsectionrow-untouched",
+      "briefsectionrow-untouchedalreadyasked",
+      "briefsectionrow-emptysection",
+      "briefsectionrow-longheading"
     ]
   },
   {
@@ -346,7 +409,14 @@
       "mapnodepill-pro",
       "mapnodepill-research",
       "mapnodepill-risk",
-      "mapnodepill-rootidea"
+      "mapnodepill-rootidea",
+      "mapnodepill-yours",
+      "mapnodepill-asked",
+      "mapnodepill-yoursandasked",
+      "mapnodepill-foldable",
+      "mapnodepill-folded",
+      "mapnodepill-frombriefsection",
+      "mapnodepill-yoursaskedandfrombrief"
     ]
   },
   {
@@ -700,6 +770,12 @@
     "testFile": "app/lib/collapse.test.ts"
   },
   {
+    "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
+    "filePath": "app/lib/briefCoverage.ts",
+    "name": "computeBriefCoverage",
+    "testFile": "app/lib/briefCoverage.test.ts"
+  },
+  {
     "description": "Builds the orthogonal SVG path from a parent's bottom edge to a child's top edge, routed through a horizontal bus midway between the levels so siblings share it and the tree reads as one structure. Emits a straight line when the two are already aligned.",
     "filePath": "app/lib/mapLayout.ts",
     "name": "connectorPath",
@@ -843,6 +919,12 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "A character count with grouped thousands. A bare 12690 reads as an identifier sitting in a column of otherwise short numbers; grouped, it reads as an amount, which is the only reason it is shown.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "formatCharCount",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
     "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, and the indented node tree - so a client sees both views of the thinking the way the UI shows them side by side.",
     "filePath": "app/lib/mcpFormat.ts",
     "name": "formatMapDetail",
@@ -871,6 +953,12 @@
       "justification": "A one-line Prisma findUnique with no branching. The behaviour actually worth pinning is that getMap excludes the brief text while read_map still announces it, which mcpFormat.test.ts covers.",
       "kind": "trivial-wrapper"
     }
+  },
+  {
+    "description": "Loads a map's brief and returns its coverage by the nodes on that map, ready to render. The thin database half of computeBriefCoverage, kept here so that module stays pure and testable. Returns only headings and counts - never the brief's text - so rendering the panel on the server does not put a document of tens of thousands of characters on the wire. Null when the map has no brief, which the workspace renders by mounting no panel at all.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "getBriefCoverage",
+    "testFile": "app/lib/briefCoverage.test.ts"
   },
   {
     "description": "Reads one map with its full conversation and node tree in creation order. The single read behind the workspace, the summary screen and the MCP get_thinking_map tool.",
@@ -1143,6 +1231,12 @@
     "testFile": "app/lib/briefSections.test.ts"
   },
   {
+    "description": "Renders a brief section id as a person reads it - s7 becomes the section mark for 7. The id is the address the splitter derives, a node stores in sourceRef, and read_brief takes; the mark is only ever its display. Extracted from four inline copies across three components, which was three chances for the brief panel and a node pill to call the same section two different things.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "sectionLabel",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
     "filePath": "app/lib/messageLines.ts",
     "name": "splitAssistantLines",
@@ -1204,6 +1298,12 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "toolSummaries",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The sentence a person sends the agent when they notice a brief section nobody has dealt with. It rides the existing user.note channel, so the wording IS the whole message - nothing else carries the intent. It names the section twice over, by mark and by heading, so the agent can go straight to it rather than re-reading the outline, and it asks a question rather than only reporting an absence, because the point is to get the section dealt with on the next turn.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "untouchedNoteText",
+    "testFile": "app/lib/briefFormat.test.ts"
   },
   {
     "description": "The ask_user promise lifecycle: park an agent's turn on a set of questions, and release it when they are answered or the clock runs out. Separate from the log because it is a different clock — the log is durable and outlives everyone, this is one turn held in memory. A second ask releases the first as unanswered rather than stranding its promise.",

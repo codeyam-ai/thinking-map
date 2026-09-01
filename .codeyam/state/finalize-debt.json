@@ -3,5 +3,9 @@
   "lastFinalizedSha": "32605fc2f07550ad7feed0823494fb03b333f599",
   "lastFullFinalizeSha": "22836f1a3f2a6db4dfbf494088e7a3e740f85708",
   "lastFullFinalizeTree": "227c46176b7737b4afc0271a9fb0d106b95d706226ef105dbe069e33d6e61464",
-  "deferred": []
+  "deferred": [],
+  "drained": {
+    "screenshots": 8,
+    "at": "2026-09-01T16:57:57Z"
+  }
 }

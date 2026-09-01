@@ -3,7 +3,10 @@ import {
   approxPages,
   extractionWarning,
   firstLines,
+  formatCharCount,
   normalizeBriefText,
+  sectionLabel,
+  untouchedNoteText,
 } from './briefFormat';
 
 // A brief arrives out of a PDF, a Word file, or someone's clipboard, and each
@@ -170,5 +173,71 @@ describe('extractionWarning', () => {
     expect(extractionWarning('', A_BIG_FILE, '')).toContain(
       'No text came out of that file',
     );
+  });
+});
+
+// `s7` is the id the splitter derives and the node stores; `§7` is what a
+// person reads. This conversion was inlined at four call sites across three
+// components before it lived here — three chances for the panel and a pill to
+// disagree about what to call the same section.
+describe('sectionLabel', () => {
+  // The ordinary case: the storage id becomes the display label.
+  it('renders a section id as a section mark', () => {
+    expect(sectionLabel('s7')).toBe('§7');
+  });
+
+  // Ids are sequential and a long brief runs past nine, so the transform must
+  // not assume a single digit.
+  it('handles a multi-digit section number', () => {
+    expect(sectionLabel('s12')).toBe('§12');
+  });
+
+  // Only a LEADING `s` is the prefix. Stripping every `s` would mangle an id
+  // that happens to contain another one.
+  it('strips only the leading prefix', () => {
+    expect(sectionLabel('s3s')).toBe('§3s');
+  });
+});
+
+// The character count is the number that makes an untouched stretch land — a
+// section count alone understates it — so it has to read as a quantity rather
+// than as an identifier.
+describe('formatCharCount', () => {
+  // Thousands are grouped, because a bare 12690 reads as an id in a column of
+  // otherwise short numbers.
+  it('groups thousands', () => {
+    expect(formatCharCount(12690)).toBe('12,690');
+  });
+
+  // Below a thousand there is nothing to group and no separator should appear.
+  it('leaves a short count alone', () => {
+    expect(formatCharCount(640)).toBe('640');
+  });
+
+  // An empty section is a real state — a heading with nothing under it.
+  it('formats zero', () => {
+    expect(formatCharCount(0)).toBe('0');
+  });
+});
+
+// The sentence a person sends the agent when they notice a section nobody has
+// dealt with. It rides the existing user-note channel, so its wording IS the
+// whole message — no other structure carries the intent.
+describe('untouchedNoteText', () => {
+  // It names the section both ways: the mark the person just clicked, and the
+  // heading, so the agent can find it without another round trip.
+  it('names the section by mark and heading', () => {
+    const text = untouchedNoteText({
+      id: 's4',
+      heading: 'What we think we need',
+    });
+    expect(text).toContain('§4');
+    expect(text).toContain('What we think we need');
+  });
+
+  // It asks for something rather than only reporting an absence — the point is
+  // to get the section dealt with on the agent's next turn.
+  it('asks the agent to act rather than only reporting the gap', () => {
+    expect(untouchedNoteText({ id: 's4', heading: 'Timeline' })).toMatch(/\?$/);
   });
 });

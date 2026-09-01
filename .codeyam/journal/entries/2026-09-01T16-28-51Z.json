@@ -1,0 +1,1267 @@
+{
+  "timestamp": "2026-09-01T16:28:51Z",
+  "title": "Show Which of the Brief Has Been Accounted For",
+  "type": "feature",
+  "userRequest": "## Summary\n\nA client who hands over a twenty-page spec wants one thing before they will\ntrust anything you say about it: evidence you read all of it. Once a brief is on\na map, the agent's nodes are assertions about a document — \"your real user is a\nteacher, not a student\", \"this deadline is an assumption, not a constraint\" —\nand right now a node arrives with no way back to the passage that produced it.\nThe client has to take twenty pills on faith and has no way to see which three\npages nobody has touched. This gives every node an optional reference to the\nbrief section it came from, renders that reference on the pill, and adds a brief\npanel beside the map that marks each section as accounted-for or untouched. The\nuntouched half is the more valuable one: it is the difference between \"the agent\nread your brief\" and \"the agent read pages 1–4 and inferred the rest\".\n\n## Key Decisions\n\n- **A section reference, not a quotation.** The node stores `s7`, and the panel\n  resolves it against the sections derived from the immutable brief text. Storing\n  the quoted passage instead would duplicate the document into the node table and\n  invite the two copies to disagree; the reference cannot drift because the text\n  it points into cannot change.\n- **Provenance is optional and always will be.** A node the person typed, or one\n  the agent inferred across the whole document, genuinely has no single source\n  section — and forcing one would produce fabricated citations, which is worse\n  than none. An unreferenced node renders exactly as it does today.\n- **Coverage is counted, not asserted by the agent.** The panel derives its\n  numbers from the nodes that actually cite each section. An agent cannot mark a\n  section \"covered\"; it can only produce nodes that cite it. That makes the\n  untouched list something the agent cannot talk its way out of, which is the\n  only reason it is worth showing to a client.\n- **Untouched is a prompt, not a scold.** A section with no nodes gets an\n  affordance that writes a note naming it into the exchange log — the existing\n  `user.note` path — so \"you haven't dealt with §12\" reaches the agent on its\n  next turn through machinery that already exists, rather than a new channel.\n- **The panel is a third pane, not a takeover.** `MapWorkspace` is currently the\n  map plus the exchange column; the brief becomes a collapsible pane on the\n  other side, absent entirely when the map has no brief. A map started from one\n  line must look exactly as it does today.\n- **`read_brief`'s outline reports coverage too.** The agent should be able to\n  see which sections it has already accounted for without re-reading them —\n  otherwise the panel tells the person something the agent cannot see, and the\n  two halves of the exchange disagree about the same document.\n\n## Implementation\n\n### 1. The reference on the node\n\n**File**: `prisma/schema.prisma`\n\n`MapNode` gains `sourceRef String?` — the brief section id this node came from.\nOptional, so no backfill and no default (per `DATABASE.md`). Comment it beside\n`sourceUrl`, which is the deliberate contrast worth writing down: `sourceUrl`\npoints out of the map at the web, `sourceRef` points into the client's own\ndocument.\n\n### 2. Carry it through the write path\n\n**File**: `app/lib/toolCatalog.ts`\n\nAdd `sourceRef` to `nodeShape`, described so the agent knows the contract: cite\nthe section a claim actually came from, and leave it off rather than guessing.\n\n**File**: `app/lib/nodePlan.ts`\n\n`PlannedInsert` gains `sourceRef`, and `planMapMutations` reads it in the\n`add_nodes` branch the same way it reads `sourceUrl` — dropped when absent. It\nshould also be settable via `update_node`, since an agent often only works out\nwhere a claim came from on a later pass.\n\n**File**: `app/lib/mapStore.ts`\n\n`applyToolCalls` writes `sourceRef` on insert and includes it in the\n`node.added` event payload, so a second front door reading the log learns the\nprovenance rather than only seeing it in the database.\n\n### 3. Compute coverage\n\n**New file**: `app/lib/briefCoverage.ts`\n\nPure: sections plus nodes in, per-section counts out —\n`{ id, heading, charCount, nodeCount, nodes }[]` plus an `untouched` list and a\ncovered/total headline. No database, no React. Worth testing: a node citing a\nsection id that does not exist (counted nowhere, and reported as a dangling\nreference rather than silently dropped), a brief with no cited sections at all,\nand a map with no brief.\n\n### 4. The brief panel\n\n**New file**: `app/components/BriefPanel.tsx`\n\nThe document beside the map: source name, the covered/total headline, and the\nsection list with each section's node count. Untouched sections are visibly\ndistinct and carry the \"ask about this section\" affordance, which calls\n`bridge.contribute('user.note', …)` with the section named. Collapsible, and\nmounted only when the map has a brief.\n\n**New file**: `app/components/BriefSectionRow.tsx`\n\nOne section row — heading, character count, node count or the untouched marker,\nand the ask affordance. Its own component so it gets an isolated scenario per\nstate, matching how `SavedMapRow` and `OpenQuestionRow` are split out.\n\n**File**: `app/components/MapWorkspace.tsx`\n\nTake optional brief coverage and mount `BriefPanel` to the left of\n`ThinkingMapView`. Optional the whole way down, as `mapId` already is, so an\nisolated scenario mounts the map without inventing a brief.\n\n**File**: `app/map/[id]/page.tsx`\n\nFetch the brief and its sections server-side, compute coverage, and pass it to\n`MapScreen`. This is where the pieces meet; keep the route to fetching and\nmounting, as it does now.\n\n**File**: `app/components/MapScreen.tsx`\n\nThread the coverage through to `MapWorkspace`. The summary branch does not take\nit — the plan view has no map to annotate.\n\n### 5. The reference on the pill\n\n**File**: `app/components/MapNodePill.tsx`\n\nWhen `node.sourceRef` is set, the eyebrow carries a small section marker beside\nthe kind and the `· yours` badge, and the pill's `title` names the section. This\nfollows the badge precedent exactly: a fact already stored on the node, shown\nwhere the node already narrates itself.\n\n**File**: `app/lib/mapLayout.ts`\n\n`FlatNode` gains optional `sourceRef`, alongside `origin` and the offsets, which\nare optional for the same stated reason — a caller that only wants geometry\nshould not have to carry it.\n\n### 6. Let the agent see its own coverage\n\n**File**: `app/lib/toolRuntime.ts`\n\nThe outline the brief-reading tool returns gains a node count per section and a\nclosing line naming the sections nothing cites yet. An agent that has been\nworking for twenty turns should be able to ask \"what have I not dealt with?\" and\nget an answer, rather than re-reading the whole document to find out.\n\n## Reused existing code\n\n- `MapNodePill` from `app/components/MapNodePill.tsx` (glossary entry:\n  `MapNodePill`) — the eyebrow already renders kind, `just updated`, and the\n  `yours` badge; the section marker is the fourth thing in that same line.\n- `planMapMutations` and `PlannedInsert` from `app/lib/nodePlan.ts` (glossary\n  entry: `planMapMutations`) — `sourceUrl` is the exact precedent for an\n  optional passthrough field, including how it is dropped when absent.\n- `applyToolCalls` from `app/lib/mapStore.ts` (glossary entry: `applyToolCalls`)\n  — the insert-and-log path, unchanged apart from one more column and one more\n  payload field.\n- `nodeShape` in `app/lib/toolCatalog.ts` — the one schema every door validates\n  a node against.\n- `MapWorkspace` and `ThinkingMapView` from `app/components/` (glossary entries:\n  `MapWorkspace`, `ThinkingMapView`) — the pane arrangement the panel joins.\n- `useWebMcpBridge` and `contribute` from `app/components/WebMcpBridge.tsx`\n  (glossary entry: `WebMcpBridge`) — the untouched-section prompt rides the\n  existing user-note contribution path, so it wakes a waiting agent with no new\n  mechanism.\n- `FlatNode` from `app/lib/mapLayout.ts` — the optional-field convention this\n  follows.\n- `SavedMapRow` and `OpenQuestionRow` from `app/components/` (glossary entries:\n  `SavedMapRow`, `OpenQuestionRow`) — the row-component split this copies.\n\n**Existing-implementation survey.** No provenance field of any kind exists on\n`MapNode` today. Its columns are `parentId`, `kind`, `label`, `detail`,\n`status`, `sourceUrl`, `order`, `origin`, `offsetX`, `offsetY`. `sourceUrl` is\nthe only reference-shaped one and is documented as \"where a research finding\ncame from\" — an external web URL hung off a `finding`, not a pointer into the\nclient's document; overloading it would make the same column mean two\nincompatible things and break the research card's link rendering. `origin`\nrecords which *side* wrote a node, never what it was derived from. Nothing\ncomputes coverage of anything, and there is no third pane in `MapWorkspace`.\n\n## Scenarios to Demonstrate\n\n- Mid-deconstruction — a brief roughly half covered, the panel showing counts\n  beside the sections that have nodes and the untouched ones marked\n- Fully accounted for — every section cited, the headline saying so; the state a\n  client is actually being shown before they approve anything\n- Nothing cited yet — a brief just attached, the panel entirely untouched, which\n  is the honest day-one picture rather than an empty component\n- A pill carrying its section marker beside the kind eyebrow and the `yours`\n  badge, next to a pill with no reference at all\n- A dangling reference — a node citing a section id the brief does not have,\n  reported rather than silently dropped\n- A map with no brief — the workspace exactly as it is today, no third pane",
+  "description": "A client who hands over a twenty-page spec wants evidence you read all of it. Nodes gained an optional `sourceRef` naming the brief section they were derived from, node pills carry that section in their eyebrow, and the brief now sits as a third pane beside the map marking each section as accounted-for or untouched. The coverage numbers are COUNTED from the nodes that actually cite each section rather than asserted by the agent, which is what makes the untouched list something an agent cannot talk its way out of — and `read_brief`'s outline reports the same counts, so the person and the agent never disagree about the same document.\n\nThe panel's weighting is deliberately inverted against the obvious reading: untouched sections carry the ink and accounted-for ones recede, because the map beside the panel is already the covered sections' evidence and rendering the one finding a client is owed as the quietest thing on screen would bury it. Not lime and not red — lime marks the one thing that just changed, and red would read as a defect rather than a prompt. Untouched sections carry an affordance that writes a note naming the section into the existing `user.note` exchange channel, so it wakes a waiting agent with no new mechanism.\n\nTwo behaviours came from running against real data rather than the mockup: a section with zero characters (the brief's own title line, which the splitter keeps as part of the document's shape) counts in NEITHER half of the tally, because a heading with nothing under it has nothing to have accounted for and counting it made the headline overstate; and the ask affordance is labelled by section mark rather than heading, because the spelled-out version wrapped to three lines in a 276px rail. The accessible name keeps the heading.\n\nSCOPE VERDICT: this cycle delivered no project deliverable and deferred none — all 10 were already resolved before it began (confirmed at the plan gate, where `deliverables --open` reported none open). It deepens the already-delivered 'a live visual map that grows as the conversation develops' and the brief intake shipped by the preceding 'Start a Map From a Client Brief' cycle. Worth surfacing for the durable record: the single deferred row, the assist-track MCP client registration, carries `decidedBy: user`, so it was a confirmed choice; the nine 'delivered' rows all carry `decidedBy: agent` from earlier cycles and have never been user-confirmed as complete.\n\nAlso resolved here, both pre-existing rather than introduced by this work: a stale test-registry key left behind by an earlier 'two'->'three' rename in `toolCatalog.test.ts`, and a stale `all` partition cache that was surfacing 19 phantom unwired-test findings. Audit ends at 0 findings with 354 tests passing.\n\nOne pre-existing behaviour this feature makes easier to hit, deliberately left alone: the map clamps at a minimum zoom (~62%) and scrolls beyond it, so a wide tree clips at the card edges. The brief panel takes 276px, so that clamp is now reached at a lower node count. Confirmed pre-existing — `sprawling-a-deep-wide-map` has no brief panel and clips identically.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/show-which-of-the-brief-has-been-accounted-for.md\t.codeyam/plans/completed/show-which-of-the-brief-has-been-accounted-for.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-attached--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-nothingextracted--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-pasted--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-scannedpdf--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapconnectors-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapconnectors-singlechild--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-asked--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-foldable--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-folded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-gap--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-justupdated--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-openquestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-pro--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-research--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-risk--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-rootidea--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursandasked--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/started-from-a-client-brief.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3111e4c51d01b121f7e882234f86d32479c0d45cd9eccc4c2cac26acf9f165b2.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/aaed829508f29198946cf2ae00c26220d98ae8aa1e96bd2c77b584ffbe113811.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b1d513fa5bede7e79fe591fbc57e30e378b9081ed1c798bf25f4720efd9e3d93.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f2011f0c0ed99608c71755d0489ebb3710d1bb5747d739ca9c8012e04e40ee76.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f4da1c9ce6fd0a7674c276eefde79ce02dc8c725411114cf185b9c2f9037493e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f6eda582e6fd8decbad1b4c402a91ec7dbf6df8129cab67f9399557c6168bdfb.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapNodePill.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapNodePill/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/briefFormat.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/briefFormat.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapLayout.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/nodePlan.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolRuntime.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/design/active_tab.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/.active",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/01-keylime-mockup.html",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/02-keylime-mockup.html",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/03-editorial-mockup.html",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/04-offcatalog-mockup.html",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/current-state.md",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/design-system.md",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/round.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/design/rounds/round-1/target.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/askaboutsectionbutton-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/askaboutsectionbutton-doubledigitsection.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/askaboutsectionbutton-longheading.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/brief-attached-nothing-cited-yet.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/brief-fully-accounted-for.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefcoverageheadline-fullyaccountedfor.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefcoverageheadline-nothingcited.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefcoverageheadline-onesectionleft.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefcoverageheadline-partlycovered.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdanglingnote-onedangling.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdanglingnote-severaldangling.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanel-danglingreference.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanel-fullyaccountedfor.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanel-middeconstruction.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanel-nothingcitedyet.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanelheader-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanelheader-longsourcename.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpanelheader-nothingaccountedfor.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefsectionrow-covered.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefsectionrow-emptysection.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefsectionrow-longheading.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefsectionrow-untouched.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefsectionrow-untouchedalreadyasked.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-frombriefsection.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-yoursaskedandfrombrief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-doubledigitsection--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-doubledigitsection--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-longheading--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-longheading--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-fullyaccountedfor--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-fullyaccountedfor--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-nothingcited--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-nothingcited--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-onesectionleft--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-onesectionleft--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-partlycovered--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-partlycovered--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdanglingnote-onedangling--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdanglingnote-onedangling--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdanglingnote-severaldangling--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdanglingnote-severaldangling--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanelheader-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanelheader-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanelheader-longsourcename--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanelheader-longsourcename--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanelheader-nothingaccountedfor--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanelheader-nothingaccountedfor--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-covered--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-covered--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-emptysection--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-emptysection--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-longheading--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-longheading--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-untouched--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-untouched--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-untouchedalreadyasked--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-untouchedalreadyasked--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-frombriefsection--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-frombriefsection--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursaskedandfrombrief--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursaskedandfrombrief--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c7bf4156d35019ace38cd63748149288dfbf762eedcc0ec7fcc6bca81c32e537.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e4d8b929db516f14937cb41e6d509f5cc9869ab4b799a91229cfa896c3814cfb.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AskAboutSectionButton.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefCoverageHeadline.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefDanglingNote.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefPanel.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefPanelHeader.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefSectionRow.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AskAboutSectionButton/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefCoverageHeadline/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefDanglingNote/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefPanel/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefPanelHeader/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefSectionRow/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefCoverage.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefCoverage.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "Arranged - a map tidied by hand",
+      "screenshotPath": "arranged-a-map-tidied-by-hand--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--desktop.png"
+    },
+    {
+      "name": "AskAboutSectionButton - Default",
+      "screenshotPath": "askaboutsectionbutton-default--desktop.png"
+    },
+    {
+      "name": "AskAboutSectionButton - DoubleDigitSection",
+      "screenshotPath": "askaboutsectionbutton-doubledigitsection--desktop.png"
+    },
+    {
+      "name": "AskAboutSectionButton - LongHeading",
+      "screenshotPath": "askaboutsectionbutton-longheading--desktop.png"
+    },
+    {
+      "name": "BriefCoverageHeadline - FullyAccountedFor",
+      "screenshotPath": "briefcoverageheadline-fullyaccountedfor--desktop.png"
+    },
+    {
+      "name": "BriefCoverageHeadline - NothingCited",
+      "screenshotPath": "briefcoverageheadline-nothingcited--desktop.png"
+    },
+    {
+      "name": "BriefCoverageHeadline - OneSectionLeft",
+      "screenshotPath": "briefcoverageheadline-onesectionleft--desktop.png"
+    },
+    {
+      "name": "BriefCoverageHeadline - PartlyCovered",
+      "screenshotPath": "briefcoverageheadline-partlycovered--desktop.png"
+    },
+    {
+      "name": "BriefDanglingNote - OneDangling",
+      "screenshotPath": "briefdanglingnote-onedangling--desktop.png"
+    },
+    {
+      "name": "BriefDanglingNote - SeveralDangling",
+      "screenshotPath": "briefdanglingnote-severaldangling--desktop.png"
+    },
+    {
+      "name": "BriefDrop - Attached",
+      "screenshotPath": "briefdrop-attached--desktop.png"
+    },
+    {
+      "name": "BriefDrop - Default",
+      "screenshotPath": "briefdrop-default--desktop.png"
+    },
+    {
+      "name": "BriefExcerpt - Default",
+      "screenshotPath": "briefexcerpt-default--desktop.png"
+    },
+    {
+      "name": "BriefExcerpt - NothingExtracted",
+      "screenshotPath": "briefexcerpt-nothingextracted--desktop.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--desktop.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--desktop.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--desktop.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--desktop.png"
+    },
+    {
+      "name": "BriefPanelHeader - Default",
+      "screenshotPath": "briefpanelheader-default--desktop.png"
+    },
+    {
+      "name": "BriefPanelHeader - LongSourceName",
+      "screenshotPath": "briefpanelheader-longsourcename--desktop.png"
+    },
+    {
+      "name": "BriefPanelHeader - NothingAccountedFor",
+      "screenshotPath": "briefpanelheader-nothingaccountedfor--desktop.png"
+    },
+    {
+      "name": "BriefReadout - Default",
+      "screenshotPath": "briefreadout-default--desktop.png"
+    },
+    {
+      "name": "BriefReadout - Pasted",
+      "screenshotPath": "briefreadout-pasted--desktop.png"
+    },
+    {
+      "name": "BriefReadout - ScannedPdf",
+      "screenshotPath": "briefreadout-scannedpdf--desktop.png"
+    },
+    {
+      "name": "BriefSectionRow - Covered",
+      "screenshotPath": "briefsectionrow-covered--desktop.png"
+    },
+    {
+      "name": "BriefSectionRow - EmptySection",
+      "screenshotPath": "briefsectionrow-emptysection--desktop.png"
+    },
+    {
+      "name": "BriefSectionRow - LongHeading",
+      "screenshotPath": "briefsectionrow-longheading--desktop.png"
+    },
+    {
+      "name": "BriefSectionRow - Untouched",
+      "screenshotPath": "briefsectionrow-untouched--desktop.png"
+    },
+    {
+      "name": "BriefSectionRow - UntouchedAlreadyAsked",
+      "screenshotPath": "briefsectionrow-untouchedalreadyasked--desktop.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--desktop.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Default",
+      "screenshotPath": "exchangecolumn-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - NothingWaiting",
+      "screenshotPath": "exchangecolumn-nothingwaiting--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Quiet",
+      "screenshotPath": "exchangecolumn-quiet--desktop.png"
+    },
+    {
+      "name": "IdeaPrompt - Default",
+      "screenshotPath": "ideaprompt-default--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--desktop.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--desktop.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--desktop.png"
+    },
+    {
+      "name": "MapConnectors - Default",
+      "screenshotPath": "mapconnectors-default--desktop.png"
+    },
+    {
+      "name": "MapConnectors - SingleChild",
+      "screenshotPath": "mapconnectors-singlechild--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Asked",
+      "screenshotPath": "mapnodepill-asked--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Default",
+      "screenshotPath": "mapnodepill-default--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Foldable",
+      "screenshotPath": "mapnodepill-foldable--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Folded",
+      "screenshotPath": "mapnodepill-folded--desktop.png"
+    },
+    {
+      "name": "MapNodePill - FromBriefSection",
+      "screenshotPath": "mapnodepill-frombriefsection--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Gap",
+      "screenshotPath": "mapnodepill-gap--desktop.png"
+    },
+    {
+      "name": "MapNodePill - JustUpdated",
+      "screenshotPath": "mapnodepill-justupdated--desktop.png"
+    },
+    {
+      "name": "MapNodePill - OpenQuestion",
+      "screenshotPath": "mapnodepill-openquestion--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Pro",
+      "screenshotPath": "mapnodepill-pro--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Research",
+      "screenshotPath": "mapnodepill-research--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Risk",
+      "screenshotPath": "mapnodepill-risk--desktop.png"
+    },
+    {
+      "name": "MapNodePill - RootIdea",
+      "screenshotPath": "mapnodepill-rootidea--desktop.png"
+    },
+    {
+      "name": "MapNodePill - YoursAndAsked",
+      "screenshotPath": "mapnodepill-yoursandasked--desktop.png"
+    },
+    {
+      "name": "MapNodePill - YoursAskedAndFromBrief",
+      "screenshotPath": "mapnodepill-yoursaskedandfrombrief--desktop.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--desktop.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--desktop.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Many",
+      "screenshotPath": "openquestions-many--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - One",
+      "screenshotPath": "openquestions-one--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Two",
+      "screenshotPath": "openquestions-two--desktop.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Nudged",
+      "screenshotPath": "thinkingmapview-nudged--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 354,
+    "passed": 354,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 354,
+        "passed": 354
+      }
+    ]
+  }
+}

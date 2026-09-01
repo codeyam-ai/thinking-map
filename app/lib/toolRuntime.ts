@@ -11,6 +11,7 @@ import 'server-only';
 import type { z } from 'zod';
 import { applyToolCalls, getBrief, getMap } from './mapStore';
 import { splitIntoSections } from './briefSections';
+import { computeBriefCoverage } from './briefCoverage';
 import { formatMapDetail } from './mcpFormat';
 import {
   currentRevision,
@@ -62,14 +63,31 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     }
 
     const sections = splitIntoSections(brief.text);
+
+    // Coverage belongs in the outline because the person is being shown it. An
+    // agent that has been working for twenty turns should be able to ask "what
+    // have I not dealt with?" and get an answer, instead of re-reading the
+    // whole document to find out — and if only the panel knew, the two halves
+    // of the exchange would disagree about the same document.
+    const map = await getMap(ctx.mapId);
+    const coverage = computeBriefCoverage(sections, map?.nodes ?? []);
+    const counted = new Map(coverage.sections.map((s) => [s.id, s]));
+
     const outline = [
       `# ${brief.sourceName}`,
       `${brief.charCount} characters, ${sections.length} section(s).`,
+      `${coverage.covered} of ${coverage.total} accounted for by nodes on the map.`,
       '',
-      ...sections.map(
-        (s) => `[${s.id}] ${s.heading} — ${s.charCount} characters`,
-      ),
+      ...sections.map((s) => {
+        const n = counted.get(s.id)?.nodeCount ?? 0;
+        return `[${s.id}] ${s.heading} — ${s.charCount} characters, ${n} node(s)`;
+      }),
       '',
+      coverage.untouched.length === 0
+        ? 'Every section is cited by at least one node.'
+        : `Nothing on the map cites ${coverage.untouched
+            .map((s) => s.id)
+            .join(', ')} yet.`,
       'Call read_brief again with a section id to read one in full.',
     ].join('\n');
 
@@ -80,10 +98,14 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
           hasBrief: true,
           sourceName: brief.sourceName,
           charCount: brief.charCount,
+          covered: coverage.covered,
+          total: coverage.total,
+          untouched: coverage.untouched.map((s) => s.id),
           sections: sections.map(({ id, heading, charCount }) => ({
             id,
             heading,
             charCount,
+            nodeCount: counted.get(id)?.nodeCount ?? 0,
           })),
         },
       };

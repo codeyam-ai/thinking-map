@@ -24,6 +24,10 @@ export interface FlatNode {
    *  wants geometry should not have to carry an arrangement it never set. */
   offsetX?: number | null;
   offsetY?: number | null;
+  /** The brief section this node was derived from. Optional for the same
+   *  reason `origin` is — and doubly so, since most maps have no brief at
+   *  all for it to point into. */
+  sourceRef?: string | null;
 }
 
 export interface LaidOutNode {
@@ -37,6 +41,12 @@ export interface LaidOutNode {
   /** The map is co-authored now, so a node carries the side that wrote it and
    *  the pill can say so. */
   origin: string | null;
+  /** The brief section this node came from, so the pill can name it.
+   *
+   *  Optional rather than required — unlike `origin`, which every pill
+   *  narrates. Most maps have no brief at all, so a fixture or a caller that
+   *  only wants geometry should not have to declare an absence. */
+  sourceRef?: string | null;
   depth: number;
   /** Top-left corner, in map pixels. */
   x: number;
@@ -184,6 +194,7 @@ export function layoutMap(flat: FlatNode[]): MapLayout {
       status: tn.node.status as NodeStatus,
       sourceUrl: tn.node.sourceUrl,
       origin: tn.node.origin ?? null,
+      sourceRef: tn.node.sourceRef ?? null,
       depth: tn.depth,
       x,
       y,

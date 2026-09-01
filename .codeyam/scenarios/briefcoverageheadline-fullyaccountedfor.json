@@ -1,0 +1,12 @@
+{
+  "name": "BriefCoverageHeadline - FullyAccountedFor",
+  "id": "3626c733-e263-441a-a9ea-2310f706ed0f",
+  "url": "/isolated-components/BriefCoverageHeadline?s=FullyAccountedFor",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefCoverageHeadline",
+  "scenarioType": "component",
+  "description": "Every section accounted for. The sentence inverts entirely and the untouched line disappears - the state a client is actually being shown before they approve anything."
+}

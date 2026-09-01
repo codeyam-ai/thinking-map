@@ -86,6 +86,7 @@
         "order": 0,
         "origin": "agent",
         "parentId": "nb-idea",
+        "sourceRef": "s3",
         "status": "answered"
       },
       {
@@ -96,6 +97,7 @@
         "order": 1,
         "origin": "agent",
         "parentId": "nb-idea",
+        "sourceRef": "s2",
         "status": "answered"
       },
       {
@@ -106,6 +108,7 @@
         "order": 2,
         "origin": "agent",
         "parentId": "nb-idea",
+        "sourceRef": "s6",
         "status": "answered"
       },
       {
@@ -116,6 +119,7 @@
         "order": 0,
         "origin": "agent",
         "parentId": "nb-problem",
+        "sourceRef": "s5",
         "status": "open"
       },
       {
@@ -126,6 +130,7 @@
         "order": 0,
         "origin": "agent",
         "parentId": "nb-user",
+        "sourceRef": "s5",
         "status": "open"
       }
     ],
@@ -150,5 +155,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "A map whose source is a twenty-page spec rather than a sentence. The root pill carries the brief's own heading instead of a 57-character slice, the agent has read the outline and put the document's real gaps on the map as open questions, and the brief itself is never on screen - it is read through read_brief, a section at a time."
+  "description": "A map whose source is a twenty-page spec rather than a sentence, mid-deconstruction. The root pill carries the brief's own heading instead of a 57-character slice, and the agent has put the document's real gaps on the map as open questions. The brief now sits beside the map as a third pane: four of its seven countable sections are accounted for, the three nobody has touched carry the ink while the covered ones recede, and the title section - a heading with nothing under it - counts in neither half. Nodes derived from a section name it in their eyebrow, so a claim can be traced back to the passage that produced it."
 }

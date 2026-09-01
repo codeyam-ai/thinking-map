@@ -87,6 +87,12 @@ const nodeShape = z.object({
     .describe(
       'Only for a "slice": the ref or real id of the ONE node this slice would settle — the assumption, risk, or open question that building it would answer. If it settles nothing, leave this off rather than picking the nearest node; an increment that tests nothing is shown as proving nothing, which is the honest answer.',
     ),
+  sourceRef: z
+    .string()
+    .optional()
+    .describe(
+      "The brief section this claim came from, as the section id read_brief reported (e.g. 's7'). Cite the section a claim actually came from; leave it off rather than guessing. A node you inferred across the whole document, or one the person typed, has no single source — an omitted ref is correct there, and a wrong one is worse than none.",
+    ),
 });
 
 export interface ToolSpec {

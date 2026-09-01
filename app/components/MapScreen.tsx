@@ -2,6 +2,7 @@ import AgentStatus from './AgentStatus';
 import AppHeader from './AppHeader';
 import MapWorkspace from './MapWorkspace';
 import SummaryScreen from './SummaryScreen';
+import type { BriefCoverage } from '../lib/briefCoverage';
 import { mapCaption } from '../lib/mapCaption';
 import type { Phase } from '../lib/mapKinds';
 import type { FlatNode } from '../lib/mapLayout';
@@ -18,11 +19,15 @@ export default function MapScreen({
   phase,
   nodes,
   mapId,
+  brief,
 }: {
   phase: Phase;
   nodes: FlatNode[] & SummaryNode[];
   /** Only the working view needs it — the summary has no map to arrange. */
   mapId?: string;
+  /** Only the working view takes it too: the plan view has no map to
+   *  annotate, so brief coverage has nothing to sit beside there. */
+  brief?: { sourceName: string; coverage: BriefCoverage };
 }) {
   return (
     <main className="flex h-screen flex-col gap-6 px-10 py-8">
@@ -30,7 +35,12 @@ export default function MapScreen({
       {phase === 'next-steps' ? (
         <SummaryScreen nodes={nodes} />
       ) : (
-        <MapWorkspace nodes={nodes} caption={mapCaption(nodes)} mapId={mapId} />
+        <MapWorkspace
+          nodes={nodes}
+          caption={mapCaption(nodes)}
+          mapId={mapId}
+          brief={brief}
+        />
       )}
     </main>
   );

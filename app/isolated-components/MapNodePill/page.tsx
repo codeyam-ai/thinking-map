@@ -30,6 +30,14 @@ const scenarios: Record<string, Props> = {
   // Both marks at once: a node the person wrote AND has since asked about, so
   // the eyebrow has to stay readable when it is carrying everything it can.
   YoursAndAsked: { node: { id: "n", parentId: null, kind: "goal", label: "Refind a half-remembered idea", detail: null, status: "answered", sourceUrl: null, origin: "user", depth: 1, x: 0, y: 0, width: 260, height: 56 }, asked: true },
+  // A claim that came from one identifiable part of the client's brief. The
+  // section mark is the fourth thing the eyebrow can carry and goes last,
+  // because it is the only one of them about the DOCUMENT rather than the node.
+  FromBriefSection: { node: { id: "n", parentId: null, kind: "problem", label: "3,400 lapsed rather than make the trip", detail: null, status: "answered", sourceUrl: null, sourceRef: "s2", origin: "agent", depth: 1, x: 0, y: 0, width: 268, height: 56 } },
+  // The eyebrow carrying everything at once: written by the person, asked
+  // about, and traced to a section. This is the crowded case that decides
+  // whether the marks stay readable or turn into a run-on.
+  YoursAskedAndFromBrief: { node: { id: "n", parentId: null, kind: "goal", label: "One place to plan a term", detail: null, status: "answered", sourceUrl: null, sourceRef: "s12", origin: "user", depth: 1, x: 0, y: 0, width: 268, height: 56 }, asked: true },
   // A node with a branch under it: the fold control sits on the bottom edge,
   // where the branch leaves the pill.
   Foldable: { node: { id: "n", parentId: null, kind: "research", label: "7 existing tools found", detail: null, status: "answered", sourceUrl: null, origin: "agent", depth: 1, x: 0, y: 0, width: 240, height: 56 }, hiddenCount: 5 },

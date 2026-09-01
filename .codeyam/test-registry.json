@@ -383,7 +383,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › counts an empty document as zero pages",
-      "line": 71,
+      "line": 74,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -392,7 +392,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › counts any non-empty document as at least one page",
-      "line": 65,
+      "line": 68,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -401,7 +401,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › never returns a negative page count",
-      "line": 76,
+      "line": 79,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -410,7 +410,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › scales with length",
-      "line": 81,
+      "line": 84,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -727,6 +727,78 @@
       "key": "collapsedDescendantCount › is zero for an id that is not on the map",
       "line": 115,
       "registeredAt": "2026-09-01T13:18:16Z",
+      "runner": "tests"
+    },
+    {
+      "description": "...unless something actually cites it, in which case the citation is real and the section is genuinely accounted for.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › counts an empty section that something cites",
+      "line": 112,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The base case: each section reports how many nodes cite it, and the list stays in document order so the panel can render it without re-sorting.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › counts the nodes citing each section, in document order",
+      "line": 36,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unreferenced node is the normal case — most nodes have no single source section — so it must not read as a dangling citation.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › ignores nodes with no sourceRef rather than counting them as dangling",
+      "line": 73,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A heading with nothing under it is part of the document's shape, but there is nothing in it to have accounted for — counting it as untouched made the panel report one more unread section than the brief has.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › leaves an empty section out of both halves of the tally",
+      "line": 100,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Silently dropping a citation would let `covered` overstate itself, which is the exact failure this feature exists to prevent.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › reports a node citing a section the brief does not have",
+      "line": 84,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The untouched half is the valuable one, so it is a first-class output rather than something every caller has to filter for itself.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › reports untouched sections and how much document they are",
+      "line": 54,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A map with no brief splits into no sections. Zeroed, not thrown: the workspace renders that state by mounting no panel at all.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › returns a zeroed coverage for a map with no brief",
+      "line": 122,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief nobody has cited yet is the honest day-one picture, not an error.",
+      "file": "app/lib/briefCoverage.test.ts",
+      "format": "vitest",
+      "key": "computeBriefCoverage › treats a brief with nothing cited as fully untouched",
+      "line": 62,
+      "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
     {
@@ -1121,7 +1193,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › does not treat a zero byte length as a healthy empty extraction",
-      "line": 158,
+      "line": 161,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1130,7 +1202,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › names an unnamed file readably",
-      "line": 169,
+      "line": 172,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1139,7 +1211,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › stays quiet about a short document that is also a small file",
-      "line": 164,
+      "line": 167,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1148,7 +1220,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › stays quiet when a real document came out",
-      "line": 129,
+      "line": 132,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1157,7 +1229,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › warns when a large file yielded almost no text",
-      "line": 142,
+      "line": 145,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1166,7 +1238,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › warns when no text came out",
-      "line": 134,
+      "line": 137,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1238,7 +1310,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns an empty string for a document with no text",
-      "line": 110,
+      "line": 113,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1247,7 +1319,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns an empty string when asked for no lines",
-      "line": 116,
+      "line": 119,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1256,7 +1328,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns everything when asked for more lines than the document has",
-      "line": 105,
+      "line": 108,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1265,7 +1337,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns the first n lines",
-      "line": 92,
+      "line": 95,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1274,8 +1346,35 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › skips blank lines instead of counting them",
-      "line": 98,
+      "line": 101,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty section is a real state — a heading with nothing under it.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "formatCharCount › formats zero",
+      "line": 218,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Thousands are grouped, because a bare 12690 reads as an id in a column of otherwise short numbers.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "formatCharCount › groups thousands",
+      "line": 208,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Below a thousand there is nothing to group and no separator should appear.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "formatCharCount › leaves a short count alone",
+      "line": 213,
+      "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
     {
@@ -1814,7 +1913,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › collapses three or more newlines to a paragraph break",
-      "line": 26,
+      "line": 29,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1823,7 +1922,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › converts CRLF to LF",
-      "line": 15,
+      "line": 18,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1832,7 +1931,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › converts a bare CR to LF",
-      "line": 20,
+      "line": 23,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1841,7 +1940,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › keeps leading whitespace on a line",
-      "line": 44,
+      "line": 47,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1850,7 +1949,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › leaves a single blank line alone",
-      "line": 31,
+      "line": 34,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1859,7 +1958,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › reduces a whitespace-only document to an empty string",
-      "line": 55,
+      "line": 58,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1868,7 +1967,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › strips trailing spaces and tabs from every line",
-      "line": 37,
+      "line": 40,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1877,7 +1976,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › trims the whole document",
-      "line": 49,
+      "line": 52,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2530,6 +2629,33 @@
       "runner": "tests"
     },
     {
+      "description": "Ids are sequential and a long brief runs past nine, so the transform must not assume a single digit.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "sectionLabel › handles a multi-digit section number",
+      "line": 191,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: the storage id becomes the display label.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "sectionLabel › renders a section id as a section mark",
+      "line": 185,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Only a LEADING `s` is the prefix. Stripping every `s` would mangle an id that happens to contain another one.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "sectionLabel › strips only the leading prefix",
+      "line": 197,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
       "description": "Only a line that ENDS in \"?\" is being asked of the person; a question mark inside a sentence is usually quoting them back to themselves.",
       "file": "app/lib/messageLines.test.ts",
       "format": "vitest",
@@ -2869,6 +2995,24 @@
       "key": "toolSummaries › summarises every catalog tool with a name, title and description",
       "line": 159,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "It asks for something rather than only reporting an absence — the point is to get the section dealt with on the agent's next turn.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "untouchedNoteText › asks the agent to act rather than only reporting the gap",
+      "line": 240,
+      "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "It names the section both ways: the mark the person just clicked, and the heading, so the agent can find it without another round trip.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "untouchedNoteText › names the section by mark and heading",
+      "line": 229,
+      "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
     {

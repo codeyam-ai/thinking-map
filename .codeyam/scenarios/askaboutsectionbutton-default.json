@@ -1,0 +1,12 @@
+{
+  "name": "AskAboutSectionButton - Default",
+  "id": "3ec6da62-a798-4588-b6f8-f41503735d01",
+  "url": "/isolated-components/AskAboutSectionButton?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AskAboutSectionButton",
+  "scenarioType": "component",
+  "description": "The affordance on an unaccounted-for section. Labelled by section mark, with the heading kept as the accessible name where length costs nothing."
+}

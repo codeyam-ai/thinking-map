@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanel - FullyAccountedFor",
+  "id": "3ae4e289-800a-4a4d-bbc6-93d0dc725f80",
+  "url": "/isolated-components/BriefPanel?s=FullyAccountedFor",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanel",
+  "scenarioType": "component",
+  "description": "Every section cited. The headline inverts to say so, and this is the state a client is actually being shown before they approve anything."
+}

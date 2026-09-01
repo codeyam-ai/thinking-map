@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import AgentSimulator from '@/app/components/AgentSimulator';
 import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
-import { getMap } from '@/app/lib/mapStore';
+import { getBriefCoverage, getMap } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
 import { isPhase, type Phase } from '@/app/lib/mapKinds';
 
@@ -24,6 +24,11 @@ export default async function MapPage({
   // and fetch before it knows anything.
   const { revision, events } = await readSince(map.id);
 
+  // Null unless this map was started from a brief, which is most of them.
+  const brief = map.brief
+    ? await getBriefCoverage(map.id, map.nodes)
+    : null;
+
   return (
     // The bridge wraps the whole surface rather than one panel: the map is the
     // shared artifact, so an agent's tools stay bound for as long as the page
@@ -33,7 +38,12 @@ export default async function MapPage({
       initialEvents={events}
       initialRevision={revision}
     >
-      <MapScreen phase={phase} nodes={map.nodes} mapId={map.id} />
+      <MapScreen
+        phase={phase}
+        nodes={map.nodes}
+        mapId={map.id}
+        brief={brief ?? undefined}
+      />
       {process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}
     </WebMcpBridge>
   );

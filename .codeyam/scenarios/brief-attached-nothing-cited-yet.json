@@ -1,0 +1,71 @@
+{
+  "name": "Brief attached, nothing cited yet",
+  "id": "88679814-0506-4360-9f07-d8ba76fdd499",
+  "url": "/map/map-brief-fresh",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapBrief": [
+      {
+        "charCount": 3428,
+        "id": "brief-map-brief-fresh",
+        "mapId": "map-brief-fresh",
+        "mediaType": "application/pdf",
+        "sourceName": "northgate-renewal-brief.pdf",
+        "text": "# Northgate Library — Digital Membership Renewal\n\n## Background\n\nNorthgate Library District serves 41,000 cardholders across six branches and a\nbookmobile. Membership is free but must be renewed every two years, which is a\nstate requirement tied to proof of residence rather than a policy we chose.\nRenewal is currently done in person at a service desk. In FY24 we processed\n9,180 renewals and lost an estimated 3,400 cardholders who simply let their\nmembership lapse rather than make the trip.\n\n## Who this is for\n\nOur cardholders are not a homogenous group and the renewal problem does not\nfall on them evenly. Roughly 30% of active cardholders are over 65. About\n5,600 households in the district have no fixed broadband connection. Four of\nour six branches are in neighbourhoods where the median household income is\nbelow the county median. Any solution that assumes a smartphone, a printer, or\na credit card on file will exclude the people who use the library most.\n\n## What we think we need\n\nA cardholder should be able to renew from a browser without visiting a branch.\nThey should be able to do it on behalf of the other cards in their household.\nStaff should be able to see what was renewed and by whom, and should be able\nto intervene when an automated check fails rather than the cardholder hitting\na dead end.\n\n## Residency verification\n\nThis is the part we are least sure about. State rules require proof that the\ncardholder still lives in the district. Today a staff member looks at a\nutility bill or a lease. We do not know what the digital equivalent is, and we\nare not comfortable asking people to upload a photograph of a bill to a system\nwe would then have to secure and retain.\n\n## Constraints\n\nOur ILS is SirsiDynix Symphony, currently on-premises, upgraded last in 2022.\nThe vendor offers a renewal module we have not evaluated. We have one\nhalf-time developer and no dedicated designer. The board's funding decision is\nmade in March and anything not costed by February will not be in that cycle.\n\n## What success looks like\n\nFewer lapsed memberships, shorter desk queues, and no cardholder who could\nrenew in person before finding they cannot renew now. We would rather ship\nsomething narrow that works for everyone than something complete that works\nfor the people who already find us easy to use.\n\n## Out of scope\n\nNew card signups. Fine payment. Anything touching the catalogue or holds."
+      }
+    ],
+    "mapEvent": [
+      {
+        "id": "ef1",
+        "kind": "node.added",
+        "mapId": "map-brief-fresh",
+        "origin": "user",
+        "payload": "{\"id\": \"nf-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Northgate Library \\u2014 Digital Membership Renewal\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ef2",
+        "kind": "agent.note",
+        "mapId": "map-brief-fresh",
+        "origin": "agent",
+        "payload": "{\"text\": \"Brief attached \\u2014 eight sections, 3,428 characters. Reading the outline before I add anything.\"}",
+        "revision": 2
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "nf-idea",
+        "kind": "idea",
+        "label": "Northgate Library — Digital Membership Renewal",
+        "mapId": "map-brief-fresh",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "Work out what we can actually build before the March board meeting.",
+        "id": "mf1",
+        "mapId": "map-brief-fresh",
+        "origin": "user",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-brief-fresh",
+        "phase": "deconstruct",
+        "revision": 2,
+        "seedIdea": "Work out what we can actually build before the March board meeting.",
+        "title": "Northgate Library — Digital Membership Renewal"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "description": "A brief just attached, with only the root idea on the map and nothing citing any section. The honest day-one picture rather than an empty component: every section carries the ink, and the headline names the whole document as untouched. This is the state that makes the difference between reading a brief and inferring it most visible."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BriefCoverageHeadline - NothingCited",
+  "id": "1ca18be5-1eee-4a3c-8a18-d8b30384571a",
+  "url": "/isolated-components/BriefCoverageHeadline?s=NothingCited",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefCoverageHeadline",
+  "scenarioType": "component",
+  "description": "A brief just attached with nothing citing any of it - the honest day-one picture, and an empty progress bar rather than an empty component."
+}

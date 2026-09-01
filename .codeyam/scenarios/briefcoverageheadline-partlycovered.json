@@ -1,0 +1,12 @@
+{
+  "name": "BriefCoverageHeadline - PartlyCovered",
+  "id": "cf232dc6-4ab8-4648-87e0-72d2ed4d3fd1",
+  "url": "/isolated-components/BriefCoverageHeadline?s=PartlyCovered",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefCoverageHeadline",
+  "scenarioType": "component",
+  "description": "The ordinary working state. It leads with what is UNTOUCHED rather than what is covered, and puts the character count on its own line because a count of sections understates the finding on its own."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanelHeader - LongSourceName",
+  "id": "69929fa3-5627-4aaf-aff3-6c632c1ea5d3",
+  "url": "/isolated-components/BriefPanelHeader?s=LongSourceName",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanelHeader",
+  "scenarioType": "component",
+  "description": "A filename long enough to truncate. Truncated rather than wrapped on purpose - wrapping would push the headline underneath it down the panel, and the headline is what matters."
+}

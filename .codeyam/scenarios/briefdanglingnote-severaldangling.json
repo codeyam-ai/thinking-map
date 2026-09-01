@@ -1,0 +1,12 @@
+{
+  "name": "BriefDanglingNote - SeveralDangling",
+  "id": "c97b26f3-bcc2-41dd-a0ad-3dd6d05c83d8",
+  "url": "/isolated-components/BriefDanglingNote?s=SeveralDangling",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefDanglingNote",
+  "scenarioType": "component",
+  "description": "Several at once - the shape you get when a brief is replaced by a shorter one and every id past its new end dangles together."
+}

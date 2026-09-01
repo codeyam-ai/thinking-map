@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brief panel — section rail, weight inverted (anchored)</title>
+<style>
+  :root{
+    --paper:#f1efea; --surface:#ffffff; --ink:#0f0f0f; --ink-soft:#4a4a45;
+    --muted:#8a8a85; --line:#e2e0d9; --lime:#d5f560; --lime-deep:#c6ec44;
+    --thread:#8b8bc8; --risk:#c4736a; --pro:#6b9e84;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; padding:36px; min-height:100vh;
+  }
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta{font-size:12.5px;color:var(--muted)}
+  .workspace{display:flex;gap:24px;align-items:stretch;height:1010px}
+
+  /* ── the new third pane ─────────────────────────────
+     Weight is INVERTED against the obvious reading: the sections nobody has
+     touched carry the ink, and the ones already accounted for recede. The
+     covered sections have done their job — the map beside this panel is their
+     evidence. What is left for this panel to say is what nobody has dealt with. */
+  .brief{
+    flex:0 0 276px; background:var(--surface); border-radius:16px;
+    padding:26px 22px; display:flex; flex-direction:column; overflow:hidden;
+  }
+  .brief-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .brief-src{font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:18px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .headline{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.25;margin-bottom:5px}
+  .headline .n{font-variant-numeric:tabular-nums}
+  .sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.45}
+  .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;display:flex;margin-bottom:22px}
+  .bar i{display:block;height:100%;background:var(--ink)}
+
+  .rows{display:flex;flex-direction:column;overflow:hidden}
+  .row{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+  .row:first-child{border-top:none}
+  .sid{font-size:10.5px;font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;
+    padding-top:3px;min-width:22px;color:var(--line)}
+  .rbody{flex:1;min-width:0}
+  .rhead{font-size:13px;line-height:1.35}
+  .rmeta{font-size:11.5px;margin-top:3px;font-variant-numeric:tabular-nums}
+  .count{
+    flex:0 0 auto;font-size:11.5px;font-variant-numeric:tabular-nums;
+    min-width:26px;height:22px;padding:0 8px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ACCOUNTED FOR — quiet. It is already answered; the map shows how. */
+  .row.done .rhead{color:var(--muted);font-weight:500}
+  .row.done .rmeta{color:var(--line)}
+  .row.done .count{border:1px solid var(--line);color:var(--muted);font-weight:500}
+
+  /* UNTOUCHED — the ink. This is what the panel exists to say. */
+  .row.untouched{padding:13px 0}
+  .row.untouched .sid{color:var(--ink)}
+  .row.untouched .rhead{color:var(--ink);font-weight:700;font-size:13.5px}
+  .row.untouched .rmeta{color:var(--ink-soft);font-weight:500}
+  .row.untouched .count{border:1.5px dashed var(--ink);color:var(--ink);font-weight:700}
+  .ask{
+    margin-top:8px;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--ink);background:none;border:1.5px solid var(--ink);border-radius:11px;
+    padding:5px 11px;cursor:pointer;
+  }
+
+  /* ── existing map card, unchanged ──────────────────── */
+  .map{flex:1;background:var(--surface);border-radius:16px;padding:26px 30px;position:relative;min-width:0}
+  .map-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .tree{position:relative;height:640px}
+  .node{position:absolute;transform:translateX(-50%);text-align:center}
+  .node .eyebrow{margin-bottom:7px;white-space:nowrap}
+  .pill{
+    display:inline-block;padding:15px 26px;border-radius:999px;background:var(--surface);
+    border:1.5px solid var(--ink);font-size:14.5px;font-weight:600;white-space:nowrap;
+  }
+  .pill.root{background:var(--ink);color:#fff;border-color:var(--ink);padding:19px 30px;font-size:16px}
+  .pill.open{border:1.5px dashed var(--line);color:var(--muted);font-weight:500}
+  .sref{color:var(--muted)}
+  .link{position:absolute}
+  .v{border-left:1.5px dashed var(--thread)}
+  .h{border-top:1.5px dashed var(--thread)}
+  .dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--thread)}
+  .zoom{position:absolute;right:26px;bottom:22px;display:flex;align-items:center;gap:14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 16px;
+    font-size:12.5px;color:var(--muted)}
+  .zoom b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ── existing exchange column, unchanged ───────────── */
+  .rail{flex:0 0 296px;background:var(--surface);border-radius:16px;padding:26px 22px;overflow:hidden}
+  .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;
+    padding:9px 8px 9px 16px;margin:8px 0 16px;font-size:13.5px;color:var(--muted)}
+  .field span{flex:1}
+  .send{width:30px;height:30px;border-radius:50%;background:var(--lime);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .q{font-size:13.5px;font-weight:500}
+  .toggle{display:flex;align-items:center;gap:14px;margin:18px 0 4px}
+  .toggle .on{background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.1em;
+    padding:6px 13px;border-radius:999px}
+  .log{margin-top:8px}
+  .ev{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .av{flex:0 0 20px;height:20px;border-radius:50%;border:1.5px solid var(--line);margin-top:1px}
+  .av.agent{background:var(--ink);border-color:var(--ink)}
+  .ev p{font-size:13px;font-weight:600;line-height:1.4}
+  .ev small{display:block;font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px;line-height:1.45}
+</style>
+</head>
+<body>
+<div class="workspace">
+
+  <!-- NEW: brief panel — section rail, with covered/untouched weight inverted -->
+  <aside class="brief">
+    <div class="brief-head">
+      <span class="eyebrow">Brief</span>
+      <span class="meta">7 of 11 accounted for</span>
+    </div>
+    <div class="brief-src">Northwind Learning — platform brief</div>
+
+    <div class="headline"><span class="n">4 sections</span> nobody has touched</div>
+    <div class="sub">2,810 characters — a fifth of the document — with nothing on the map pointing at them.</div>
+    <div class="bar"><i style="width:63.6%"></i></div>
+
+    <div class="rows">
+      <div class="row done"><span class="sid">S1</span><div class="rbody">
+        <div class="rhead">Overview</div><div class="rmeta">1,240 chars</div></div>
+        <span class="count">3</span></div>
+
+      <div class="row done"><span class="sid">S2</span><div class="rbody">
+        <div class="rhead">Who this is for</div><div class="rmeta">890 chars</div></div>
+        <span class="count">2</span></div>
+
+      <div class="row done"><span class="sid">S3</span><div class="rbody">
+        <div class="rhead">The problem today</div><div class="rmeta">1,510 chars</div></div>
+        <span class="count">4</span></div>
+
+      <div class="row done"><span class="sid">S4</span><div class="rbody">
+        <div class="rhead">Goals for year one</div><div class="rmeta">1,120 chars</div></div>
+        <span class="count">2</span></div>
+
+      <div class="row untouched"><span class="sid">S5</span><div class="rbody">
+        <div class="rhead">Out of scope</div><div class="rmeta">640 chars · nothing cites this</div>
+        <button class="ask">Ask about §5</button></div>
+        <span class="count">0</span></div>
+
+      <div class="row done"><span class="sid">S6</span><div class="rbody">
+        <div class="rhead">Existing systems</div><div class="rmeta">1,380 chars</div></div>
+        <span class="count">1</span></div>
+
+      <div class="row untouched"><span class="sid">S7</span><div class="rbody">
+        <div class="rhead">Accessibility requirements</div><div class="rmeta">970 chars · nothing cites this</div>
+        <button class="ask">Ask about §7</button></div>
+        <span class="count">0</span></div>
+
+      <div class="row done"><span class="sid">S8</span><div class="rbody">
+        <div class="rhead">Data and privacy</div><div class="rmeta">1,650 chars</div></div>
+        <span class="count">1</span></div>
+
+      <div class="row untouched"><span class="sid">S9</span><div class="rbody">
+        <div class="rhead">Timeline</div><div class="rmeta">720 chars · nothing cites this</div>
+        <button class="ask">Ask about §9</button></div>
+        <span class="count">0</span></div>
+
+      <div class="row untouched"><span class="sid">S10</span><div class="rbody">
+        <div class="rhead">Budget envelope</div><div class="rmeta">480 chars · nothing cites this</div>
+        <button class="ask">Ask about §10</button></div>
+        <span class="count">0</span></div>
+
+      <div class="row done"><span class="sid">S11</span><div class="rbody">
+        <div class="rhead">How we'll measure success</div><div class="rmeta">1,090 chars</div></div>
+        <span class="count">2</span></div>
+    </div>
+  </aside>
+
+  <!-- unchanged map card -->
+  <main class="map">
+    <div class="map-head"><span class="eyebrow">Live map</span><span class="meta">5 answered, 2 still open</span></div>
+    <div class="tree">
+      <div class="node" style="left:50%;top:0"><div class="eyebrow">Idea · Yours</div>
+        <div class="pill root">Northwind learning platform</div></div>
+      <div class="link v" style="left:50%;top:88px;height:26px"></div>
+      <div class="link h" style="left:22%;top:114px;width:56%"></div>
+      <div class="dot" style="left:calc(22% - 3px);top:111px"></div>
+      <div class="dot" style="left:calc(78% - 3px);top:111px"></div>
+      <div class="link v" style="left:22%;top:114px;height:52px"></div>
+      <div class="link v" style="left:78%;top:114px;height:52px"></div>
+
+      <div class="node" style="left:22%;top:172px"><div class="eyebrow">Problem <span class="sref">· S3</span></div>
+        <div class="pill">Teachers rebuild the same lesson</div></div>
+      <div class="node" style="left:78%;top:172px"><div class="eyebrow">Goal · Yours <span class="sref">· S4</span></div>
+        <div class="pill">One place to plan a term</div></div>
+
+      <div class="link v" style="left:22%;top:250px;height:76px"></div>
+      <div class="link v" style="left:78%;top:250px;height:76px"></div>
+      <div class="dot" style="left:calc(22% - 3px);top:323px"></div>
+      <div class="dot" style="left:calc(78% - 3px);top:323px"></div>
+
+      <div class="node" style="left:22%;top:334px"><div class="eyebrow">Finding <span class="sref">· S6</span></div>
+        <div class="pill">Three systems already hold rosters</div></div>
+      <div class="node" style="left:78%;top:334px"><div class="eyebrow">Approach</div>
+        <div class="pill">Start from the teacher's week</div></div>
+
+      <div class="link v" style="left:78%;top:412px;height:26px"></div>
+      <div class="link h" style="left:50%;top:438px;width:54%"></div>
+      <div class="dot" style="left:calc(50% - 3px);top:435px"></div>
+      <div class="dot" style="left:calc(104% - 3px);top:435px"></div>
+      <div class="link v" style="left:50%;top:438px;height:52px"></div>
+
+      <div class="node" style="left:50%;top:496px"><div class="eyebrow">Open</div>
+        <div class="pill open">Who owns accessibility sign-off?</div></div>
+      <div class="node" style="left:20%;top:496px"><div class="eyebrow">Open</div>
+        <div class="pill open">Is the March date fixed?</div></div>
+    </div>
+    <div class="zoom">− <b>100%</b> + <span>Fit</span></div>
+  </main>
+
+  <!-- unchanged exchange column -->
+  <aside class="rail">
+    <div class="eyebrow">Waiting on you · 2</div>
+    <div class="q" style="margin-top:14px">Who owns accessibility sign-off?</div>
+    <div class="field"><span>Answer…</span><div class="send">↗</div></div>
+    <div class="q">Is the March date fixed?</div>
+    <div class="field"><span>Answer…</span><div class="send">↗</div></div>
+    <div class="toggle"><span class="on">NOTE</span><span class="eyebrow">Add node</span></div>
+    <div class="field"><span>Leave a note for the agent…</span><div class="send">↗</div></div>
+    <div class="eyebrow" style="margin-top:20px">Activity</div>
+    <div class="log">
+      <div class="ev"><div class="av agent"></div><p>Agent read the brief<small>Eleven sections, 12,690 characters.</small></p></div>
+      <div class="ev"><div class="av"></div><p>You added "One place to plan a term"</p></div>
+      <div class="ev"><div class="av agent"></div><p>Agent left a note<small>§3 is where the real problem is — the rest of page one is context.</small></p></div>
+      <div class="ev"><div class="av agent"></div><p>Agent asked 2 questions</p></div>
+    </div>
+  </aside>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+{
+  "name": "Brief fully accounted for",
+  "id": "3b71d74a-4942-4ae5-9d63-05eac26fc7d1",
+  "url": "/map/map-brief-covered",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapBrief": [
+      {
+        "charCount": 3428,
+        "id": "brief-map-brief-covered",
+        "mapId": "map-brief-covered",
+        "mediaType": "application/pdf",
+        "sourceName": "northgate-renewal-brief.pdf",
+        "text": "# Northgate Library — Digital Membership Renewal\n\n## Background\n\nNorthgate Library District serves 41,000 cardholders across six branches and a\nbookmobile. Membership is free but must be renewed every two years, which is a\nstate requirement tied to proof of residence rather than a policy we chose.\nRenewal is currently done in person at a service desk. In FY24 we processed\n9,180 renewals and lost an estimated 3,400 cardholders who simply let their\nmembership lapse rather than make the trip.\n\n## Who this is for\n\nOur cardholders are not a homogenous group and the renewal problem does not\nfall on them evenly. Roughly 30% of active cardholders are over 65. About\n5,600 households in the district have no fixed broadband connection. Four of\nour six branches are in neighbourhoods where the median household income is\nbelow the county median. Any solution that assumes a smartphone, a printer, or\na credit card on file will exclude the people who use the library most.\n\n## What we think we need\n\nA cardholder should be able to renew from a browser without visiting a branch.\nThey should be able to do it on behalf of the other cards in their household.\nStaff should be able to see what was renewed and by whom, and should be able\nto intervene when an automated check fails rather than the cardholder hitting\na dead end.\n\n## Residency verification\n\nThis is the part we are least sure about. State rules require proof that the\ncardholder still lives in the district. Today a staff member looks at a\nutility bill or a lease. We do not know what the digital equivalent is, and we\nare not comfortable asking people to upload a photograph of a bill to a system\nwe would then have to secure and retain.\n\n## Constraints\n\nOur ILS is SirsiDynix Symphony, currently on-premises, upgraded last in 2022.\nThe vendor offers a renewal module we have not evaluated. We have one\nhalf-time developer and no dedicated designer. The board's funding decision is\nmade in March and anything not costed by February will not be in that cycle.\n\n## What success looks like\n\nFewer lapsed memberships, shorter desk queues, and no cardholder who could\nrenew in person before finding they cannot renew now. We would rather ship\nsomething narrow that works for everyone than something complete that works\nfor the people who already find us easy to use.\n\n## Out of scope\n\nNew card signups. Fine payment. Anything touching the catalogue or holds."
+      }
+    ],
+    "mapEvent": [
+      {
+        "id": "ec1",
+        "kind": "node.added",
+        "mapId": "map-brief-covered",
+        "origin": "user",
+        "payload": "{\"id\": \"nc-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Northgate Library \\u2014 Digital Membership Renewal\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ec2",
+        "kind": "agent.note",
+        "mapId": "map-brief-covered",
+        "origin": "agent",
+        "payload": "{\"text\": \"Walked every section of the brief. Each one now has at least one node pointing at it.\"}",
+        "revision": 2
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "nc-idea",
+        "kind": "idea",
+        "label": "Northgate Library — Digital Membership Renewal",
+        "mapId": "map-brief-covered",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "nc-problem",
+        "kind": "problem",
+        "label": "3,400 lapsed rather than travel",
+        "mapId": "map-brief-covered",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "nc-idea",
+        "sourceRef": "s2",
+        "status": "answered"
+      },
+      {
+        "id": "nc-q1",
+        "kind": "open-question",
+        "label": "What proves residence?",
+        "mapId": "map-brief-covered",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "nc-problem",
+        "sourceRef": "s5",
+        "status": "open"
+      },
+      {
+        "id": "nc-user",
+        "kind": "user",
+        "label": "41,000 cardholders",
+        "mapId": "map-brief-covered",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "nc-idea",
+        "sourceRef": "s3",
+        "status": "answered"
+      },
+      {
+        "id": "nc-goal",
+        "kind": "goal",
+        "label": "Renew from a browser",
+        "mapId": "map-brief-covered",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "nc-user",
+        "sourceRef": "s4",
+        "status": "answered"
+      },
+      {
+        "id": "nc-measure",
+        "kind": "goal",
+        "label": "Fewer lapsed, shorter queues",
+        "mapId": "map-brief-covered",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "nc-goal",
+        "sourceRef": "s7",
+        "status": "answered"
+      },
+      {
+        "id": "nc-scope",
+        "kind": "constraint",
+        "label": "Not signups or fines",
+        "mapId": "map-brief-covered",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "nc-goal",
+        "sourceRef": "s8",
+        "status": "answered"
+      },
+      {
+        "id": "nc-constraint",
+        "kind": "constraint",
+        "label": "Costed by February",
+        "mapId": "map-brief-covered",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "nc-idea",
+        "sourceRef": "s6",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "Work out what we can actually build before the March board meeting.",
+        "id": "mc1",
+        "mapId": "map-brief-covered",
+        "origin": "user",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-brief-covered",
+        "phase": "deconstruct",
+        "revision": 11,
+        "seedIdea": "Work out what we can actually build before the March board meeting.",
+        "title": "Northgate Library — Digital Membership Renewal"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "description": "Every section of the brief cited by at least one node - the state a client is actually being shown before they approve anything. The headline inverts to say so, the whole list recedes to grey because none of it is outstanding any more, and the title section still counts in neither half since a heading with nothing under it has nothing to account for."
+}

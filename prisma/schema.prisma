@@ -106,6 +106,27 @@ model MapNode {
   /// and never drawn. A dangling id is tolerated and reported: the node it
   /// names may since have been deleted.
   testsNodeId String?
+  /// The brief section id this node was derived from (e.g. `s7`), when the map
+  /// has a brief and this claim came from one identifiable part of it.
+  ///
+  /// The deliberate contrast with `sourceUrl` directly above: `sourceUrl` points
+  /// OUT of the map at the web, `sourceRef` points INTO the client's own
+  /// document. Overloading one column for both would make the research card's
+  /// link rendering wrong for half of its values.
+  ///
+  /// It is also the contrast with `testsNodeId` directly above: that points at
+  /// another NODE on this map, while this points at a passage in the document
+  /// the map came from. Both are pointers resolved in code rather than drawn.
+  ///
+  /// Stores the section id, never the quoted passage. Sections are derived on
+  /// demand by `app/lib/briefSections.ts` from brief text that is written once
+  /// and never updated, so the reference cannot drift from what it points at —
+  /// whereas a copy of the passage kept here could.
+  ///
+  /// Optional, and always will be: a node the person typed, or one the agent
+  /// inferred across the whole document, has no single source section. Forcing
+  /// one would produce fabricated citations, which is worse than none.
+  sourceRef String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
   /// user | agent. Without this an agent re-reading the map cannot tell its

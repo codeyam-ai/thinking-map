@@ -1,0 +1,12 @@
+{
+  "name": "BriefCoverageHeadline - OneSectionLeft",
+  "id": "b05a1851-aa89-410f-9bf4-f116fff3f04f",
+  "url": "/isolated-components/BriefCoverageHeadline?s=OneSectionLeft",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BriefCoverageHeadline",
+  "scenarioType": "component",
+  "description": "One section left, pinning the singular. '1 sections' is exactly the kind of thing that survives review and then embarrasses you in front of a client."
+}

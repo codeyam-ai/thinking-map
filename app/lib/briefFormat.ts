@@ -99,3 +99,40 @@ export function firstLines(text: string, count: number): string {
     .slice(0, count)
     .join('\n');
 }
+
+/**
+ * A section id as a person reads it: `s7` becomes `§7`.
+ *
+ * `s7` is the address — what the splitter derives, what a node stores in
+ * `sourceRef`, what `read_brief` takes. `§7` is only ever the display of it.
+ * Keeping the conversion here rather than inline is what stops the brief panel
+ * and a node pill from drifting into calling the same section two things.
+ */
+export function sectionLabel(sectionId: string): string {
+  return `§${sectionId.replace(/^s/, '')}`;
+}
+
+/** A character count with grouped thousands. A bare `12690` reads as an id
+ *  sitting in a column of otherwise short numbers; `12,690` reads as an
+ *  amount, which is the point of showing it. */
+export function formatCharCount(charCount: number): string {
+  return charCount.toLocaleString('en-US');
+}
+
+/**
+ * What the person sends the agent when they notice a section nobody has dealt
+ * with.
+ *
+ * This rides the existing `user.note` channel, so the sentence IS the whole
+ * message — nothing else carries the intent. It therefore has to name the
+ * section twice over: the mark the person just clicked, and the heading, so
+ * the agent can go straight to it instead of re-reading the outline to work
+ * out which one `§4` was. And it asks a question rather than only reporting an
+ * absence, because the point is to get the section dealt with on the next turn.
+ */
+export function untouchedNoteText(section: {
+  id: string;
+  heading: string;
+}): string {
+  return `Nothing on the map accounts for ${sectionLabel(section.id)} "${section.heading}" yet. What does it say, and what should come out of it?`;
+}

@@ -2,6 +2,7 @@
 
 import NodeFoldToggle from './NodeFoldToggle';
 import { useNodeDrag } from '../hooks/useNodeDrag';
+import { sectionLabel } from '../lib/briefFormat';
 import { ACCENT_KINDS, KIND_EYEBROW } from '../lib/mapKinds';
 import { nodeShellClasses } from '../lib/nodeAppearance';
 import type { LaidOutNode } from '../lib/mapLayout';
@@ -116,11 +117,28 @@ export default function MapNodePill({
             It sits in the eyebrow beside the other two facts about the node
             rather than on the pill, because it is provenance, not status. */}
         {asked ? ' · asked' : ''}
+        {/* Where a claim came from, when it came from one identifiable part of
+            the client's brief. Last in the same line and the same shape as the
+            badges above it: a fact already stored on the node, shown where the
+            node already narrates itself. It goes last because it is the only
+            one of the four that is about the DOCUMENT rather than the node. */}
+        {node.sourceRef ? ` · ${sectionLabel(node.sourceRef)}` : ''}
       </span>
       <div
         className={`relative flex items-center justify-center rounded-full border px-4 text-center ${shell}`}
         style={{ height: node.height }}
-        title={node.detail ?? undefined}
+        /* The eyebrow has room for the section number only; the hover says
+           which section that is, alongside whatever detail the node carries. */
+        title={
+          [
+            node.detail,
+            node.sourceRef
+              ? `From ${sectionLabel(node.sourceRef)} of the brief`
+              : null,
+          ]
+            .filter(Boolean)
+            .join('\n\n') || undefined
+        }
       >
         {accent === 'find' ? (
           <svg
