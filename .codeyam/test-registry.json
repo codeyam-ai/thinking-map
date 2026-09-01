@@ -239,7 +239,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › does not re-scroll when the phase is unchanged",
-      "line": 61,
+      "line": 94,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -248,7 +248,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › marks only the active phase as the current step",
-      "line": 89,
+      "line": 122,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -257,7 +257,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › renders every phase, so the whole process stays reachable",
-      "line": 79,
+      "line": 112,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -266,7 +266,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › scrolls the active pill into view on first render",
-      "line": 35,
+      "line": 68,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -275,7 +275,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › scrolls the newly active pill into view when the phase advances",
-      "line": 48,
+      "line": 81,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -2512,14 +2512,6 @@
       "runner": "tests"
     },
     {
-      "description": "",
-      "file": "app/lib/nodeAppearance.test.ts",
-      "format": "vitest",
-      "key": "nodeShellClasses › accents risk and pro nodes, and only those",
-      "registeredAt": "2026-09-01T23:31:21Z",
-      "runner": "tests"
-    },
-    {
       "description": "Gaps are the most valuable finding on the map, not a warning — an earlier build wrongly reddened them. They read as questions, which is what a gap is: something nobody has answered.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
@@ -2535,22 +2527,6 @@
       "key": "nodeShellClasses › draws an unanswered question dashed and unfilled",
       "line": 28,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "",
-      "file": "app/lib/nodeAppearance.test.ts",
-      "format": "vitest",
-      "key": "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind",
-      "registeredAt": "2026-09-01T23:31:21Z",
-      "runner": "tests"
-    },
-    {
-      "description": "",
-      "file": "app/lib/nodeAppearance.test.ts",
-      "format": "vitest",
-      "key": "nodeShellClasses › fills the root idea solid, the one dark shape on the page",
-      "registeredAt": "2026-09-01T23:31:21Z",
       "runner": "tests"
     },
     {
@@ -2599,14 +2575,6 @@
       "runner": "tests"
     },
     {
-      "description": "",
-      "file": "app/lib/nodeAppearance.test.ts",
-      "format": "vitest",
-      "key": "nodeShellClasses › leaves a gap node neutral",
-      "registeredAt": "2026-09-01T23:31:21Z",
-      "runner": "tests"
-    },
-    {
       "description": "Exactly one thing per screen wears the lime, and it is what just changed — an accent colour must not steal it.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
@@ -2622,14 +2590,6 @@
       "key": "nodeShellClasses › lets the root treatment win over every other rule",
       "line": 42,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "",
-      "file": "app/lib/nodeAppearance.test.ts",
-      "format": "vitest",
-      "key": "nodeShellClasses › marks a research node as a find",
-      "registeredAt": "2026-09-01T23:31:21Z",
       "runner": "tests"
     },
     {
