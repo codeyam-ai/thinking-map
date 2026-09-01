@@ -32,6 +32,11 @@ import {
 
 type Impl = (ctx: ToolContext, input: never) => Promise<ToolResult>;
 
+/** One question as `ask_user` accepts it: the bare string it has always taken,
+ *  or that string with a few suggested answers attached. The union is what
+ *  makes the field additive — nothing an existing agent sends stops working. */
+type AskedQuestion = string | { text: string; options?: string[] };
+
 const IMPLEMENTATIONS: Record<string, Impl> = {
   async read_map(ctx, input: { sinceRevision?: number }) {
     if (typeof input.sinceRevision === 'number') {
@@ -244,8 +249,19 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     };
   },
 
-  async ask_user(ctx, input: { questions: string[]; timeoutSeconds?: number }) {
+  async ask_user(
+    ctx,
+    input: { questions: AskedQuestion[]; timeoutSeconds?: number },
+  ) {
     const before = await currentRevision(ctx.mapId);
+
+    // A question is either a bare string or that string with suggested answers
+    // attached. Normalising here rather than at each use is what lets the rest
+    // of this tool stay exactly as it was — and what keeps `questions: ["…"]`,
+    // the shape every existing agent sends, working verbatim.
+    const asking = input.questions.map((question) =>
+      typeof question === 'string' ? { text: question } : question,
+    );
 
     // The questions become real open-question nodes FIRST, so they survive the
     // agent giving up, the page reloading, and the agent never coming back.
@@ -255,11 +271,12 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
         {
           name: 'add_nodes',
           input: {
-            nodes: input.questions.map((text, i) => ({
+            nodes: asking.map((question, i) => ({
               ref: `q${i}`,
               kind: 'open-question',
-              label: text,
+              label: question.text,
               status: 'open',
+              ...(question.options ? { options: question.options } : {}),
             })),
           },
         },
@@ -271,7 +288,7 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
       .filter((e: ExchangeEvent) => e.kind === 'node.added')
       .map((e: ExchangeEvent, i: number) => ({
         id: String((e.payload as Record<string, unknown>)?.id ?? `q${i}`),
-        text: input.questions[i] ?? '',
+        text: asking[i]?.text ?? '',
       }));
 
     await recordEvents(ctx.mapId, [

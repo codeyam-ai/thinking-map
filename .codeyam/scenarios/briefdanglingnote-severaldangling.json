@@ -1,9 +1,9 @@
 {
   "name": "BriefDanglingNote - SeveralDangling",
-  "id": "c97b26f3-bcc2-41dd-a0ad-3dd6d05c83d8",
+  "id": "0cebdf5c-fda5-4ea1-b81e-e6b189f48279",
   "url": "/isolated-components/BriefDanglingNote?s=SeveralDangling",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefDanglingNote",

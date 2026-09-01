@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - Finding",
+ "id": "41e82925-58ce-4b68-8706-dc9e315ff798",
+ "url": "/isolated-components/MapCard?s=Finding",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "A statement node \u2014 its detail is the body, and the magnifier in the corner marks it as something the partner went and found."
+}

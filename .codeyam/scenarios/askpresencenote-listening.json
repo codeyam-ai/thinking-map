@@ -1,9 +1,9 @@
 {
   "name": "AskPresenceNote - Listening",
-  "id": "281dfdf7-e1a0-4816-a9ec-b299ac2e8502",
+  "id": "81479b57-35b5-47e9-9bb5-188ed1cfde54",
   "url": "/isolated-components/AskPresenceNote?s=Listening",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AskPresenceNote",

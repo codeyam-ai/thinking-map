@@ -1,12 +1,12 @@
 {
-  "name": "IdeaForm - Default",
-  "id": "c2f8c5c3-2eeb-47ad-8c61-ebbc69a5aaa2",
-  "url": "/isolated-components/IdeaForm?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "IdeaForm",
-  "scenarioType": "component",
-  "description": "Empty, with the placeholder carrying the invitation."
+ "name": "IdeaForm - Default",
+ "id": "c2f8c5c3-2eeb-47ad-8c61-ebbc69a5aaa2",
+ "url": "/isolated-components/IdeaForm?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "IdeaForm",
+ "scenarioType": "component",
+ "description": "Empty, with the placeholder carrying the invitation."
 }

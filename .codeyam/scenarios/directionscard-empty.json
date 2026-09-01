@@ -1,12 +1,12 @@
 {
-  "name": "DirectionsCard - Empty",
-  "id": "2fa1caf2-0926-438a-809e-587033c05f56",
-  "url": "/isolated-components/DirectionsCard?s=Empty",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "DirectionsCard",
-  "scenarioType": "component",
-  "description": "No directions identified yet."
+ "name": "DirectionsCard - Empty",
+ "id": "2fa1caf2-0926-438a-809e-587033c05f56",
+ "url": "/isolated-components/DirectionsCard?s=Empty",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "DirectionsCard",
+ "scenarioType": "component",
+ "description": "No directions identified yet."
 }

@@ -1,9 +1,9 @@
 {
   "name": "AgentStatusDot - Working",
-  "id": "aabddcdc-f451-4b49-9ce4-3d836c0939b8",
+  "id": "def66b55-df45-4737-b8ce-c3222f391ffe",
   "url": "/isolated-components/AgentStatusDot?s=Working",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentStatusDot",

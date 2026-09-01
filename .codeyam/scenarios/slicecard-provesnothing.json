@@ -1,12 +1,12 @@
 {
-  "name": "SliceCard - ProvesNothing",
-  "id": "3d8ebca8-af47-4f7e-8ec3-505e3e283098",
-  "url": "/isolated-components/SliceCard?s=ProvesNothing",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SliceCard",
-  "scenarioType": "component",
-  "description": "The card that carries the feature's opinion: dashed border, a proves-nothing-yet eyebrow, and a line saying plainly that nothing on the map gets settled by building this."
+ "name": "SliceCard - ProvesNothing",
+ "id": "3d8ebca8-af47-4f7e-8ec3-505e3e283098",
+ "url": "/isolated-components/SliceCard?s=ProvesNothing",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SliceCard",
+ "scenarioType": "component",
+ "description": "The card that carries the feature's opinion: dashed border, a proves-nothing-yet eyebrow, and a line saying plainly that nothing on the map gets settled by building this."
 }

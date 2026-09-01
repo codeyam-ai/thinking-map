@@ -1,12 +1,12 @@
 {
-  "name": "ContributionBar - Default",
-  "id": "e0057d91-f765-40ac-8efd-f9004bc3fc15",
-  "url": "/isolated-components/ContributionBar?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ContributionBar",
-  "scenarioType": "component",
-  "description": "The two ways to put something into the map. Deliberately not a chat box: one line, and no history under it."
+ "name": "ContributionBar - Default",
+ "id": "e0057d91-f765-40ac-8efd-f9004bc3fc15",
+ "url": "/isolated-components/ContributionBar?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ContributionBar",
+ "scenarioType": "component",
+ "description": "The two ways to put something into the map. Deliberately not a chat box: one line, and no history under it."
 }

@@ -1,9 +1,9 @@
 {
   "name": "AskAboutSectionButton - Default",
-  "id": "3ec6da62-a798-4588-b6f8-f41503735d01",
+  "id": "86d69792-a86c-4782-bcdc-56c706ac3c6a",
   "url": "/isolated-components/AskAboutSectionButton?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AskAboutSectionButton",

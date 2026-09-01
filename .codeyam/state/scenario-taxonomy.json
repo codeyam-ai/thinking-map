@@ -203,7 +203,7 @@
       },
       "key-interaction": {
         "status": "n-a",
-        "reason": "MapScreen composes the surface; every action on it belongs to a child that owns it - the composer, the workspace, the handoff panel - and is recorded on those views rather than duplicated here."
+        "reason": "MapScreen composes the surface; answering a question - the key action on this view - is owned by the card that asks it and is captured as MapCardAnswer - ChipFilledTheBox and MapCard - EditingAnAnswer, driven as real interactions rather than duplicated here."
       }
     },
     "MapWorkspace": {
@@ -221,14 +221,14 @@
       },
       "loading": {
         "status": "n-a",
-        "reason": "The workspace is server-rendered from the map, so it has no in-flight state of its own. The only work-in-progress a person sees on this surface belongs to the reply box while a turn is running, which is captured separately as ReplyForm - Busy."
+        "reason": "The workspace is server-rendered from the map with its event log already read, so it has no in-flight state of its own. The one piece of waiting a person sees is an answer being sent from a card, which is held inside MapCardAnswer and captured on that view."
       },
       "edge": {
         "status": "covered"
       },
       "error": {
         "status": "n-a",
-        "reason": "The workspace renders whatever the map contains and has no failure state: a missing map is a 404 before this view mounts, and the one error a person actually meets - no model credential configured - is raised by the reply box and captured as ReplyForm - WithError."
+        "reason": "The workspace renders whatever the map contains and has no failure state of its own: a missing map is a 404 before this view mounts, and a failed answer write is rolled back inside useMapAnswers so the card returns to asking rather than the workspace showing an error."
       },
       "key-interaction": {
         "status": "covered"

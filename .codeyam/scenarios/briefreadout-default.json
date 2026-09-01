@@ -1,9 +1,9 @@
 {
   "name": "BriefReadout - Default",
-  "id": "4e50430a-649a-4de8-bbab-de238f35d44a",
+  "id": "9cae0f4d-922b-4c86-afbe-3afe229ba838",
   "url": "/isolated-components/BriefReadout?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefReadout",

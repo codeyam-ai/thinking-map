@@ -1,9 +1,9 @@
 {
   "name": "BriefCoverageHeadline - PartlyCovered",
-  "id": "cf232dc6-4ab8-4648-87e0-72d2ed4d3fd1",
+  "id": "7f4a3d94-fd4c-4084-8089-7b6139ff91d2",
   "url": "/isolated-components/BriefCoverageHeadline?s=PartlyCovered",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefCoverageHeadline",

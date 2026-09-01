@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - RootIdea",
+ "id": "b93d0682-4db4-428a-89d2-2fb8bc364328",
+ "url": "/isolated-components/MapCard?s=RootIdea",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "The map's subject: the only card with nothing to answer, its detail carrying the sentence the person started from."
+}

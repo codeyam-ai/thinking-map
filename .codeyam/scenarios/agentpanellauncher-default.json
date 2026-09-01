@@ -1,9 +1,9 @@
 {
   "name": "AgentPanelLauncher - Default",
-  "id": "2caabff6-debf-4dcc-ae6c-39f3836e59a0",
+  "id": "b1befa7b-f271-4bd0-80a4-f7059770dfc1",
   "url": "/isolated-components/AgentPanelLauncher?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentPanelLauncher",

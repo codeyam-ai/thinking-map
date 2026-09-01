@@ -1,15 +1,12 @@
 {
-  "name": "ThinkingMapView - Sprawling",
-  "id": "6358a29a-d708-4ea2-9c2c-e1bdced32ea9",
-  "url": "/isolated-components/ThinkingMapView?s=Sprawling",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ThinkingMapView",
-  "scenarioType": "component",
-  "description": "Seventeen nodes across four levels - past the legibility floor, so the panel scrolls a readable map rather than shrinking the labels into illegibility.",
-  "demonstratesState": {
-    "nodes": "many"
-  }
+ "name": "ThinkingMapView - Sprawling",
+ "id": "9994bf4e-63a5-4d4a-afa3-bb2a2b1e6c10",
+ "url": "/isolated-components/ThinkingMapView?s=Sprawling",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ThinkingMapView",
+ "scenarioType": "component",
+ "description": "Seventeen nodes across four levels. The column keeps every card at a readable size and scrolls rather than shrinking anything, because a map you scroll beats one that fits and cannot be read."
 }

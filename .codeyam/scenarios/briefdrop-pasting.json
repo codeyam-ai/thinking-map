@@ -1,9 +1,9 @@
 {
   "name": "BriefDrop - Pasting",
-  "id": "fc6d49b1-9031-46ac-822b-7bb928becd00",
+  "id": "41cebde4-e06f-4564-a5af-cbc628bd940a",
   "url": "/isolated-components/BriefDrop?s=Pasting",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefDrop",

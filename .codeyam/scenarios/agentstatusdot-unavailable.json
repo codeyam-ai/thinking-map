@@ -1,9 +1,9 @@
 {
   "name": "AgentStatusDot - Unavailable",
-  "id": "6c24da30-95c2-4139-bc93-1e12ebb6a10e",
+  "id": "d6199170-d8dd-4067-81c4-1397a8931120",
   "url": "/isolated-components/AgentStatusDot?s=Unavailable",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentStatusDot",

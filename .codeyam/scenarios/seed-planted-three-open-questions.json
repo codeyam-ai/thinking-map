@@ -1,123 +1,123 @@
 {
-  "name": "Seed planted - three open questions",
-  "id": "abc2c570-bbaa-4b28-ad53-1905c2db1d74",
-  "url": "/map/map-game",
-  "dimensions": [
-    "Desktop"
+ "name": "Seed planted - three open questions",
+ "id": "abc2c570-bbaa-4b28-ad53-1905c2db1d74",
+ "url": "/map/map-game",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "seed": {
+  "mapNode": [
+   {
+    "id": "n-idea",
+    "kind": "idea",
+    "label": "Educational game for kids",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": null,
+    "status": "answered",
+    "origin": "user"
+   },
+   {
+    "id": "n-who",
+    "kind": "open-question",
+    "label": "Who is it for?",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": "n-idea",
+    "status": "open",
+    "origin": "agent"
+   },
+   {
+    "id": "n-what",
+    "kind": "open-question",
+    "label": "What's the problem?",
+    "mapId": "map-game",
+    "order": 1,
+    "parentId": "n-idea",
+    "status": "open",
+    "origin": "agent"
+   },
+   {
+    "id": "n-goal",
+    "kind": "open-question",
+    "label": "What's the goal?",
+    "mapId": "map-game",
+    "order": 2,
+    "parentId": "n-idea",
+    "status": "open",
+    "origin": "agent"
+   }
   ],
-  "mocks": {},
-  "seed": {
-    "mapNode": [
-      {
-        "id": "n-idea",
-        "kind": "idea",
-        "label": "Educational game for kids",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": null,
-        "status": "answered",
-        "origin": "user"
-      },
-      {
-        "id": "n-who",
-        "kind": "open-question",
-        "label": "Who is it for?",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": "n-idea",
-        "status": "open",
-        "origin": "agent"
-      },
-      {
-        "id": "n-what",
-        "kind": "open-question",
-        "label": "What's the problem?",
-        "mapId": "map-game",
-        "order": 1,
-        "parentId": "n-idea",
-        "status": "open",
-        "origin": "agent"
-      },
-      {
-        "id": "n-goal",
-        "kind": "open-question",
-        "label": "What's the goal?",
-        "mapId": "map-game",
-        "order": 2,
-        "parentId": "n-idea",
-        "status": "open",
-        "origin": "agent"
-      }
-    ],
-    "message": [
-      {
-        "content": "I want to build an educational game for kids, but I don't know what it should be.",
-        "id": "msg-1",
-        "mapId": "map-game",
-        "role": "user",
-        "origin": "user"
-      },
-      {
-        "content": "Interesting. Before thinking about the game itself, there are three things I'd like to understand:\nWho is this actually for?\nWhat are you hoping they learn?\nAnd what are they doing instead today?",
-        "id": "msg-2",
-        "mapId": "map-game",
-        "role": "assistant",
-        "origin": "agent"
-      }
-    ],
-    "thinkingMap": [
-      {
-        "id": "map-game",
-        "phase": "deconstruct",
-        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-        "title": "Educational game for kids",
-        "revision": 5
-      }
-    ],
-    "mapEvent": [
-      {
-        "id": "ev-map-game-1",
-        "mapId": "map-game",
-        "revision": 1,
-        "kind": "node.added",
-        "origin": "user",
-        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-2",
-        "mapId": "map-game",
-        "revision": 2,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-who\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"Who is it for?\", \"status\": \"open\"}"
-      },
-      {
-        "id": "ev-map-game-3",
-        "mapId": "map-game",
-        "revision": 3,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-what\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the problem?\", \"status\": \"open\"}"
-      },
-      {
-        "id": "ev-map-game-4",
-        "mapId": "map-game",
-        "revision": 4,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the goal?\", \"status\": \"open\"}"
-      },
-      {
-        "id": "ev-map-game-5",
-        "mapId": "map-game",
-        "revision": 5,
-        "kind": "phase.set",
-        "origin": "agent",
-        "payload": "{\"phase\": \"deconstruct\"}"
-      }
-    ]
-  },
-  "scenarioType": "application",
-  "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "One idea, and the three questions the partner asked instead of answering. Every question node is dashed because nothing is settled yet."
+  "message": [
+   {
+    "content": "I want to build an educational game for kids, but I don't know what it should be.",
+    "id": "msg-1",
+    "mapId": "map-game",
+    "role": "user",
+    "origin": "user"
+   },
+   {
+    "content": "Interesting. Before thinking about the game itself, there are three things I'd like to understand:\nWho is this actually for?\nWhat are you hoping they learn?\nAnd what are they doing instead today?",
+    "id": "msg-2",
+    "mapId": "map-game",
+    "role": "assistant",
+    "origin": "agent"
+   }
+  ],
+  "thinkingMap": [
+   {
+    "id": "map-game",
+    "phase": "deconstruct",
+    "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+    "title": "Educational game for kids",
+    "revision": 5
+   }
+  ],
+  "mapEvent": [
+   {
+    "id": "ev-map-game-1",
+    "mapId": "map-game",
+    "revision": 1,
+    "kind": "node.added",
+    "origin": "user",
+    "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-2",
+    "mapId": "map-game",
+    "revision": 2,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-who\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"Who is it for?\", \"status\": \"open\"}"
+   },
+   {
+    "id": "ev-map-game-3",
+    "mapId": "map-game",
+    "revision": 3,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-what\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the problem?\", \"status\": \"open\"}"
+   },
+   {
+    "id": "ev-map-game-4",
+    "mapId": "map-game",
+    "revision": 4,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the goal?\", \"status\": \"open\"}"
+   },
+   {
+    "id": "ev-map-game-5",
+    "mapId": "map-game",
+    "revision": 5,
+    "kind": "phase.set",
+    "origin": "agent",
+    "payload": "{\"phase\": \"deconstruct\"}"
+   }
+  ]
+ },
+ "scenarioType": "application",
+ "pageFilePath": "app/map/[id]/page.tsx",
+ "description": "One idea, and the three questions the partner asked instead of answering. Every question node is dashed because nothing is settled yet."
 }

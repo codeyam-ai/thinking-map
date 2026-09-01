@@ -1,9 +1,9 @@
 {
   "name": "AgentCallLog - Default",
-  "id": "597c452f-029e-4f83-b48e-cdc85309e4a4",
+  "id": "f07f1f50-e8cf-4917-a503-97f3f4272079",
   "url": "/isolated-components/AgentCallLog?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentCallLog",

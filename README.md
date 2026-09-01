@@ -88,27 +88,31 @@ There is also one affordance on the map itself rather than in the column:
 
 ### Handling the map
 
-The map is directly manipulable, and each of the three answers a different problem:
+The map is a single column of **rows built out of cards**, growing downward. Each round
+of thinking is one row: everything the agent added in one write arrives together, and the
+next round appears as the next row down.
 
-- **Zoom and pan** — scroll or pinch over the map to zoom toward the pointer, drag empty
-  canvas to pan, and press **Fit** to hand the viewport back. Auto-fit is how the map
-  *opens*, not a standing rule: once you have set a scale it stays where you put it,
-  including across the window resizes that would otherwise re-fit underneath you.
-- **Nudge a node** — drag a pill somewhere more useful. What is stored is an *offset*
-  from the node's computed position, not a coordinate, so the tidy tree stays
-  authoritative: siblings still never overlap, parents still centre over their children,
-  and a node the agent adds tomorrow still places itself sensibly instead of landing on
-  something you moved last week. Offsets persist, so an arrangement survives a reload.
-- **Fold a branch** — click the control on a parent's bottom edge to collapse it; it
-  reports how many nodes it is holding. Folding removes the subtree from the layout
-  rather than hiding it after the fact, so the remaining tree genuinely re-tidies and
-  gets narrower — which is what rescues a map that has outgrown its panel.
+- **Scroll it** — that is the whole of the navigation. There is no zoom, no pan and no
+  fit-to-frame, because a column that grows downward does not need any of them.
+- **Answer inside the map** — a question is a card, and the card holds the question, a
+  few suggested answers, and the box you answer it in. You are no longer reading the
+  question in one place and answering it in another.
+- **Take a suggestion, or don't** — clicking a suggested answer *fills* the box rather
+  than sending it, so the words that get recorded are always yours. A question with no
+  suggestions is just a card with a box, which is the ordinary case.
+- **Edit an answer** — press **Edit** and the box comes back pre-filled. Saving records a
+  second answer rather than overwriting the first, so how your thinking changed is
+  itself part of the log.
 
-Two deliberate limits. Folding is per-viewer and unpersisted: it is a reading posture,
-not a property of the map, and an agent has no business seeing a subtree disappear.
-And moving a node is not an exchange event — the activity rail records what the two
-sides *thought*, so a move does not appear there and does not bump the map's revision,
-which means a second viewer picks it up on their next load rather than immediately.
+One row is a **round, not a tree depth**, and the difference is load-bearing: an agent
+usually asks its second batch of questions as further children of the same parent, so by
+depth both batches would collapse into one row and the map would stop showing that the
+conversation had two turns. The rounds are read off the exchange log instead — nodes
+written together share a contiguous run of revisions. A map with no log at all (an older
+map, or a seeded scenario) falls back to grouping by depth rather than refusing to draw.
+
+The tree is still there in the data. `parentId` and `order` are untouched and no agent
+had to change what it sends; only the drawing changed.
 
 ### Driving it without an agent
 
@@ -282,33 +286,33 @@ States captured as runnable scenarios with codeyam-editor:
 
 ### A brief, and nobody has picked it up yet
 
-<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--desktop.png" alt="A brief, and nobody has picked it up yet" width="280">
+<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png" alt="A brief, and nobody has picked it up yet" width="280">
 
 ### A plan with a gap - one slice proves nothing
 
 <img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
 
-### Arranged - a map tidied by hand
-
-<img src=".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png" alt="Arranged - a map tidied by hand" width="280">
-
 ### Brief attached, nothing cited yet
 
-<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png" alt="Brief attached, nothing cited yet" width="280">
-
-### Brief fully accounted for
-
-<img src=".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png" alt="Brief fully accounted for" width="280">
+<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
 
 ### Complete - what to do next
 
 <img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
 
+### Brief fully accounted for
+
+<img src=".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png" alt="Brief fully accounted for" width="280">
+
 ### Conflict declined - the person rewording survived
 
-<img src=".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png" alt="Conflict declined - the person rewording survived" width="280">
+<img src=".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png" alt="Conflict declined - the person rewording survived" width="280">
 
 ### Day one - nothing yet
 
-<img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png" alt="Day one - nothing yet" width="280">
+<img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png" alt="Day one - nothing yet" width="280">
+
+### Grounded - research and its gaps
+
+<img src=".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png" alt="Grounded - research and its gaps" width="280">
 <!-- codeyam:scenario-gallery:end -->

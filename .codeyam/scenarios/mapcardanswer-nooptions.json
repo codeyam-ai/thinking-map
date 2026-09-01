@@ -1,0 +1,13 @@
+{
+ "name": "MapCardAnswer - NoOptions",
+ "id": "a40b684e-f809-4116-a8ed-217c389525bc",
+ "url": "/isolated-components/MapCardAnswer?s=NoOptions",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardAnswer.tsx",
+ "description": "The bare affordance for a question nobody could guess the answers to \u2014 the ordinary case, not a degraded one."
+}

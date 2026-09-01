@@ -1,9 +1,9 @@
 {
   "name": "BriefPanel - MidDeconstruction",
-  "id": "9b36ccbb-057c-4d09-afa9-0c581d51451a",
+  "id": "ed8610b8-1140-4ce7-be4a-174235d2dc56",
   "url": "/isolated-components/BriefPanel?s=MidDeconstruction",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanel",

@@ -1,9 +1,9 @@
 {
   "name": "BriefPanel - DanglingReference",
-  "id": "7dd25ef1-3435-4e94-b961-cdc9359cd92a",
+  "id": "0e0bc0b7-fb0e-4564-8d99-b83e00a9d234",
   "url": "/isolated-components/BriefPanel?s=DanglingReference",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanel",

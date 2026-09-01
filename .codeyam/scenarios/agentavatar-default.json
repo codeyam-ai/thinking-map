@@ -1,9 +1,9 @@
 {
   "name": "AgentAvatar - Default",
-  "id": "d9bba2fa-b3bf-4816-92f4-6faa777cd49f",
+  "id": "f7e87b88-0561-4c76-bf78-7f204e004fc6",
   "url": "/isolated-components/AgentAvatar?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentAvatar",

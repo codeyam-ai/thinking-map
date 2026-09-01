@@ -1,9 +1,9 @@
 {
   "name": "AskAboutSectionButton - DoubleDigitSection",
-  "id": "a3d9cbcf-1261-4532-b043-cd58ded05991",
+  "id": "9e5f3cf1-b8a9-4163-9cd9-9d54599131fa",
   "url": "/isolated-components/AskAboutSectionButton?s=DoubleDigitSection",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AskAboutSectionButton",

@@ -1,54 +1,54 @@
 {
-  "name": "Nobody has picked this up yet",
-  "id": "ba134a4b-c3ab-472c-9f29-de7dc727542a",
-  "url": "/map/map-untouched",
-  "dimensions": [
-    "Desktop"
+ "name": "Nobody has picked this up yet",
+ "id": "ba134a4b-c3ab-472c-9f29-de7dc727542a",
+ "url": "/map/map-untouched",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "seed": {
+  "mapEvent": [
+   {
+    "id": "ev-map-untouched-1",
+    "kind": "node.added",
+    "mapId": "map-untouched",
+    "origin": "user",
+    "payload": "{\"id\": \"untouched-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A weekend app for splitting chores fairly between housemates\", \"status\": \"answered\"}",
+    "revision": 1
+   }
   ],
-  "mocks": {},
-  "seed": {
-    "mapEvent": [
-      {
-        "id": "ev-map-untouched-1",
-        "kind": "node.added",
-        "mapId": "map-untouched",
-        "origin": "user",
-        "payload": "{\"id\": \"untouched-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A weekend app for splitting chores fairly between housemates\", \"status\": \"answered\"}",
-        "revision": 1
-      }
-    ],
-    "mapNode": [
-      {
-        "id": "untouched-idea",
-        "kind": "idea",
-        "label": "A weekend app for splitting chores fairly between housemates",
-        "mapId": "map-untouched",
-        "order": 0,
-        "origin": "user",
-        "parentId": null,
-        "status": "answered"
-      }
-    ],
-    "message": [
-      {
-        "content": "A weekend app for splitting chores fairly between housemates",
-        "id": "untouched-m1",
-        "mapId": "map-untouched",
-        "origin": "user",
-        "role": "user"
-      }
-    ],
-    "thinkingMap": [
-      {
-        "id": "map-untouched",
-        "phase": "deconstruct",
-        "revision": 1,
-        "seedIdea": "A weekend app for splitting chores fairly between housemates",
-        "title": "A weekend app for splitting chores fairly between housemates"
-      }
-    ]
-  },
-  "scenarioType": "application",
-  "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "The reported case, and the one state no other map scenario can show: an idea submitted seconds ago that literally nothing has touched. Every other map in the set carries an agent-origin event, which is exactly why none of them shows the handoff panel. Here the log holds only the person's own root node, so the map says plainly that nothing is working on it and hands over a prompt naming this map and the first tool to call."
+  "mapNode": [
+   {
+    "id": "untouched-idea",
+    "kind": "idea",
+    "label": "A weekend app for splitting chores fairly between housemates",
+    "mapId": "map-untouched",
+    "order": 0,
+    "origin": "user",
+    "parentId": null,
+    "status": "answered"
+   }
+  ],
+  "message": [
+   {
+    "content": "A weekend app for splitting chores fairly between housemates",
+    "id": "untouched-m1",
+    "mapId": "map-untouched",
+    "origin": "user",
+    "role": "user"
+   }
+  ],
+  "thinkingMap": [
+   {
+    "id": "map-untouched",
+    "phase": "deconstruct",
+    "revision": 1,
+    "seedIdea": "A weekend app for splitting chores fairly between housemates",
+    "title": "A weekend app for splitting chores fairly between housemates"
+   }
+  ]
+ },
+ "scenarioType": "application",
+ "pageFilePath": "app/map/[id]/page.tsx",
+ "description": "The reported case, and the one state no other map scenario can show: an idea submitted seconds ago that literally nothing has touched. Every other map in the set carries an agent-origin event, which is exactly why none of them shows the handoff panel. Here the log holds only the person's own root node, so the map says plainly that nothing is working on it and hands over a prompt naming this map and the first tool to call."
 }

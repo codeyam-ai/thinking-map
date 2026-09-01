@@ -1,9 +1,9 @@
 {
   "name": "BriefSectionRow - Untouched",
-  "id": "b1e1ebe0-ce7a-4877-8462-f939a2a44530",
+  "id": "6a271056-f701-4a39-84bd-60fa170c6c0e",
   "url": "/isolated-components/BriefSectionRow?s=Untouched",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefSectionRow",

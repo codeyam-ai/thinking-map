@@ -1,12 +1,12 @@
 {
-  "name": "ContributionTabs - Note",
-  "id": "9d42bc21-2c70-402b-a4d7-08d0174320c2",
-  "url": "/isolated-components/ContributionTabs?s=Note",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ContributionTabs",
-  "scenarioType": "component",
-  "description": "Composing a note, which the agent reads on its next turn."
+ "name": "ContributionTabs - Note",
+ "id": "9d42bc21-2c70-402b-a4d7-08d0174320c2",
+ "url": "/isolated-components/ContributionTabs?s=Note",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ContributionTabs",
+ "scenarioType": "component",
+ "description": "Composing a note, which the agent reads on its next turn."
 }

@@ -1,0 +1,13 @@
+{
+ "name": "NodeAccentMark - Research",
+ "id": "5071d53f-6453-4c8d-a5ba-dfcec0d76b8d",
+ "url": "/isolated-components/NodeAccentMark?s=Research",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeAccentMark",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/NodeAccentMark.tsx",
+ "description": "The magnifier: the one accent that reads as an activity \u2014 the partner went and looked \u2014 rather than a judgement."
+}

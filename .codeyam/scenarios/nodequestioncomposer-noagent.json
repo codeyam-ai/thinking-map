@@ -1,12 +1,12 @@
 {
-  "name": "NodeQuestionComposer - NoAgent",
-  "id": "c1f20b43-f1bc-4527-9187-2c93c11a0e38",
-  "url": "/isolated-components/NodeQuestionComposer?s=NoAgent",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "NodeQuestionComposer",
-  "scenarioType": "component",
-  "description": "The state every real capture produces, and the one worth getting right: nothing is attached, so the send control reads 'Leave this question' and the line beneath says the question waits in the log until an agent reads it. No promise of a reply."
+ "name": "NodeQuestionComposer - NoAgent",
+ "id": "c1f20b43-f1bc-4527-9187-2c93c11a0e38",
+ "url": "/isolated-components/NodeQuestionComposer?s=NoAgent",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeQuestionComposer",
+ "scenarioType": "component",
+ "description": "The state every real capture produces, and the one worth getting right: nothing is attached, so the send control reads 'Leave this question' and the line beneath says the question waits in the log until an agent reads it. No promise of a reply."
 }

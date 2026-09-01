@@ -1,9 +1,9 @@
 {
   "name": "BriefMenu - LongFilename",
-  "id": "6b967930-43ec-4fc1-b5f3-ffa48f9403ff",
+  "id": "f3266f7c-8ef1-49c1-b0fc-f15b5bc6cdc8",
   "url": "/isolated-components/BriefMenu?s=LongFilename",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefMenu",

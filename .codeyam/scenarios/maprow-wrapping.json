@@ -1,0 +1,13 @@
+{
+ "name": "MapRow - Wrapping",
+ "id": "bf1d89a3-441e-45df-b9a6-979ce9871910",
+ "url": "/isolated-components/MapRow?s=Wrapping",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapRow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapRow.tsx",
+ "description": "Five cards, past what one line holds. Wrapping is what lets a single layout serve a half screen and a desktop with no breakpoint deciding between them."
+}

@@ -1,9 +1,9 @@
 {
   "name": "AgentCallLog - Empty",
-  "id": "3a634767-e7bb-4b9c-aade-4875affaf47c",
+  "id": "cbd11588-73e1-42ba-aece-5c094b69a5d0",
   "url": "/isolated-components/AgentCallLog?s=Empty",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentCallLog",

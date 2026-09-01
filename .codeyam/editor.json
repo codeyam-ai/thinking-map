@@ -651,7 +651,7 @@
     }
   },
   "database": null,
-  "defaultScreenSize": "Desktop",
+  "defaultScreenSize": "Tablet",
   "deviceScaleFactor": 2.0,
   "env": {},
   "files": {

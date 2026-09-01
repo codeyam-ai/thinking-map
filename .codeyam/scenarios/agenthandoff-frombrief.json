@@ -1,9 +1,9 @@
 {
   "name": "AgentHandoff - FromBrief",
-  "id": "41c38b14-d874-4b52-9077-6300a09e2b16",
+  "id": "b8eea6cb-b3fa-4fba-94c3-9553a0f73de7",
   "url": "/isolated-components/AgentHandoff?s=FromBrief",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentHandoff",

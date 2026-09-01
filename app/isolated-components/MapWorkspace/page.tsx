@@ -122,6 +122,56 @@ const scenarios: Record<string, Fixture> = {
     status: "connected",
     tools: TOOLS,
   },
+  // Far more than fits: six rounds of give-and-take, so the column runs well
+  // past the frame and has to be scrolled. This is the claim the whole change
+  // makes — the map builds DOWNWARD, and a long conversation becomes a long
+  // page rather than a plane you have to navigate.
+  //
+  // Two of the agent's batches land at the same tree depth on purpose. By depth
+  // they would collapse into one row; by round they stay two, which is the
+  // distinction the row grouping exists to preserve.
+  ManyRounds: {
+    nodes: [
+      node("xn-idea", null, "idea", "Tool for tracking reading", "answered", 0, "user"),
+      node("m-q1", "xn-idea", "open-question", "Do you reread your own notes today?", "answered", 0, "agent"),
+      node("m-q2", "xn-idea", "open-question", "Is this for you alone, or shared?", "open", 1, "agent"),
+      node("m-own", "xn-idea", "constraint", "It has to work on my phone, on a train", "answered", 2, "user"),
+      node("m-find", "xn-idea", "finding", "Every tool that stuck had a weekly digest", "answered", 3, "agent"),
+      node("m-q3", "xn-idea", "open-question", "Would a weekly digest actually get read?", "open", 4, "agent"),
+      node("m-q4", "xn-idea", "open-question", "What would make you open it twice?", "open", 5, "agent"),
+      node("m-appr", "xn-idea", "approach", "Capture the sentence, not the book", "answered", 6, "agent"),
+    ],
+    caption: "5 answered, 3 still open",
+    events: [
+      at(1, "node.added", "user", { id: "xn-idea", label: "Tool for tracking reading" }),
+      at(2, "node.added", "agent", { id: "m-q1", label: "Do you reread your own notes today?" }),
+      at(3, "node.added", "agent", { id: "m-q2", label: "Is this for you alone, or shared?" }),
+      at(4, "question.asked", "agent", {
+        questions: [
+          { id: "m-q1", text: "Do you reread your own notes today?" },
+          { id: "m-q2", text: "Is this for you alone, or shared?" },
+        ],
+      }),
+      at(5, "user.answer", "user", {
+        answers: [{ id: "m-q1", text: "Do you reread your own notes today?", answer: "Almost never, which is probably the whole problem." }],
+      }),
+      at(6, "user.node", "user", { id: "m-own", label: "It has to work on my phone, on a train" }),
+      at(7, "agent.note", "agent", { text: "Given that, I went looking for what makes a reading tool survive its first month." }),
+      at(8, "node.added", "agent", { id: "m-find", label: "Every tool that stuck had a weekly digest" }),
+      // A second agent batch, at the SAME depth as the first — two rows, not one.
+      at(10, "node.added", "agent", { id: "m-q3", label: "Would a weekly digest actually get read?" }),
+      at(11, "node.added", "agent", { id: "m-q4", label: "What would make you open it twice?" }),
+      at(12, "question.asked", "agent", {
+        questions: [
+          { id: "m-q3", text: "Would a weekly digest actually get read?" },
+          { id: "m-q4", text: "What would make you open it twice?" },
+        ],
+      }),
+      at(14, "node.added", "agent", { id: "m-appr", label: "Capture the sentence, not the book" }),
+    ],
+    status: "connected",
+    tools: TOOLS,
+  },
   // Day one: a map with nothing in the log yet, so the rail carries its own
   // explanation of how anything gets into it.
   Quiet: {

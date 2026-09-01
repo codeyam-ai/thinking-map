@@ -1,196 +1,196 @@
 {
-  "name": "Pivoted - now it is for teachers",
-  "id": "fbb6e99b-bf3a-4999-81f7-c7e2170ec701",
-  "url": "/map/map-game",
-  "dimensions": [
-    "Desktop"
+ "name": "Pivoted - now it is for teachers",
+ "id": "fbb6e99b-bf3a-4999-81f7-c7e2170ec701",
+ "url": "/map/map-game",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "seed": {
+  "mapNode": [
+   {
+    "id": "n-idea",
+    "kind": "idea",
+    "label": "Educational game",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": null,
+    "status": "answered",
+    "origin": "user"
+   },
+   {
+    "detail": "Changed from children. The vocabulary problem and the research below still hold.",
+    "id": "n-user",
+    "kind": "user",
+    "label": "For: Teachers",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": "n-idea",
+    "status": "updated",
+    "origin": "agent"
+   },
+   {
+    "id": "n-a",
+    "kind": "approach",
+    "label": "Classroom vocabulary game",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": "n-user",
+    "status": "answered",
+    "origin": "agent"
+   },
+   {
+    "id": "n-b",
+    "kind": "approach",
+    "label": "Teacher assessment tool",
+    "mapId": "map-game",
+    "order": 1,
+    "parentId": "n-user",
+    "status": "answered",
+    "origin": "agent"
+   },
+   {
+    "id": "n-c",
+    "kind": "approach",
+    "label": "Shared parent-teacher app",
+    "mapId": "map-game",
+    "order": 2,
+    "parentId": "n-user",
+    "status": "answered",
+    "origin": "agent"
+   },
+   {
+    "id": "n-ar",
+    "kind": "risk",
+    "label": "Another tool to learn",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": "n-a",
+    "status": "answered",
+    "origin": "agent"
+   },
+   {
+    "id": "n-bn",
+    "kind": "constraint",
+    "label": "Needs district buy-in",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": "n-b",
+    "status": "answered",
+    "origin": "agent"
+   },
+   {
+    "id": "n-cp",
+    "kind": "pro",
+    "label": "Reuses existing rapport",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": "n-c",
+    "status": "answered",
+    "origin": "agent"
+   }
   ],
-  "mocks": {},
-  "seed": {
-    "mapNode": [
-      {
-        "id": "n-idea",
-        "kind": "idea",
-        "label": "Educational game",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": null,
-        "status": "answered",
-        "origin": "user"
-      },
-      {
-        "detail": "Changed from children. The vocabulary problem and the research below still hold.",
-        "id": "n-user",
-        "kind": "user",
-        "label": "For: Teachers",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": "n-idea",
-        "status": "updated",
-        "origin": "agent"
-      },
-      {
-        "id": "n-a",
-        "kind": "approach",
-        "label": "Classroom vocabulary game",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": "n-user",
-        "status": "answered",
-        "origin": "agent"
-      },
-      {
-        "id": "n-b",
-        "kind": "approach",
-        "label": "Teacher assessment tool",
-        "mapId": "map-game",
-        "order": 1,
-        "parentId": "n-user",
-        "status": "answered",
-        "origin": "agent"
-      },
-      {
-        "id": "n-c",
-        "kind": "approach",
-        "label": "Shared parent-teacher app",
-        "mapId": "map-game",
-        "order": 2,
-        "parentId": "n-user",
-        "status": "answered",
-        "origin": "agent"
-      },
-      {
-        "id": "n-ar",
-        "kind": "risk",
-        "label": "Another tool to learn",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": "n-a",
-        "status": "answered",
-        "origin": "agent"
-      },
-      {
-        "id": "n-bn",
-        "kind": "constraint",
-        "label": "Needs district buy-in",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": "n-b",
-        "status": "answered",
-        "origin": "agent"
-      },
-      {
-        "id": "n-cp",
-        "kind": "pro",
-        "label": "Reuses existing rapport",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": "n-c",
-        "status": "answered",
-        "origin": "agent"
-      }
-    ],
-    "message": [
-      {
-        "content": "Actually, what if this isn't for kids, what if it's for teachers instead?",
-        "id": "msg-1",
-        "mapId": "map-game",
-        "role": "user",
-        "origin": "user"
-      },
-      {
-        "content": "That changes a few things, not everything. I kept your original idea and updated who it's for. Here are three directions this could go.",
-        "id": "msg-2",
-        "mapId": "map-game",
-        "role": "assistant",
-        "origin": "agent"
-      }
-    ],
-    "thinkingMap": [
-      {
-        "id": "map-game",
-        "phase": "explore",
-        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-        "title": "Educational game for kids",
-        "revision": 9
-      }
-    ],
-    "mapEvent": [
-      {
-        "id": "ev-map-game-1",
-        "mapId": "map-game",
-        "revision": 1,
-        "kind": "node.added",
-        "origin": "user",
-        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-2",
-        "mapId": "map-game",
-        "revision": 2,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-user\", \"parentId\": \"n-idea\", \"kind\": \"user\", \"label\": \"For: Teachers\", \"status\": \"updated\"}"
-      },
-      {
-        "id": "ev-map-game-3",
-        "mapId": "map-game",
-        "revision": 3,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-a\", \"parentId\": \"n-user\", \"kind\": \"approach\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-4",
-        "mapId": "map-game",
-        "revision": 4,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-b\", \"parentId\": \"n-user\", \"kind\": \"approach\", \"label\": \"Teacher assessment tool\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-5",
-        "mapId": "map-game",
-        "revision": 5,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-c\", \"parentId\": \"n-user\", \"kind\": \"approach\", \"label\": \"Shared parent-teacher app\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-6",
-        "mapId": "map-game",
-        "revision": 6,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-ar\", \"parentId\": \"n-a\", \"kind\": \"risk\", \"label\": \"Another tool to learn\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-7",
-        "mapId": "map-game",
-        "revision": 7,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-bn\", \"parentId\": \"n-b\", \"kind\": \"constraint\", \"label\": \"Needs district buy-in\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-8",
-        "mapId": "map-game",
-        "revision": 8,
-        "kind": "node.added",
-        "origin": "agent",
-        "payload": "{\"id\": \"n-cp\", \"parentId\": \"n-c\", \"kind\": \"pro\", \"label\": \"Reuses existing rapport\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-9",
-        "mapId": "map-game",
-        "revision": 9,
-        "kind": "phase.set",
-        "origin": "agent",
-        "payload": "{\"phase\": \"explore\"}"
-      }
-    ]
-  },
-  "scenarioType": "application",
-  "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "The direction changed and nothing was lost. The updated node wears the lime; three approaches branch beneath it with their pros and risks."
+  "message": [
+   {
+    "content": "Actually, what if this isn't for kids, what if it's for teachers instead?",
+    "id": "msg-1",
+    "mapId": "map-game",
+    "role": "user",
+    "origin": "user"
+   },
+   {
+    "content": "That changes a few things, not everything. I kept your original idea and updated who it's for. Here are three directions this could go.",
+    "id": "msg-2",
+    "mapId": "map-game",
+    "role": "assistant",
+    "origin": "agent"
+   }
+  ],
+  "thinkingMap": [
+   {
+    "id": "map-game",
+    "phase": "explore",
+    "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+    "title": "Educational game for kids",
+    "revision": 9
+   }
+  ],
+  "mapEvent": [
+   {
+    "id": "ev-map-game-1",
+    "mapId": "map-game",
+    "revision": 1,
+    "kind": "node.added",
+    "origin": "user",
+    "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-2",
+    "mapId": "map-game",
+    "revision": 2,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-user\", \"parentId\": \"n-idea\", \"kind\": \"user\", \"label\": \"For: Teachers\", \"status\": \"updated\"}"
+   },
+   {
+    "id": "ev-map-game-3",
+    "mapId": "map-game",
+    "revision": 3,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-a\", \"parentId\": \"n-user\", \"kind\": \"approach\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-4",
+    "mapId": "map-game",
+    "revision": 4,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-b\", \"parentId\": \"n-user\", \"kind\": \"approach\", \"label\": \"Teacher assessment tool\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-5",
+    "mapId": "map-game",
+    "revision": 5,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-c\", \"parentId\": \"n-user\", \"kind\": \"approach\", \"label\": \"Shared parent-teacher app\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-6",
+    "mapId": "map-game",
+    "revision": 6,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-ar\", \"parentId\": \"n-a\", \"kind\": \"risk\", \"label\": \"Another tool to learn\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-7",
+    "mapId": "map-game",
+    "revision": 7,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-bn\", \"parentId\": \"n-b\", \"kind\": \"constraint\", \"label\": \"Needs district buy-in\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-8",
+    "mapId": "map-game",
+    "revision": 8,
+    "kind": "node.added",
+    "origin": "agent",
+    "payload": "{\"id\": \"n-cp\", \"parentId\": \"n-c\", \"kind\": \"pro\", \"label\": \"Reuses existing rapport\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-9",
+    "mapId": "map-game",
+    "revision": 9,
+    "kind": "phase.set",
+    "origin": "agent",
+    "payload": "{\"phase\": \"explore\"}"
+   }
+  ]
+ },
+ "scenarioType": "application",
+ "pageFilePath": "app/map/[id]/page.tsx",
+ "description": "The direction changed and nothing was lost. The updated node wears the lime; three approaches branch beneath it with their pros and risks."
 }

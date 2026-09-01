@@ -1,12 +1,12 @@
 {
-  "name": "NodeKindPicker - Risk",
-  "id": "79e18b03-2954-46ac-ac20-6f13f6582072",
-  "url": "/isolated-components/NodeKindPicker?s=Risk",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "NodeKindPicker",
-  "scenarioType": "component",
-  "description": "A coloured kind selected, showing the picker covers the whole vocabulary rather than the neutral kinds alone."
+ "name": "NodeKindPicker - Risk",
+ "id": "79e18b03-2954-46ac-ac20-6f13f6582072",
+ "url": "/isolated-components/NodeKindPicker?s=Risk",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeKindPicker",
+ "scenarioType": "component",
+ "description": "A coloured kind selected, showing the picker covers the whole vocabulary rather than the neutral kinds alone."
 }

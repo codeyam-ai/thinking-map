@@ -1,9 +1,9 @@
 {
   "name": "BuildSequence - Empty",
-  "id": "da5b8b07-bf93-44af-8da7-19e93e78c9cc",
+  "id": "ecb0e72f-0a28-47f0-b3fd-456ce9cb6aa4",
   "url": "/isolated-components/BuildSequence?s=Empty",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BuildSequence",

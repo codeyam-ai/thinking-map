@@ -1,12 +1,12 @@
 {
-  "name": "CopyablePrompt - ShortPrompt",
-  "id": "2b559dc1-7875-47cb-a566-b8b199bc9fbe",
-  "url": "/isolated-components/CopyablePrompt?s=ShortPrompt",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "CopyablePrompt",
-  "scenarioType": "component",
-  "description": "A brief-started map's prompt: shorter, and naming read_brief instead. Worth seeing beside the default because the monospace block has to read well at both lengths."
+ "name": "CopyablePrompt - ShortPrompt",
+ "id": "2b559dc1-7875-47cb-a566-b8b199bc9fbe",
+ "url": "/isolated-components/CopyablePrompt?s=ShortPrompt",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "CopyablePrompt",
+ "scenarioType": "component",
+ "description": "A brief-started map's prompt: shorter, and naming read_brief instead. Worth seeing beside the default because the monospace block has to read well at both lengths."
 }

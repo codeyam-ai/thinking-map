@@ -1,0 +1,13 @@
+{
+ "name": "RecordedAnswer - Default",
+ "id": "0b73511a-3e2e-476e-82e6-d4704f8da6d3",
+ "url": "/isolated-components/RecordedAnswer?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "RecordedAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/RecordedAnswer.tsx",
+ "description": "The answer in the card's body with a quiet way back in. The Edit affordance carries the eyebrow's weight rather than a button's."
+}

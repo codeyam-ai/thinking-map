@@ -1,0 +1,13 @@
+{
+ "name": "MapRow - NamedByPhase",
+ "id": "4d065539-bb32-40cc-9ac2-fd48565e2c00",
+ "url": "/isolated-components/MapRow?s=NamedByPhase",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapRow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapRow.tsx",
+ "description": "A round that opened a phase names itself after the phase instead of its number, which is the more useful label once the thinking has moved on."
+}

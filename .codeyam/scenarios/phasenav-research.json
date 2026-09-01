@@ -1,12 +1,12 @@
 {
-  "name": "PhaseNav - Research",
-  "id": "0f71f62b-5f4a-46dd-b2fb-e506d1245b2c",
-  "url": "/isolated-components/PhaseNav?s=Research",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "PhaseNav",
-  "scenarioType": "component",
-  "description": "Mid-loop, with Research active - completed phases are deliberately not distinguished from upcoming ones."
+ "name": "PhaseNav - Research",
+ "id": "0f71f62b-5f4a-46dd-b2fb-e506d1245b2c",
+ "url": "/isolated-components/PhaseNav?s=Research",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "PhaseNav",
+ "scenarioType": "component",
+ "description": "Mid-loop, with Research active - completed phases are deliberately not distinguished from upcoming ones."
 }

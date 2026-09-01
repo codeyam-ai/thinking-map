@@ -1,9 +1,9 @@
 {
   "name": "BuildSequence - ProvesNothing",
-  "id": "a4a0b925-1bd5-41a7-812f-7e22ad5599c3",
+  "id": "2cd6f8c2-30a7-4fe9-bcbf-e63744986b72",
   "url": "/isolated-components/BuildSequence?s=ProvesNothing",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BuildSequence",

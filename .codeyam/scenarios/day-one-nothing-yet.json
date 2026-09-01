@@ -1,19 +1,18 @@
 {
-  "name": "Day one - nothing yet",
-  "id": "4e28929a-9609-4fd3-b673-a6dd96fc6065",
-  "url": "/",
-  "dimensions": [
-    "Desktop",
-    "Tablet"
-  ],
-  "mocks": {},
-  "seed": {
-    "mapNode": [],
-    "message": [],
-    "thinkingMap": [],
-    "mapEvent": []
-  },
-  "scenarioType": "application",
-  "pageFilePath": "app/page.tsx",
-  "description": "The production default. No maps exist yet, so the landing page is just the question, the two ways in - a sentence or a whole brief - and the starter chips. This is what a brand-new install actually looks like."
+ "name": "Day one - nothing yet",
+ "id": "4e28929a-9609-4fd3-b673-a6dd96fc6065",
+ "url": "/",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "seed": {
+  "mapNode": [],
+  "message": [],
+  "thinkingMap": [],
+  "mapEvent": []
+ },
+ "scenarioType": "application",
+ "pageFilePath": "app/page.tsx",
+ "description": "The production default. No maps exist yet, so the landing page is just the question, the two ways in - a sentence or a whole brief - and the starter chips. This is what a brand-new install actually looks like."
 }

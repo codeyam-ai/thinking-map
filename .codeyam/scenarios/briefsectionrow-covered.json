@@ -1,9 +1,9 @@
 {
   "name": "BriefSectionRow - Covered",
-  "id": "c15deb4b-034b-4a62-9daf-024101733e51",
+  "id": "4d0d3f78-68ee-461b-907a-dc1ff7e51a28",
   "url": "/isolated-components/BriefSectionRow?s=Covered",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefSectionRow",

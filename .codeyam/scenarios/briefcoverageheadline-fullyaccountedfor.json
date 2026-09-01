@@ -1,9 +1,9 @@
 {
   "name": "BriefCoverageHeadline - FullyAccountedFor",
-  "id": "3626c733-e263-441a-a9ea-2310f706ed0f",
+  "id": "51096f35-3c0f-482c-8baf-fc0523ebabbd",
   "url": "/isolated-components/BriefCoverageHeadline?s=FullyAccountedFor",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefCoverageHeadline",

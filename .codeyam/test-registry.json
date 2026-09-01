@@ -181,105 +181,6 @@
       "runner": "tests"
     },
     {
-      "description": "The plane is scaled, so screen travel has to be divided by the scale — without it a node drifts further from the pointer the further you zoom in.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill drag › converts screen travel into map pixels using the scale",
-      "line": 94,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Below the threshold the gesture is a click, which is what keeps a label selectable and leaves room for click-to-ask on the same element.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill drag › does not report a nudge for movement under the threshold",
-      "line": 47,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "A read-only mount — an isolated scenario with no map to write back to — must not install a gesture at all.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill drag › is inert when no nudge handler is given",
-      "line": 122,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The feedback complaint that produced this test: the node has to follow the pointer, so movement is reported on every move rather than only on release.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill drag › reports movement continuously while the drag is in flight",
-      "line": 63,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The committed delta is what gets persisted, so it must be the total travel from where the drag began, not the last increment.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill drag › reports the total delta once on release",
-      "line": 79,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The frame beneath pans on pointerdown, so a pointer that lands on a node must not also move the map.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill drag › stops the pointerdown from reaching the panning canvas",
-      "line": 108,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Reaching for the fold control is not a drag of the node it sits on.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill fold affordance › does not start a node drag when the fold control is pressed",
-      "line": 176,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Unfolded, the control says what it will do rather than what it is hiding.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill fold affordance › offers to fold a node that has descendants",
-      "line": 143,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Folded, it reports the cost — the count is what tells you whether the branch is worth opening again.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill fold affordance › reports the hidden count once folded",
-      "line": 150,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The pill is presentational: it reports which node was folded and leaves the decision about what that means to its caller.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill fold affordance › reports the toggle for its own node id",
-      "line": 165,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "No children means nothing to fold, so the control must not appear at all.",
-      "file": "app/components/MapNodePill.render.test.tsx",
-      "format": "vitest",
-      "key": "MapNodePill fold affordance › shows no fold control for a node with nothing under it",
-      "line": 137,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
       "description": "The kind has to be in the accepted set at all — this is what makes it wake an agent parked on await_user_activity rather than sitting inert.",
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
@@ -415,114 +316,6 @@
       "runner": "tests"
     },
     {
-      "description": "Folding is a reading posture, so it has to be reversible in place.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView folding › brings the branch back when unfolded",
-      "line": 140,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Folding one branch must not disturb another.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView folding › leaves other branches alone",
-      "line": 148,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Folding filters the layout's INPUT, so the descendants genuinely leave the map — the behaviour that lets an oversized tree re-tidy and get narrower.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView folding › removes a folded branch’s descendants from the map",
-      "line": 119,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The count is counted over the whole map rather than the visible slice, so it stays truthful once the branch it describes has gone.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView folding › reports how much a folded branch is holding",
-      "line": 133,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "A committed drag is written back to the map it belongs to, and it must NOT go through the exchange log — a move is arrangement, not thinking.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView nudges › persists a committed nudge to the positions endpoint",
-      "line": 158,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "An isolated scenario has no map to write back to; the map must still be draggable, the arrangement simply does not outlive the page.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView nudges › stays manipulable with no map id, without attempting a write",
-      "line": 180,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Fit is disabled until there is something to reset, so a live button never leaves the person wondering what it did.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView viewport › disables fit until the viewport is the person’s",
-      "line": 92,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Zoom is a ratio in both directions, so zooming out has to undo zooming in rather than bottoming out at the fit.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView viewport › lowers the scale when zoom out is pressed",
-      "line": 82,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The controls promise something the map can do; an empty map can do none of it, so offering them would be a promise it cannot keep.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView viewport › offers no viewport controls on an empty map",
-      "line": 56,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The counterpart to the empty case: with a tree on screen, all three controls have to be reachable.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView viewport › offers zoom and fit once there is a map to manipulate",
-      "line": 64,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Zooming in has to raise the readout — this is the whole point of the control, and the readout is the only thing that says where the map is.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView viewport › raises the scale when zoom in is pressed",
-      "line": 73,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The reset hands control back to the auto-fit rather than computing a scale of its own, which is what makes it exact instead of approximate.",
-      "file": "app/components/ThinkingMapView.render.test.tsx",
-      "format": "vitest",
-      "key": "ThinkingMapView viewport › returns to the auto-fit scale when fit is pressed",
-      "line": 102,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
       "description": "The regression this file exists for: WebMcpBridge renders copy promising these tools are reachable, so all seven must actually appear beside it.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
@@ -601,6 +394,69 @@
       "key": "answeredResponse › reports each question with the answer it received",
       "line": 138,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The log holds every kind of event; only answers are answers.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › ignores events that are not answers",
+      "line": 77,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Editing an answer is posting a second one, so the later answer must stand. If the first won, the Edit affordance would silently do nothing.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › lets a later answer replace an earlier one for the same question",
+      "line": 55,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case — one question, one answer, shown back on its card.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › reads a single answer back by its question id",
+      "line": 35,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One user.answer can settle several questions at once.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › reads every answer out of a multi-answer event",
+      "line": 41,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Day one: nothing has been answered, and every card is still asking.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › returns nothing for an empty log",
+      "line": 30,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One malformed payload must not blank every other answer on the map.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › skips malformed entries without losing the good ones",
+      "line": 88,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Latest is by revision, not by array position — the caller is not required to have sorted the log first.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "answersByNodeId › takes the highest-revision answer when the log arrives out of order",
+      "line": 65,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
@@ -910,48 +766,102 @@
       "runner": "tests"
     },
     {
-      "description": "The `+1` case, which is where an off-by-one in the walk would show first.",
-      "file": "app/lib/collapse.test.ts",
+      "description": "The order is fixed so the line reads the same way on every card, with the document reference last because it is the only fact not about the node.",
+      "file": "app/lib/cardEyebrow.test.ts",
       "format": "vitest",
-      "key": "collapsedDescendantCount › counts a single-child branch",
-      "line": 98,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "cardEyebrow › appends every fact in a fixed order",
+      "line": 58,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
-      "description": "The count is the whole subtree, because that is what folding takes away.",
-      "file": "app/lib/collapse.test.ts",
+      "description": "The map is co-authored, so the person's own contributions say so.",
+      "file": "app/lib/cardEyebrow.test.ts",
       "format": "vitest",
-      "key": "collapsedDescendantCount › counts every descendant, not just direct children",
-      "line": 93,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "cardEyebrow › badges a node the person wrote",
+      "line": 33,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
-      "description": "The starting node is excluded from its own count, so the root reports six of the seven rows rather than all seven.",
-      "file": "app/lib/collapse.test.ts",
+      "description": "The rule with teeth. Leaving this at \"Open\" would label the answer printed directly underneath it as unanswered.",
+      "file": "app/lib/cardEyebrow.test.ts",
       "format": "vitest",
-      "key": "collapsedDescendantCount › counts everything below the root",
-      "line": 109,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "cardEyebrow › calls an answered question answered rather than open",
+      "line": 22,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
-      "description": "Zero is what makes the fold affordance stay off a leaf.",
-      "file": "app/lib/collapse.test.ts",
+      "description": "An unanswered question is open, which is exactly what it should say.",
+      "file": "app/lib/cardEyebrow.test.ts",
       "format": "vitest",
-      "key": "collapsedDescendantCount › is zero for a leaf",
-      "line": 103,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "cardEyebrow › calls an unanswered question open",
+      "line": 16,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
-      "description": "A node deleted between render and count must read as zero rather than throwing under the pill that asked.",
-      "file": "app/lib/collapse.test.ts",
+      "description": "The agent's own writes are the default and carry no badge — badging both sides would make the distinction useless.",
+      "file": "app/lib/cardEyebrow.test.ts",
       "format": "vitest",
-      "key": "collapsedDescendantCount › is zero for an id that is not on the map",
-      "line": 115,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "cardEyebrow › does not badge a node the agent wrote",
+      "line": 41,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A kind the vocabulary does not know is shown as-is rather than blanking the line — a card that cannot name itself is worse than one naming itself oddly.",
+      "file": "app/lib/cardEyebrow.test.ts",
+      "format": "vitest",
+      "key": "cardEyebrow › falls back to the raw kind when the vocabulary has no label",
+      "line": 72,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`answered` is meaningful only on a question — nothing else on the map has an answer, so a statement node must keep its own kind.",
+      "file": "app/lib/cardEyebrow.test.ts",
+      "format": "vitest",
+      "key": "cardEyebrow › leaves a non-question kind alone even when flagged answered",
+      "line": 28,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Absent optional facts must not leave stray separators behind.",
+      "file": "app/lib/cardEyebrow.test.ts",
+      "format": "vitest",
+      "key": "cardEyebrow › leaves no dangling separator when the optional facts are absent",
+      "line": 77,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Provenance, so it can be seen without opening anything.",
+      "file": "app/lib/cardEyebrow.test.ts",
+      "format": "vitest",
+      "key": "cardEyebrow › marks a node the person has asked about",
+      "line": 46,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Where a claim came from, when it came from one identifiable part of the client's brief.",
+      "file": "app/lib/cardEyebrow.test.ts",
+      "format": "vitest",
+      "key": "cardEyebrow › names the brief section a claim came from",
+      "line": 52,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: the kind's own label, and nothing else to say.",
+      "file": "app/lib/cardEyebrow.test.ts",
+      "format": "vitest",
+      "key": "cardEyebrow › names the node kind",
+      "line": 10,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
@@ -1024,33 +934,6 @@
       "key": "computeBriefCoverage › treats a brief with nothing cited as fully untouched",
       "line": 62,
       "registeredAt": "2026-09-01T15:57:26Z",
-      "runner": "tests"
-    },
-    {
-      "description": "An aligned pair should get a straight line, not a degenerate dog-leg with zero-length segments.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "connectorPath › drops straight down when parent and child share a centre",
-      "line": 209,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Siblings share that bus, which is what makes the tree read as one structure rather than a set of unrelated lines.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "connectorPath › routes through a horizontal bus midway between the two levels",
-      "line": 216,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A connector that started inside the parent pill or stopped short of the child would leave visible gaps against the dotted stroke.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "connectorPath › starts at the parent bottom edge and ends at the child top edge",
-      "line": 224,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
     {
@@ -1747,6 +1630,123 @@
       "runner": "tests"
     },
     {
+      "description": "The log may account for some of the map and not the rest — a seeded map that was then worked on. The explained part keeps its rounds and the remainder is appended by depth rather than dropped.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › appends nodes the log never mentioned after the rounds it explained",
+      "line": 151,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A phase set immediately after a round is what that round moved the thinking to, so the row can name itself after the phase instead of its number.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › attributes a phase set immediately after a round to that round",
+      "line": 205,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A phase set further downstream belongs to whatever round actually preceded it, so an unrelated round must not claim it.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › does not attribute a distant phase set to an earlier round",
+      "line": 217,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A seeded scenario, or a map written before any of this shipped, has no log to read. It must still draw as rows rather than as nothing.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › falls back to grouping by depth when there is no event log",
+      "line": 133,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The map is co-authored, so the person's own contribution is a round of its own rather than being folded into whichever agent batch it fell between.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › gives a user-added node its own round between two agent batches",
+      "line": 109,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The log arrives ordered in practice, but the grouping must not depend on the caller having sorted it — contiguity is about revisions, not position.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › groups by revision even when the events arrive out of order",
+      "line": 229,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One add_nodes call writes its events inside one transaction, so they share a contiguous revision run and one origin — that run is one row.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › groups one contiguous run of adds into one round",
+      "line": 64,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An id in the log with no node on the map is a node deleted since. It must not produce an empty row, and must not take the rest of its round with it.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › ignores logged ids whose nodes are no longer on the map",
+      "line": 167,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The root is the map's subject, not one of its answers. A row that mixed it in with the first batch would read as though somebody had asked it.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › keeps the root alone even when its add is contiguous with the next batch",
+      "line": 180,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE case this module exists for. Both batches are children of the root, so both sit at depth 1; grouping by depth would merge them into one row and lose the fact that the agent asked twice.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › keeps two batches at the same tree depth as two separate rounds",
+      "line": 81,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Sibling order is the map's own, so a row reads left to right the way the agent meant it to rather than in whatever order the log happened to land.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › orders the cards in a round by their sibling order",
+      "line": 192,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The seed idea alone, which is every map on day one.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › puts a lone root in a single round",
+      "line": 55,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing to group is not an error state — an empty map renders its invitation.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "groupIntoRounds › returns no rounds for a map with no nodes",
+      "line": 50,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
       "description": "A finished map still holds every working node; only the four summary kinds belong on this screen.",
       "file": "app/lib/summaryGroups.test.ts",
       "format": "vitest",
@@ -1906,141 +1906,6 @@
       "key": "isWebMcpAvailable › is unavailable without a browser agent",
       "line": 55,
       "registeredAt": "2026-09-01T01:16:02Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The offset is a nudge away from the tidy position, so what it must NOT do is replace it: the tree stays authoritative and the offset rides on top.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap arrangement offsets › adds the offset to the tidy position rather than replacing it",
-      "line": 133,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The bounds are measured AFTER offsets are applied. Measuring first would clip a node dragged past the widest column out of the scrollable extent.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap arrangement offsets › grows the bounds to contain a node nudged past them",
-      "line": 172,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Absent offsets are the overwhelmingly common case and must change nothing.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap arrangement offsets › lays out identically when no node carries an offset",
-      "line": 147,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Nudging one node must not move its siblings — the tidy pass runs first and the offset applies only to the node that carries it.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap arrangement offsets › moves only the node that carries the offset",
-      "line": 189,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Nulls arrive from the database on a caller that selects the column but has never had it set; they must read as \"no nudge\", not NaN.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap arrangement offsets › treats a null offset as no offset",
-      "line": 159,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Depth is what puts a node on the right row; the database stores only parentId, so the tree has to be reconstructed correctly.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › assigns depth by ancestry",
-      "line": 31,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Centring is what makes the map look deliberate rather than left-piled; it is the single most visible property of the layout.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › centres a parent over its children",
-      "line": 49,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Overlapping pills would make the map unreadable, and long labels are the case most likely to cause it.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › never overlaps siblings",
-      "line": 64,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Rows arrive from the database in creation order, so left-to-right position has to come from the stored order instead.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › orders siblings by their order field, not insertion order",
-      "line": 79,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A tree reads as a tree only if each generation sits below the last.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › puts each level on its own row",
-      "line": 40,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The reported bounds drive the scale-to-fit calculation, so a node outside them would be clipped out of view.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › reports bounds that contain every node",
-      "line": 120,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The map panel renders before any node exists, so the empty case must be a clean zero rather than NaN bounds.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › returns an empty layout for no nodes",
-      "line": 25,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A malformed parent chain must not hang the render — the map is drawn on every keystroke of the conversation.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › terminates on a parent cycle instead of hanging",
-      "line": 113,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A half-written map should still draw; losing nodes silently would be worse than showing an extra root.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › treats a node whose parent is missing as a root rather than dropping it",
-      "line": 105,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Node width tracks its label so text stays on two lines at most, but an unbounded label must not stretch the pill into a paragraph.",
-      "file": "app/lib/mapLayout.test.ts",
-      "format": "vitest",
-      "key": "layoutMap › widens a node to fit a longer label, up to a cap",
-      "line": 92,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
     {
@@ -2431,102 +2296,120 @@
       "runner": "tests"
     },
     {
-      "description": "A single move should not have to wrap itself in an array.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "A drag could settle several nodes at once, so a batch is the shape of the request.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
-      "key": "parseNudges › accepts a lone object as a batch of one",
-      "line": 24,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseNudges › accepts a batch of nudges",
+      "line": 12,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
-      "description": "A nudge is a signed delta from the tidy position, so negatives are ordinary.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "A lone object is accepted as a batch of one, so the common case does not have to wrap itself in an array.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
-      "key": "parseNudges › accepts negative and fractional offsets",
-      "line": 31,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseNudges › accepts a single nudge without an array wrapper",
+      "line": 25,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
-      "description": "The batch is the shape of the request, because a drag can settle several nodes at once.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "Without a node id there is nothing to move.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
-      "key": "parseNudges › parses a batch of nudges",
-      "line": 11,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseNudges › rejects a missing or empty node id",
+      "line": 37,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
-      "description": "NaN and Infinity are both `typeof number`, and either one in the column would put the node nowhere — this is why the check is `isFinite`.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "A null or non-object entry must be reported, not thrown on.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
-      "key": "parseNudges › rejects NaN and Infinity",
+      "key": "parseNudges › rejects a null entry without throwing",
       "line": 67,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
-      "description": "Without an id there is nothing to move, and an undefined id would sail into the ownership query as a lookup for `undefined`.",
-      "file": "app/lib/nodePositions.test.ts",
-      "format": "vitest",
-      "key": "parseNudges › rejects a missing node id",
-      "line": 45,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Both axes are required: writing only one would leave the other at whatever the row already held, which is a position nobody chose.",
-      "file": "app/lib/nodePositions.test.ts",
-      "format": "vitest",
-      "key": "parseNudges › rejects a missing offset",
-      "line": 75,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "An empty array would otherwise reach the database as a transaction that writes nothing and reports success.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "An empty batch asks for nothing and is more likely a bug than an intent.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
       "key": "parseNudges › rejects an empty batch",
-      "line": 39,
+      "line": 32,
       "registeredAt": "2026-09-01T13:18:16Z",
       "runner": "tests"
     },
     {
-      "description": "An empty id would pass a bare `typeof` check and match no node.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "Finite, not merely numeric: NaN and Infinity are both `typeof number`, and either one written to the column would put a node nowhere.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
-      "key": "parseNudges › rejects an empty node id",
-      "line": 52,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseNudges › rejects offsets that are not finite numbers",
+      "line": 48,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
-      "description": "A numeric string is the shape a hand-written client sends most often.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "One bad entry rejects the whole batch rather than silently moving the rest — a partial arrangement is harder to explain than a refused one.",
+      "file": "app/api/maps/[id]/positions/route.test.ts",
       "format": "vitest",
-      "key": "parseNudges › rejects an offset sent as a string",
-      "line": 59,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseNudges › rejects the whole batch when one entry is malformed",
+      "line": 57,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
-      "description": "The body is whatever a caller posted, so destructuring it must not throw on null or on a bare string.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "A blank or non-string entry would render as an unlabelled button nobody could interpret, so it is dropped rather than shown.",
+      "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
-      "key": "parseNudges › rejects null and non-object entries",
-      "line": 94,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseOptions › drops blank and non-string entries",
+      "line": 130,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
-      "description": "One bad entry fails the whole batch rather than being silently dropped: a half-applied drag is worse than a rejected one.",
-      "file": "app/lib/nodePositions.test.ts",
+      "description": "An empty array is the same situation as no column at all.",
+      "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
-      "key": "parseNudges › rejects the whole batch when any entry is malformed",
-      "line": 83,
-      "registeredAt": "2026-09-01T13:18:16Z",
+      "key": "parseOptions › offers no chips for an empty array",
+      "line": 135,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Valid JSON of the wrong shape is still not a list of suggestions.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "parseOptions › offers no chips when the JSON is not an array",
+      "line": 123,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A malformed column must not take the card down with it.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "parseOptions › offers no chips when the column is not valid JSON",
+      "line": 118,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A question with no shortlist is the ordinary case, not a degraded one — the card is simply a card with an answer box.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "parseOptions › offers no chips when the column is null",
+      "line": 104,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The stored shape: a JSON array of strings, because SQLite has no arrays.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "parseOptions › reads the stored JSON array back as chips",
+      "line": 110,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
@@ -2572,6 +2455,69 @@
       "key": "pendingQuestions › reads the questions out of a pending ask_user result",
       "line": 82,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Non-strings are dropped rather than coerced: a numeric option is a mistake, and rendering it as \"1\" would hide the mistake behind a plausible chip.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › drops non-string options rather than stringifying them",
+      "line": 247,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The field is additive: every node the model already knew how to send still plans exactly as it did, carrying no options.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › leaves a node that predates the field unchanged",
+      "line": 271,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary path: a shortlist survives as the JSON array the column holds.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › serialises a question’s suggested answers to a JSON array",
+      "line": 210,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty array must not become a stored empty array — that would render a chip row holding nothing.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › stores nothing for an empty option list",
+      "line": 227,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A list of blanks is the same situation as an empty list.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › stores nothing when every option is blank",
+      "line": 234,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything that is not a list at all is not a shortlist.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › stores nothing when options is not an array",
+      "line": 258,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Most questions have no obvious shortlist, and that is not a degraded case.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations suggested answers › stores nothing when the model offered no options",
+      "line": 221,
+      "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
     {
@@ -2968,6 +2914,51 @@
       "key": "resultText › reads the first text block of an MCP response",
       "line": 11,
       "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A mixed round counts nodes instead: naming the majority kind would misdescribe what is actually in the row.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › counts nodes rather than questions when the round is mixed",
+      "line": 274,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round that is all questions says so — \"three questions\" is what the person is actually being asked to deal with.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › counts questions when every card in the round is one",
+      "line": 259,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Once a round opened a phase, the phase is the more useful name for it than its position in the sequence.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › names a round after the phase it opened",
+      "line": 282,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The first row is the map's subject, and calling it \"Round 1 of 4\" would describe the idea as though somebody had asked for it.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › names the opening round after the idea rather than numbering it",
+      "line": 253,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The singular has to be right; \"1 questions\" is exactly the kind of thing that makes an interface look unfinished.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › uses the singular for a round holding one question",
+      "line": 266,
+      "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
     {
@@ -3394,6 +3385,78 @@
       "runner": "tests"
     },
     {
+      "description": "The write goes out in the shape the bridge takes: the answer keyed by node id, and the question it belongs to alongside it.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › hands the writer the answer and the question it belongs to",
+      "line": 108,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A failure on one question must not disturb another that succeeded.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › leaves other answers standing when one write fails",
+      "line": 87,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An isolated scenario has no exchange to write to. The map must still read correctly; it simply offers no way to answer.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › offers no way to answer when there is no writer",
+      "line": 138,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The answers already in the log are what a reloaded page shows.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › reads the answers already in the log",
+      "line": 39,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Editing an answer is posting another one, so the newer value must win on the card as well as in the log.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › replaces an earlier answer with a newer one for the same question",
+      "line": 123,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "With nothing answered, every card is still asking.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › reports no answers for an empty log",
+      "line": 33,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The optimistic case: the answer is on the card before the write resolves.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › shows an answer immediately, before the write completes",
+      "line": 48,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The rollback. A failed write must not leave the card claiming an answer that was never recorded.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › takes the answer back off the card when the write fails",
+      "line": 71,
+      "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
       "description": "These three are what the contribution affordances post. Narrowing this set would silently drop a person's contribution on the floor.",
       "file": "app/lib/exchange.test.ts",
       "format": "vitest",
@@ -3517,87 +3580,6 @@
       "key": "visibleEvents › keeps an agent update to a node the person answered",
       "line": 73,
       "registeredAt": "2026-09-01T11:37:21Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Folding is depth-unbounded: a grandchild goes with its parent's branch.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › drops descendants at every depth, not just direct children",
-      "line": 49,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Two folded branches are independent of each other.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › handles several collapsed branches at once",
-      "line": 54,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "An id that is not on the map must not disturb the result.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › ignores a collapsed id that matches no node",
-      "line": 69,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "A leaf has nothing underneath, so folding it is a no-op rather than an error.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › is a no-op for a node with no children",
-      "line": 64,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The folded node itself stays — it is what you click to unfold again.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › keeps the collapsed node and drops only what is under it",
-      "line": 40,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Folding the root leaves the root alone on the map, not an empty map.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › leaves just the root when the root is collapsed",
-      "line": 59,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The map panel renders before any node exists, so folding must survive the day-one map rather than assuming there is a tree to walk.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › returns an empty list for an empty map",
-      "line": 75,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Nothing folded is the ordinary case and must not disturb the input.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › returns every node when nothing is collapsed",
-      "line": 35,
-      "registeredAt": "2026-09-01T13:18:16Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The layout guards against a parentId cycle so a malformed map still draws; folding has to survive the same input rather than spinning on it.",
-      "file": "app/lib/collapse.test.ts",
-      "format": "vitest",
-      "key": "visibleNodes › terminates on a parentId cycle",
-      "line": 81,
-      "registeredAt": "2026-09-01T13:18:16Z",
       "runner": "tests"
     },
     {

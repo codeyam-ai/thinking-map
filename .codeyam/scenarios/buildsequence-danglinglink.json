@@ -1,9 +1,9 @@
 {
   "name": "BuildSequence - DanglingLink",
-  "id": "73fa2fab-0194-4b3d-97c5-7254a00c4424",
+  "id": "da824a03-0124-4adc-987d-17a9406de6c4",
   "url": "/isolated-components/BuildSequence?s=DanglingLink",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BuildSequence",

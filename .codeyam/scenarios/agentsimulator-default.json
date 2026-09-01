@@ -1,9 +1,9 @@
 {
   "name": "AgentSimulator - Default",
-  "id": "9068a6e6-4b7f-4588-bd26-2c858adf0394",
+  "id": "a90844c8-1ee8-4ebc-8f21-1f660300cb57",
   "url": "/isolated-components/AgentSimulator?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentSimulator",

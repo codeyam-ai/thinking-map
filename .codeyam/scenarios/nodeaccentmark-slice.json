@@ -1,0 +1,13 @@
+{
+ "name": "NodeAccentMark - Slice",
+ "id": "81e81cbd-7342-4d07-8c4d-0c8a4eb29c56",
+ "url": "/isolated-components/NodeAccentMark?s=Slice",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeAccentMark",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/NodeAccentMark.tsx",
+ "description": "A slice earns the same mark, because it is the one thing you actually go and build."
+}

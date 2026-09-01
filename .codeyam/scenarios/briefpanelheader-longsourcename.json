@@ -1,9 +1,9 @@
 {
   "name": "BriefPanelHeader - LongSourceName",
-  "id": "69929fa3-5627-4aaf-aff3-6c632c1ea5d3",
+  "id": "c00ef1d6-75e9-49b4-af62-8095fcee435f",
   "url": "/isolated-components/BriefPanelHeader?s=LongSourceName",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanelHeader",

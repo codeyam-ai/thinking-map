@@ -1,0 +1,13 @@
+{
+ "name": "MapCardAnswer - ManyOptions",
+ "id": "389289af-40b8-47e7-a13e-b895e8468af6",
+ "url": "/isolated-components/MapCardAnswer?s=ManyOptions",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardAnswer.tsx",
+ "description": "Four suggestions wrapping onto two rows, where the chips still have to read as chips rather than compress into a strip."
+}

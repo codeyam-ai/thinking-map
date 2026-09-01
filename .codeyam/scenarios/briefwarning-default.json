@@ -1,9 +1,9 @@
 {
   "name": "BriefWarning - Default",
-  "id": "5016d934-465d-445a-8713-38528385fdde",
+  "id": "05c7b874-4a43-416b-a54d-fd1c553db9ae",
   "url": "/isolated-components/BriefWarning?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefWarning",

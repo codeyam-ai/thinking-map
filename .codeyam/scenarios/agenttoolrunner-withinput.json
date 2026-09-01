@@ -1,9 +1,9 @@
 {
   "name": "AgentToolRunner - WithInput",
-  "id": "11781df5-c218-49e6-8abe-cc641c0964cd",
+  "id": "0efd42fc-54fe-4b31-ab8a-2b86fb26f533",
   "url": "/isolated-components/AgentToolRunner?s=WithInput",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentToolRunner",

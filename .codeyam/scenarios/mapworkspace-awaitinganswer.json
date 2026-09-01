@@ -1,12 +1,12 @@
 {
-  "name": "MapWorkspace - AwaitingAnswer",
-  "id": "9bca0408-3faa-4f87-8d75-1122c88d535a",
-  "url": "/isolated-components/MapWorkspace?s=AwaitingAnswer",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "MapWorkspace",
-  "scenarioType": "component",
-  "description": "The paused moment: an ask_user is in flight, so the agent's turn is blocked on the person. Same two questions, but now somebody is actually waiting for them."
+ "name": "MapWorkspace - AwaitingAnswer",
+ "id": "9bca0408-3faa-4f87-8d75-1122c88d535a",
+ "url": "/isolated-components/MapWorkspace?s=AwaitingAnswer",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapWorkspace",
+ "scenarioType": "component",
+ "description": "The paused moment: an ask_user is in flight, so the agent's turn is blocked on the person. Same two questions, but now somebody is actually waiting for them."
 }

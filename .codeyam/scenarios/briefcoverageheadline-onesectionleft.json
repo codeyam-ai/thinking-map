@@ -1,9 +1,9 @@
 {
   "name": "BriefCoverageHeadline - OneSectionLeft",
-  "id": "b05a1851-aa89-410f-9bf4-f116fff3f04f",
+  "id": "db000aab-4a84-41f8-9ba8-1148c978f099",
   "url": "/isolated-components/BriefCoverageHeadline?s=OneSectionLeft",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefCoverageHeadline",

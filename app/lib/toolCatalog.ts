@@ -93,6 +93,12 @@ const nodeShape = z.object({
     .describe(
       "The brief section this claim came from, as the section id read_brief reported (e.g. 's7'). Cite the section a claim actually came from; leave it off rather than guessing. A node you inferred across the whole document, or one the person typed, has no single source — an omitted ref is correct there, and a wrong one is worse than none.",
     ),
+  options: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Only meaningful on an "open-question": a few likely answers to offer as one-tap chips. The person can always type their own — a chip fills the box rather than sending it — so these are a head start, not a closed set of choices. Omit them when you genuinely cannot guess; a question with no options is an ordinary question with a text box.',
+    ),
 });
 
 export interface ToolSpec {
@@ -200,7 +206,26 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     description:
       'Put one or more questions on the map and wait for the person to answer them in the page. Bounded: if they do not answer in time you get status "pending" and a cursor, the questions stay on screen, and their answer lands in the log for your next read. Nothing is lost by giving up.',
     inputSchema: z.object({
-      questions: z.array(z.string()).min(1),
+      // A question is either the bare string it always was, or that string with
+      // a few suggested answers attached. The union rather than a replacement
+      // is what keeps every agent written against the old shape working
+      // verbatim — `questions: ["…"]` is still valid input.
+      questions: z
+        .array(
+          z.union([
+            z.string(),
+            z.object({
+              text: z.string(),
+              options: z
+                .array(z.string())
+                .optional()
+                .describe(
+                  'A few likely answers, offered as one-tap chips. A chip fills the answer box rather than sending it, so the person can still edit or ignore them.',
+                ),
+            }),
+          ]),
+        )
+        .min(1),
       timeoutSeconds: z.number().int().optional(),
     }),
   },

@@ -1,0 +1,19 @@
+{
+  "name": "AnswerChips - Picked",
+  "id": "7eecaff7-ef80-4316-b2ed-075e40a855c1",
+  "url": "/isolated-components/AnswerChips?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerChips",
+  "scenarioType": "component",
+  "pageFilePath": "app/components/AnswerChips.tsx",
+  "description": "A chip after it has been clicked, with its text landed in the answer box beneath rather than sent. The whole argument for chips over multiple choice, in one frame.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Somebody's garage"
+    }
+  ]
+}

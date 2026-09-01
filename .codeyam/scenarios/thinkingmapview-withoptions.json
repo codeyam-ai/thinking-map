@@ -1,0 +1,13 @@
+{
+ "name": "ThinkingMapView - WithOptions",
+ "id": "6b262117-b78f-4ebf-b33c-7732ea46c8fa",
+ "url": "/isolated-components/ThinkingMapView?s=WithOptions",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ThinkingMapView",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/ThinkingMapView.tsx",
+ "description": "The same three questions, each carrying a few suggested answers. There is no event log at all, so the rounds come from the depth fallback \u2014 the two halves of the feature working together on an older map somebody has started answering."
+}

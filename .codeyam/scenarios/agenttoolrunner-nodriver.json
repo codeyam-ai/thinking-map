@@ -1,9 +1,9 @@
 {
   "name": "AgentToolRunner - NoDriver",
-  "id": "dfae56ba-eaa5-44bd-9b99-0643a3f10b24",
+  "id": "1c2c2bb1-3e26-4a17-89d6-d4943a5e0022",
   "url": "/isolated-components/AgentToolRunner?s=NoDriver",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentToolRunner",

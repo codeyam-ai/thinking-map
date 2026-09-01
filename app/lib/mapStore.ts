@@ -268,6 +268,7 @@ export async function applyToolCalls(
         sourceUrl: node.sourceUrl,
         testsNodeId,
         sourceRef: node.sourceRef,
+        options: node.options,
         order: node.order,
         origin,
       },
@@ -291,6 +292,15 @@ export async function applyToolCalls(
         // the database where the log's readers cannot see it. Omitted entirely
         // when absent, so an unreferenced node's event is unchanged.
         ...(created.sourceRef ? { sourceRef: created.sourceRef } : {}),
+        // Carried for the same reason `sourceRef` is: a second front door
+        // reading the log should learn what was offered alongside a question,
+        // not just that a question appeared. Sent as the array the tools take
+        // rather than the JSON string the column holds — the log speaks the
+        // contract's language, not the database's. Omitted when absent, so an
+        // ordinary question's event is byte-for-byte what it always was.
+        ...(created.options
+          ? { options: JSON.parse(created.options) as string[] }
+          : {}),
       },
     });
   }

@@ -1,9 +1,9 @@
 {
   "name": "BriefPanel - FullyAccountedFor",
-  "id": "3ae4e289-800a-4a4d-bbc6-93d0dc725f80",
+  "id": "f3dff1db-0c49-4add-94a1-85f99f1d745e",
   "url": "/isolated-components/BriefPanel?s=FullyAccountedFor",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanel",

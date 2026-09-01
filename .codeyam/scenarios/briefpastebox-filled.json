@@ -1,9 +1,9 @@
 {
   "name": "BriefPasteBox - Filled",
-  "id": "c77b4769-fcc6-455d-a1b3-8fa437fa6be4",
+  "id": "de99e569-fcf9-4616-b090-c9796d60e06e",
   "url": "/isolated-components/BriefPasteBox?s=Filled",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPasteBox",

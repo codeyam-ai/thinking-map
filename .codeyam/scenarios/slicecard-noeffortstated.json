@@ -1,12 +1,12 @@
 {
-  "name": "SliceCard - NoEffortStated",
-  "id": "19e24c81-aa46-47aa-866f-f5e01d07afe7",
-  "url": "/isolated-components/SliceCard?s=NoEffortStated",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SliceCard",
-  "scenarioType": "component",
-  "description": "A slice settling a risk with no effort note. The card drops the line rather than printing an empty one, because the effort is the agent's own sentence and there is not always one."
+ "name": "SliceCard - NoEffortStated",
+ "id": "19e24c81-aa46-47aa-866f-f5e01d07afe7",
+ "url": "/isolated-components/SliceCard?s=NoEffortStated",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SliceCard",
+ "scenarioType": "component",
+ "description": "A slice settling a risk with no effort note. The card drops the line rather than printing an empty one, because the effort is the agent's own sentence and there is not always one."
 }

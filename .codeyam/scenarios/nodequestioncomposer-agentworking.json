@@ -1,12 +1,12 @@
 {
-  "name": "NodeQuestionComposer - AgentWorking",
-  "id": "85c056d2-7220-4e7c-8bf7-b735a9254582",
-  "url": "/isolated-components/NodeQuestionComposer?s=AgentWorking",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "NodeQuestionComposer",
-  "scenarioType": "component",
-  "description": "Mid-tool-call still counts as listening: the agent sees the question when its turn comes back round, so 'working' must read the same as 'connected' here rather than as absence."
+ "name": "NodeQuestionComposer - AgentWorking",
+ "id": "85c056d2-7220-4e7c-8bf7-b735a9254582",
+ "url": "/isolated-components/NodeQuestionComposer?s=AgentWorking",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeQuestionComposer",
+ "scenarioType": "component",
+ "description": "Mid-tool-call still counts as listening: the agent sees the question when its turn comes back round, so 'working' must read the same as 'connected' here rather than as absence."
 }

@@ -1,9 +1,9 @@
 {
   "name": "BriefExcerpt - NothingExtracted",
-  "id": "cc09de36-c85f-41bc-8da1-836e0b605d27",
+  "id": "f088dede-b237-449f-94c2-9a3fa566669e",
   "url": "/isolated-components/BriefExcerpt?s=NothingExtracted",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefExcerpt",

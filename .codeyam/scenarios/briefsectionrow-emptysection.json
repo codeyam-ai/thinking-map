@@ -1,9 +1,9 @@
 {
   "name": "BriefSectionRow - EmptySection",
-  "id": "9306d7b0-014a-4982-8e6a-6590f52d5ffe",
+  "id": "cbcf8069-6d6d-4575-8da6-9622d4d8abf4",
   "url": "/isolated-components/BriefSectionRow?s=EmptySection",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefSectionRow",

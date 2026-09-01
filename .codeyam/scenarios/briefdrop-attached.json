@@ -1,9 +1,9 @@
 {
   "name": "BriefDrop - Attached",
-  "id": "db5d4cd0-442b-48c0-a203-438af2e74273",
+  "id": "c7d9fbe6-8eaf-4dab-8fa4-cf89ede609b5",
   "url": "/isolated-components/BriefDrop?s=Attached",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefDrop",

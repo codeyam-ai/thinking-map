@@ -1,9 +1,9 @@
 {
   "name": "AskPresenceNote - NoAgent",
-  "id": "459d4f04-c823-4db9-b194-488c245e1b6d",
+  "id": "0b730197-bb7b-4abf-a461-5793333b2511",
   "url": "/isolated-components/AskPresenceNote?s=NoAgent",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AskPresenceNote",

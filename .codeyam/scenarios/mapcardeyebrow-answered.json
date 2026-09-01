@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - Answered",
+ "id": "2c7934e7-ea67-4ef7-ad71-b20225a61568",
+ "url": "/isolated-components/MapCardEyebrow?s=Answered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "The rule with teeth \u2014 an answered question stops calling itself Open, or the card would label the answer beneath it as unanswered."
+}

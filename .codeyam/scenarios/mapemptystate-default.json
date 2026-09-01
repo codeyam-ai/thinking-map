@@ -1,0 +1,13 @@
+{
+ "name": "MapEmptyState - Default",
+ "id": "41685c6f-877e-46a7-8a80-156fcfc4341c",
+ "url": "/isolated-components/MapEmptyState?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapEmptyState",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapEmptyState.tsx",
+ "description": "The map on day one. Per the design system it describes what happens next rather than reporting an absence, so it invites the next answer instead of showing a void."
+}

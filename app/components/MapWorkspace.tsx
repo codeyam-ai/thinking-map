@@ -1,21 +1,31 @@
+'use client';
+
 import BriefPanel from './BriefPanel';
-import ExchangeColumn from './ExchangeColumn';
+import ContributionBar from './ContributionBar';
+import Disclosure from './Disclosure';
+import ExchangeRail from './ExchangeRail';
 import ThinkingMapView from './ThinkingMapView';
+import { useWebMcpBridge } from './WebMcpBridge';
 import type { BriefCoverage } from '../lib/briefCoverage';
 import type { FlatNode } from '../lib/mapLayout';
 
 /**
- * The working view: the map, the client's brief on one side, and the page's
- * half of the exchange on the other.
+ * The working view: the map, and beneath it the two things that are not
+ * questions.
  *
- * The agent lives in the browser now, not in the app, so there is no
- * conversation here to render — the page cannot see it and under WebMCP never
- * will. The map keeps the frame, because the map is the artifact both sides are
- * working on; the column beside it is only what this page genuinely owns.
+ * This used to be a split — the map on one side, a column of questions on the
+ * other — and the argument for it was that the map is the artifact and the
+ * column beside it is what the page owns. The answer changed: the page owns the
+ * map AND the answering, and they are the same surface now. A question is
+ * answered on its own card, so there is no column of questions left to put
+ * anywhere.
  *
- * The brief is a third pane rather than a takeover, and it is absent entirely
- * when the map has no brief — a map started from one line must look exactly as
- * it did before this pane existed.
+ * What did not fit on a card stays, folded away: somewhere to volunteer
+ * something nobody asked for, and the record of what has happened. Both are
+ * closed by default, because the map is what you came to look at.
+ *
+ * The brief is still a pane rather than a takeover, and still absent entirely
+ * when the map has no brief.
  */
 export default function MapWorkspace({
   nodes,
@@ -25,21 +35,33 @@ export default function MapWorkspace({
 }: {
   nodes: FlatNode[];
   caption: string;
-  /** Passed through so a nudged node can be written back. Optional the whole
-   *  way down, so an isolated scenario mounts the map without inventing one. */
+  /** Passed through to the map. Optional the whole way down, so an isolated
+   *  scenario mounts the map without inventing one. */
   mapId?: string;
-  /** Present only when this map was started from a brief. Optional for the
-   *  same reason `mapId` is: an isolated scenario mounts the map without
-   *  having to invent a document for it. */
+  /** Present only when this map was started from a brief. */
   brief?: { sourceName: string; coverage: BriefCoverage };
 }) {
+  const { events } = useWebMcpBridge();
+
   return (
     <div className="flex min-h-0 flex-1 gap-6">
       {brief ? (
         <BriefPanel sourceName={brief.sourceName} coverage={brief.coverage} />
       ) : null}
-      <ThinkingMapView nodes={nodes} caption={caption} mapId={mapId} />
-      <ExchangeColumn nodes={nodes} />
+
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+        <ThinkingMapView nodes={nodes} caption={caption} mapId={mapId} />
+
+        <Disclosure summary="Add something of your own">
+          <ContributionBar />
+        </Disclosure>
+
+        <Disclosure summary={`Activity · ${events.length}`}>
+          <div className="max-h-[280px] overflow-y-auto">
+            <ExchangeRail events={events} />
+          </div>
+        </Disclosure>
+      </div>
     </div>
   );
 }

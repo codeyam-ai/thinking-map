@@ -1,12 +1,12 @@
 {
-  "name": "CopyablePrompt - DefaultLabel",
-  "id": "be7e6ed6-b092-49e8-9552-2362cf0f0529",
-  "url": "/isolated-components/CopyablePrompt?s=DefaultLabel",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "CopyablePrompt",
-  "scenarioType": "component",
-  "description": "The generic label, for any caller that is not the handoff panel. Short text, so the button rather than the block carries the visual weight."
+ "name": "CopyablePrompt - DefaultLabel",
+ "id": "be7e6ed6-b092-49e8-9552-2362cf0f0529",
+ "url": "/isolated-components/CopyablePrompt?s=DefaultLabel",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "CopyablePrompt",
+ "scenarioType": "component",
+ "description": "The generic label, for any caller that is not the handoff panel. Short text, so the button rather than the block carries the visual weight."
 }

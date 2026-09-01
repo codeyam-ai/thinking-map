@@ -30,6 +30,10 @@ export interface PlannedInsert {
    *  NOT a node ref, so it needs no resolution pass — it points out of the
    *  map at the document, not at another node. */
   sourceRef: string | null;
+  /** Suggested answers for an open question, already serialised to the JSON
+   *  array the column stores — SQLite has no array type. Null when the model
+   *  offered none, which is the ordinary case. */
+  options: string | null;
   order: number;
 }
 
@@ -57,6 +61,24 @@ export interface MapMutationPlan {
 export interface ToolInvocation {
   name: string;
   input: unknown;
+}
+
+/**
+ * Suggested answers, ready to store.
+ *
+ * Dropped entirely unless there is at least one usable string, so a model that
+ * sends `options: []` or a list of blanks produces a plain question rather than
+ * a node carrying an empty array nobody can render. Non-strings are filtered
+ * rather than stringified: `[1, 2]` is a mistake, and `"1"` as a suggested
+ * answer would hide it.
+ */
+function serialiseOptions(raw: unknown): string | null {
+  if (!Array.isArray(raw)) return null;
+  const options = raw.filter(
+    (option): option is string =>
+      typeof option === 'string' && option.trim().length > 0,
+  );
+  return options.length > 0 ? JSON.stringify(options) : null;
 }
 
 /**
@@ -106,6 +128,7 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
           testsRef: node.tests ? String(node.tests) : null,
           sourceRef: node.sourceRef ? String(node.sourceRef) : null,
+          options: serialiseOptions(node.options),
           order: order++,
         });
       }

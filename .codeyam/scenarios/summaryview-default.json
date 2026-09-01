@@ -1,12 +1,12 @@
 {
-  "name": "SummaryView - Default",
-  "id": "d77f4493-678c-4237-8e94-d890a1aa0b46",
-  "url": "/isolated-components/SummaryView?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SummaryView",
-  "scenarioType": "component",
-  "description": "The whole final screen: know, don't know, directions, a build sequence starting with paper cards, and five next steps - what you build first sitting above what you go and find out."
+ "name": "SummaryView - Default",
+ "id": "d77f4493-678c-4237-8e94-d890a1aa0b46",
+ "url": "/isolated-components/SummaryView?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SummaryView",
+ "scenarioType": "component",
+ "description": "The whole final screen: know, don't know, directions, a build sequence starting with paper cards, and five next steps - what you build first sitting above what you go and find out."
 }

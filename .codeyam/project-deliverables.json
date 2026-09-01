@@ -27,10 +27,10 @@
       "id": "a-live-visual-map-that-grows-as-the",
       "text": "A live visual map that grows as the conversation develops (idea, users, problem, goals, assumptions, open questions)",
       "status": "delivered",
-      "resolvedAt": "2026-09-01T00:01:12.376508950+00:00",
-      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "resolvedAt": "2026-09-01T19:57:53.978596867+00:00",
+      "resolvedInFeature": "The Map Builds Downward",
       "planSlug": null,
-      "note": "Tidy-tree layout with dotted connectors and status-driven node treatments across all seventeen node kinds. Shown by eight application scenarios and eight MapNodePill component scenarios.",
+      "note": "A single column of stage rows that grows downward: one row per round of thinking, each node a card carrying its kind eyebrow and, for a question, the suggested answers and the box you answer it in. Replaces the tidy-tree-on-a-plane rendering (retired with its zoom, pan, fold and drag) while leaving parentId, order and the whole tool contract untouched. Shown by the-map-builds-downward-four-rounds at desktop and narrow width, mapworkspace-manyrounds, and the MapCard / MapRow / MapCardAnswer component scenarios.",
       "decidedBy": "agent"
     },
     {

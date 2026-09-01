@@ -1,12 +1,12 @@
 {
-  "name": "KeepThinkingPanel - Default",
-  "id": "89433300-b522-47cd-beac-01d9eeb941d3",
-  "url": "/isolated-components/KeepThinkingPanel?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "KeepThinkingPanel",
-  "scenarioType": "component",
-  "description": "What sits under the finished plan, so the end of the loop is not a dead end."
+ "name": "KeepThinkingPanel - Default",
+ "id": "89433300-b522-47cd-beac-01d9eeb941d3",
+ "url": "/isolated-components/KeepThinkingPanel?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "KeepThinkingPanel",
+ "scenarioType": "component",
+ "description": "What sits under the finished plan, so the end of the loop is not a dead end."
 }

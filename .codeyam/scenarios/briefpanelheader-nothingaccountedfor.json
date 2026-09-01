@@ -1,9 +1,9 @@
 {
   "name": "BriefPanelHeader - NothingAccountedFor",
-  "id": "0bdf6f0e-a355-4269-8993-9de4331c7fb1",
+  "id": "c11440a3-2e06-4828-a36e-75d059005182",
   "url": "/isolated-components/BriefPanelHeader?s=NothingAccountedFor",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanelHeader",

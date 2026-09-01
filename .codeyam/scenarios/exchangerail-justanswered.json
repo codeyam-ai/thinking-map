@@ -1,12 +1,12 @@
 {
-  "name": "ExchangeRail - JustAnswered",
-  "id": "7226791a-9d3c-4dec-87df-a294a33e9178",
-  "url": "/isolated-components/ExchangeRail?s=JustAnswered",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ExchangeRail",
-  "scenarioType": "component",
-  "description": "An answer arriving, with the node.updated that closed the question suppressed so one act reads as one line."
+ "name": "ExchangeRail - JustAnswered",
+ "id": "7226791a-9d3c-4dec-87df-a294a33e9178",
+ "url": "/isolated-components/ExchangeRail?s=JustAnswered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ExchangeRail",
+ "scenarioType": "component",
+ "description": "An answer arriving, with the node.updated that closed the question suppressed so one act reads as one line."
 }

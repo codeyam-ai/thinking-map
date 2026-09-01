@@ -1,9 +1,9 @@
 {
   "name": "AppHeader - Default",
-  "id": "ac41bb0c-bfe0-4e04-8e25-c06466b74489",
+  "id": "9abdf23a-0f0f-4dd7-a4ac-4df1ff1b3670",
   "url": "/isolated-components/AppHeader?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AppHeader",

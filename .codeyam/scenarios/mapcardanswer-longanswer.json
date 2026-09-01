@@ -1,0 +1,13 @@
+{
+ "name": "MapCardAnswer - LongAnswer",
+ "id": "5c15f732-d1a2-4f77-8239-9183e4b4cc4d",
+ "url": "/isolated-components/MapCardAnswer?s=LongAnswer",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardAnswer.tsx",
+ "description": "A real answer with its reason attached, wrapping rather than clipping \u2014 this is the person's own words, never worth truncating."
+}

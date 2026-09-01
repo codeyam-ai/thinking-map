@@ -1,12 +1,12 @@
 {
-  "name": "MapWorkspace - JustAnswered",
-  "id": "74f55a87-1c02-44f4-8dad-82745ad31664",
-  "url": "/isolated-components/MapWorkspace?s=JustAnswered",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "MapWorkspace",
-  "scenarioType": "component",
-  "description": "A question resolved: it leaves the panel, the node wears the lime as the one thing that just changed, and the answer is the newest row in the rail."
+ "name": "MapWorkspace - JustAnswered",
+ "id": "abb8dfa8-dd88-4111-990c-3a91c3b7c15d",
+ "url": "/isolated-components/MapWorkspace?s=JustAnswered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapWorkspace",
+ "scenarioType": "component",
+ "description": "A question resolved. The answer does not go anywhere \u2014 it takes the body of the card that asked, with an Edit beneath it, and the map's caption re-counts itself. The activity fold records it as the newest entry."
 }

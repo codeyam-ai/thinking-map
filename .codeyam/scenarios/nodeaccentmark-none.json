@@ -1,0 +1,13 @@
+{
+ "name": "NodeAccentMark - None",
+ "id": "e1f42fed-bc40-4693-b184-28e9fdb11ae4",
+ "url": "/isolated-components/NodeAccentMark?s=None",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeAccentMark",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/NodeAccentMark.tsx",
+ "description": "Most kinds carry no accent, and the correct output is an empty corner rather than a neutral placeholder."
+}

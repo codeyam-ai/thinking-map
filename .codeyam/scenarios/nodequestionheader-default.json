@@ -1,12 +1,12 @@
 {
-  "name": "NodeQuestionHeader - Default",
-  "id": "c35a4250-b684-4e37-bb17-6d5020456d9f",
-  "url": "/isolated-components/NodeQuestionHeader?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "NodeQuestionHeader",
-  "scenarioType": "component",
-  "description": "What the composer is about: the eyebrow, the node's own words repeated from the pill, and the way out. The label is repeated because the composer covers part of the map."
+ "name": "NodeQuestionHeader - Default",
+ "id": "c35a4250-b684-4e37-bb17-6d5020456d9f",
+ "url": "/isolated-components/NodeQuestionHeader?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeQuestionHeader",
+ "scenarioType": "component",
+ "description": "What the composer is about: the eyebrow, the node's own words repeated from the pill, and the way out. The label is repeated because the composer covers part of the map."
 }

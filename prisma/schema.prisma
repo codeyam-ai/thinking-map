@@ -133,6 +133,20 @@ model MapNode {
   /// own writes from the person's, and will re-ingest its own output as new
   /// information. It is also what lets the UI mark what the person contributed.
   origin    String  @default("agent")
+  /// A few likely answers to offer alongside an open question, as a JSON array
+  /// of strings — the chips on the question's card. Held as a String because
+  /// SQLite has no array type, in the manner this schema already uses for
+  /// enum-less values.
+  ///
+  /// Meaningful only on an `open-question`. Optional and always will be: an
+  /// agent that never learned the field, and a question with no obvious
+  /// shortlist, both produce a card that is simply an input — which is the
+  /// ordinary case, not a degraded one.
+  ///
+  /// The chips fill the input rather than submitting it, so these are
+  /// suggestions the person edits, never a closed set of choices. Storing them
+  /// does not make the question multiple-choice.
+  options   String?
   /// A nudge away from the node's computed tidy position, in layout pixels —
   /// not a position. The tidy tree stays authoritative: siblings still never
   /// overlap by default, parents still centre over their children, and a node
@@ -146,6 +160,11 @@ model MapNode {
   ///
   /// Defaulted rather than nullable so every existing row is already valid and
   /// no backfill is needed.
+  ///
+  /// VESTIGIAL as of the "The Map Builds Downward" plan: the map is now a
+  /// scrolling column of card rows with no plane to nudge a node around on, so
+  /// nothing reads these. Kept rather than dropped because dropping a column is
+  /// a migration and that plan deliberately is not one.
   offsetX   Float   @default(0)
   offsetY   Float   @default(0)
 

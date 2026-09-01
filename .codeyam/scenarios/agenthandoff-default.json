@@ -1,9 +1,9 @@
 {
   "name": "AgentHandoff - Default",
-  "id": "1130ea3d-f5f6-4e56-916b-195b6d4cade2",
+  "id": "52a40784-37cd-4beb-b379-0fb771979376",
   "url": "/isolated-components/AgentHandoff?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentHandoff",

@@ -1,9 +1,9 @@
 {
   "name": "BriefMenu - Default",
-  "id": "e5a46888-2bf6-4bed-aa67-3493d0064a36",
+  "id": "5a7f959b-7290-4243-b76d-85fd8c43fb58",
   "url": "/isolated-components/BriefMenu?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefMenu",

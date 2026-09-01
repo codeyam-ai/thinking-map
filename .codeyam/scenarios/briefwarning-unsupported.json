@@ -1,9 +1,9 @@
 {
   "name": "BriefWarning - Unsupported",
-  "id": "45b0cc65-f4eb-4c27-b193-6f384a21a244",
+  "id": "a4365212-29fb-4aa0-85d4-fbda66716b42",
   "url": "/isolated-components/BriefWarning?s=Unsupported",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefWarning",

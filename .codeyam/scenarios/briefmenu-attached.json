@@ -1,9 +1,9 @@
 {
   "name": "BriefMenu - Attached",
-  "id": "a5dca8c6-aa79-4843-872d-7f2ea611ad00",
+  "id": "bfca85fa-5f8b-48b4-af51-d9405baad716",
   "url": "/isolated-components/BriefMenu?s=Attached",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefMenu",

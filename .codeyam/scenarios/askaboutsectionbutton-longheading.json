@@ -1,9 +1,9 @@
 {
   "name": "AskAboutSectionButton - LongHeading",
-  "id": "f135bf0d-4169-4312-904a-305f943ceb7b",
+  "id": "f2f9dee0-c103-46e2-a36c-819743519e84",
   "url": "/isolated-components/AskAboutSectionButton?s=LongHeading",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AskAboutSectionButton",

@@ -1,159 +1,159 @@
 {
-  "name": "Started from a client brief",
-  "id": "c4a8def1-6bf1-4921-9329-c463cc85641b",
-  "url": "/map/map-brief",
-  "dimensions": [
-    "Desktop"
+ "name": "Started from a client brief",
+ "id": "c4a8def1-6bf1-4921-9329-c463cc85641b",
+ "url": "/map/map-brief",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "seed": {
+  "mapBrief": [
+   {
+    "charCount": 3428,
+    "id": "brief-northgate",
+    "mapId": "map-brief",
+    "mediaType": "application/pdf",
+    "sourceName": "northgate-renewal-brief.pdf",
+    "text": "# Northgate Library \u2014 Digital Membership Renewal\n\n## Background\n\nNorthgate Library District serves 41,000 cardholders across six branches and a\nbookmobile. Membership is free but must be renewed every two years, which is a\nstate requirement tied to proof of residence rather than a policy we chose.\nRenewal is currently done in person at a service desk. In FY24 we processed\n9,180 renewals and lost an estimated 3,400 cardholders who simply let their\nmembership lapse rather than make the trip.\n\n## Who this is for\n\nOur cardholders are not a homogenous group and the renewal problem does not\nfall on them evenly. Roughly 30% of active cardholders are over 65. About\n5,600 households in the district have no fixed broadband connection. Four of\nour six branches are in neighbourhoods where the median household income is\nbelow the county median. Any solution that assumes a smartphone, a printer, or\na credit card on file will exclude the people who use the library most.\n\n## What we think we need\n\nA cardholder should be able to renew from a browser without visiting a branch.\nThey should be able to do it on behalf of the other cards in their household.\nStaff should be able to see what was renewed and by whom, and should be able\nto intervene when an automated check fails rather than the cardholder hitting\na dead end.\n\n## Residency verification\n\nThis is the part we are least sure about. State rules require proof that the\ncardholder still lives in the district. Today a staff member looks at a\nutility bill or a lease. We do not know what the digital equivalent is, and we\nare not comfortable asking people to upload a photograph of a bill to a system\nwe would then have to secure and retain.\n\n## Constraints\n\nOur ILS is SirsiDynix Symphony, currently on-premises, upgraded last in 2022.\nThe vendor offers a renewal module we have not evaluated. We have one\nhalf-time developer and no dedicated designer. The board's funding decision is\nmade in March and anything not costed by February will not be in that cycle.\n\n## What success looks like\n\nFewer lapsed memberships, shorter desk queues, and no cardholder who could\nrenew in person before finding they cannot renew now. We would rather ship\nsomething narrow that works for everyone than something complete that works\nfor the people who already find us easy to use.\n\n## Out of scope\n\nNew card signups. Fine payment. Anything touching the catalogue or holds."
+   }
   ],
-  "mocks": {},
-  "seed": {
-    "mapBrief": [
-      {
-        "charCount": 3428,
-        "id": "brief-northgate",
-        "mapId": "map-brief",
-        "mediaType": "application/pdf",
-        "sourceName": "northgate-renewal-brief.pdf",
-        "text": "# Northgate Library — Digital Membership Renewal\n\n## Background\n\nNorthgate Library District serves 41,000 cardholders across six branches and a\nbookmobile. Membership is free but must be renewed every two years, which is a\nstate requirement tied to proof of residence rather than a policy we chose.\nRenewal is currently done in person at a service desk. In FY24 we processed\n9,180 renewals and lost an estimated 3,400 cardholders who simply let their\nmembership lapse rather than make the trip.\n\n## Who this is for\n\nOur cardholders are not a homogenous group and the renewal problem does not\nfall on them evenly. Roughly 30% of active cardholders are over 65. About\n5,600 households in the district have no fixed broadband connection. Four of\nour six branches are in neighbourhoods where the median household income is\nbelow the county median. Any solution that assumes a smartphone, a printer, or\na credit card on file will exclude the people who use the library most.\n\n## What we think we need\n\nA cardholder should be able to renew from a browser without visiting a branch.\nThey should be able to do it on behalf of the other cards in their household.\nStaff should be able to see what was renewed and by whom, and should be able\nto intervene when an automated check fails rather than the cardholder hitting\na dead end.\n\n## Residency verification\n\nThis is the part we are least sure about. State rules require proof that the\ncardholder still lives in the district. Today a staff member looks at a\nutility bill or a lease. We do not know what the digital equivalent is, and we\nare not comfortable asking people to upload a photograph of a bill to a system\nwe would then have to secure and retain.\n\n## Constraints\n\nOur ILS is SirsiDynix Symphony, currently on-premises, upgraded last in 2022.\nThe vendor offers a renewal module we have not evaluated. We have one\nhalf-time developer and no dedicated designer. The board's funding decision is\nmade in March and anything not costed by February will not be in that cycle.\n\n## What success looks like\n\nFewer lapsed memberships, shorter desk queues, and no cardholder who could\nrenew in person before finding they cannot renew now. We would rather ship\nsomething narrow that works for everyone than something complete that works\nfor the people who already find us easy to use.\n\n## Out of scope\n\nNew card signups. Fine payment. Anything touching the catalogue or holds."
-      }
-    ],
-    "mapEvent": [
-      {
-        "id": "ev-brief-1",
-        "kind": "node.added",
-        "mapId": "map-brief",
-        "origin": "user",
-        "payload": "{\"id\": \"nb-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Northgate Library — Digital Membership Renewal\", \"status\": \"answered\"}",
-        "revision": 1
-      },
-      {
-        "id": "ev-brief-2",
-        "kind": "agent.note",
-        "mapId": "map-brief",
-        "origin": "agent",
-        "payload": "{\"text\": \"Read the brief's outline first — six sections. Pulling Background and Who this is for before I add anything.\"}",
-        "revision": 2
-      },
-      {
-        "id": "ev-brief-3",
-        "kind": "node.added",
-        "mapId": "map-brief",
-        "origin": "agent",
-        "payload": "{\"id\": \"nb-user\", \"parentId\": \"nb-idea\", \"kind\": \"user\", \"label\": \"For: 41,000 cardholders, a third over 65\", \"status\": \"answered\"}",
-        "revision": 3
-      },
-      {
-        "id": "ev-brief-4",
-        "kind": "node.added",
-        "mapId": "map-brief",
-        "origin": "agent",
-        "payload": "{\"id\": \"nb-problem\", \"parentId\": \"nb-idea\", \"kind\": \"problem\", \"label\": \"3,400 lapsed rather than make the trip\", \"status\": \"answered\"}",
-        "revision": 4
-      },
-      {
-        "id": "ev-brief-5",
-        "kind": "question.asked",
-        "mapId": "map-brief",
-        "origin": "agent",
-        "payload": "{\"questions\": [{\"id\": \"nb-q1\", \"text\": \"What counts as proof of residence without keeping the document?\"}, {\"id\": \"nb-q2\", \"text\": \"How does a renter with no bill in their name renew?\"}]}",
-        "revision": 5
-      },
-      {
-        "id": "ev-brief-6",
-        "kind": "agent.note",
-        "mapId": "map-brief",
-        "origin": "agent",
-        "payload": "{\"text\": \"Residency verification is the section the brief is least sure about — those two questions are what it does not answer.\"}",
-        "revision": 6
-      }
-    ],
-    "mapNode": [
-      {
-        "id": "nb-idea",
-        "kind": "idea",
-        "label": "Northgate Library — Digital Membership Renewal",
-        "mapId": "map-brief",
-        "order": 0,
-        "origin": "user",
-        "parentId": null,
-        "status": "answered"
-      },
-      {
-        "id": "nb-user",
-        "kind": "user",
-        "label": "For: 41,000 cardholders, a third over 65",
-        "mapId": "map-brief",
-        "order": 0,
-        "origin": "agent",
-        "parentId": "nb-idea",
-        "sourceRef": "s3",
-        "status": "answered"
-      },
-      {
-        "id": "nb-problem",
-        "kind": "problem",
-        "label": "3,400 lapsed rather than make the trip",
-        "mapId": "map-brief",
-        "order": 1,
-        "origin": "agent",
-        "parentId": "nb-idea",
-        "sourceRef": "s2",
-        "status": "answered"
-      },
-      {
-        "id": "nb-constraint",
-        "kind": "constraint",
-        "label": "One half-time developer, costed by February",
-        "mapId": "map-brief",
-        "order": 2,
-        "origin": "agent",
-        "parentId": "nb-idea",
-        "sourceRef": "s6",
-        "status": "answered"
-      },
-      {
-        "id": "nb-q1",
-        "kind": "open-question",
-        "label": "What counts as proof of residence without keeping the document?",
-        "mapId": "map-brief",
-        "order": 0,
-        "origin": "agent",
-        "parentId": "nb-problem",
-        "sourceRef": "s5",
-        "status": "open"
-      },
-      {
-        "id": "nb-q2",
-        "kind": "open-question",
-        "label": "How does a renter with no bill in their name renew?",
-        "mapId": "map-brief",
-        "order": 0,
-        "origin": "agent",
-        "parentId": "nb-user",
-        "sourceRef": "s5",
-        "status": "open"
-      }
-    ],
-    "message": [
-      {
-        "content": "Work out what we can actually build before the March board meeting.",
-        "id": "mb1",
-        "mapId": "map-brief",
-        "origin": "user",
-        "role": "user"
-      }
-    ],
-    "thinkingMap": [
-      {
-        "id": "map-brief",
-        "phase": "deconstruct",
-        "revision": 6,
-        "seedIdea": "Work out what we can actually build before the March board meeting.",
-        "title": "Northgate Library — Digital Membership Renewal"
-      }
-    ]
-  },
-  "scenarioType": "application",
-  "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "A map whose source is a twenty-page spec rather than a sentence, mid-deconstruction. The root pill carries the brief's own heading instead of a 57-character slice, and the agent has put the document's real gaps on the map as open questions. The brief now sits beside the map as a third pane: four of its seven countable sections are accounted for, the three nobody has touched carry the ink while the covered ones recede, and the title section - a heading with nothing under it - counts in neither half. Nodes derived from a section name it in their eyebrow, so a claim can be traced back to the passage that produced it."
+  "mapEvent": [
+   {
+    "id": "ev-brief-1",
+    "kind": "node.added",
+    "mapId": "map-brief",
+    "origin": "user",
+    "payload": "{\"id\": \"nb-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Northgate Library \u2014 Digital Membership Renewal\", \"status\": \"answered\"}",
+    "revision": 1
+   },
+   {
+    "id": "ev-brief-2",
+    "kind": "agent.note",
+    "mapId": "map-brief",
+    "origin": "agent",
+    "payload": "{\"text\": \"Read the brief's outline first \u2014 six sections. Pulling Background and Who this is for before I add anything.\"}",
+    "revision": 2
+   },
+   {
+    "id": "ev-brief-3",
+    "kind": "node.added",
+    "mapId": "map-brief",
+    "origin": "agent",
+    "payload": "{\"id\": \"nb-user\", \"parentId\": \"nb-idea\", \"kind\": \"user\", \"label\": \"For: 41,000 cardholders, a third over 65\", \"status\": \"answered\"}",
+    "revision": 3
+   },
+   {
+    "id": "ev-brief-4",
+    "kind": "node.added",
+    "mapId": "map-brief",
+    "origin": "agent",
+    "payload": "{\"id\": \"nb-problem\", \"parentId\": \"nb-idea\", \"kind\": \"problem\", \"label\": \"3,400 lapsed rather than make the trip\", \"status\": \"answered\"}",
+    "revision": 4
+   },
+   {
+    "id": "ev-brief-5",
+    "kind": "question.asked",
+    "mapId": "map-brief",
+    "origin": "agent",
+    "payload": "{\"questions\": [{\"id\": \"nb-q1\", \"text\": \"What counts as proof of residence without keeping the document?\"}, {\"id\": \"nb-q2\", \"text\": \"How does a renter with no bill in their name renew?\"}]}",
+    "revision": 5
+   },
+   {
+    "id": "ev-brief-6",
+    "kind": "agent.note",
+    "mapId": "map-brief",
+    "origin": "agent",
+    "payload": "{\"text\": \"Residency verification is the section the brief is least sure about \u2014 those two questions are what it does not answer.\"}",
+    "revision": 6
+   }
+  ],
+  "mapNode": [
+   {
+    "id": "nb-idea",
+    "kind": "idea",
+    "label": "Northgate Library \u2014 Digital Membership Renewal",
+    "mapId": "map-brief",
+    "order": 0,
+    "origin": "user",
+    "parentId": null,
+    "status": "answered"
+   },
+   {
+    "id": "nb-user",
+    "kind": "user",
+    "label": "For: 41,000 cardholders, a third over 65",
+    "mapId": "map-brief",
+    "order": 0,
+    "origin": "agent",
+    "parentId": "nb-idea",
+    "sourceRef": "s3",
+    "status": "answered"
+   },
+   {
+    "id": "nb-problem",
+    "kind": "problem",
+    "label": "3,400 lapsed rather than make the trip",
+    "mapId": "map-brief",
+    "order": 1,
+    "origin": "agent",
+    "parentId": "nb-idea",
+    "sourceRef": "s2",
+    "status": "answered"
+   },
+   {
+    "id": "nb-constraint",
+    "kind": "constraint",
+    "label": "One half-time developer, costed by February",
+    "mapId": "map-brief",
+    "order": 2,
+    "origin": "agent",
+    "parentId": "nb-idea",
+    "sourceRef": "s6",
+    "status": "answered"
+   },
+   {
+    "id": "nb-q1",
+    "kind": "open-question",
+    "label": "What counts as proof of residence without keeping the document?",
+    "mapId": "map-brief",
+    "order": 0,
+    "origin": "agent",
+    "parentId": "nb-problem",
+    "sourceRef": "s5",
+    "status": "open"
+   },
+   {
+    "id": "nb-q2",
+    "kind": "open-question",
+    "label": "How does a renter with no bill in their name renew?",
+    "mapId": "map-brief",
+    "order": 0,
+    "origin": "agent",
+    "parentId": "nb-user",
+    "sourceRef": "s5",
+    "status": "open"
+   }
+  ],
+  "message": [
+   {
+    "content": "Work out what we can actually build before the March board meeting.",
+    "id": "mb1",
+    "mapId": "map-brief",
+    "origin": "user",
+    "role": "user"
+   }
+  ],
+  "thinkingMap": [
+   {
+    "id": "map-brief",
+    "phase": "deconstruct",
+    "revision": 6,
+    "seedIdea": "Work out what we can actually build before the March board meeting.",
+    "title": "Northgate Library \u2014 Digital Membership Renewal"
+   }
+  ]
+ },
+ "scenarioType": "application",
+ "pageFilePath": "app/map/[id]/page.tsx",
+ "description": "A map whose source is a twenty-page spec rather than a sentence, mid-deconstruction. The root pill carries the brief's own heading instead of a 57-character slice, and the agent has put the document's real gaps on the map as open questions. The brief now sits beside the map as a third pane: four of its seven countable sections are accounted for, the three nobody has touched carry the ink while the covered ones recede, and the title section - a heading with nothing under it - counts in neither half. Nodes derived from a section name it in their eyebrow, so a claim can be traced back to the passage that produced it."
 }

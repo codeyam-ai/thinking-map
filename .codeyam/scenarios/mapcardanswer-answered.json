@@ -1,0 +1,13 @@
+{
+ "name": "MapCardAnswer - Answered",
+ "id": "964348b8-aab7-4e9e-8ba0-409463c86c87",
+ "url": "/isolated-components/MapCardAnswer?s=Answered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardAnswer.tsx",
+ "description": "What the person said, with a quiet Edit beneath it. Settled, without the reopening being an invitation."
+}

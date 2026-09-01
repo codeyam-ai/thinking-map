@@ -1,0 +1,13 @@
+{
+  "name": "AnswerChips - Default",
+  "id": "aa7e963a-4777-459e-8cf5-49aac263026f",
+  "url": "/isolated-components/AnswerChips?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerChips",
+  "scenarioType": "component",
+  "pageFilePath": "app/components/AnswerChips.tsx",
+  "description": "The shortlist an agent offers alongside a question. A chip fills the answer box rather than sending it — the rule SuggestionChips established on the landing screen."
+}

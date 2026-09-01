@@ -1,9 +1,9 @@
 {
   "name": "BriefPanel - NothingCitedYet",
-  "id": "e26fa549-979f-4fb0-9bf4-f6c3da65053f",
+  "id": "72a5b920-e92a-4e55-b636-4dee2ba7c9e6",
   "url": "/isolated-components/BriefPanel?s=NothingCitedYet",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanel",

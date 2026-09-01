@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - Default",
+ "id": "041fae6e-99e9-4718-94c5-0c4c8d754c8d",
+ "url": "/isolated-components/MapCardEyebrow?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "An unanswered question: Open, and nothing else to say."
+}

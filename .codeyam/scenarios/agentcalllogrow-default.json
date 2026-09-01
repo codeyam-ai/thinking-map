@@ -1,9 +1,9 @@
 {
   "name": "AgentCallLogRow - Default",
-  "id": "bef7fda4-b60a-414e-9ab0-2ec49ae3d4e9",
+  "id": "4b55b9b6-e3ef-4181-bfd0-14e9d188ce9b",
   "url": "/isolated-components/AgentCallLogRow?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentCallLogRow",

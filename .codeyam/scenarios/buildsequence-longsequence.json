@@ -1,9 +1,9 @@
 {
   "name": "BuildSequence - LongSequence",
-  "id": "1e800abe-e714-47b1-8289-46be502a6eb1",
+  "id": "8c6c162f-d6f1-4094-b600-f3f39597693d",
   "url": "/isolated-components/BuildSequence?s=LongSequence",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BuildSequence",

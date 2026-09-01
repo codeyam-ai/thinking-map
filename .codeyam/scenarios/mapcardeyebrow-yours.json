@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - Yours",
+ "id": "0e513ee1-0f70-4143-9aaa-6c3f47c4c20c",
+ "url": "/isolated-components/MapCardEyebrow?s=Yours",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "A node the person wrote, badged so the co-authorship is visible without opening anything."
+}

@@ -1,9 +1,9 @@
 {
   "name": "BriefMenu - Busy",
-  "id": "2f1228c5-854a-4205-9d2f-943f1a3d823d",
+  "id": "6b95fab5-91cc-415f-be4d-81c72fe64086",
   "url": "/isolated-components/BriefMenu?s=Busy",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefMenu",

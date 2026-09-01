@@ -1,12 +1,12 @@
 {
-  "name": "NodeQuestionComposer - LongLabel",
-  "id": "07130ccb-4b51-43f7-b5b8-cf9ea46649b1",
-  "url": "/isolated-components/NodeQuestionComposer?s=LongLabel",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "NodeQuestionComposer",
-  "scenarioType": "component",
-  "description": "A node label long enough to need truncating. Labels are written by an agent and never length-checked, so the header has to hold its shape without pushing the field or the close control out of the card."
+ "name": "NodeQuestionComposer - LongLabel",
+ "id": "07130ccb-4b51-43f7-b5b8-cf9ea46649b1",
+ "url": "/isolated-components/NodeQuestionComposer?s=LongLabel",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeQuestionComposer",
+ "scenarioType": "component",
+ "description": "A node label long enough to need truncating. Labels are written by an agent and never length-checked, so the header has to hold its shape without pushing the field or the close control out of the card."
 }

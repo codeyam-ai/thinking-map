@@ -197,3 +197,82 @@ describe('planMapMutations', () => {
     expect(plan.phase).toBe('explore');
   });
 });
+
+// The suggested answers a question can carry. The field is optional and
+// additive, so the cases that matter are the ones where it must produce NO
+// options at all — a question with an empty array stored on it would render a
+// chip row with nothing in it.
+describe('planMapMutations suggested answers', () => {
+  const optionsOf = (node: unknown) =>
+    planMapMutations([addNodes([node])]).inserts[0]!.options;
+
+  // The ordinary path: a shortlist survives as the JSON array the column holds.
+  it('serialises a question’s suggested answers to a JSON array', () => {
+    const options = optionsOf({
+      ref: 'q',
+      kind: 'open-question',
+      label: 'Who is it for?',
+      options: ['Just me', 'The whole street'],
+    });
+    expect(JSON.parse(options!)).toEqual(['Just me', 'The whole street']);
+  });
+
+  // Most questions have no obvious shortlist, and that is not a degraded case.
+  it('stores nothing when the model offered no options', () => {
+    expect(optionsOf({ ref: 'q', kind: 'open-question', label: 'Why?' })).toBeNull();
+  });
+
+  // An empty array must not become a stored empty array — that would render a
+  // chip row holding nothing.
+  it('stores nothing for an empty option list', () => {
+    expect(
+      optionsOf({ ref: 'q', kind: 'open-question', label: 'Why?', options: [] }),
+    ).toBeNull();
+  });
+
+  // A list of blanks is the same situation as an empty list.
+  it('stores nothing when every option is blank', () => {
+    expect(
+      optionsOf({
+        ref: 'q',
+        kind: 'open-question',
+        label: 'Why?',
+        options: ['', '   '],
+      }),
+    ).toBeNull();
+  });
+
+  // Non-strings are dropped rather than coerced: a numeric option is a mistake,
+  // and rendering it as "1" would hide the mistake behind a plausible chip.
+  it('drops non-string options rather than stringifying them', () => {
+    const options = optionsOf({
+      ref: 'q',
+      kind: 'open-question',
+      label: 'Why?',
+      options: ['Keep', 7, null, { a: 1 }],
+    });
+    expect(JSON.parse(options!)).toEqual(['Keep']);
+  });
+
+  // Anything that is not a list at all is not a shortlist.
+  it('stores nothing when options is not an array', () => {
+    expect(
+      optionsOf({
+        ref: 'q',
+        kind: 'open-question',
+        label: 'Why?',
+        options: 'Just me',
+      }),
+    ).toBeNull();
+  });
+
+  // The field is additive: every node the model already knew how to send still
+  // plans exactly as it did, carrying no options.
+  it('leaves a node that predates the field unchanged', () => {
+    const plan = planMapMutations([
+      addNodes([{ ref: 'a', kind: 'finding', label: 'Two keyholders' }]),
+    ]);
+    expect(plan.inserts[0]!.options).toBeNull();
+    expect(plan.inserts[0]!.label).toBe('Two keyholders');
+  });
+});

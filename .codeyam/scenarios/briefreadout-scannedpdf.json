@@ -1,9 +1,9 @@
 {
   "name": "BriefReadout - ScannedPdf",
-  "id": "4ba1fe95-03ad-405f-ad6f-edf06083db1e",
+  "id": "3c0bead6-1098-42b8-ba61-2dcb515ac0b3",
   "url": "/isolated-components/BriefReadout?s=ScannedPdf",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefReadout",

@@ -1,9 +1,9 @@
 {
   "name": "AgentStatus - NoAgent",
-  "id": "68bad75e-fcf9-471b-aae8-90109b82c79e",
+  "id": "764fc958-98a7-487b-a06d-df232299b599",
   "url": "/isolated-components/AgentStatus?s=NoAgent",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentStatus",

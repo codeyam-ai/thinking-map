@@ -1,9 +1,9 @@
 {
   "name": "BuildSequence - FirstSliceOnly",
-  "id": "1ea12ab6-ca00-4a74-ac91-a07f73cdea5d",
+  "id": "5c279ef1-c048-473c-a405-d37ceabda3f2",
   "url": "/isolated-components/BuildSequence?s=FirstSliceOnly",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BuildSequence",

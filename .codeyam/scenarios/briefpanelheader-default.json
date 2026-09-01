@@ -1,9 +1,9 @@
 {
   "name": "BriefPanelHeader - Default",
-  "id": "4facee17-c741-46b0-999e-b9935f425758",
+  "id": "dc7dceb9-b1ee-4df9-9a12-5ef68c36a7e3",
   "url": "/isolated-components/BriefPanelHeader?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPanelHeader",

@@ -1,9 +1,9 @@
 {
   "name": "AgentHandoff - LongIdea",
-  "id": "e867df3b-cf4a-4191-8e2c-4c6857e07527",
+  "id": "79090011-f6ac-4105-8617-40adbf4de38e",
   "url": "/isolated-components/AgentHandoff?s=LongIdea",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentHandoff",

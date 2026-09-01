@@ -1,9 +1,9 @@
 {
   "name": "BriefSectionRow - LongHeading",
-  "id": "5babb800-2ab7-4c9a-8a72-1fdba21ee5b3",
+  "id": "24f65bab-e41f-4a95-949a-893d17447a6f",
   "url": "/isolated-components/BriefSectionRow?s=LongHeading",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefSectionRow",

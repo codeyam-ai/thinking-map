@@ -85,6 +85,26 @@
     ]
   },
   {
+    "description": "A question's suggested answers, as chips. Clicking one FILLS the answer box rather than submitting it — the rule SuggestionChips established on the landing screen, and the reason these are a head start rather than a set of choices. Deliberately not SuggestionChips itself, which is bound to the landing page's fixed list and has no per-question input.",
+    "filePath": "app/components/AnswerChips.tsx",
+    "name": "AnswerChips",
+    "scenarios": [
+      "answerchips-default",
+      "answerchips-empty",
+      "answerchips-single",
+      "answerchips-wrapping"
+    ]
+  },
+  {
+    "description": "Just enough of the WebMCP bridge to record an answer. Narrowed deliberately: the answers hook has no business with tools or connection status, and the narrow shape is what lets a test hand it a plain function instead of standing up a context.",
+    "filePath": "app/hooks/useMapAnswers.ts",
+    "name": "AnswerWriter",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface — the narrowed slice of the WebMCP bridge the answers hook needs. It declares a shape and emits no runtime code, so there is nothing to execute; the behaviour behind it is covered by useMapAnswers.test.ts, which supplies this shape directly.",
+      "kind": "type-only"
+    }
+  },
+  {
     "description": "Wordmark left, phase track right. Shared by the landing screen and the map workspace so the two never drift.",
     "filePath": "app/components/AppHeader.tsx",
     "name": "AppHeader",
@@ -258,6 +278,15 @@
     ]
   },
   {
+    "description": "The facts a card knows about itself that its eyebrow can name: kind, origin, brief section, whether it has been asked about, and whether it has been answered.",
+    "filePath": "app/lib/cardEyebrow.ts",
+    "name": "CardEyebrowFacts",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface naming the facts a card's eyebrow can report. It declares a shape and emits no runtime code; every field is exercised through cardEyebrow in cardEyebrow.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
     "description": "Scaffold-shipped layout for the isolation-route tree, providing the centred capture frame and the production guard.",
     "filePath": "app/codeyam-isolate/layout.tsx",
     "name": "CodeYamIsolateLayout",
@@ -304,21 +333,20 @@
     ]
   },
   {
+    "description": "A compact fold: a summary line you press to reveal what is under it. A native <details> rather than a hook and a boolean — keyboard-operable and announced correctly with nothing wired up, working before hydration, and open/closed is a reading posture no other component needs to know about. It exists because the map became the whole surface, leaving the contribution bar and the activity rail with no column to live in.",
+    "filePath": "app/components/Disclosure.tsx",
+    "name": "Disclosure",
+    "scenarios": [
+      "disclosure-default",
+      "disclosure-withcount"
+    ]
+  },
+  {
     "description": "The summary screen's empty state, phrased as the next action rather than the absence of data.",
     "filePath": "app/components/EmptyHint.tsx",
     "name": "EmptyHint",
     "scenarios": [
       "emptyhint-default"
-    ]
-  },
-  {
-    "description": "The page's half of the exchange, in the order that matters: what is being waited on, then the ways to put something in, then the record of what has happened. It holds no reconstruction of the agent's conversation because there is none to hold — the page cannot see it and under WebMCP never will.",
-    "filePath": "app/components/ExchangeColumn.tsx",
-    "name": "ExchangeColumn",
-    "scenarios": [
-      "exchangecolumn-default",
-      "exchangecolumn-nothingwaiting",
-      "exchangecolumn-quiet"
     ]
   },
   {
@@ -423,38 +451,64 @@
     }
   },
   {
-    "description": "The dotted edge layer beneath the node pills. Dotted because the structure is provisional - this is thinking in progress, not an org chart.",
-    "filePath": "app/components/MapConnectors.tsx",
-    "name": "MapConnectors",
+    "description": "What useMapAnswers returns: every question's current answer, and the function that records one. The recorder is optional because an isolated scenario has no exchange to write to — the map still reads correctly there, it simply cannot be answered.",
+    "filePath": "app/hooks/useMapAnswers.ts",
+    "name": "MapAnswers",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface describing what useMapAnswers returns. It declares a shape and emits no runtime code; the values it describes are asserted in useMapAnswers.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "One node on the map, as a card. The card replaced the pill because a pill could only ever hold a label, and the thing a question most needs to hold is the answer to it — so the body is one of three things: what a statement node says, the affordance for an unanswered question, or the answer to one somebody has answered. Fill is deliberately neutral on every card; which card wears the lime belongs to the card-visual plan.",
+    "filePath": "app/components/MapCard.tsx",
+    "name": "MapCard",
     "scenarios": [
-      "mapconnectors-default",
-      "mapconnectors-singlechild"
+      "mapcard-default",
+      "mapcard-nooptions",
+      "mapcard-answered",
+      "mapcard-rootidea",
+      "mapcard-finding",
+      "mapcard-yours",
+      "mapcard-longlabel"
     ]
   },
   {
-    "description": "One node on the map. Carries an eyebrow naming its kind so the map reads without a legend, and takes its shell treatment from nodeShellClasses where the status-precedence rule lives.",
-    "filePath": "app/components/MapNodePill.tsx",
-    "name": "MapNodePill",
+    "description": "The answering affordance inside a question card — the change the whole plan is for, since the question and the place you answer it are now one object rather than a dashed pill on a map and a row in a panel beside it. Holds its own draft because each card owns exactly one answer, and swaps to the recorded answer once there is one.",
+    "filePath": "app/components/MapCardAnswer.tsx",
+    "name": "MapCardAnswer",
     "scenarios": [
-      "mapnodepill-default",
-      "mapnodepill-gap",
-      "mapnodepill-justupdated",
-      "mapnodepill-openquestion",
-      "mapnodepill-pro",
-      "mapnodepill-research",
-      "mapnodepill-risk",
-      "mapnodepill-rootidea",
-      "mapnodepill-yours",
-      "mapnodepill-asked",
-      "mapnodepill-yoursandasked",
-      "mapnodepill-foldable",
-      "mapnodepill-folded",
-      "mapnodepill-frombriefsection",
-      "mapnodepill-yoursaskedandfrombrief"
+      "mapcardanswer-default",
+      "mapcardanswer-nooptions",
+      "mapcardanswer-answered",
+      "mapcardanswer-longanswer",
+      "mapcardanswer-manyoptions"
     ]
   },
   {
-    "description": "The map route. Loads one thinking map and switches between the two-panel workspace and the summary screen on the phase, deriving the live-map caption from the current nodes.",
+    "description": "The line above a card's title, naming what the card is. Presentational only: which words go in the line is cardEyebrow's business, because that is string logic with a rule worth testing rather than anything about rendering.",
+    "filePath": "app/components/MapCardEyebrow.tsx",
+    "name": "MapCardEyebrow",
+    "scenarios": [
+      "mapcardeyebrow-default",
+      "mapcardeyebrow-answered",
+      "mapcardeyebrow-finding",
+      "mapcardeyebrow-yours",
+      "mapcardeyebrow-asked",
+      "mapcardeyebrow-frombrief",
+      "mapcardeyebrow-everything"
+    ]
+  },
+  {
+    "description": "The map on day one. Per the design system an empty state describes what happens next rather than reporting an absence, so it says the map fills in as you answer. Deliberately not EmptyHint, which renders an <li> for the summary screen's list and would be invalid markup inside the map's column.",
+    "filePath": "app/components/MapEmptyState.tsx",
+    "name": "MapEmptyState",
+    "scenarios": [
+      "mapemptystate-default"
+    ]
+  },
+  {
+    "description": "The map route. Loads one thinking map with its whole exchange log, and switches between the working map and the summary screen on the phase, deriving the live-map caption from the current nodes. The log is read here rather than fetched later because the map is drawn from it: which nodes arrived together is what makes a round, and a round is what makes a row.",
     "filePath": "app/map/[id]/page.tsx",
     "name": "MapPage",
     "scenarios": [
@@ -466,6 +520,18 @@
     ]
   },
   {
+    "description": "One round of thinking, as a row: everything in it arrived together, and the next round appears below it — the whole of what 'the map builds downward' means. The band wraps rather than scrolling sideways, which is what makes one layout work at every width with no breakpoint deciding which it is in.",
+    "filePath": "app/components/MapRow.tsx",
+    "name": "MapRow",
+    "scenarios": [
+      "maprow-default",
+      "maprow-partlyanswered",
+      "maprow-theidea",
+      "maprow-wrapping",
+      "maprow-namedbyphase"
+    ]
+  },
+  {
     "description": "The whole map surface: the header with agent presence, and whichever view the phase calls for. The working tree while the thinking is live, the plan once it has run out — the same map at two moments, which is why choosing between them lives here rather than in the route.",
     "filePath": "app/components/MapScreen.tsx",
     "name": "MapScreen",
@@ -473,16 +539,6 @@
       "mapscreen-working",
       "mapscreen-noagent",
       "mapscreen-summary"
-    ]
-  },
-  {
-    "description": "The zoom cluster over the bottom-right of the map panel: zoom out, the current scale as a percentage, zoom in, and a fit-to-map reset. It states the scale as a number because the map has no other way to say where it is — the same tree fills the panel at 66% and at 136%, and only the readout distinguishes the whole shape from a detail. Fit is disabled while the viewport is already the automatic fit.",
-    "filePath": "app/components/MapViewportControls.tsx",
-    "name": "MapViewportControls",
-    "scenarios": [
-      "mapviewportcontrols-autofit",
-      "mapviewportcontrols-zoomedin",
-      "mapviewportcontrols-zoomedout"
     ]
   },
   {
@@ -503,13 +559,15 @@
     ]
   },
   {
-    "description": "The fold control straddling a node pill's bottom edge, where its branch leaves it. Folded, it shows what folding cost as a count rather than a bare chevron, because the count is what tells you whether the branch is worth reopening. It is its own element rather than a change to the pill's shell, so the status-precedence rule nodeShellClasses owns is left undisturbed.",
-    "filePath": "app/components/NodeFoldToggle.tsx",
-    "name": "NodeFoldToggle",
+    "description": "The mark in a card's top-right corner, for the three kinds that carry one. It reads the accent from ACCENT_KINDS rather than a list of its own, so a kind added to that table cannot end up with a colour and no mark. Research and slice get the magnifier carried across from the node pill; pro and risk get a coloured dot, because there the colour IS the information.",
+    "filePath": "app/components/NodeAccentMark.tsx",
+    "name": "NodeAccentMark",
     "scenarios": [
-      "nodefoldtoggle-default",
-      "nodefoldtoggle-folded",
-      "nodefoldtoggle-largebranch"
+      "nodeaccentmark-research",
+      "nodeaccentmark-slice",
+      "nodeaccentmark-pro",
+      "nodeaccentmark-risk",
+      "nodeaccentmark-none"
     ]
   },
   {
@@ -542,24 +600,13 @@
     ]
   },
   {
-    "description": "One question with an inline answer field. The row owns its own draft, since each row answers exactly one question, and its send control names that question — several sit in the panel at once, and one repeated label leaves a screen reader unable to tell them apart.",
-    "filePath": "app/components/OpenQuestionRow.tsx",
-    "name": "OpenQuestionRow",
-    "scenarios": [
-      "openquestionrow-default",
-      "openquestionrow-longquestion",
-      "openquestionrow-typed"
-    ]
-  },
-  {
-    "description": "The questions addressed to the person, with somewhere to answer them. An open-question node is a request, not a shape, so leaving it only as a dashed pill buries the one thing anybody is waiting on. Empties as they are answered, and renders nothing when none are open.",
-    "filePath": "app/components/OpenQuestions.tsx",
-    "name": "OpenQuestions",
-    "scenarios": [
-      "openquestions-one",
-      "openquestions-two",
-      "openquestions-many"
-    ]
+    "description": "One node's arrangement as a client would ask for it. Vestigial: the map is a scrolling column of card rows with no plane to drag a node around on, so nothing produces one any more.",
+    "filePath": "app/api/maps/[id]/positions/route.ts",
+    "name": "Nudge",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface describing one node's arrangement as a client would request it. It declares a shape and emits no runtime code; parseNudges, which produces it, is covered by route.test.ts.",
+      "kind": "type-only"
+    }
   },
   {
     "description": "The six-phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar.",
@@ -573,12 +620,40 @@
     "testFile": "app/components/PhaseNav.render.test.tsx"
   },
   {
+    "description": "What the person said, shown back in the card's body. The Edit affordance is deliberately quiet — the eyebrow's weight rather than a button's — because an answered question is settled and reopening it should be available without being an invitation.",
+    "filePath": "app/components/RecordedAnswer.tsx",
+    "name": "RecordedAnswer",
+    "scenarios": [
+      "recordedanswer-default",
+      "recordedanswer-longanswer",
+      "recordedanswer-terse"
+    ]
+  },
+  {
     "description": "The document shell: html and body, the global stylesheet, and the page metadata. Scaffold-shipped; this project changed only the title and description.",
     "filePath": "app/layout.tsx",
     "name": "RootLayout",
     "untestabilityReason": {
       "justification": "Framework-required document shell generated by the stack template. It renders its children inside html/body and carries the metadata export - there is no behaviour of this project's own to assert, and every application scenario renders through it.",
       "kind": "scaffold"
+    }
+  },
+  {
+    "description": "One round of thinking as the map draws it: a 1-based index shown to the person as the card's marker, the nodes that arrived together, and the phase this round opened when it opened one.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "Round",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface describing one round as the map draws it. It declares a shape and emits no runtime code; its values are asserted throughout mapRounds.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "A contiguous run of node-adds from one side of the exchange, with the revision span it covers so a phase set can be attributed to the round that closed it.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "Run",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface, internal to the round grouping, describing a contiguous run of node-adds and the revision span it covers. It declares a shape and emits no runtime code; the grouping it serves is covered by mapRounds.test.ts.",
+      "kind": "type-only"
     }
   },
   {
@@ -721,6 +796,12 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "The latest answer per question id, read off the exchange log rather than the node — the node's status records that a question is settled, the log holds what was actually said. Latest wins because editing an answer IS posting another one, which is what makes an edit take effect and edit history free. A malformed entry is skipped rather than blanking every other answer.",
+    "filePath": "app/lib/mapAnswers.ts",
+    "name": "answersByNodeId",
+    "testFile": "app/lib/mapAnswers.test.ts"
+  },
+  {
     "description": "Reads the id/answer pairs out of a user.answer payload sent by the browser. Untrusted on this side of the wire, so a malformed payload yields an empty list rather than throwing.",
     "filePath": "app/lib/contributions.ts",
     "name": "answersOf",
@@ -797,34 +878,16 @@
     ]
   },
   {
-    "description": "Groups nodes by parent id so a subtree can be walked downward. The map stores only parentId, so this is the edge index both collapse operations need.",
-    "filePath": "app/lib/collapse.ts",
-    "name": "childIndex",
-    "testFile": "app/lib/collapse.test.ts"
-  },
-  {
-    "description": "Holds a zoom level between the viewport's minimum and maximum, so no wheel flick or repeated button press can drive the map to an unreadable or unusable scale.",
-    "filePath": "app/hooks/useMapViewport.ts",
-    "name": "clamp",
-    "testFile": "app/components/ThinkingMapView.render.test.tsx"
-  },
-  {
-    "description": "How many nodes sit beneath a given node, at any depth, so a folded pill can say what it is holding. Counted over the whole map rather than the visible slice, so the number stays truthful once the branch it describes has gone.",
-    "filePath": "app/lib/collapse.ts",
-    "name": "collapsedDescendantCount",
-    "testFile": "app/lib/collapse.test.ts"
+    "description": "The line a card uses to say what it is: the node's kind, then who wrote it, then whether it has been asked about, then the brief section it came from, in that fixed order. The rule with teeth is that an answered question stops calling itself Open — leaving the kind's default would have the card label the answer printed directly beneath it as unanswered.",
+    "filePath": "app/lib/cardEyebrow.ts",
+    "name": "cardEyebrow",
+    "testFile": "app/lib/cardEyebrow.test.ts"
   },
   {
     "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
     "filePath": "app/lib/briefCoverage.ts",
     "name": "computeBriefCoverage",
     "testFile": "app/lib/briefCoverage.test.ts"
-  },
-  {
-    "description": "Builds the orthogonal SVG path from a parent's bottom edge to a child's top edge, routed through a horizontal bus midway between the levels so siblings share it and the tree reads as one structure. Emits a straight line when the two are already aligned.",
-    "filePath": "app/lib/mapLayout.ts",
-    "name": "connectorPath",
-    "testFile": "app/lib/mapLayout.test.ts"
   },
   {
     "description": "Turns one contribution from the page into the events that should be recorded for it, performing the map writes it implies. A note is only ever an event; an answer also closes its question, and a node is created first so the event can carry its real id.",
@@ -853,16 +916,16 @@
     "testFile": "app/lib/exchange.test.ts"
   },
   {
+    "description": "How deep a node sits in the tree, following parentId upward. Used only by the round grouping's fallback, for a map whose history was never recorded. Stops rather than hanging on a cycle or a missing parent, so a half-written map still groups.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "depthOf",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
     "description": "Names a new map from whatever the person gave us. With a brief, prefers its first markdown heading, then its first non-empty line - so the root pill reads as a title instead of a 57-character slice of a twenty-page spec. Without a brief it is the original behaviour unchanged: the seed idea, clipped to 60 characters.",
     "filePath": "app/lib/mapStore.ts",
     "name": "deriveTitle",
     "testFile": "app/lib/deriveTitle.test.ts"
-  },
-  {
-    "description": "Every node beneath a starting node, at any depth, excluding the starting node itself. Guards against a parentId cycle the same way the layout does, so a malformed map still folds rather than hanging.",
-    "filePath": "app/lib/collapse.ts",
-    "name": "descendants",
-    "testFile": "app/lib/collapse.test.ts"
   },
   {
     "description": "The rail line for one event that does not collapse — a note, an answer, a question, a phase change. The wording is the interface: it is the only account a person gets of what an agent did to their map, so it lives in one place and is pinned by tests.",
@@ -1022,6 +1085,12 @@
     ]
   },
   {
+    "description": "Groups a map's nodes into the rounds that produced them — one round per write, read off the exchange log, because nodes written together share a contiguous run of revisions and one origin. Deliberately NOT grouped by tree depth: an agent's second batch of questions usually lands at the same depth as its first, so by depth the two turns would collapse into one row. The root idea is always its own first round, and nodes the log never mentions fall back to depth grouping so a seeded or pre-existing map still draws.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "groupIntoRounds",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
     "description": "Sorts a finished map's nodes into the regions of the summary screen - known, unknown, directions, next steps and the build sequence's slices - ignoring every other kind and ordering each bucket by its stored order, because the steps and the slices are both numbered on screen. Slices sit beside the next steps rather than replacing them: a next step can be to interview three teachers, which is not something you build.",
     "filePath": "app/lib/summaryGroups.ts",
     "name": "groupSummaryNodes",
@@ -1085,12 +1154,6 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
-    "description": "Tidy-tree layout for the thinking map. Rebuilds the tree from flat nodes joined only by parentId, sizes each pill to its label, centres every parent over its children, and returns absolute pixel positions plus overall bounds. Treats an orphaned node as a root and terminates on a parent cycle rather than hanging the render.",
-    "filePath": "app/lib/mapLayout.ts",
-    "name": "layoutMap",
-    "testFile": "app/lib/mapLayout.test.ts"
-  },
-  {
     "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",
     "filePath": "app/lib/mapStore.ts",
     "name": "listMaps",
@@ -1131,12 +1194,6 @@
       "justification": "A bare findUnique selecting only the id, coerced to a boolean. The work is the database call itself; the route behaviour it guards is covered by the exchange route's own probes and the mid-exchange scenario.",
       "kind": "platform-glue"
     }
-  },
-  {
-    "description": "Sizes a node pill to its label so text stays on two lines at most, capped so an unbounded label cannot stretch a pill into a paragraph. The root gets a fixed wider box.",
-    "filePath": "app/lib/mapLayout.ts",
-    "name": "measureWidth",
-    "testFile": "app/lib/mapLayout.test.ts"
   },
   {
     "description": "Reads navigator.modelContext, or null where there is none. The single place the WebMCP global is touched, so the draft spec moving again is one edit rather than a sweep.",
@@ -1187,10 +1244,28 @@
     "testFile": "app/lib/briefInput.test.ts"
   },
   {
-    "description": "Validates a node-arrangement batch off a request body, returning the parsed nudges or the message explaining what was wrong. Lives apart from the route so what counts as a well-formed nudge is checkable without an HTTP request; offsets must be finite, because NaN and Infinity are both typeof number and either one would put a node nowhere.",
-    "filePath": "app/lib/nodePositions.ts",
+    "description": "Reads a nudge batch off a request body, returning the parsed batch or the message to send back — the caller picks the status code, this decides what is acceptable. Offsets must be FINITE, not merely numeric: NaN and Infinity are both typeof number and either would put a node nowhere. One bad entry rejects the whole batch, since a partial arrangement is harder to explain than a refused one. Vestigial along with its route: nothing produces a nudge now that the map is a scrolling column of cards.",
+    "filePath": "app/api/maps/[id]/positions/route.ts",
     "name": "parseNudges",
-    "testFile": "app/lib/nodePositions.test.ts"
+    "testFile": "app/api/maps/[id]/positions/route.test.ts"
+  },
+  {
+    "description": "Reads a question's suggested answers out of the JSON array the column stores — SQLite has no array type. A missing, malformed, or wrongly-shaped value yields no chips at all, because a question with no shortlist is the ordinary case rather than a degraded one; blank and non-string entries are dropped so no unlabelled chip is ever rendered.",
+    "filePath": "app/lib/mapAnswers.ts",
+    "name": "parseOptions",
+    "testFile": "app/lib/mapAnswers.test.ts"
+  },
+  {
+    "description": "Reads a node id out of an event payload, returning null for anything that is not a non-empty string. Keeps a malformed event from contributing a phantom id to a round.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "payloadId",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Reads a phase name out of a phase.set payload, returning null for anything that is not a non-empty string. Lets a round be named after the phase it opened without a malformed payload blanking the row's eyebrow.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "payloadPhase",
+    "testFile": "app/lib/mapRounds.test.ts"
   },
   {
     "description": "The questions a pending ask_user is waiting on. The server writes them onto the map and returns this pending shape; only the page can perform the middle step of asking a person. Returns empty for an errored call or a result carrying none, which is the signal to hand the server's response straight back - putting a prompt on screen off the back of a failure would be worse than showing nothing.",
@@ -1268,6 +1343,12 @@
     "testFile": "app/lib/agentDemo.test.ts"
   },
   {
+    "description": "The line above a row, naming what the round was. A round that is entirely questions says so, because the question count is what the person is being asked to deal with; a mixed round counts nodes instead, since naming the majority kind would misdescribe it. The opening round is named for the idea rather than numbered.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "roundEyebrow",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
     "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "runLength",
@@ -1282,6 +1363,12 @@
     ]
   },
   {
+    "description": "Cuts the log's node-adds into runs, starting a new one whenever the writing side changes or the revisions stop being contiguous. A non-add event between two adds breaks contiguity, which is exactly right: ask_user writes its questions and then a question.asked, so a later add_nodes is genuinely a later turn.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "runsFromLog",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
     "description": "Builds one BriefSection from an index, a heading and a body - trimming the body and deriving its character count so the outline can be trusted without any passage being read.",
     "filePath": "app/lib/briefSections.ts",
     "name": "section",
@@ -1292,6 +1379,12 @@
     "filePath": "app/lib/briefFormat.ts",
     "name": "sectionLabel",
     "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "Turns a model's suggested answers into the JSON array the column stores, dropping the field entirely unless at least one usable string survives — so an agent sending an empty list or a list of blanks produces a plain question rather than a node carrying an array nothing can render. Non-strings are filtered rather than coerced, because a numeric option is a mistake and stringifying it would hide one.",
+    "filePath": "app/lib/nodePlan.ts",
+    "name": "serialiseOptions",
+    "testFile": "app/lib/nodePlan.test.ts"
   },
   {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
@@ -1375,26 +1468,10 @@
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
-    "description": "Scales a fixed-size plane to fit its frame down to a legibility floor, and opens an oversized map centred on its root. Seeing the whole shape at once is the point of the map, so fitting beats scrolling - but a map that would need shrinking past the floor scrolls instead.",
-    "filePath": "app/hooks/useFitToFrame.ts",
-    "name": "useFitToFrame",
-    "scenarios": [
-      "thinkingmapview-default",
-      "thinkingmapview-seeded",
-      "sprawling-a-deep-wide-map"
-    ]
-  },
-  {
-    "description": "The person's control of the map plane: zoom about the pointer, drag-to-pan, and a fit-to-map reset. It wraps useFitToFrame rather than sitting beside it, reporting the automatic fit until someone touches the viewport and their own scale from then on; fitToMap hands control back rather than recomputing a scale, which is what makes the reset exact.",
-    "filePath": "app/hooks/useMapViewport.ts",
-    "name": "useMapViewport",
-    "testFile": "app/components/ThinkingMapView.render.test.tsx"
-  },
-  {
-    "description": "The click-or-drag gesture on a map node, reporting movement as a delta in map pixels rather than screen pixels so a node does not drift from the pointer as you zoom in. Deltas go to the caller on every move, because only the layout can carry the node's dotted connector along with it.",
-    "filePath": "app/hooks/useNodeDrag.ts",
-    "name": "useNodeDrag",
-    "testFile": "app/components/MapNodePill.render.test.tsx"
+    "description": "What every question on the map has been answered, and how to answer one. Merges the log's answers with an optimistic layer for answers written in this tab: the answer takes the card's body the moment it is sent, because one still sitting in the input after you pressed send reads as the answer having been lost, and it is rolled back only if the write actually failed. The pending entry is never cleared on success — the log catches up on its own, and clearing early would flicker the question back to unanswered.",
+    "filePath": "app/hooks/useMapAnswers.ts",
+    "name": "useMapAnswers",
+    "testFile": "app/hooks/useMapAnswers.test.ts"
   },
   {
     "description": "The bridge if there is one, null if there is not. For a component that renders in both the app and an isolated scenario, where the throwing accessor would make the second case a crash rather than a state. Anything that genuinely needs the exchange still uses useWebMcpBridge and says so by throwing.",
@@ -1425,12 +1502,6 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "visibleEvents",
     "testFile": "app/lib/exchangeRail.test.ts"
-  },
-  {
-    "description": "The nodes still on the map once the given branches are folded, keeping each collapsed node itself and dropping only its descendants. It filters the layout's INPUT, which is what lets the remaining tree genuinely re-tidy and get narrower rather than leaving holes where the hidden nodes were.",
-    "filePath": "app/lib/collapse.ts",
-    "name": "visibleNodes",
-    "testFile": "app/lib/collapse.test.ts"
   },
   {
     "description": "Blocks until somebody starts a thinking map, or until the caller's timeout expires. The server-door half of the answer to a page not being able to wake an agent: nothing here pushes, but an agent with nothing to do can park, so a submitted idea is picked up rather than sitting on an empty page. A near-copy of waitForUserActivity - check first, then race the in-process emitter against a poll, on a bounded deadline - so the two read as one pattern. Cursored by createdAt rather than revision, because revision is per-map and a map that does not exist yet has none a waiter could have read. The comparison is exclusive, which is what stops a re-park from re-delivering the map just handed over. A timeout is a normal result carrying the cursor, never an error.",

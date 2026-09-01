@@ -1,9 +1,9 @@
 {
   "name": "BriefPasteBox - Default",
-  "id": "d3e631d4-1965-4201-aac0-7098bc0fd1d3",
+  "id": "4b9a2b4e-7eff-4c0f-b697-e66cb8093269",
   "url": "/isolated-components/BriefPasteBox?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefPasteBox",

@@ -1,9 +1,9 @@
 {
   "name": "BriefExcerpt - Default",
-  "id": "8e7bcb2e-fd21-4655-9347-462730dd790f",
+  "id": "6393e9f9-ed42-4507-b9ea-86fc982d6c43",
   "url": "/isolated-components/BriefExcerpt?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefExcerpt",

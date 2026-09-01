@@ -1,9 +1,9 @@
 {
   "name": "AgentCallLog - WithFailure",
-  "id": "108739ff-2432-443f-8ff9-a8627dcb819b",
+  "id": "e7db30a7-a0ff-43db-b31a-7c9aa714dab1",
   "url": "/isolated-components/AgentCallLog?s=WithFailure",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentCallLog",

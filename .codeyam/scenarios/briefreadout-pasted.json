@@ -1,9 +1,9 @@
 {
   "name": "BriefReadout - Pasted",
-  "id": "f8a09315-730e-40be-8ae0-d67fa2268a80",
+  "id": "deb22222-ae4e-4c88-9d65-f1ab55b996a6",
   "url": "/isolated-components/BriefReadout?s=Pasted",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BriefReadout",

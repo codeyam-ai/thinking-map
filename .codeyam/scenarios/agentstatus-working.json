@@ -1,9 +1,9 @@
 {
   "name": "AgentStatus - Working",
-  "id": "5b443df8-ba4c-4bfc-8bd9-5c910742d916",
+  "id": "5a3a36f2-012f-40a5-8d6e-47aa723f7679",
   "url": "/isolated-components/AgentStatus?s=Working",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentStatus",
