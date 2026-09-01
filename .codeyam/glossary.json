@@ -308,7 +308,8 @@
       "webmcpbridge-onequestion",
       "webmcpbridge-awaitinganswer",
       "webmcpbridge-manyquestions"
-    ]
+    ],
+    "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
     "description": "The product mark: three nodes and the connectors between them, doubling as the link home from every screen.",
