@@ -156,7 +156,7 @@
    },
    {
     "id": "map-bakery",
-    "phase": "deconstruct",
+    "phase": "map",
     "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.",
     "title": "Should the bakery deliver?",
     "revision": 3

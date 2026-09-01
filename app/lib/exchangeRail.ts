@@ -10,7 +10,7 @@
 // which events are worth showing at all, how a run of them collapses, and how
 // one of them is worded.
 
-import { PHASE_LABELS, isPhase } from './mapKinds';
+import { PHASE_LABELS, normalizePhase } from './mapKinds';
 import type { ExchangeEvent, Origin } from './exchange';
 
 export interface RailEntry {
@@ -78,9 +78,12 @@ function firstAnswer(event: ExchangeEvent): string | null {
 
 function phaseName(event: ExchangeEvent): string | null {
   const phase = field(event.payload, 'phase');
-  if (!phase || !isPhase(phase)) return phase;
-  // The nav numbers the phases ("05 Explore"); a sentence should not.
-  return PHASE_LABELS[phase].replace(/^\d+\s+/, '');
+  // Through the resolver, so a `phase.set` recorded before the merge reads as
+  // the phase it now is rather than as the raw word the log happens to hold.
+  const resolved = phase ? normalizePhase(phase) : null;
+  if (!resolved) return phase;
+  // The nav numbers the phases ("04 Explore"); a sentence should not.
+  return PHASE_LABELS[resolved].replace(/^\d+\s+/, '');
 }
 
 const SIDE: Record<string, string> = { agent: 'Agent', user: 'You' };

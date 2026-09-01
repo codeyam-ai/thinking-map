@@ -118,7 +118,7 @@ export async function createMap(seedIdea: string, brief?: BriefInput) {
     data: {
       title,
       seedIdea: trimmed,
-      phase: 'deconstruct',
+      phase: 'map',
       ...(brief
         ? {
             brief: {

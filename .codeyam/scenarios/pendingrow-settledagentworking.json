@@ -1,0 +1,12 @@
+{
+  "name": "PendingRow - SettledAgentWorking",
+  "id": "92ba2fc9-a294-4f14-8982-61414bd2f29f",
+  "url": "/isolated-components/PendingRow?s=SettledAgentWorking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingRow",
+  "scenarioType": "component",
+  "description": "The only case where what was added has genuinely reached someone: an agent whose turn is running right now."
+}

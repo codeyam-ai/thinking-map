@@ -18,7 +18,7 @@
       "dimension": "events",
       "value": "many",
       "rationale": "source-derived state events=many",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "brief",

@@ -1,0 +1,12 @@
+{
+  "name": "RowProgress - Default",
+  "id": "7d5091f4-337c-49ab-9fee-5fe56dd44947",
+  "url": "/isolated-components/RowProgress?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowProgress",
+  "scenarioType": "component",
+  "description": "Two of three answered — the ordinary mid-round state, and a count with no button beside it because the cards above are the action."
+}

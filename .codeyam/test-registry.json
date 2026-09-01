@@ -239,7 +239,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › does not re-scroll when the phase is unchanged",
-      "line": 60,
+      "line": 61,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -248,7 +248,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › marks only the active phase as the current step",
-      "line": 85,
+      "line": 89,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -257,7 +257,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › renders every phase, so the whole process stays reachable",
-      "line": 73,
+      "line": 79,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -266,7 +266,7 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › scrolls the active pill into view on first render",
-      "line": 34,
+      "line": 35,
       "registeredAt": "2026-09-01T17:49:44Z",
       "runner": "tests"
     },
@@ -275,8 +275,53 @@
       "file": "app/components/PhaseNav.render.test.tsx",
       "format": "vitest",
       "key": "PhaseNav active-step visibility › scrolls the newly active pill into view when the phase advances",
-      "line": 47,
+      "line": 48,
       "registeredAt": "2026-09-01T17:49:44Z",
+      "runner": "tests"
+    },
+    {
+      "description": "While questions are open the cards are the action, so the footer counts and offers nothing to press.",
+      "file": "app/components/RowFooter.render.test.tsx",
+      "format": "vitest",
+      "key": "RowFooter › counts while the round is still being answered",
+      "line": 19,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The end of the loop has no further step, so there is nothing to offer even though the round is finished and settled.",
+      "file": "app/components/RowFooter.render.test.tsx",
+      "format": "vitest",
+      "key": "RowFooter › offers nothing at the end of the loop",
+      "line": 86,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Once the wait has settled, the action takes over from the count.",
+      "file": "app/components/RowFooter.render.test.tsx",
+      "format": "vitest",
+      "key": "RowFooter › offers the phase action once the wait has settled",
+      "line": 51,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "THE ONE A SCREENSHOT CANNOT MAKE. The round is done and the map is still reaching, so the shimmering row above is already explaining the wait. Anything here would be the same thing said twice, one line apart — which is exactly what the first build of this did, and what looked wrong on screen.",
+      "file": "app/components/RowFooter.render.test.tsx",
+      "format": "vitest",
+      "key": "RowFooter › renders nothing while the map is still reaching for the next round",
+      "line": 37,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A round of statements was never something to answer, so it must not show a \"0 of 0 answered\" line on its way to the action.",
+      "file": "app/components/RowFooter.render.test.tsx",
+      "format": "vitest",
+      "key": "RowFooter › shows no count for a round that asked nothing",
+      "line": 68,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
       "runner": "tests"
     },
     {
@@ -1913,7 +1958,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › accepts every phase in the loop",
-      "line": 10,
+      "line": 19,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1922,7 +1967,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › accepts the node kinds the map can draw",
-      "line": 32,
+      "line": 107,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1931,8 +1976,44 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › accepts the three node statuses",
-      "line": 54,
+      "line": 129,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "PHASE_ASK sits beside the labels precisely so it cannot drift from them; a phase with no entry would render an empty footer under a finished round.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › has an ask for every phase, pointing only at real phases",
+      "line": 87,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The merge is the point: five steps, not six. Pinned as a literal so that re-adding a phase has to come here and say so.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › has five phases, with deconstruct no longer among them",
+      "line": 27,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The labels renumber with the merge. A label out of step with its position is the nav telling the person they are on a different step than they are.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › numbers the labels in order from 01",
+      "line": 77,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The two ends of the loop have no page-side button: `idea` has not reached the map yet, and `next-steps` is where the loop arrives.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › offers no action at the two ends of the loop",
+      "line": 99,
+      "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
     {
@@ -1940,7 +2021,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › rejects a node kind the map has no treatment for",
-      "line": 48,
+      "line": 123,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1949,7 +2030,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › rejects a phase that is not part of the loop",
-      "line": 24,
+      "line": 40,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1958,8 +2039,44 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › rejects an unknown node status",
-      "line": 61,
+      "line": 136,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A current name resolves to itself, so callers need only one function.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › resolves a current phase to itself",
+      "line": 54,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Null rather than a guess: the caller picks its own fallback instead of being handed a phase the stored value never meant.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › resolves an unknown phase to null",
+      "line": 62,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Existing rows carry `deconstruct`, and there was no data migration — so every read path has to resolve it. This is the guarantee that lets those maps keep rendering.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › resolves the retired phase name to the phase that replaced it",
+      "line": 49,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The tool schema validates against this, so an agent that learned the old vocabulary keeps working rather than having its call rejected.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › still accepts the retired name as a set_phase argument",
+      "line": 70,
+      "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
     {
@@ -2458,6 +2575,105 @@
       "runner": "tests"
     },
     {
+      "description": "Completion is read off the NEWEST round only, so a question abandoned three rounds ago cannot hold the loop hostage — it stays answerable and stops gating. The caller passes the newest round's count; this pins that the module honours it rather than looking any wider.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › advances on the newest round alone, whatever older rounds left open",
+      "line": 113,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Each status gets its OWN sentence — a shared one would make the distinction above invisible on screen even though the logic drew it.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › gives each presence state a distinct sentence",
+      "line": 101,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`next-steps` is where the loop ARRIVES. Reaching for a further round there would promise a continuation the product does not have.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › hides at the end of the loop",
+      "line": 34,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing has been drawn, so there is no round to reach past.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › hides when the map has no rounds at all",
+      "line": 28,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The cards are the action while questions are open. A placeholder below them would be the page reaching for something the person has not finished giving.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › hides while the newest round still has open questions",
+      "line": 22,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The pending row also appears on a DAY-ONE map — a seed idea nobody has picked up, with no answers on it at all — so no sentence may name answers the person has not given. This is the assertion that keeps the wording true in both cases rather than only in the end-of-round one.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › never claims answers exist, since a day-one map has none",
+      "line": 59,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The three sentences are the honest part, and they are genuinely different claims — \"has everything you have added\" is only true of an agent whose turn is running.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › says an agent has what you added only when one is actually in a turn",
+      "line": 69,
+      "registeredAt": "2026-09-01T21:51:26.091293511+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Attached but idle: it will see the answers when its turn comes round, which is a weaker claim and has to read as one.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › says an attached agent is waiting for its turn, not working",
+      "line": 79,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state every preview and capture actually produces, and the one most at risk of being quietly dressed up as one of the other two. It must never claim an agent is there.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › says plainly that nothing can reach the page when nothing can",
+      "line": 90,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The round is done and the poll may still bring a new one: this is the whole point of the feature — the page moves before anybody asks it to.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › shimmers as soon as the round is answered",
+      "line": 40,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Bounded, not indefinite. A row that shimmered forever would be claiming an agent was writing, which is the one thing this page can never know.",
+      "file": "app/lib/pendingRow.test.ts",
+      "format": "vitest",
+      "key": "pendingRow › stops shimmering once the wait runs out",
+      "line": 46,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
       "description": "Non-strings are dropped rather than coerced: a numeric option is a mistake, and rendering it as \"1\" would hide the mistake behind a plausible chip.",
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
@@ -2935,12 +3151,30 @@
       "runner": "tests"
     },
     {
+      "description": "An unrecognised phase still prints itself rather than vanishing into the round-number fallback, which would hide that the map holds something odd.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › falls back to printing an unknown phase rather than dropping it",
+      "line": 304,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
       "description": "Once a round opened a phase, the phase is the more useful name for it than its position in the sequence.",
       "file": "app/lib/mapRounds.test.ts",
       "format": "vitest",
       "key": "roundEyebrow › names a round after the phase it opened",
       "line": 282,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round recorded before the phases merged carries `deconstruct`, which the nav no longer shows. A row naming a step the person cannot find anywhere is worse than one naming its number, so the alias resolves here too.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › names a round stored under the retired phase after the phase that replaced it",
+      "line": 295,
+      "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
     {
@@ -2959,6 +3193,69 @@
       "key": "roundEyebrow › uses the singular for a round holding one question",
       "line": 266,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary working state — the \"2 of 3 answered\" the footer prints.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › counts a partly answered round",
+      "line": 40,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The opening state of a round of questions.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › counts every question as open when none are answered",
+      "line": 26,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer for a question that is not in THIS round must not count toward it — the answers map spans the whole map, the round does not.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › counts only answers belonging to the nodes it was given",
+      "line": 92,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE TRAP. A goal or assumption the agent has not filled in carries `status: 'open'` and shows in the map's caption as still open — but it has no answer box, so the person cannot clear it. Counting it would leave the loop permanently one short and the next row never reached for.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › ignores non-question nodes even when their status says open",
+      "line": 71,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty round is not a half-finished one.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › reports an empty round as having nothing to do",
+      "line": 106,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing left to do: this is what opens the next row.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › reports nothing open once every question is answered",
+      "line": 58,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round of pure statements is complete on arrival — there was never anything in it for the person to do.",
+      "file": "app/lib/roundProgress.test.ts",
+      "format": "vitest",
+      "key": "roundProgress › treats a round of statements as complete",
+      "line": 85,
+      "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
     {
@@ -3382,6 +3679,222 @@
       "key": "untouchedNoteText › names the section by mark and heading",
       "line": 229,
       "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The busy flag has to clear on both paths, or the button stays dead after one failure.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › clears busy after a successful move",
+      "line": 146,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "In an isolated scenario there is no map to advance. It must be inert, not throw — the same way the map is readable without a bridge.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › does nothing at all with no map to advance",
+      "line": 157,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`next-steps` has nowhere further to go, and neither does an unknown phase.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › does nothing when there is no next phase",
+      "line": 171,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "It calls the same tool through the same route an agent would, rather than reaching around it — so there is one implementation of what a phase set is.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › moves the phase through the tools route",
+      "line": 74,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The note names the phase in the words the nav uses, so someone reading the log and someone reading the screen see the same vocabulary.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › names the destination phase in the note",
+      "line": 57,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The phase is server-rendered, so without this the nav would keep showing the old step until something else happened to refresh the page.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › re-reads the page once the phase has moved",
+      "line": 92,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A declined write must not leave the button claiming success.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › reports a failed phase write",
+      "line": 102,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "And it must not say the note was lost, because it was not — it is on the log, and telling someone otherwise is its own small dishonesty.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › says the note survived a failed phase write",
+      "line": 116,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Without a bridge the phase still moves. The note is the part that needs somewhere to go, not the phase set.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › still moves the phase when there is no way to leave a note",
+      "line": 182,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A network throw is the same story as a declined write, not a crash.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › survives the request throwing outright",
+      "line": 130,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The order that makes the log readable.",
+      "file": "app/hooks/useAdvancePhase.test.ts",
+      "format": "vitest",
+      "key": "useAdvancePhase › writes the note before it moves the phase",
+      "line": 37,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unmounted map must not leave a timer running.",
+      "file": "app/hooks/useBoundedWait.test.ts",
+      "format": "vitest",
+      "key": "useBoundedWait › clears its timer on unmount",
+      "line": 75,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Inactive means there is nothing being waited on, so no clock runs.",
+      "file": "app/hooks/useBoundedWait.test.ts",
+      "format": "vitest",
+      "key": "useBoundedWait › never elapses while inactive",
+      "line": 34,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round that goes back to being unanswered — the person pressed Edit — is not still waiting, and must not carry its old elapsed time forward.",
+      "file": "app/hooks/useBoundedWait.test.ts",
+      "format": "vitest",
+      "key": "useBoundedWait › resets when the wait stops being active",
+      "line": 42,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The one that matters for a live map: a new round arrived, so the page is reaching for the NEXT thing and the wait starts over rather than being already expired.",
+      "file": "app/hooks/useBoundedWait.test.ts",
+      "format": "vitest",
+      "key": "useBoundedWait › restarts the wait when the reset key changes",
+      "line": 57,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing has elapsed at the moment the wait begins.",
+      "file": "app/hooks/useBoundedWait.test.ts",
+      "format": "vitest",
+      "key": "useBoundedWait › starts at zero",
+      "line": 16,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "It reports a step rather than a running total: re-rendering the map column once a frame to move a decision that flips once would be pure waste.",
+      "file": "app/hooks/useBoundedWait.test.ts",
+      "format": "vitest",
+      "key": "useBoundedWait › stays at zero until the limit, then reports the limit",
+      "line": 23,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing changed, so there is nothing to react to.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › does not scroll on a re-render that changes neither input",
+      "line": 106,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The regression that shipped once: StrictMode double-invokes effects on mount, so a \"have I run yet\" flag gets consumed by the first invocation and the second one scrolls. Seeding from mount-time values means neither invocation sees a transition.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › does not scroll on mount, even when the effect runs twice",
+      "line": 41,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE COURTESY. Someone who scrolled up to re-read round one is reading, and a round arriving must not drag them back down.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › leaves a reader alone who has scrolled up",
+      "line": 76,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "And it picks them back up when they return to the bottom, rather than giving up on following for the rest of the session.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › resumes following once the reader returns to the bottom",
+      "line": 90,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round arriving is the page reacting, and that is what earns a scroll.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › scrolls when a new round arrives",
+      "line": 52,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The moment the last answer goes in, the map reaches for the next row — and the column follows it down. This is \"the app moves first\" as a scroll.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › scrolls when the round completes and the page starts reaching",
+      "line": 64,
+      "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The map renders in isolated scenarios with no scroll container measured; reading the position must not throw there.",
+      "file": "app/hooks/useFollowColumn.test.ts",
+      "format": "vitest",
+      "key": "useFollowColumn › survives being asked for a position with no container",
+      "line": 118,
+      "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
     {

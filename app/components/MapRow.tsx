@@ -20,12 +20,16 @@ export default function MapRow({
   answers,
   askedIds,
   onAnswer,
+  entering = false,
 }: {
   round: Round;
   totalRounds: number;
   answers: Map<string, string>;
   askedIds: ReadonlySet<string>;
   onAnswer?(id: string, label: string, answer: string): Promise<void>;
+  /** This round is the one that just arrived, so its cards land rather than
+   *  appear. */
+  entering?: boolean;
 }) {
   return (
     <section className="mb-8">
@@ -53,6 +57,7 @@ export default function MapRow({
               answer={answers.get(node.id) ?? null}
               asked={askedIds.has(node.id)}
               onAnswer={onAnswer}
+              entering={entering}
             />
           </div>
         ))}

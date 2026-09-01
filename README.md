@@ -42,11 +42,10 @@ well enough to find a better answer.**
 | Phase | What happens |
 | --- | --- |
 | 01 Idea | You type something vague into one free-text input. No structured fields. Or you arrive with a client's brief — paste it, or drop the `.pdf` / `.docx` / `.md` / `.txt` — and the document comes in whole. |
-| 02 Deconstruct | The partner asks a small number of high-value questions instead of answering. |
-| 03 Map | Your answers become nodes: users, problems, goals, assumptions, open questions. |
-| 04 Research | A live web search grounds the map in what already exists, and in the gaps. |
-| 05 Explore | You change direction; the map adds and updates, and explains what changed. |
-| 06 Next steps | What we know, what we don't, three directions, five concrete steps. |
+| 02 Map | The partner asks a small number of high-value questions instead of answering, and your answers become the map: users, problems, goals, assumptions, open questions. Asking and mapping were once two phases; they are one activity, and the cards make that literal — a question and the node it becomes are the same card. `deconstruct` is still accepted everywhere a phase is read or set, and resolves to this one. |
+| 03 Research | A live web search grounds the map in what already exists, and in the gaps. |
+| 04 Explore | You change direction; the map adds and updates, and explains what changed. |
+| 05 Next steps | What we know, what we don't, three directions, five concrete steps. |
 
 ## Setup
 
@@ -196,6 +195,22 @@ Two more things worth knowing:
   `await_new_map` take a timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
   nothing: the question stays on the map and the answer lands in the log for your next
   read.
+- **The page advances its own phase, and says so on the log.** When a round's questions
+  are all answered and nothing more arrives, the map offers the one action that ends the
+  phase — "Ready to research", and so on. Pressing it posts a `user.note` naming the
+  transition and *then* calls `set_phase`, so a phase that moved is something you read
+  rather than something you infer from a value that changed under you. The person is no
+  longer required to go and prod you in the other window to make the loop advance.
+- **The pending row is a statement about the log, not about you.** Once a round is
+  answered the page immediately draws the next row as shimmering placeholders — but since
+  it cannot start your turn, that shimmer is bounded. After about twenty seconds it
+  resolves into whichever of three sentences is actually true: an agent is working and has
+  what was added, an agent is attached but not in a turn, or nothing can reach the page and
+  what was added is simply on the log. A row that shimmered indefinitely would be claiming
+  you were writing, which is exactly the claim this contract says a page can never make.
+  (The sentences say "what you have added" rather than "your answers" on purpose: the same
+  row appears on a day-one map that has a seed idea and no answers at all, and naming
+  answers there would name something that does not exist.)
 
 ### Driving the tools without a browser agent
 
@@ -292,13 +307,17 @@ States captured as runnable scenarios with codeyam-editor:
 
 <img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
 
-### Brief attached, nothing cited yet
+### An older question, three rounds up, still open
 
-<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
+<img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
 
 ### Complete - what to do next
 
 <img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
+
+### Brief attached, nothing cited yet
+
+<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
 
 ### Brief fully accounted for
 
@@ -311,8 +330,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Day one - nothing yet
 
 <img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png" alt="Day one - nothing yet" width="280">
-
-### Grounded - research and its gaps
-
-<img src=".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png" alt="Grounded - research and its gaps" width="280">
 <!-- codeyam:scenario-gallery:end -->

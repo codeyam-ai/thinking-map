@@ -1,0 +1,12 @@
+{
+  "name": "RowFooter - StillAnswering",
+  "id": "338a8e47-43be-4c68-a1d1-742fc7588ef9",
+  "url": "/isolated-components/RowFooter?s=StillAnswering",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowFooter",
+  "scenarioType": "component",
+  "description": "Mid-round: the footer counts and offers nothing else. A button here would invite skipping past questions nobody has looked at."
+}

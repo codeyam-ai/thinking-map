@@ -1,0 +1,12 @@
+{
+  "name": "RowProgress - NoneAnswered",
+  "id": "ab384c28-d6bb-4edb-8d4a-93fa2643e400",
+  "url": "/isolated-components/RowProgress?s=NoneAnswered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowProgress",
+  "scenarioType": "component",
+  "description": "A round that has just landed with nothing done yet."
+}

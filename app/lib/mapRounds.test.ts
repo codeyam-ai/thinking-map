@@ -281,8 +281,30 @@ describe('roundEyebrow', () => {
   // its position in the sequence.
   it('names a round after the phase it opened', () => {
     const nodes = [node('q1', 'root', 0)];
+    // The phase's own LABEL with its number stripped, not the raw stored
+    // string with its dashes swapped — so the row and the activity rail call
+    // the same phase by the same name.
     expect(roundEyebrow(round(2, nodes, 'next-steps'), 4)).toBe(
-      'next steps · 1 question',
+      'Next steps · 1 question',
+    );
+  });
+
+  // A round recorded before the phases merged carries `deconstruct`, which the
+  // nav no longer shows. A row naming a step the person cannot find anywhere
+  // is worse than one naming its number, so the alias resolves here too.
+  it('names a round stored under the retired phase after the phase that replaced it', () => {
+    const nodes = [node('q1', 'root', 0)];
+    expect(roundEyebrow(round(2, nodes, 'deconstruct'), 4)).toBe(
+      'Map · 1 question',
+    );
+  });
+
+  // An unrecognised phase still prints itself rather than vanishing into the
+  // round-number fallback, which would hide that the map holds something odd.
+  it('falls back to printing an unknown phase rather than dropping it', () => {
+    const nodes = [node('q1', 'root', 0)];
+    expect(roundEyebrow(round(2, nodes, 'brainstorm'), 4)).toBe(
+      'brainstorm · 1 question',
     );
   });
 });

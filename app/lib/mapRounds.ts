@@ -20,6 +20,7 @@
 // inferred from a screenshot.
 
 import type { ExchangeEvent } from './exchange';
+import { PHASE_LABELS, normalizePhase } from './mapKinds';
 import type { FlatNode } from './mapLayout';
 
 export interface Round {
@@ -207,9 +208,17 @@ export function roundEyebrow(round: Round, total: number): string {
       ? `${count} question${count === 1 ? '' : 's'}`
       : `${count} node${count === 1 ? '' : 's'}`;
 
-  const name = round.phase
-    ? round.phase.replace(/-/g, ' ')
-    : `Round ${round.index} of ${total}`;
+  // Through the resolver and the labels: the round's phase is whatever the log
+  // recorded, which on an older map is `deconstruct`, and a row that names
+  // itself after a phase the nav no longer shows is a row naming a step the
+  // person cannot find. Unrecognised phases still print themselves rather than
+  // vanishing.
+  const resolved = round.phase ? normalizePhase(round.phase) : null;
+  const phaseName = resolved
+    ? PHASE_LABELS[resolved].replace(/^\d+\s+/, '')
+    : round.phase?.replace(/-/g, ' ');
+
+  const name = phaseName ?? `Round ${round.index} of ${total}`;
 
   return `${name} · ${what}`;
 }

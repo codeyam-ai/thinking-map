@@ -31,7 +31,7 @@
   "thinkingMap": [
    {
     "id": "map-game",
-    "phase": "deconstruct",
+    "phase": "map",
     "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
     "title": "Educational game for kids",
     "revision": 2

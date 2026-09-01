@@ -794,7 +794,7 @@
    },
    {
     "id": "map-c",
-    "phase": "deconstruct",
+    "phase": "map",
     "seedIdea": "Should the bakery deliver?",
     "title": "Should the bakery deliver?",
     "revision": 3

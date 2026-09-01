@@ -1,0 +1,116 @@
+{
+  "name": "The round is answered, and the map reaches on",
+  "id": "6117efbb-9957-44ff-be40-1f689439ce10",
+  "url": "/map/map-reaching",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-reaching-1",
+        "kind": "node.added",
+        "mapId": "map-reaching",
+        "origin": "user",
+        "payload": "{\"id\": \"r-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A repair cafe in the church hall\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-reaching-2",
+        "kind": "node.added",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "payload": "{\"id\": \"r-q-who\", \"parentId\": \"r-idea\", \"kind\": \"open-question\", \"label\": \"Who actually turns up to fix things?\", \"status\": \"open\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-reaching-3",
+        "kind": "node.added",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "payload": "{\"id\": \"r-q-liability\", \"parentId\": \"r-idea\", \"kind\": \"open-question\", \"label\": \"What happens when a repair fails and the thing is worse?\", \"status\": \"open\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-reaching-4",
+        "kind": "question.asked",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "payload": "{\"count\": 2}",
+        "revision": 4
+      },
+      {
+        "id": "ev-reaching-5",
+        "kind": "user.answer",
+        "mapId": "map-reaching",
+        "origin": "user",
+        "payload": "{\"answers\": [{\"id\": \"r-q-who\", \"answer\": \"A rota of two or three, plus whoever is curious\"}, {\"id\": \"r-q-liability\", \"answer\": \"Nobody has asked yet, and that worries me\"}]}",
+        "revision": 5
+      }
+    ],
+    "mapNode": [
+      {
+        "detail": "People throw away kettles and lamps that need one solder joint.",
+        "id": "r-idea",
+        "kind": "idea",
+        "label": "A repair cafe in the church hall",
+        "mapId": "map-reaching",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "r-q-who",
+        "kind": "open-question",
+        "label": "Who actually turns up to fix things?",
+        "mapId": "map-reaching",
+        "options": "[\"Retired engineers\", \"Anyone curious\", \"A rota of two or three\"]",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "r-idea",
+        "status": "answered"
+      },
+      {
+        "id": "r-q-liability",
+        "kind": "open-question",
+        "label": "What happens when a repair fails and the thing is worse?",
+        "mapId": "map-reaching",
+        "options": "[\"A sign saying so\", \"Insurance\", \"Nobody has asked yet\"]",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "r-idea",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "A repair cafe in the church hall, one Saturday a month. People throw away kettles and lamps that need one solder joint.",
+        "id": "rm-1",
+        "mapId": "map-reaching",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Two things decide whether this is a nice idea or a real one: who fixes, and what happens when a fix goes wrong.",
+        "id": "rm-2",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-reaching",
+        "phase": "map",
+        "revision": 5,
+        "seedIdea": "A repair cafe in the church hall, one Saturday a month.",
+        "title": "A repair cafe in the church hall"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The moment the loop used to stall. Every question in the newest round has been answered, and rather than sitting still waiting to be prodded, the map has already drawn the next row beneath them as placeholders. Deliberately kept to two questions so the reaching row is visible in the same frame as the round that triggered it."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "RowFooter - ReadyToResearch",
+  "id": "dfbfb254-433d-4274-a701-c4ace5fa566d",
+  "url": "/isolated-components/RowFooter?s=ReadyToResearch",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowFooter",
+  "scenarioType": "component",
+  "description": "The wait settled with nothing coming, so the phase's action takes over from the count."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "PendingNote - NoAgent",
+  "id": "9d7a4d55-a7a8-4f9a-960e-c715be5ebb05",
+  "url": "/isolated-components/PendingNote?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingNote",
+  "scenarioType": "component",
+  "description": "The honest half, in one line: nothing can reach the page, so what was added is simply on the log. It says 'what you have added' rather than 'your answers' because the same row appears on a day-one map that has a seed idea and no answers at all."
+}

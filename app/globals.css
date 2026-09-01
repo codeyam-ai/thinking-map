@@ -102,8 +102,43 @@ button:disabled {
   animation: node-in 220ms ease-out both;
 }
 
+/* A card the map is reaching for but does not have yet. A slow sweep rather
+   than a pulse: the page is waiting on someone, not loading something, and a
+   throbbing placeholder overstates how imminent the answer is. */
+@keyframes card-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.card-shimmer {
+  /* Paper, not surface. A placeholder the colour of a real card would BE a real
+     card with nothing written on it; letting the page show through says the
+     card has not arrived rather than that it arrived empty. */
+  background-color: var(--paper);
+  background-image: linear-gradient(
+    100deg,
+    transparent 35%,
+    var(--surface) 50%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  animation: card-shimmer 2.4s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .node-in {
     animation: none;
+  }
+
+  /* A resting state rather than a still sweep: with the animation stopped, the
+     gradient would freeze mid-position and read as a rendering fault. The
+     paper-coloured block still says "not here yet", without the motion. */
+  .card-shimmer {
+    animation: none;
+    background-image: none;
   }
 }

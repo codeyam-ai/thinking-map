@@ -42,7 +42,7 @@
     "thinkingMap": [
       {
         "id": "map-brief-untouched",
-        "phase": "deconstruct",
+        "phase": "map",
         "revision": 1,
         "seedIdea": "",
         "title": "Northgate Library — Digital Membership Renewal"

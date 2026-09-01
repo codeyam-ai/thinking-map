@@ -1,0 +1,15 @@
+{
+  "name": "PendingRow - SettledNoAgent",
+  "id": "ef1fceaa-9467-47fd-b7b2-7f36260e203e",
+  "url": "/isolated-components/PendingRow?s=SettledNoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingRow",
+  "scenarioType": "component",
+  "description": "The shimmer's time is up and nothing is attached, so it says so. This is the state every preview and capture genuinely produces, and the one most at risk of being quietly dressed up as an agent that is on its way.",
+  "demonstratesState": {
+    "kind": "settled"
+  }
+}

@@ -516,7 +516,9 @@
       "pivoted-now-it-is-for-teachers",
       "complete-what-to-do-next",
       "a-plan-with-a-gap-one-slice-proves-nothing",
-      "sprawling-a-deep-wide-map"
+      "sprawling-a-deep-wide-map",
+      "the-round-is-answered-and-the-map-reaches-on",
+      "an-older-question-three-rounds-up-still-open"
     ]
   },
   {
@@ -609,6 +611,47 @@
     }
   },
   {
+    "description": "The placeholder band. Its geometry mirrors MapRow's exactly — same wrap, gap, and card min/max/height — so the placeholders stand where the real cards will and the row does not jump sideways when they arrive; that coupling is the point, which is why the numbers are repeated rather than approximated. The cards are aria-hidden, but the shimmer IS a message, so it is also said in words to a live region for a reader who cannot see it.",
+    "filePath": "app/components/PendingCards.tsx",
+    "name": "PendingCards",
+    "scenarios": [
+      "pendingcards-default",
+      "pendingcards-two"
+    ]
+  },
+  {
+    "description": "What the wait turned out to mean, in one line. Its own component for the same reason AskPresenceNote is: this is the part of the pending row that has to be honest, and a sentence that has to be honest is worth being able to point at. The wording lives in pendingRow, where tests pin it.",
+    "filePath": "app/components/PendingNote.tsx",
+    "name": "PendingNote",
+    "scenarios": [
+      "pendingnote-noagent",
+      "pendingnote-agentworking",
+      "pendingnote-agentidle"
+    ]
+  },
+  {
+    "description": "The row the map reaches for before it has one — the whole of what 'the app moves first' means. A round gets finished and the next row appears immediately as placeholders, so the column visibly grows downward instead of sitting still. It must never imply an agent is writing, because the page cannot start anyone's turn, so the shimmer is bounded and resolves into whichever of three sentences is actually true.",
+    "filePath": "app/components/PendingRow.tsx",
+    "name": "PendingRow",
+    "scenarios": [
+      "pendingrow-waiting",
+      "pendingrow-settlednoagent",
+      "pendingrow-settledagentworking",
+      "pendingrow-settledagentidle"
+    ]
+  },
+  {
+    "description": "The one action worth taking when a phase's work is done, at the bottom of the round you just finished rather than up in the chrome — with the map drawn as a column you answer in place, the eye is already there. Sentence and label both come from PHASE_ASK beside the phase labels, so the step the nav names and the step this offers to leave cannot drift apart; what the press does lives in useAdvancePhase.",
+    "filePath": "app/components/PhaseAdvance.tsx",
+    "name": "PhaseAdvance",
+    "scenarios": [
+      "phaseadvance-endofmap",
+      "phaseadvance-endofresearch",
+      "phaseadvance-endofexplore",
+      "phaseadvance-nomaptoadvance"
+    ]
+  },
+  {
     "description": "The six-phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar.",
     "filePath": "app/components/PhaseNav.tsx",
     "name": "PhaseNav",
@@ -648,6 +691,28 @@
     }
   },
   {
+    "description": "What to do when the round is done, under the round it is done with. Composition and one choice: the count while there is still answering to do, the phase's action once nothing more is coming, and deliberately NOTHING in between — while the map is still reaching, the shimmering row above is already saying it, and a second line one line apart was the first thing that looked wrong on screen. No presence line lives here for the same reason.",
+    "filePath": "app/components/RowFooter.tsx",
+    "name": "RowFooter",
+    "scenarios": [
+      "rowfooter-stillanswering",
+      "rowfooter-readytoresearch",
+      "rowfooter-roundofstatements"
+    ],
+    "testFile": "app/components/RowFooter.render.test.tsx"
+  },
+  {
+    "description": "How far through the round you are, as a count with no action beside it. A button here would invite skipping past questions the person has not looked at — while a round is still being answered, the cards ARE the action.",
+    "filePath": "app/components/RowProgress.tsx",
+    "name": "RowProgress",
+    "scenarios": [
+      "rowprogress-default",
+      "rowprogress-noneanswered",
+      "rowprogress-singlequestion",
+      "rowprogress-longround"
+    ]
+  },
+  {
     "description": "A contiguous run of node-adds from one side of the exchange, with the revision span it covers so a phase set can be attributed to the round that closed it.",
     "filePath": "app/lib/mapRounds.ts",
     "name": "Run",
@@ -670,7 +735,8 @@
     "name": "SavedMapRow",
     "scenarios": [
       "savedmaprow-default",
-      "savedmaprow-singlenode"
+      "savedmaprow-singlenode",
+      "savedmaprow-legacyphase"
     ]
   },
   {
@@ -748,7 +814,7 @@
     ]
   },
   {
-    "description": "The right-hand panel: the conversation rendered as structure. Composes the connector layer and the node pills over a plane that scales to fit, down to a legibility floor.",
+    "description": "The map: a single column of rows growing downward, scrolled like a page — and reaching for the next row before anyone asks it to. It was once a tidy tree on a zoomable plane; the tree is still in the data (parentId and order are untouched, the tool contract unchanged) but a column that grows downward is navigated by scrolling, so the zoom, pan, fit and fold all went. Composition only: rounds come from mapRounds, progress from roundProgress, what may honestly be claimed while waiting from pendingRow, the clock bounding that wait from useBoundedWait, and following the column down from useFollowColumn.",
     "filePath": "app/components/ThinkingMapView.tsx",
     "name": "ThinkingMapView",
     "scenarios": [
@@ -1136,7 +1202,7 @@
     "testFile": "app/lib/mapKinds.test.ts"
   },
   {
-    "description": "Type guard for the six phases of the loop. SQLite has no enums, so phase strings arrive from the database and from model tool calls unvalidated; this is what keeps an unknown value out of the phase nav.",
+    "description": "Type guard for the five phases of the loop. SQLite has no enums, so phase strings arrive from the database and from model tool calls unvalidated; this is what keeps an unknown value out of the phase nav. It deliberately answers a NARROWER question than normalizePhase: whether a value is literally one of the five current phases, which is what the tool schema validates against. A stored phase from before deconstruct and map merged is not one of them, and goes through normalizePhase instead.",
     "filePath": "app/lib/mapKinds.ts",
     "name": "isPhase",
     "testFile": "app/lib/mapKinds.test.ts"
@@ -1229,6 +1295,12 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "The phase a stored string means, following the legacy aliases. Distinct from isPhase, which answers whether a value is literally one of the five current phases: the tool schema validates against the current vocabulary, while every path that READS a stored phase has to cope with what earlier versions wrote — chiefly 'deconstruct', which resolves to 'map'. Returns null for an unrecognised string so the caller picks its own fallback rather than being handed a wrong phase.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "normalizePhase",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
     "description": "Tells a subscribed agent the log moved. Reads the hook at call time rather than capturing it at module load, so a browser that gains the capability mid-session is picked up without a reload. Purely an optimisation that removes polling latency; a notification is not a turn and nothing depends on it.",
     "filePath": "app/lib/webmcp.ts",
     "name": "notifyExchangeUpdated",
@@ -1272,6 +1344,12 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "pendingQuestions",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "What the page may honestly claim while it waits for the next round. The shimmering placeholder row is a promise, and WebMCP is pull-only — the page cannot start an agent's turn or know one is coming — so the shimmer is bounded and resolves into one of three genuinely different sentences: an agent is working and has the answers, an agent is attached but not in a turn, or nothing can reach the page and the answers are simply on the log. Hidden while the newest round still has open questions, and at next-steps where the loop arrives. Modelled on askPresence, which does the same job for the ask composer.",
+    "filePath": "app/lib/pendingRow.ts",
+    "name": "pendingRow",
+    "testFile": "app/lib/pendingRow.test.ts"
   },
   {
     "description": "A phase's name for use in a sentence. The phase nav numbers its labels; the rail strips the number, so a row reads 'moved to Explore' rather than 'moved to 05 Explore'.",
@@ -1349,6 +1427,12 @@
     "testFile": "app/lib/mapRounds.test.ts"
   },
   {
+    "description": "How far through a round the person is — the definition the whole feature gates on: the footer's count, whether the next row is reached for, and whether the phase's action appears. Counts only ANSWERABLE cards: a goal or assumption the agent has not filled in carries status 'open' and shows in the map caption, but has no answer box, so counting it would leave the loop permanently one short and the next row never reached for.",
+    "filePath": "app/lib/roundProgress.ts",
+    "name": "roundProgress",
+    "testFile": "app/lib/roundProgress.test.ts"
+  },
+  {
     "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "runLength",
@@ -1385,6 +1469,12 @@
     "filePath": "app/lib/nodePlan.ts",
     "name": "serialiseOptions",
     "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
+    "description": "The sentence the bounded shimmer resolves into, for each of the three things that can be true about who can hear the log: an agent mid-turn has what was added, an agent is attached but not in a turn, or nothing can reach the page at all. The three are deliberately distinct claims — collapsing them would make the page sound more attended-to than it is. Says what you have added rather than your answers, because the same row appears on a day-one map that has only a seed idea. Exported so the isolated-component fixtures cite the real sentence instead of a hand-copy that can drift.",
+    "filePath": "app/lib/pendingRow.ts",
+    "name": "settledNote",
+    "testFile": "app/lib/pendingRow.test.ts"
   },
   {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
@@ -1456,16 +1546,34 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "Moving the map to its next phase, from the page — the first page-side caller of set_phase, which until now only ever moved because an agent moved it. The ORDER is the point: the note saying what was decided goes on the log BEFORE the phase moves, so an agent reading the log finds a sentence rather than a phase that silently changed under it. A failed phase write therefore leaves the decision recorded, and says so rather than claiming the note was lost.",
+    "filePath": "app/hooks/useAdvancePhase.ts",
+    "name": "useAdvancePhase",
+    "testFile": "app/hooks/useAdvancePhase.test.ts"
+  },
+  {
     "description": "The ask_user promise lifecycle: park an agent's turn on a set of questions, and release it when they are answered or the clock runs out. Separate from the log because it is a different clock — the log is durable and outlives everyone, this is one turn held in memory. A second ask releases the first as unanswered rather than stranding its promise.",
     "filePath": "app/hooks/useAskUser.ts",
     "name": "useAskUser",
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
+    "description": "How long something has been true, reported once it has been true long enough — the only input the pending row needs that a pure function cannot compute. Reports a STEP rather than a ticking clock, 0 until the limit then the limit, because a value changing every frame would re-render the whole map column to move a decision that flips exactly once. Restarts on its reset key, so a new round means the page is reaching for something new rather than still waiting on the old.",
+    "filePath": "app/hooks/useBoundedWait.ts",
+    "name": "useBoundedWait",
+    "testFile": "app/hooks/useBoundedWait.test.ts"
+  },
+  {
     "description": "The page's own copy of the exchange log, kept current. Polls the log forward from the cursor it holds — the same way an agent reads it, because WebMCP is pull-only and there is no push channel — and re-renders the server component when the log moves past what was rendered, so the server-rendered map does not sit out of step with its own log.",
     "filePath": "app/hooks/useExchangeLog.ts",
     "name": "useExchangeLog",
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
+  },
+  {
+    "description": "Keeping the bottom of a growing column in view, for a reader who is already at the bottom and nobody else. Two subtleties: it must not fire on first paint, because a page that jumps to its own bottom before the person has read the top is not reacting to anything; and 'have I run before' is the wrong way to express that, since StrictMode invokes effects twice on mount and would consume such a flag — so the refs are seeded with mount-time values during render and the effect compares against a transition instead.",
+    "filePath": "app/hooks/useFollowColumn.ts",
+    "name": "useFollowColumn",
+    "testFile": "app/hooks/useFollowColumn.test.ts"
   },
   {
     "description": "What every question on the map has been answered, and how to answer one. Merges the log's answers with an optimistic layer for answers written in this tab: the answer takes the card's body the moment it is sent, because one still sitting in the input after you pressed send reads as the answer having been lost, and it is rolled back only if the write actually failed. The pending entry is never cleared on success — the log catches up on its own, and clearing early would flicker the question back to unanswered.",

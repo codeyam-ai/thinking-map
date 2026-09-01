@@ -7,6 +7,7 @@ import ExchangeRail from './ExchangeRail';
 import ThinkingMapView from './ThinkingMapView';
 import { useWebMcpBridge } from './WebMcpBridge';
 import type { BriefCoverage } from '../lib/briefCoverage';
+import type { Phase } from '../lib/mapKinds';
 import type { FlatNode } from '../lib/mapLayout';
 
 /**
@@ -32,9 +33,13 @@ export default function MapWorkspace({
   caption,
   mapId,
   brief,
+  phase,
 }: {
   nodes: FlatNode[];
   caption: string;
+  /** Passed straight down to the map, which is where the round footer needs it
+   *  to name the action that ends the phase. */
+  phase?: Phase;
   /** Passed through to the map. Optional the whole way down, so an isolated
    *  scenario mounts the map without inventing one. */
   mapId?: string;
@@ -50,7 +55,12 @@ export default function MapWorkspace({
       ) : null}
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-        <ThinkingMapView nodes={nodes} caption={caption} mapId={mapId} />
+        <ThinkingMapView
+          nodes={nodes}
+          caption={caption}
+          mapId={mapId}
+          phase={phase}
+        />
 
         <Disclosure summary="Add something of your own">
           <ContributionBar />

@@ -1,0 +1,12 @@
+{
+  "name": "PendingCards - Two",
+  "id": "8c801223-766e-4f44-8c27-bfc6a7d63cef",
+  "url": "/isolated-components/PendingCards?s=Two",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingCards",
+  "scenarioType": "component",
+  "description": "A narrower reach. The band wraps rather than scrolling sideways, so the count varies with no breakpoint deciding anything."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "PhaseAdvance - EndOfMap",
+  "id": "83321e3d-fd4a-4cf7-b50a-5584308e0adb",
+  "url": "/isolated-components/PhaseAdvance?s=EndOfMap",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseAdvance",
+  "scenarioType": "component",
+  "description": "The end of 02 Map: the questions are answered, so what is left is going and finding things out. Ready to research."
+}

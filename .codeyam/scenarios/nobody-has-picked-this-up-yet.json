@@ -41,7 +41,7 @@
   "thinkingMap": [
    {
     "id": "map-untouched",
-    "phase": "deconstruct",
+    "phase": "map",
     "revision": 1,
     "seedIdea": "A weekend app for splitting chores fairly between housemates",
     "title": "A weekend app for splitting chores fairly between housemates"

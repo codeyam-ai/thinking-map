@@ -16,8 +16,20 @@ const scenarios: Record<string, Props> = {
     map: {
       id: "map-bakery",
       title: "Should the bakery deliver?",
-      phase: "deconstruct",
+      phase: "map",
       _count: { nodes: 1 },
+    },
+  },
+  // Deliberately still stored as the phase that no longer exists. Every other
+  // fixture was moved to `map` when the two phases merged; this one is kept
+  // behind so the alias is demonstrated on screen and not only in a unit test —
+  // it must render as "02 Map", never as the raw word the row holds.
+  LegacyPhase: {
+    map: {
+      id: "map-chores",
+      title: "A weekend app for splitting chores fairly",
+      phase: "deconstruct",
+      _count: { nodes: 5 },
     },
   },
 };

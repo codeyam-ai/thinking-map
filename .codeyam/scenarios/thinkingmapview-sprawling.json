@@ -7,6 +7,7 @@
  ],
  "mocks": {},
  "componentName": "ThinkingMapView",
+ "demonstratesState": { "rounds": "many" },
  "scenarioType": "component",
  "description": "Seventeen nodes across four levels. The column keeps every card at a readable size and scrolls rather than shrinking anything, because a map you scroll beats one that fits and cannot be read."
 }

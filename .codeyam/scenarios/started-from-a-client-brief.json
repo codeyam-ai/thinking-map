@@ -146,7 +146,7 @@
   "thinkingMap": [
    {
     "id": "map-brief",
-    "phase": "deconstruct",
+    "phase": "map",
     "revision": 6,
     "seedIdea": "Work out what we can actually build before the March board meeting.",
     "title": "Northgate Library \u2014 Digital Membership Renewal"

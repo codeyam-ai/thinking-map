@@ -29,6 +29,7 @@ export default function MapCard({
   answer,
   asked = false,
   onAnswer,
+  entering = false,
 }: {
   node: FlatNode;
   /** Which round this card belongs to, and how many there are — the `2/4`
@@ -40,6 +41,10 @@ export default function MapCard({
   /** The person has already asked about this node. */
   asked?: boolean;
   onAnswer?(id: string, label: string, answer: string): Promise<void>;
+  /** This card belongs to the round that just arrived. The animation runs once
+   *  on mount, and a card is keyed by node id, so a round genuinely lands
+   *  rather than being redrawn on every poll. */
+  entering?: boolean;
 }) {
   const isRoot = node.parentId === null;
   const isQuestion = node.kind === 'open-question';
@@ -48,7 +53,11 @@ export default function MapCard({
   const answered = answer !== null && answer !== undefined;
 
   return (
-    <article className="flex min-h-[240px] w-full min-w-[220px] max-w-[300px] flex-col rounded-[20px] border border-line bg-surface p-5">
+    <article
+      className={`flex min-h-[240px] w-full min-w-[220px] max-w-[300px] flex-col rounded-[20px] border border-line bg-surface p-5 ${
+        entering ? 'node-in' : ''
+      }`}
+    >
       <header className="flex items-start justify-between gap-3">
         <span className="text-[12px] font-bold tabular-nums text-muted">
           {round}/{totalRounds}

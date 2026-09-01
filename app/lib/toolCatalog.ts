@@ -13,7 +13,7 @@
 // itself execute.
 
 import { z } from 'zod';
-import { NODE_KINDS, NODE_STATUSES, PHASES } from './mapKinds';
+import { ACCEPTED_PHASE_NAMES, NODE_KINDS, NODE_STATUSES } from './mapKinds';
 import type { Origin } from './exchange';
 
 /**
@@ -191,7 +191,13 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     title: 'Move the map to a new phase',
     description:
       'Advance the map through the loop once the conversation has genuinely reached the next phase.',
-    inputSchema: z.object({ phase: z.enum(PHASES) }),
+    inputSchema: z.object({
+      phase: z
+        .enum(ACCEPTED_PHASE_NAMES)
+        .describe(
+          'One of: idea, map, research, explore, next-steps. `deconstruct` is also accepted and is treated as `map` — the two were merged into one phase, and the old name keeps working for agents that learned it.',
+        ),
+    }),
   },
   {
     name: 'post_note',

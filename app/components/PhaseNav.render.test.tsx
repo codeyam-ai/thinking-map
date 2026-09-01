@@ -3,6 +3,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import PhaseNav from './PhaseNav';
+import { PHASES, PHASE_LABELS } from '../lib/mapKinds';
 
 // The one genuinely testable behavior the scrolling track ships with.
 //
@@ -68,15 +69,18 @@ describe('PhaseNav active-step visibility', () => {
   });
 
   // The design decision this locks in: at narrow widths the track SCROLLS
-  // rather than collapsing to a "3 of 6" summary, because it is a map of the
-  // process rather than a progress bar. All six stay in the DOM at every width.
+  // rather than collapsing to a "3 of 5" summary, because it is a map of the
+  // process rather than a progress bar. Every step stays in the DOM at every
+  // width.
+  //
+  // Counted off PHASES rather than a literal: the loop has already been
+  // renumbered once (deconstruct and map merged), and this test is about the
+  // track showing ALL of whatever the loop is — not about there being five.
   it('renders every phase, so the whole process stays reachable', () => {
     spyOnScrollIntoView();
     render(<PhaseNav active="idea" />);
 
-    // The track scrolls rather than collapsing to a summary: all six steps are
-    // in the DOM at every width.
-    expect(screen.getAllByText(/^0[1-6] /)).toHaveLength(6);
+    expect(screen.getAllByText(/^\d\d /)).toHaveLength(PHASES.length);
   });
 
   // Exactly one pill carries `aria-current="step"` — the hook the scroll effect
@@ -88,6 +92,8 @@ describe('PhaseNav active-step visibility', () => {
 
     const current = container.querySelectorAll('[aria-current="step"]');
     expect(current).toHaveLength(1);
-    expect(current[0].textContent).toContain('04');
+    // Read from the labels rather than hardcoded: research is 03 since the
+    // merge, and pinning the number here would only re-break on the next one.
+    expect(current[0].textContent).toContain(PHASE_LABELS.research);
   });
 });

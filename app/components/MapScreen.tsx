@@ -53,6 +53,7 @@ export default function MapScreen({
           caption={mapCaption(nodes)}
           mapId={mapId}
           brief={brief}
+          phase={phase}
         />
       )}
     </main>
