@@ -2710,14 +2710,6 @@
       "runner": "tests"
     },
     {
-      "description": "",
-      "file": "app/lib/toolCatalog.test.ts",
-      "format": "vitest",
-      "key": "the shared tool catalog › marks the two read-only tools as read-only",
-      "registeredAt": "2026-09-01T15:20:39Z",
-      "runner": "tests"
-    },
-    {
       "description": "The cap is what stops a confused agent pinning a connection open forever.",
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
