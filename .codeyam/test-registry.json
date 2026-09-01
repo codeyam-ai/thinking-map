@@ -280,6 +280,69 @@
       "runner": "tests"
     },
     {
+      "description": "The reported case, and the reason this plan exists. A track that fits has nothing hidden past either edge, so a fade there is a promise of content that does not exist — and it is drawn straight over the active lime pill.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › applies no fade at all when the whole track fits",
+      "line": 159,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A window can cross the fits / does-not-fit boundary without any scrolling at all. Left to the scroll listener alone, a track that just became wide enough to fit would keep a fade it no longer has any content to justify.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › drops the fade when a resize makes the track fit",
+      "line": 232,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The mirror of the reported bug. Scrolled hard against the end, the trailing fade has to go — otherwise the active pill is washed out again, this time on a track where the fade looked justified.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › drops the trailing fade once the track is scrolled to the end",
+      "line": 193,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Content is cut off both ways, so both edges earn a fade. This is the state the mask exists for, and the only one where the old behaviour was right.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › fades both edges mid-track",
+      "line": 181,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Parked at the start of a track that genuinely does overflow: there is more to the right and nothing to the left, so exactly one edge should say so.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › fades only the trailing edge at the start of an overflowing track",
+      "line": 170,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The decision has to track the reader, not just the first paint. Without the scroll listener the fade would be frozen at whatever was true on mount, which is the static-decoration bug wearing a different disguise.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › re-derives the fade when the reader scrolls the track",
+      "line": 217,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Sub-pixel widths mean scrollLeft rarely lands exactly on its maximum, so a strict equality check would leave the trailing fade stuck on at an end the reader has visibly reached. Half a pixel short still counts as the end.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav edge fades › treats a sub-pixel gap at the end as the end",
+      "line": 205,
+      "registeredAt": "2026-09-01T23:06:53Z",
+      "runner": "tests"
+    },
+    {
       "description": "While questions are open the cards are the action, so the footer counts and offers nothing to press.",
       "file": "app/components/RowFooter.render.test.tsx",
       "format": "vitest",
@@ -2449,6 +2512,14 @@
       "runner": "tests"
     },
     {
+      "description": "",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › accents risk and pro nodes, and only those",
+      "registeredAt": "2026-09-01T23:31:21Z",
+      "runner": "tests"
+    },
+    {
       "description": "Gaps are the most valuable finding on the map, not a warning — an earlier build wrongly reddened them. They read as questions, which is what a gap is: something nobody has answered.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
@@ -2464,6 +2535,22 @@
       "key": "nodeShellClasses › draws an unanswered question dashed and unfilled",
       "line": 28,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind",
+      "registeredAt": "2026-09-01T23:31:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › fills the root idea solid, the one dark shape on the page",
+      "registeredAt": "2026-09-01T23:31:21Z",
       "runner": "tests"
     },
     {
@@ -2512,6 +2599,14 @@
       "runner": "tests"
     },
     {
+      "description": "",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › leaves a gap node neutral",
+      "registeredAt": "2026-09-01T23:31:21Z",
+      "runner": "tests"
+    },
+    {
       "description": "Exactly one thing per screen wears the lime, and it is what just changed — an accent colour must not steal it.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
@@ -2527,6 +2622,14 @@
       "key": "nodeShellClasses › lets the root treatment win over every other rule",
       "line": 42,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › marks a research node as a find",
+      "registeredAt": "2026-09-01T23:31:21Z",
       "runner": "tests"
     },
     {

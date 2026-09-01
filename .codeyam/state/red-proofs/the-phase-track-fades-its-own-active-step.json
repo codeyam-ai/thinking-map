@@ -1,0 +1,64 @@
+{
+  "provenAt": "2026-09-01T23:06:25Z",
+  "slug": "the-phase-track-fades-its-own-active-step",
+  "paths": [
+    "app/components/PhaseNav.tsx"
+  ],
+  "runScope": [
+    "app/components/PhaseNav.tsx"
+  ],
+  "tests": {
+    "applies no fade at all when the whole track fits": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "drops the fade when a resize makes the track fit": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "drops the trailing fade once the track is scrolled to the end": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "fades both edges mid-track": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "fades only the trailing edge at the start of an overflowing track": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "re-derives the fade when the reader scrolls the track": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "applies no fade at all when the whole track fits",
+      "fades both edges mid-track",
+      "drops the trailing fade once the track is scrolled to the end",
+      "re-derives the fade when the reader scrolls the track",
+      "drops the fade when a resize makes the track fit"
+    ]
+  }
+}

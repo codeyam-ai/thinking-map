@@ -328,6 +328,37 @@
         "status": "covered"
       }
     },
+    "PhaseNav": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The track renders the PHASES module constant, not data. There is no zero-item state - a build with no phases would be a broken constant, not a state a person can reach."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "Same fixed constant: the phase count is set in source, never by a query or a prop, so the empty-to-many boundary is not a state this component can be in."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "added"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Nothing is fetched. The labels are a constant and the only prop is which phase is active, so there is no pending state to render."
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "Every label is a fixed string in PHASE_LABELS, so no long, short, unicode or missing-field text can reach this component. What varies at the edge is the WIDTH, and that is the many archetype - the narrow overflow scenarios."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No failure path. An unknown phase cannot arrive - the prop is a union type over the same constant the track renders."
+      },
+      "key-interaction": {
+        "status": "added"
+      }
+    },
     "RowThreads": {
       "empty": {
         "status": "covered"

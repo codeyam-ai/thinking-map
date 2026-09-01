@@ -1,0 +1,18 @@
+{
+  "surface": "PhaseNav",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "isActive",
+      "value": "true",
+      "rationale": "source-derived state isActive=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "isActive",
+      "value": "false",
+      "rationale": "source-derived state isActive=false",
+      "status": "covered"
+    }
+  ]
+}

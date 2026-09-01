@@ -1,0 +1,12 @@
+{
+  "name": "PhaseNav - NarrowAtEnd",
+  "id": "5852410f-209c-4ebd-9bbb-85d07b6f30ae",
+  "url": "/isolated-components/PhaseNav?s=NarrowAtEnd",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseNav",
+  "scenarioType": "component",
+  "description": "The mirror of the reported bug. Scrolled hard against the end, the trailing fade is gone and the leading one has appeared - so the active lime pill reads solid even on a track where a fade looked justified."
+}

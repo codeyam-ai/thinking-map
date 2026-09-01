@@ -1374,10 +1374,30 @@
   },
   "PhaseNav active-step visibility › does not re-scroll when the phase is unchanged": {
     "file": "app/components/PhaseNav.render.test.tsx",
-    "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:06:49.195980297+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:03:09.250410668+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T22:43:16.532040387+00:00",
         "kind": "full",
@@ -1405,26 +1425,6 @@
       },
       {
         "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:02.720156704+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1432,10 +1432,30 @@
   },
   "PhaseNav active-step visibility › marks only the active phase as the current step": {
     "file": "app/components/PhaseNav.render.test.tsx",
-    "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:06:49.195980297+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:03:09.250410668+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T22:43:16.532040387+00:00",
         "kind": "full",
@@ -1463,26 +1483,6 @@
       },
       {
         "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:02.720156704+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1490,10 +1490,30 @@
   },
   "PhaseNav active-step visibility › renders every phase, so the whole process stays reachable": {
     "file": "app/components/PhaseNav.render.test.tsx",
-    "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:06:49.195980297+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:03:09.250410668+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T22:43:16.532040387+00:00",
         "kind": "full",
@@ -1521,26 +1541,6 @@
       },
       {
         "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:02.720156704+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1548,10 +1548,30 @@
   },
   "PhaseNav active-step visibility › scrolls the active pill into view on first render": {
     "file": "app/components/PhaseNav.render.test.tsx",
-    "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:06:49.195980297+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:03:09.250410668+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T22:43:16.532040387+00:00",
         "kind": "full",
@@ -1579,26 +1599,6 @@
       },
       {
         "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:02.720156704+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -1606,10 +1606,30 @@
   },
   "PhaseNav active-step visibility › scrolls the newly active pill into view when the phase advances": {
     "file": "app/components/PhaseNav.render.test.tsx",
-    "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:06:49.195980297+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:03:09.250410668+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T22:43:16.532040387+00:00",
         "kind": "full",
@@ -1639,24 +1659,130 @@
         "at": "2026-09-01T21:33:40.316636753+00:00",
         "kind": "changed",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "PhaseNav edge fades › applies no fade at all when the whole track fits": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
+        "at": "2026-09-01T23:07:27.917189221+00:00",
         "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "PhaseNav edge fades › drops the fade when a resize makes the track fit": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "at": "2026-09-01T23:07:27.917189221+00:00",
         "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "PhaseNav edge fades › drops the trailing fade once the track is scrolled to the end": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:02.720156704+00:00",
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "PhaseNav edge fades › fades both edges mid-track": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "PhaseNav edge fades › fades only the trailing edge at the start of an overflowing track": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "PhaseNav edge fades › re-derives the fade when the reader scrolls the track": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "PhaseNav edge fades › treats a sub-pixel gap at the end as the end": {
+    "file": "app/components/PhaseNav.render.test.tsx",
+    "lastRunAt": "2026-09-01T23:27:27.342838398+00:00",
+    "lastRunKind": "targeted",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T23:27:27.342838398+00:00",
+        "kind": "targeted",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T23:07:27.917189221+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -15010,6 +15136,64 @@
       }
     ]
   },
+  "nodeShellClasses › accents risk and pro nodes, and only those": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T22:09:54.992302604+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T22:09:54.992302604+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T22:04:04.329379791+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:51:18.053769883+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:44.772930938+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:14.285262719+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:50.876956731+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:34.289119325+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:15.378464999+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:25:55.333435268+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
   "nodeShellClasses › draws a gap as a question rather than a warning": {
     "file": "app/lib/nodeAppearance.test.ts",
     "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
@@ -15106,6 +15290,122 @@
       },
       {
         "at": "2026-09-01T21:33:02.720156704+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T22:09:54.992302604+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T22:09:54.992302604+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T22:04:04.329379791+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:51:18.053769883+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:44.772930938+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:14.285262719+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:50.876956731+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:34.289119325+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:15.378464999+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:25:55.333435268+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › fills the root idea solid, the one dark shape on the page": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T22:09:54.992302604+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T22:09:54.992302604+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T22:04:04.329379791+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:51:18.053769883+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:44.772930938+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:14.285262719+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:50.876956731+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:34.289119325+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:15.378464999+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:25:55.333435268+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -15341,6 +15641,64 @@
       }
     ]
   },
+  "nodeShellClasses › leaves a gap node neutral": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T22:09:54.992302604+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T22:09:54.992302604+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T22:04:04.329379791+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:51:18.053769883+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:44.772930938+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:14.285262719+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:50.876956731+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:34.289119325+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:15.378464999+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:25:55.333435268+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
   "nodeShellClasses › lets \"updated\" win over an accent kind": {
     "file": "app/lib/nodeAppearance.test.ts",
     "lastRunAt": "2026-09-01T22:43:16.532040387+00:00",
@@ -15452,6 +15810,64 @@
       },
       {
         "at": "2026-09-01T21:33:02.720156704+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › marks a research node as a find": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T22:09:54.992302604+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T22:09:54.992302604+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T22:04:04.329379791+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:51:18.053769883+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:44.772930938+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:32:14.285262719+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:50.876956731+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:34.289119325+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:26:15.378464999+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-01T21:25:55.333435268+00:00",
         "kind": "changed",
         "status": "pass"
       }

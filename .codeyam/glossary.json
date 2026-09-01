@@ -668,7 +668,7 @@
     ]
   },
   {
-    "description": "The six-phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar.",
+    "description": "The phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar. Below lg the track scrolls horizontally rather than collapsing to a summary, and its edge fades are derived from scroll position - each one appears only when there is genuinely more track past that edge, so the fade never washes out the active pill on a track that fits.",
     "filePath": "app/components/PhaseNav.tsx",
     "name": "PhaseNav",
     "scenarios": [
