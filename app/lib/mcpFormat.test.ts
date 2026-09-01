@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatMapDetail, formatMapList } from './mcpFormat';
+import { formatMapDetail, formatMapList, formatNewMaps } from './mcpFormat';
 
 const row = (id: string, title: string, phase: string, nodes = 0, messages = 0) => ({
   id,
@@ -83,5 +83,78 @@ describe('formatMapDetail', () => {
   it('renders a map with no nodes', () => {
     const out = formatMapDetail({ ...detail, nodes: [] });
     expect(out).toContain('(empty — nothing on the map yet)');
+  });
+});
+
+// What an agent parked on await_new_map actually reads. It arrives with no
+// context about the map at all, so every row has to carry the id, the idea and
+// the next call — and an expiry has to read as normal rather than as failure.
+describe('formatNewMaps', () => {
+  const CURSOR = '2026-09-01T17:23:26.907Z';
+  const newMap = (over = {}) => ({
+    id: 'map-one',
+    title: 'A chore app',
+    seedIdea: 'A weekend app for splitting chores fairly',
+    hasBrief: false,
+    ...over,
+  });
+
+  // The id is what every follow-up tool call takes; a row without it is a dead
+  // end, exactly as in formatMapList.
+  it('leads each row with the map id', () => {
+    expect(formatNewMaps([newMap()], CURSOR)).toContain('map-one');
+  });
+
+  // The agent has to be told what to do next, not left to infer it.
+  it('spells out read_map as the next call for a sentence-started map', () => {
+    const out = formatNewMaps([newMap()], CURSOR);
+    expect(out).toContain('read_map with mapId "map-one"');
+  });
+
+  // A brief-started map's seed idea is empty or near-empty, so the brief is the
+  // thing worth reading first.
+  it('spells out read_brief as the next call for a brief-started map', () => {
+    const out = formatNewMaps([newMap({ hasBrief: true, seedIdea: '' })], CURSOR);
+    expect(out).toContain('read_brief with mapId "map-one"');
+    expect(out).not.toContain('read_map');
+  });
+
+  // A blank line where the idea should be reads as missing data rather than as
+  // a map that genuinely started from a document.
+  it('says so explicitly when a map has no seed idea', () => {
+    const out = formatNewMaps([newMap({ hasBrief: true, seedIdea: '   ' })], CURSOR);
+    expect(out).toContain('started from a brief');
+  });
+
+  // One wait can hand back several maps, and the count must agree with itself.
+  it('renders every map when several arrive at once', () => {
+    const out = formatNewMaps(
+      [newMap(), newMap({ id: 'map-two', title: 'Another' })],
+      CURSOR,
+    );
+    expect(out).toContain('2 new maps');
+    expect(out).toContain('map-one');
+    expect(out).toContain('map-two');
+  });
+
+  // '1 new maps' is exactly the kind of thing that survives review and then
+  // reads as broken.
+  it('keeps the count singular for a single map', () => {
+    expect(formatNewMaps([newMap()], CURSOR)).toContain('1 new map:');
+  });
+
+  // Without the cursor the agent cannot re-park exactly, and would either miss
+  // a map or re-read one it already handled.
+  it('hands back the cursor to resume from', () => {
+    expect(formatNewMaps([newMap()], CURSOR)).toContain(CURSOR);
+  });
+
+  // The expiry case. An agent looping on this sees it constantly, so it must
+  // read as an ordinary answer and still carry the cursor.
+  it('reports an empty result as normal rather than as a failure', () => {
+    const out = formatNewMaps([], CURSOR);
+    expect(out).toContain('No new maps yet');
+    expect(out).toContain(CURSOR);
+    expect(out).not.toMatch(/error|failed|unable/i);
   });
 });

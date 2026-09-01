@@ -1,0 +1,12 @@
+{
+  "name": "SeedIdeaQuote - LongIdea",
+  "id": "541a3266-7e8e-44d2-ad22-89d5e5069046",
+  "url": "/isolated-components/SeedIdeaQuote?s=LongIdea",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SeedIdeaQuote",
+  "scenarioType": "component",
+  "description": "A long idea at close to the full desktop width - it still holds a single line, which is the point: the italic and the left rule have to keep reading as a quote at the length where they are nearly a full-width run of text."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "SeedIdeaQuote - ShortIdea",
+  "id": "5d282c8e-5725-4858-bdec-8f301301c732",
+  "url": "/isolated-components/SeedIdeaQuote?s=ShortIdea",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SeedIdeaQuote",
+  "scenarioType": "component",
+  "description": "A terse idea, short enough that the rule is most of the visual weight - the case where the treatment either still reads as a quote or stops doing so."
+}

@@ -1,0 +1,18 @@
+{
+  "surface": "CopyablePrompt",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "copied",
+      "value": "true",
+      "rationale": "source-derived state copied=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "copied",
+      "value": "false",
+      "rationale": "source-derived state copied=false",
+      "status": "planned"
+    }
+  ]
+}

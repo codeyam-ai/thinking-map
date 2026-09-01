@@ -1,3 +1,4 @@
+import AgentHandoff from './AgentHandoff';
 import AgentStatus from './AgentStatus';
 import AppHeader from './AppHeader';
 import MapWorkspace from './MapWorkspace';
@@ -20,6 +21,7 @@ export default function MapScreen({
   nodes,
   mapId,
   brief,
+  seedIdea,
 }: {
   phase: Phase;
   nodes: FlatNode[] & SummaryNode[];
@@ -28,10 +30,21 @@ export default function MapScreen({
   /** Only the working view takes it too: the plan view has no map to
    *  annotate, so brief coverage has nothing to sit beside there. */
   brief?: { sourceName: string; coverage: BriefCoverage };
+  /** Quoted back by the handoff panel, so a person whose idea nobody has picked
+   *  up can see it was kept. Optional the whole way down, matching `brief`, so
+   *  an isolated scenario can mount the map without inventing one. */
+  seedIdea?: string;
 }) {
   return (
     <main className="flex h-screen flex-col gap-3 px-4 py-4 sm:px-6 lg:gap-6 lg:px-10 lg:py-8">
       <AppHeader phase={phase} status={<AgentStatus />} />
+      {mapId ? (
+        <AgentHandoff
+          mapId={mapId}
+          seedIdea={seedIdea}
+          hasBrief={brief !== undefined}
+        />
+      ) : null}
       {phase === 'next-steps' ? (
         <SummaryScreen nodes={nodes} />
       ) : (

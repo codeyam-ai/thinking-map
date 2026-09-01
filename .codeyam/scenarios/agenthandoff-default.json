@@ -1,0 +1,12 @@
+{
+  "name": "AgentHandoff - Default",
+  "id": "1130ea3d-f5f6-4e56-916b-195b6d4cade2",
+  "url": "/isolated-components/AgentHandoff?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentHandoff",
+  "scenarioType": "component",
+  "description": "The reported case, rendered: someone typed a sentence, pressed send, and landed on a map nobody is working on. It says so plainly rather than spinning, quotes their idea back so they can see it was kept, and hands over a prompt naming this map's id and read_map as the first call."
+}

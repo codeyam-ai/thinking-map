@@ -1,5 +1,36 @@
 {
   "views": {
+    "AgentHandoff": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The panel is itself the empty-ish state of a map. It renders only when nothing has worked the map, and when there is no seed idea to show it drops the quote and points at the brief instead - that is the FromBrief scenario, not a separate empty one."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It renders one card of fixed copy, never a list, so there is no overflow or truncation boundary. Length variation is the edge archetype, covered by LongIdea."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Nothing here is asynchronous. The panel reads bridge state already resolved by the provider and renders synchronously; there is no pending phase to picture."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure this panel can be in. Its whole purpose is to state an ordinary absence honestly - the states where it must NOT render are asserted in AgentHandoff.render.test.tsx, where 'nothing' is a real assertion rather than a blank frame."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Its one action is the copy button, which belongs to CopyablePrompt and is recorded on that view. The copied label needs a successful navigator.clipboard write, which the capture browser refuses."
+      }
+    },
     "BriefDrop": {
       "empty": {
         "status": "covered"
@@ -59,6 +90,37 @@
         "reason": "The region is read-only: it renders slices and binds no handlers. The plan is something the client reads and argues with, not something they operate."
       }
     },
+    "CopyablePrompt": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The only caller builds the text from handoffCopy, which always returns a non-empty prompt. An empty string would render an empty bordered box, which is a caller bug rather than a state of this component."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "This renders one block of text, never a list, so there is no overflow or truncation boundary to show. Length variation is the edge archetype, covered by ShortPrompt and DefaultLabel."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "There is nothing asynchronous to wait for on render. The clipboard write is instantaneous from the component's point of view and resolves into the copied label, not a loading state."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The failure path - a refused or unavailable clipboard - is deliberately indistinguishable from the resting state: the button simply does not change, and the text stays on screen so the person can select it by hand. It is therefore already shown by Default, and a separate capture would be a byte-identical duplicate."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The copied label is reachable only through a successful navigator.clipboard write, which the capture browser refuses - a registered interaction scenario captured the pre-click state and was deleted rather than shipped as a misleading duplicate of Default. The state is covered instead by app/components/AgentHandoff.render.test.tsx and the CopyablePrompt behaviour is asserted there rather than pictured."
+      }
+    },
     "Home": {
       "empty": {
         "status": "covered"
@@ -116,6 +178,34 @@
         "status": "covered"
       }
     },
+    "MapScreen": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The route is force-dynamic and server-renders the map with its log already read, so the page never paints a pending state - by the time MapScreen mounts, its data is resolved."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "covered"
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "MapScreen composes the surface; every action on it belongs to a child that owns it - the composer, the workspace, the handoff panel - and is recorded on those views rather than duplicated here."
+      }
+    },
     "MapWorkspace": {
       "empty": {
         "status": "covered"
@@ -142,6 +232,37 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "SeedIdeaQuote": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The empty case renders nothing at all by design - a blank seed idea produces no element rather than empty quote marks. A capture of it would be an empty frame indistinguishable from a broken one, so it is pinned in handoffCopy.test.ts and the AgentHandoff render tests instead."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It renders exactly one quote, never a list. Length variation is the edge archetype, covered by LongIdea and ShortIdea."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "It is a pure presentational component over a string prop with no asynchronous work, so there is no pending phase."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "It takes a single optional string and has no failure mode; an absent value is the blank case, which renders nothing by design."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "It is static text with no handlers - there is no action a person can take on it."
       }
     },
     "SliceCard": {

@@ -43,6 +43,7 @@ export default async function MapPage({
         nodes={map.nodes}
         mapId={map.id}
         brief={brief ?? undefined}
+        seedIdea={map.seedIdea}
       />
       {process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}
     </WebMcpBridge>

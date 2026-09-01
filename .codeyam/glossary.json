@@ -27,6 +27,16 @@
     ]
   },
   {
+    "description": "The panel a person meets when they submit an idea and nothing picks it up. Before it existed the only sign of that was 'No agent attached' in the header, which states a fact about the page rather than telling the person what to do about it. A renderer only - every string comes from handoffCopy, where tests pin it. What it decides is whether to appear at all: it hides when an agent is listening, using the identical predicate NodeQuestionComposer uses so working counts as attached and the two surfaces cannot contradict each other, and it hides when the log already carries an agent-origin event, because a map an agent has already worked is not waiting for one.",
+    "filePath": "app/components/AgentHandoff.tsx",
+    "name": "AgentHandoff",
+    "scenarios": [
+      "agenthandoff-default",
+      "agenthandoff-frombrief",
+      "agenthandoff-longidea"
+    ]
+  },
+  {
     "description": "The collapsed dev panel, pinned to the corner: present enough to find, quiet enough to ignore. It sits over the map rather than in the layout because it is not part of the product.",
     "filePath": "app/components/AgentPanelLauncher.tsx",
     "name": "AgentPanelLauncher",
@@ -270,6 +280,16 @@
     ]
   },
   {
+    "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff panel with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath.",
+    "filePath": "app/components/CopyablePrompt.tsx",
+    "name": "CopyablePrompt",
+    "scenarios": [
+      "copyableprompt-default",
+      "copyableprompt-shortprompt",
+      "copyableprompt-defaultlabel"
+    ]
+  },
+  {
     "description": "The strongest directions on the summary screen, lettered A onward so they can be referred to by name in conversation.",
     "filePath": "app/components/DirectionsCard.tsx",
     "name": "DirectionsCard",
@@ -387,6 +407,15 @@
       "landingscreen-dayone",
       "landingscreen-default"
     ]
+  },
+  {
+    "description": "The one channel on mapEvents that is not a map id. Every other emit is keyed by mapId, which cannot carry news of a map no waiter knows the id of yet - and that is exactly what a newly started map is. A constant rather than a literal because a waiter subscribed to a typo'd string would simply never wake, which is indistinguishable from nobody having submitted anything.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "MAP_CREATED",
+    "untestabilityReason": {
+      "justification": "A single string constant naming an event channel; the behaviour that depends on it is covered by the waitForNewMap tests in app/lib/exchange.integration.test.ts.",
+      "kind": "type-only"
+    }
   },
   {
     "description": "The dotted edge layer beneath the node pills. Dotted because the structure is provisional - this is thinking in progress, not an org chart.",
@@ -572,6 +601,16 @@
       "justification": "Shipped by the codeyam scaffolder and untouched by this project. It is development-only tooling - it calls notFound in production - and belongs to the editor's surface rather than the product's.",
       "kind": "scaffold"
     }
+  },
+  {
+    "description": "The person's own words, handed back to them. Its own component because of the decision it owns: a map started from a document rather than a sentence has no seed idea, and rendering empty quote marks around nothing would look like the text was lost - the precise anxiety this panel exists to answer. Blank in, nothing out.",
+    "filePath": "app/components/SeedIdeaQuote.tsx",
+    "name": "SeedIdeaQuote",
+    "scenarios": [
+      "seedideaquote-default",
+      "seedideaquote-longidea",
+      "seedideaquote-shortidea"
+    ]
   },
   {
     "description": "The lime circular send control with its arrow, positioned inside whichever input pill hosts it. Shared by the landing prompt and the conversation reply box.",
@@ -938,6 +977,12 @@
     "testFile": "app/lib/mcpFormat.test.ts"
   },
   {
+    "description": "Renders what await_new_map handed back, for an agent that arrives with no context about the map at all. Every row leads with the id and spells out the next call rather than leaving it to be inferred: read_brief when the map was started from a document, read_map otherwise. An expiry gets its own branch - no new maps yet plus the cursor to resume from - so an agent looping on this never reads the ordinary case as a failure.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatNewMaps",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
     "description": "Sends a page-side tool call to the tools route, where the shared runtime executes it. The page cannot run the catalog itself because every implementation ends in SQLite, so this one hop is the only difference between the page door and the two server doors.",
     "filePath": "app/lib/webmcp.ts",
     "name": "forward",
@@ -985,6 +1030,12 @@
       "justification": "Four straight-line statements with no branching: construct server, construct transport, connect, delegate. The tools underneath are covered by their own entries, and the endpoint was verified end to end against a live MCP client - initialize, tools/list, and a create/add-node/read round trip.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "The wording a map with nobody attached to it says for itself. WebMCP is pull-only, so submitting an idea writes a map but does not summon anyone to think about it - and a spinner would be a lie about work that will never begin on its own. Returns the eyebrow, the explanation, a copyable start prompt naming the map id, and the two ways to attach. hasBrief is an argument rather than a branch in the component because a brief-started map has no sentence to quote and its agent should read the brief, not the emptier map. Pure and pinned by tests, following askPresence, because the wording IS the interface here.",
+    "filePath": "app/lib/handoffCopy.ts",
+    "name": "handoffCopy",
+    "testFile": "app/lib/handoffCopy.test.ts"
   },
   {
     "description": "Stands in for a heading when a passage has none: the first nine words of its opening line, elided if there were more. A person scanning the outline needs to recognise the passage, not read it.",
@@ -1375,6 +1426,12 @@
     "filePath": "app/lib/collapse.ts",
     "name": "visibleNodes",
     "testFile": "app/lib/collapse.test.ts"
+  },
+  {
+    "description": "Blocks until somebody starts a thinking map, or until the caller's timeout expires. The server-door half of the answer to a page not being able to wake an agent: nothing here pushes, but an agent with nothing to do can park, so a submitted idea is picked up rather than sitting on an empty page. A near-copy of waitForUserActivity - check first, then race the in-process emitter against a poll, on a bounded deadline - so the two read as one pattern. Cursored by createdAt rather than revision, because revision is per-map and a map that does not exist yet has none a waiter could have read. The comparison is exclusive, which is what stops a re-park from re-delivering the map just handed over. A timeout is a normal result carrying the cursor, never an error.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "waitForNewMap",
+    "testFile": "app/lib/exchange.integration.test.ts"
   },
   {
     "description": "Blocks until the person contributes, or until the caller's timeout expires. Re-reads the log first because an event may already be waiting and a waiter that subscribed before checking would sleep through it; then races an in-process emitter against a ~500ms poll. The poll is what lets a write from the separate stdio process wake a waiter living in the web process - an emitter alone would be silently correct in dev and silently wrong across front doors. Always resolves: a timeout is a normal result carrying the cursor, never a hang.",

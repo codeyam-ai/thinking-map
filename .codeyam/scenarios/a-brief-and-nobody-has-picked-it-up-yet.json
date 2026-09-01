@@ -1,0 +1,55 @@
+{
+  "name": "A brief, and nobody has picked it up yet",
+  "id": "73174faf-9c74-4c73-a602-1f668721bb2e",
+  "url": "/map/map-brief-untouched",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapBrief": [
+      {
+        "charCount": 412,
+        "id": "brief-map-brief-untouched",
+        "mapId": "map-brief-untouched",
+        "mediaType": "application/pdf",
+        "sourceName": "northgate-renewal-brief.pdf",
+        "text": "# Northgate Library — Digital Membership Renewal\n\n## Background\n\nNorthgate Library District serves 41,000 cardholders across six branches. Membership is free but must be renewed every two years, in person at a service desk.\n\n## What we think we need\n\nA way for a cardholder to renew without making the trip, without weakening the proof-of-residence check the state requires of us.\n"
+      }
+    ],
+    "mapEvent": [
+      {
+        "id": "ev-map-brief-untouched-1",
+        "kind": "node.added",
+        "mapId": "map-brief-untouched",
+        "origin": "user",
+        "payload": "{\"id\": \"brief-untouched-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Northgate Library — Digital Membership Renewal\", \"status\": \"answered\"}",
+        "revision": 1
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "brief-untouched-idea",
+        "kind": "idea",
+        "label": "Northgate Library — Digital Membership Renewal",
+        "mapId": "map-brief-untouched",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-brief-untouched",
+        "phase": "deconstruct",
+        "revision": 1,
+        "seedIdea": "",
+        "title": "Northgate Library — Digital Membership Renewal"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The same untouched state, but started from a document instead of a sentence. There is no seed idea to quote back, so the panel shows no quote at all rather than empty marks, and its prompt points the agent at the brief rather than at the emptier map. The brief panel and the handoff panel sit on the page together, which is the arrangement someone attaching a document actually meets."
+}

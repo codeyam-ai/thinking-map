@@ -8,7 +8,14 @@ import { computeBriefCoverage, type CoverageNode } from './briefCoverage';
 import { splitIntoSections } from './briefSections';
 import { KIND_EYEBROW } from './mapKinds';
 import { planMapMutations, type ToolInvocation } from './nodePlan';
-import { recordEvents, type EventInput, type Origin } from './exchange';
+import {
+  MAP_CREATED,
+  mapEvents,
+  recordEvents,
+  type EventInput,
+  type NewMapSummary,
+  type Origin,
+} from './exchange';
 
 export async function listMaps() {
   return prisma.thinkingMap.findMany({
@@ -160,6 +167,25 @@ export async function createMap(seedIdea: string, brief?: BriefInput) {
       payload: { id: root?.id, kind: 'idea', label: title },
     },
   ]);
+
+  // Wake anyone parked in `waitForNewMap`.
+  //
+  // AFTER `recordEvents`, deliberately: a waiter woken before the root node's
+  // event exists would read a map whose log is empty and conclude there was
+  // nothing to do — the one race that would make parking worse than polling.
+  //
+  // Best-effort and in-process only. Correctness across processes is the
+  // waiter's poll, not this: the stdio MCP server does not share an emitter
+  // with Next, so an agent connected there is woken by the poll and this emit
+  // is purely the same-process fast path.
+  const summary: NewMapSummary = {
+    id: map.id,
+    title: map.title,
+    seedIdea: map.seedIdea,
+    hasBrief: brief !== undefined,
+    createdAt: map.createdAt,
+  };
+  mapEvents.emit(MAP_CREATED, summary);
 
   return map;
 }

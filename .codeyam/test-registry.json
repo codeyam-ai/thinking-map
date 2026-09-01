@@ -1,6 +1,69 @@
 {
   "tests": [
     {
+      "description": "An attached agent makes the panel wrong: something IS on this.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › renders nothing when an agent is connected",
+      "line": 56,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case that would drift. `working` means a tool is mid-flight, and that agent still sees this map when its turn comes round — so it counts as attached, exactly as askPresence treats it. If this and the node-question composer ever disagreed, one page would contradict itself.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › renders nothing when an agent is mid-tool-call",
+      "line": 69,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Reopening a map an agent has already contributed to, in a browser with no agent. Bridge status alone would wrongly show the panel here.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › renders nothing when the log already carries an agent-origin event",
+      "line": 80,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported case: someone submitted an idea, nothing is attached, and the log holds only their own root node.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › renders when nothing is attached and no agent has worked the map",
+      "line": 46,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "No provider at all — an isolated scenario. useOptionalWebMcpBridge returns null rather than throwing, and absence is honest absence.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › renders without a bridge provider at all",
+      "line": 91,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The prompt is the useful part, and it is useless without the id.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › shows a start prompt naming this map",
+      "line": 97,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief-started map has no sentence, so the panel must not render empty quote marks where the person's words would go.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › shows no quoted idea for a map started from a brief",
+      "line": 108,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "Every step is a REAL call against the bound catalog, so a step with no explanation would leave a viewer unable to tell what it demonstrated.",
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
@@ -986,7 +1049,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "currentRevision › reports the map’s revision without reading the log",
-      "line": 197,
+      "line": 199,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -995,7 +1058,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "currentRevision › throws for a map that does not exist",
-      "line": 208,
+      "line": 210,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -1495,6 +1558,78 @@
       "runner": "tests"
     },
     {
+      "description": "Without the cursor the agent cannot re-park exactly, and would either miss a map or re-read one it already handled.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › hands back the cursor to resume from",
+      "line": 148,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "'1 new maps' is exactly the kind of thing that survives review and then reads as broken.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › keeps the count singular for a single map",
+      "line": 142,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The id is what every follow-up tool call takes; a row without it is a dead end, exactly as in formatMapList.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › leads each row with the map id",
+      "line": 104,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One wait can hand back several maps, and the count must agree with itself.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › renders every map when several arrive at once",
+      "line": 130,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The expiry case. An agent looping on this sees it constantly, so it must read as an ordinary answer and still carry the cursor.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › reports an empty result as normal rather than as a failure",
+      "line": 154,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A blank line where the idea should be reads as missing data rather than as a map that genuinely started from a document.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › says so explicitly when a map has no seed idea",
+      "line": 124,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief-started map's seed idea is empty or near-empty, so the brief is the thing worth reading first.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › spells out read_brief as the next call for a brief-started map",
+      "line": 116,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The agent has to be told what to do next, not left to infer it.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatNewMaps › spells out read_map as the next call for a sentence-started map",
+      "line": 109,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "A finished map still holds every working node; only the four summary kinds belong on this screen.",
       "file": "app/lib/summaryGroups.test.ts",
       "format": "vitest",
@@ -1537,6 +1672,87 @@
       "key": "groupSummaryNodes › splits nodes into the summary buckets",
       "line": 15,
       "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief-only map has no sentence. Interpolating an empty one would leave stray quote marks around nothing, which reads as lost text.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › leaves no empty quotes in the prompt when there is no seed idea",
+      "line": 46,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The panel is only useful if it names a way out, and the tool is what makes the next idea automatic rather than another copy-paste.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › names await_new_map as the way to stop copying prompts by hand",
+      "line": 68,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Without the id the prompt is useless — an agent handed it has no way to know which of the person's maps they meant.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › names the map id in the start prompt",
+      "line": 13,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The load-bearing claim of the whole panel. Nothing is attached, so nothing may be described as in progress or on its way.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › never claims work is underway or an agent is coming",
+      "line": 53,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A brief-only map has little or nothing in the seed idea, so read_map would show the agent the emptier of the two things it could read.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › points at read_brief when the map was started from a brief",
+      "line": 27,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An ordinary map started from a sentence: the map is the thing to read.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › points at read_map for a map started from a sentence",
+      "line": 19,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The person's own words carry the context an agent needs, so a sentence-map prompt should hand them over rather than making the agent go and look.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › quotes the seed idea in the prompt when there is one",
+      "line": 35,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every field renders directly; an empty one would be a blank row in the card.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › returns non-empty copy for every field in both cases",
+      "line": 74,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Saying the idea is saved is the reassurance that replaces the false one — the person's first worry on an empty map is that their input was lost.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › says the idea is saved",
+      "line": 61,
+      "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
     {
@@ -2471,7 +2687,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › decodes stored payloads back into objects",
-      "line": 184,
+      "line": 186,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2480,7 +2696,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › reports the current revision even when the delta is empty",
-      "line": 172,
+      "line": 174,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2489,7 +2705,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › returns only what happened after the cursor",
-      "line": 159,
+      "line": 161,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2498,7 +2714,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › returns the whole log when given no cursor",
-      "line": 146,
+      "line": 148,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2507,7 +2723,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › leaves the map at the revision of its last event",
-      "line": 72,
+      "line": 74,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2516,7 +2732,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › mints one revision per event and returns them in order",
-      "line": 59,
+      "line": 61,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2525,7 +2741,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › records nothing and holds the revision for an empty batch",
-      "line": 122,
+      "line": 124,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2534,7 +2750,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › refuses to write against an unknown map",
-      "line": 134,
+      "line": 136,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2543,7 +2759,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › returns every event the original call wrote on a retry",
-      "line": 101,
+      "line": 103,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2552,7 +2768,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › treats a repeated requestId as a no-op and returns the original revision",
-      "line": 83,
+      "line": 85,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3268,11 +3484,65 @@
       "runner": "tests"
     },
     {
+      "description": "The whole point of handing the cursor back: re-parking with it must not re-deliver work the agent has already been given.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForNewMap › does not re-deliver a map through the cursor it handed back",
+      "line": 340,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The wake path, and the reason the feature exists at all.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForNewMap › releases when a map is created during the wait",
+      "line": 307,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "hasBrief is what decides read_brief over read_map downstream, so it has to be right for both shapes of map.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForNewMap › reports whether each map was started from a brief",
+      "line": 383,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The check-first guarantee: a map created between the agent's last call and this one is already waiting, and a waiter that subscribed before checking would sleep straight through it.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForNewMap › returns immediately when a map already exists after the cursor",
+      "line": 294,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One wait can cover several submissions, and creation order is the order an agent should work them in.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForNewMap › returns several maps in creation order when they arrive together",
+      "line": 362,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A timeout must RESOLVE and must carry a usable cursor — an agent looping on this sees the empty case far more often than the full one.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "waitForNewMap › times out cleanly with a usable cursor when nobody starts anything",
+      "line": 324,
+      "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "The agent's own writes must not wake it — otherwise an agent that posts a note wakes itself and never actually waits for the person.",
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › does not wake on the agent’s own writes",
-      "line": 229,
+      "line": 231,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3281,7 +3551,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › returns immediately when the person already acted",
-      "line": 217,
+      "line": 219,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3290,7 +3560,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › times out cleanly with a resume cursor when nobody acts",
-      "line": 261,
+      "line": 263,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3299,7 +3569,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › wakes and returns the user’s events when they act during the wait",
-      "line": 244,
+      "line": 246,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },

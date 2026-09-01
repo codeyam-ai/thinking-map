@@ -126,8 +126,9 @@ three run the same tool catalog (`app/lib/toolCatalog.ts` declares the tools;
 `app/lib/toolRuntime.ts` implements them once), so no door can drift from the others.
 
 The shared tools are `read_map`, `add_nodes`, `update_node`, `set_phase`, `post_note`,
-`ask_user`, and `await_user_activity`. `list_thinking_maps` and `create_thinking_map`
-are server-door-only — a page is already on one map.
+`ask_user`, and `await_user_activity`. `list_thinking_maps`, `create_thinking_map` and
+`await_new_map` are server-door-only — a page is already on one map, so none of the
+three has anything to offer it.
 
 **In the page (WebMCP).** The agent lives in the browser and the page publishes its
 tools to it. This needs Chrome 146+ (`navigator.modelContext`), HTTPS or localhost, and
@@ -176,14 +177,19 @@ Three habits follow from that, and the tools are shaped to make them easy:
   carrying the same value returns the original revision instead of writing twice.
 - **Wait with `await_user_activity`,** not a polling loop. It blocks until the person
   actually does something.
+- **Park on `await_new_map` when you have no map yet.** Same idiom one level up: it
+  blocks until somebody starts a map anywhere, then hands you each new one with its seed
+  idea and whether it came from a brief. A page still cannot wake you — but if you are
+  already waiting at the server door when someone submits an idea, the map is picked up
+  the moment it exists rather than sitting there.
 
 Two more things worth knowing:
 
 - **Conflicts come back as results, not errors.** Pass `expectedRevision` to
   `update_node`; if the person changed that node since you read it, the write is declined
   and both versions are described back to you. Nothing is overwritten.
-- **Every wait is bounded and resumable.** `ask_user` and `await_user_activity` take a
-  timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
+- **Every wait is bounded and resumable.** `ask_user`, `await_user_activity` and
+  `await_new_map` take a timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
   nothing: the question stays on the map and the answer lands in the log for your next
   read.
 
@@ -274,6 +280,10 @@ codeyam-editor start
 
 States captured as runnable scenarios with codeyam-editor:
 
+### A brief, and nobody has picked it up yet
+
+<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--desktop.png" alt="A brief, and nobody has picked it up yet" width="280">
+
 ### A plan with a gap - one slice proves nothing
 
 <img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
@@ -281,6 +291,14 @@ States captured as runnable scenarios with codeyam-editor:
 ### Arranged - a map tidied by hand
 
 <img src=".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png" alt="Arranged - a map tidied by hand" width="280">
+
+### Brief attached, nothing cited yet
+
+<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png" alt="Brief attached, nothing cited yet" width="280">
+
+### Brief fully accounted for
+
+<img src=".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png" alt="Brief fully accounted for" width="280">
 
 ### Complete - what to do next
 
@@ -293,16 +311,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Day one - nothing yet
 
 <img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png" alt="Day one - nothing yet" width="280">
-
-### Grounded - research and its gaps
-
-<img src=".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png" alt="Grounded - research and its gaps" width="280">
-
-### Just started
-
-<img src=".codeyam/scenarios/screenshots/just-started--desktop.png" alt="Just started" width="280">
-
-### Many saved maps
-
-<img src=".codeyam/scenarios/screenshots/many-saved-maps--desktop.png" alt="Many saved maps" width="280">
 <!-- codeyam:scenario-gallery:end -->

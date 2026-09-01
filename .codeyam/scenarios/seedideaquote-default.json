@@ -1,0 +1,12 @@
+{
+  "name": "SeedIdeaQuote - Default",
+  "id": "e1bd197f-c55e-49ae-941c-572e1ff68657",
+  "url": "/isolated-components/SeedIdeaQuote?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SeedIdeaQuote",
+  "scenarioType": "component",
+  "description": "One sentence, the shape most ideas are typed in. The left rule and the italic are what mark it as the person's own words rather than the product's."
+}

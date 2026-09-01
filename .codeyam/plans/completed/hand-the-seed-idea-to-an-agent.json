@@ -1,0 +1,42 @@
+{
+  "claimStartedAt": "2026-09-01T17:06:50Z",
+  "completedAt": "2026-09-01T18:14:17Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "ui-step22",
+    "machine": "codeyam-editor-codeyam-editor-11",
+    "originId": "352d9a0c-1c74-43dd-a639-8671a6471839",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "hand-the-seed-idea-to-an-agent",
+    "sessionId": "d0ad89ad-fd2d-4ba8-835f-f1d240b6829f",
+    "startedAt": "2026-09-01T17:06:50Z"
+  },
+  "createdAt": "2026-09-01T16:49:21Z",
+  "deliverables": [
+    "README.md",
+    "app/components/AgentHandoff.render.test.tsx",
+    "app/components/AgentHandoff.tsx",
+    "app/components/CopyablePrompt.tsx",
+    "app/components/MapScreen.tsx",
+    "app/components/SeedIdeaQuote.tsx",
+    "app/isolated-components/AgentHandoff/page.tsx",
+    "app/isolated-components/CopyablePrompt/page.tsx",
+    "app/isolated-components/SeedIdeaQuote/page.tsx",
+    "app/lib/exchange.integration.test.ts",
+    "app/lib/exchange.ts",
+    "app/lib/handoffCopy.test.ts",
+    "app/lib/handoffCopy.ts",
+    "app/lib/mapStore.ts",
+    "app/lib/mcpFormat.test.ts",
+    "app/lib/mcpFormat.ts",
+    "app/lib/mcpServer.ts",
+    "app/map/[id]/page.tsx"
+  ],
+  "journalTimestamp": "2026-09-01T18:14:17Z",
+  "mode": "ui",
+  "planFile": "completed/hand-the-seed-idea-to-an-agent.md",
+  "slug": "hand-the-seed-idea-to-an-agent",
+  "title": "Hand the Seed Idea to an Agent"
+}
