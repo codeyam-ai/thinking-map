@@ -157,6 +157,42 @@
         "parentId": "n-idea",
         "status": "answered",
         "origin": "agent"
+      },
+      {
+        "id": "n-b1",
+        "kind": "slice",
+        "label": "Ten words on paper cards, one classroom",
+        "detail": "About two days. No app at all - printed cards and a tally sheet.",
+        "mapId": "map-game",
+        "order": 14,
+        "parentId": "n-idea",
+        "status": "answered",
+        "origin": "agent",
+        "testsNodeId": "n-u3"
+      },
+      {
+        "id": "n-b2",
+        "kind": "slice",
+        "label": "One teacher runs a round and sees the scores",
+        "detail": "About a week. A single screen, one class, no accounts.",
+        "mapId": "map-game",
+        "order": 15,
+        "parentId": "n-idea",
+        "status": "answered",
+        "origin": "agent",
+        "testsNodeId": "n-u1"
+      },
+      {
+        "id": "n-b3",
+        "kind": "slice",
+        "label": "The round goes home for a parent to finish",
+        "detail": "About two weeks, and only worth starting once the classroom round holds up.",
+        "mapId": "map-game",
+        "order": 16,
+        "parentId": "n-idea",
+        "status": "answered",
+        "origin": "agent",
+        "testsNodeId": "n-u2"
       }
     ],
     "message": [
@@ -181,7 +217,7 @@
         "phase": "next-steps",
         "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
         "title": "Educational game for kids",
-        "revision": 16
+        "revision": 19
       }
     ],
     "mapEvent": [
@@ -312,10 +348,34 @@
         "kind": "phase.set",
         "origin": "agent",
         "payload": "{\"phase\": \"next-steps\"}"
+      },
+      {
+        "id": "ev-map-game-17",
+        "mapId": "map-game",
+        "revision": 17,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-b1\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"Ten words on paper cards, one classroom\", \"status\": \"answered\", \"testsNodeId\": \"n-u3\"}"
+      },
+      {
+        "id": "ev-map-game-18",
+        "mapId": "map-game",
+        "revision": 18,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-b2\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"One teacher runs a round and sees the scores\", \"status\": \"answered\", \"testsNodeId\": \"n-u1\"}"
+      },
+      {
+        "id": "ev-map-game-19",
+        "mapId": "map-game",
+        "revision": 19,
+        "kind": "node.added",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-b3\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"The round goes home for a parent to finish\", \"status\": \"answered\", \"testsNodeId\": \"n-u2\"}"
       }
     ]
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "The summary screen: what we know, what we do not, three directions, and five concrete next steps - with somewhere to put the next thought beneath it, because the plan is a starting point rather than a dead end."
+  "description": "The summary screen: what we know, what we do not, three directions, a build sequence that starts with paper and names what each increment would settle, and five concrete next steps - with somewhere to put the next thought beneath it, because the plan is a starting point rather than a dead end."
 }

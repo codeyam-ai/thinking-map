@@ -26,8 +26,8 @@ describe('resultText', () => {
 describe('DEMO_SEQUENCE', () => {
   // The sequence is the closest thing here to a written description of one
   // agent turn: say what you are about to do, orient on the brief, read, add,
-  // ask, report back. Losing the ask would make it a demo of writes rather
-  // than an exchange.
+  // ask, propose what to build, report back. Losing the ask would make it a
+  // demo of writes rather than an exchange.
   it('walks a full turn including the question that waits on the person', () => {
     expect(DEMO_SEQUENCE.map((s) => s.name)).toEqual([
       'post_note',
@@ -35,8 +35,23 @@ describe('DEMO_SEQUENCE', () => {
       'read_map',
       'add_nodes',
       'ask_user',
+      'add_nodes',
       'post_note',
     ]);
+  });
+
+  // The turn has to end somewhere a person can act, and the slice is where
+  // WebMCP cannot bind — a preview has no live agent, so this scripted step is
+  // the only way the slice path is exercisable at all.
+  it('proposes a slice that names what it would settle', () => {
+    const slices = DEMO_SEQUENCE.flatMap((step) => {
+      const nodes = (step.input as { nodes?: { kind?: string }[] })?.nodes ?? [];
+      return nodes.filter((n) => n.kind === 'slice');
+    });
+    expect(slices).toHaveLength(1);
+    // The ref it names is created earlier in the SAME call, which is the
+    // ordinary case and the reason the link goes through ref resolution.
+    expect((slices[0] as { tests?: string }).tests).toBe('c');
   });
 
   // read_brief comes BEFORE read_map: an agent handed a long document orients

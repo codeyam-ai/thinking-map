@@ -196,8 +196,18 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
       [{ name: 'set_phase', input: { phase: input.phase } }],
       { origin: ctx.origin },
     );
+    // The tool replies are this app's only channel for steering an agent that
+    // brings its own reasoning, so the one phase with a right answer says what
+    // that answer looks like. A plan that ends in a numbered list of everything
+    // reads as a plan to build all of it in order — which is the outcome this
+    // whole product exists to prevent.
+    const guidance =
+      input.phase === 'next-steps'
+        ? ' End this map on a build sequence, not just a to-do list: add "slice" nodes for the smallest increments worth building, smallest first, each naming with `tests` the assumption, risk, or open question it would settle. If an increment settles nothing, add it without `tests` rather than picking the nearest node — it will be shown as proving nothing, which is the honest answer. Put its rough effort in `detail`, in your own words.'
+        : '';
+
     return {
-      text: `The map is now in the ${input.phase} phase, at revision ${result.revision}.`,
+      text: `The map is now in the ${input.phase} phase, at revision ${result.revision}.${guidance}`,
       structured: { revision: result.revision, phase: input.phase },
     };
   },

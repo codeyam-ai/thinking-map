@@ -5,7 +5,7 @@
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
       "key": "DEMO_SEQUENCE › explains every step it runs",
-      "line": 52,
+      "line": 67,
       "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
       "runner": "tests"
     },
@@ -14,8 +14,17 @@
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
       "key": "DEMO_SEQUENCE › orients on the brief before reading the map",
-      "line": 45,
+      "line": 60,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The turn has to end somewhere a person can act, and the slice is where WebMCP cannot bind — a preview has no live agent, so this scripted step is the only way the slice path is exercisable at all.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "DEMO_SEQUENCE › proposes a slice that names what it would settle",
+      "line": 46,
+      "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
     {
@@ -565,6 +574,78 @@
       "key": "bindTools › unregisters everything it registered when disposed",
       "line": 135,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The state the feature exists to make visible: work scheduled early that tests no assumption. It is reported, never filtered out.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › flags a slice that names no node at all",
+      "line": 57,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every other kind on a finished map — the idea, the next steps, the directions — belongs to a different region of the summary screen.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › ignores nodes that are not slices",
+      "line": 92,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The sequence is numbered on screen and claims the first entry is the smallest thing worth building, so insertion order would misstate the plan.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › orders slices by order rather than input position",
+      "line": 42,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A slice can outlive the assumption it was written for. That is reported as its own state rather than rendered as a blank line.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › reports a slice whose target has been deleted",
+      "line": 68,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A slice may settle a risk or an open question just as legitimately as an assumption, so the link is not restricted by the target's kind.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › resolves a target of any kind, not just assumptions",
+      "line": 77,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary path: a slice that names a live node reports what it settles.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › resolves the node a slice would settle",
+      "line": 25,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A map that ended in next steps with no slices must render its hint rather than break, so the empty case is a value and not a special case.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › returns an empty sequence for a map with no slices",
+      "line": 104,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A slice pointing at itself resolves to itself rather than looping or being treated as dangling — nothing here walks the link transitively.",
+      "file": "app/lib/buildSequence.test.ts",
+      "format": "vitest",
+      "key": "buildSequence › tolerates a slice that names itself",
+      "line": 111,
+      "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
     {
@@ -1274,17 +1355,26 @@
       "file": "app/lib/summaryGroups.test.ts",
       "format": "vitest",
       "key": "groupSummaryNodes › ignores kinds that do not belong on the summary screen",
-      "line": 41,
+      "line": 55,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Slices and next steps answer different questions — \"interview three teachers\" is not something you build — so neither bucket may swallow the other.",
+      "file": "app/lib/summaryGroups.test.ts",
+      "format": "vitest",
+      "key": "groupSummaryNodes › keeps slices and next steps in separate buckets",
+      "line": 33,
+      "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
     {
       "description": "The screen must render its empty hints rather than crash on a map that reached the phase with nothing filled in.",
       "file": "app/lib/summaryGroups.test.ts",
       "format": "vitest",
-      "key": "groupSummaryNodes › returns four empty buckets for an empty map",
-      "line": 55,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "key": "groupSummaryNodes › returns empty buckets for an empty map",
+      "line": 70,
+      "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
     {
@@ -1292,17 +1382,17 @@
       "file": "app/lib/summaryGroups.test.ts",
       "format": "vitest",
       "key": "groupSummaryNodes › sorts each bucket by order, not by input position",
-      "line": 30,
+      "line": 44,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
     {
-      "description": "The summary screen has four regions; each must draw from its own kind, or findings land in the wrong card.",
+      "description": "Each region of the summary screen must draw from its own kind, or findings land in the wrong card.",
       "file": "app/lib/summaryGroups.test.ts",
       "format": "vitest",
-      "key": "groupSummaryNodes › splits nodes into the four summary buckets",
+      "key": "groupSummaryNodes › splits nodes into the summary buckets",
       "line": 15,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
     {
@@ -2008,6 +2098,15 @@
       "runner": "tests"
     },
     {
+      "description": "A slice carries the node it would settle. Like parentRef this stays a REF here — resolving it to a real id is applyToolCalls' job — so the plan must hand it through untouched rather than validating it against a map it cannot see.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › carries a slice tests ref through as testsRef",
+      "line": 159,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
       "description": "A kind the map has no treatment for would render as an untyped blob, so it is dropped rather than stored.",
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
@@ -2039,7 +2138,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations › handles adds, updates and a phase change in one turn",
-      "line": 156,
+      "line": 189,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -2089,6 +2188,15 @@
       "runner": "tests"
     },
     {
+      "description": "An increment that settles nothing is a real state the summary screen reports, so the absent link must survive as null rather than being invented or dropped.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › leaves testsRef null when a slice names nothing",
+      "line": 172,
+      "registeredAt": "2026-09-01T16:07:54Z",
+      "runner": "tests"
+    },
+    {
       "description": "Sibling position on screen comes from this index.",
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
@@ -2104,6 +2212,15 @@
       "key": "planMapMutations › plans an insert for a valid node",
       "line": 10,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A slice's purpose usually sharpens once the whole sequence is laid out, so the link is editable after the fact.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › plans an update to what a slice settles",
+      "line": 181,
+      "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
     {

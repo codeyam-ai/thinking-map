@@ -1,0 +1,12 @@
+{
+  "name": "SliceCard - Default",
+  "id": "9f8f4e56-bdf1-44e2-b1b7-880c70db1871",
+  "url": "/isolated-components/SliceCard?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SliceCard",
+  "scenarioType": "component",
+  "description": "One validated slice: what it builds, the node it would settle, and its stated effort - solid-bordered, because it earns its place in the sequence."
+}

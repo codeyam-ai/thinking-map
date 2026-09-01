@@ -49,6 +49,30 @@ export const DEMO_SEQUENCE: DemoStep[] = [
     note: 'asks, and waits for you to answer in the panel',
   },
   {
+    name: 'add_nodes',
+    input: {
+      nodes: [
+        {
+          ref: 'c',
+          kind: 'assumption',
+          label: 'One tap is enough to beat the notebook',
+        },
+        {
+          ref: 'd',
+          kind: 'slice',
+          label: 'Capture-only build: one button, no reading',
+          detail:
+            'About three days. No list, no search, no sync — just the tap and a file on disk.',
+          // Names a node created moments earlier in this same call, which is
+          // the ordinary case and the reason the link goes through the same
+          // ref resolution `parentRef` does.
+          tests: 'c',
+        },
+      ],
+    },
+    note: 'proposes the smallest slice, and says what it would settle',
+  },
+  {
     name: 'post_note',
     input: { text: 'Noted — I will keep the capture step to one tap.' },
     note: 'reports back',

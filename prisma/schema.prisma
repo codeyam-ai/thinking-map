@@ -83,7 +83,7 @@ model MapNode {
   /// What this node represents. One of:
   /// idea | user | problem | goal | constraint | assumption | open-question
   /// | research | finding | gap | approach | pro | risk
-  /// | known | unknown | direction | next-step
+  /// | known | unknown | direction | next-step | slice
   kind      String
   /// The short text shown inside the node pill.
   label     String
@@ -94,6 +94,18 @@ model MapNode {
   status    String  @default("open")
   /// Where a research finding came from, when this node is a finding.
   sourceUrl String?
+  /// The id of the node this slice would settle — the assumption, risk, or
+  /// open question that building it would answer. A slice that names nothing
+  /// is not a validating increment, just work scheduled early, and the summary
+  /// screen says so rather than letting it pass as progress.
+  ///
+  /// Deliberately NOT a Prisma relation. `parentId` is the map's only edge, and
+  /// a second self-relation would either collide with NodeChildren's semantics
+  /// or drag every tested assumption out of where it belongs in the tree and
+  /// into a branch under the plan. This is a pointer that is resolved in code
+  /// and never drawn. A dangling id is tolerated and reported: the node it
+  /// names may since have been deleted.
+  testsNodeId String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
   /// user | agent. Without this an agent re-reading the map cannot tell its

@@ -1,0 +1,24 @@
+{
+  "surface": "BuildSequence",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "sequence",
+      "value": "empty",
+      "rationale": "source-derived state sequence=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "sequence",
+      "value": "one",
+      "rationale": "source-derived state sequence=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "sequence",
+      "value": "many",
+      "rationale": "source-derived state sequence=many",
+      "status": "planned"
+    }
+  ]
+}

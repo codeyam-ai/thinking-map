@@ -1,0 +1,42 @@
+{
+  "surface": "SliceCard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "proves",
+      "value": "true",
+      "rationale": "source-derived state proves=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "proves",
+      "value": "false",
+      "rationale": "source-derived state proves=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "danglingId",
+      "value": "true",
+      "rationale": "source-derived state danglingId=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "danglingId",
+      "value": "false",
+      "rationale": "source-derived state danglingId=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "provesNothing",
+      "value": "true",
+      "rationale": "source-derived state provesNothing=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "provesNothing",
+      "value": "false",
+      "rationale": "source-derived state provesNothing=false",
+      "status": "covered"
+    }
+  ]
+}

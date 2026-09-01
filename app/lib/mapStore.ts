@@ -193,6 +193,16 @@ export async function applyToolCalls(
       ? (refToId.get(node.parentRef) ?? node.parentRef)
       : null;
 
+    // The same resolution, for the same reason: a slice usually names an
+    // assumption created earlier in this very call, so the ref has to become a
+    // real id before it is stored. Unresolvable values are written through
+    // rather than dropped — a dangling link is reported on screen, and losing
+    // it silently would hide the fact that the slice claimed to settle
+    // something at all.
+    const testsNodeId = node.testsRef
+      ? (refToId.get(node.testsRef) ?? node.testsRef)
+      : null;
+
     const created = await prisma.mapNode.create({
       data: {
         mapId,
@@ -202,6 +212,7 @@ export async function applyToolCalls(
         detail: node.detail,
         status: node.status,
         sourceUrl: node.sourceUrl,
+        testsNodeId,
         order: node.order,
         origin,
       },
@@ -216,6 +227,10 @@ export async function applyToolCalls(
         kind: created.kind,
         label: created.label,
         status: created.status,
+        // Carried on the event so an agent reading the log after the fact can
+        // see which assumption a slice claimed to settle, not just that a
+        // slice appeared.
+        ...(testsNodeId ? { testsNodeId } : {}),
       },
     });
   }

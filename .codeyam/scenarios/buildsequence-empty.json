@@ -1,0 +1,12 @@
+{
+  "name": "BuildSequence - Empty",
+  "id": "da5b8b07-bf93-44af-8da7-19e93e78c9cc",
+  "url": "/isolated-components/BuildSequence?s=Empty",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BuildSequence",
+  "scenarioType": "component",
+  "description": "A map that ended in next steps with no slices at all. The region shows the keep-talking hint in the voice EmptyHint already uses rather than a blank box."
+}

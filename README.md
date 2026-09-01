@@ -9,8 +9,16 @@ partner names what it doesn't know and asks the two or three questions that woul
 change what you should build. Every answer becomes a node on a map. When it helps, it
 searches the web for what already exists and hangs the findings, and the gaps in them,
 off the map. Change direction and nothing is lost: the map updates and tells you what
-changed. You leave with what you know, what you don't, the strongest directions, and
-where to start tomorrow.
+changed. You leave with what you know, what you don't, the strongest directions, the
+smallest thing worth building first, and where to start tomorrow.
+
+**A plan is a build sequence, not a to-do list.** A numbered list of everything is
+indistinguishable from a plan to build all of it in order, which is the outcome this
+tool exists to prevent. So the map ends on the smallest increment worth building, and
+each one names the assumption, risk, or open question that building it would settle. An
+increment that settles nothing is marked as proving nothing rather than sitting in the
+sequence looking like progress — making that gap visible is what stops the plan
+degenerating into a Gantt chart with rounded corners.
 
 **The agent is your browser's agent, and the page is the shared artifact.** There is no
 chat in this app. The thinking partner runs wherever you already talk to it and reaches
@@ -262,6 +270,10 @@ codeyam-editor start
 
 States captured as runnable scenarios with codeyam-editor:
 
+### A plan with a gap - one slice proves nothing
+
+<img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
+
 ### Arranged - a map tidied by hand
 
 <img src=".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png" alt="Arranged - a map tidied by hand" width="280">
@@ -289,8 +301,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Many saved maps
 
 <img src=".codeyam/scenarios/screenshots/many-saved-maps--desktop.png" alt="Many saved maps" width="280">
-
-### Mid-exchange - agent and human on one map
-
-<img src=".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png" alt="Mid-exchange - agent and human on one map" width="280">
 <!-- codeyam:scenario-gallery:end -->

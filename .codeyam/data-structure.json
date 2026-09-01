@@ -1,7 +1,7 @@
 [
   {
     "name": "ThinkingMap",
-    "description": "One session of thinking. Holds the user's original unstructured idea verbatim and tracks which stage of the loop the session has reached. Everything else hangs off this root, so a saved map can be reopened and continued later. 'revision' is a monotonic counter bumped once per committed change, in the same transaction as the write \u2014 it is the cursor an agent reads with and the only shared notion of \"now\" across all three front doors (in-page WebMCP, HTTP, stdio).",
+    "description": "One session of thinking. Holds the user's original unstructured idea verbatim and tracks which stage of the loop the session has reached. Everything else hangs off this root, so a saved map can be reopened and continued later. 'revision' is a monotonic counter bumped once per committed change, in the same transaction as the write — it is the cursor an agent reads with and the only shared notion of \"now\" across all three front doors (in-page WebMCP, HTTP, stdio).",
     "category": "datastore",
     "order": 1,
     "fields": [
@@ -45,7 +45,7 @@
   },
   {
     "name": "Message",
-    "description": "One turn of the conversation, in order. Nothing in the page renders these any more \u2014 the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
+    "description": "One turn of the conversation, in order. Nothing in the page renders these any more — the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
     "category": "datastore",
     "order": 2,
     "fields": [
@@ -84,7 +84,7 @@
   },
   {
     "name": "MapNode",
-    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step) and 'status' drives the dashed / solid / highlighted treatment from the mockups. 'origin' says whether the person or the agent contributed it, which is what stops an agent re-ingesting its own writes as new information. Self-referencing, so parents must precede children in seed input order. 'offsetX' / 'offsetY' are an arrangement nudge away from the node's computed tidy position, not a position: the tidy layout stays authoritative, so siblings still never overlap and a node added later still places itself sensibly. They default to 0, and they are deliberately absent from the agent's rendering of the map \u2014 arrangement is not thinking.",
+    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step, slice) and 'status' drives the dashed / solid / highlighted treatment from the mockups. 'origin' says whether the person or the agent contributed it, which is what stops an agent re-ingesting its own writes as new information. Self-referencing, so parents must precede children in seed input order. 'offsetX' / 'offsetY' are an arrangement nudge away from the node's computed tidy position, not a position: the tidy layout stays authoritative, so siblings still never overlap and a node added later still places itself sensibly. They default to 0, and they are deliberately absent from the agent's rendering of the map — arrangement is not thinking. 'testsNodeId' is the id of the node a slice would settle — the assumption, risk, or open question that building it would answer. It is a pointer, not an edge: it is deliberately not a Prisma relation and never draws on the map, because hijacking parentId for it would drag every tested assumption out of where it belongs in the tree. Optional, and a dangling id is tolerated — the node it names may since have been deleted, which the build sequence reports rather than rendering as a blank. 'kind' also admits 'slice': the smallest buildable increment, which carries its rough effort in 'detail' as a sentence a human can argue with rather than a number that looks computed.",
     "category": "datastore",
     "order": 3,
     "fields": [
@@ -130,6 +130,11 @@
         "required": false
       },
       {
+        "name": "testsNodeId",
+        "type": "string",
+        "required": false
+      },
+      {
         "name": "order",
         "type": "number",
         "required": true
@@ -163,7 +168,7 @@
   },
   {
     "name": "MapEvent",
-    "description": "The append-only exchange log: every change to a map, agent or human, as one ordered fact. WebMCP is pull-only \u2014 a page cannot wake an agent \u2014 so the give-and-take has to be a durable record either side can read at any time. One table answers all three forms of \"what happened after revision N?\": the agent's delta, the inbox of unread user contributions, and the activity feed. It also captures node deletion, which a diff over MapNode rows cannot. 'kind' is one of node.added, node.updated, phase.set, agent.note, question.asked, user.answer, user.note, user.node. 'requestId' is the idempotency key that makes an agent's retry a no-op rather than a duplicate.",
+    "description": "The append-only exchange log: every change to a map, agent or human, as one ordered fact. WebMCP is pull-only — a page cannot wake an agent — so the give-and-take has to be a durable record either side can read at any time. One table answers all three forms of \"what happened after revision N?\": the agent's delta, the inbox of unread user contributions, and the activity feed. It also captures node deletion, which a diff over MapNode rows cannot. 'kind' is one of node.added, node.updated, phase.set, agent.note, question.asked, user.answer, user.note, user.node. 'requestId' is the idempotency key that makes an agent's retry a no-op rather than a duplicate.",
     "category": "datastore",
     "order": 4,
     "fields": [
@@ -212,7 +217,7 @@
   },
   {
     "name": "MapBrief",
-    "description": "The client's own document, kept whole as the map's source. Written once when the map is created and never overwritten \u2014 a revised brief is a new map, not an edit to this one \u2014 which is what makes section ids derivable from the text rather than stored as rows. Held in its own model so listMaps and getMap never drag tens of thousands of characters into memory; the text has exactly one reader, the agent's read_brief tool, which returns an outline by default and a single passage on request. 'sourceName' is the uploaded filename or \"pasted\"; only the extracted text is persisted, never the file it arrived in.",
+    "description": "The client's own document, kept whole as the map's source. Written once when the map is created and never overwritten — a revised brief is a new map, not an edit to this one — which is what makes section ids derivable from the text rather than stored as rows. Held in its own model so listMaps and getMap never drag tens of thousands of characters into memory; the text has exactly one reader, the agent's read_brief tool, which returns an outline by default and a single passage on request. 'sourceName' is the uploaded filename or \"pasted\"; only the extracted text is persisted, never the file it arrived in.",
     "category": "datastore",
     "order": 5,
     "fields": [

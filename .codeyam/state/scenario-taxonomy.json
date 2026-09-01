@@ -30,6 +30,35 @@
         "status": "covered"
       }
     },
+    "BuildSequence": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "added"
+      },
+      "many": {
+        "status": "added"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The region is server-rendered from nodes already in hand - buildSequence is a pure function over an in-memory list, so there is no fetch that could be pending."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure path to render. The two things that can go wrong with a slice - naming no node, or naming a deleted one - are modelled as ordinary reported states, and each has its own scenario."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The region is read-only: it renders slices and binds no handlers. The plan is something the client reads and argues with, not something they operate."
+      }
+    },
     "Home": {
       "empty": {
         "status": "covered"
@@ -113,6 +142,68 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "SliceCard": {
+      "empty": {
+        "status": "n-a",
+        "reason": "A card always renders exactly one slice - there is no zero-slice card. The empty state belongs to BuildSequence, the region that decides whether there is anything to list, and it is covered there."
+      },
+      "single": {
+        "status": "added"
+      },
+      "typical": {
+        "status": "added"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "One card is one increment by definition. Many slices is BuildSequence's state, not this component's, and it is covered there."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Props in, markup out. Nothing is fetched, so nothing can be pending."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No failure path. A slice that settles nothing, or names a deleted node, is a legitimate state this card is built to report - each has its own scenario rather than being an error."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Purely presentational - no handlers, no controls. Nothing on the card responds to being touched."
+      }
+    },
+    "SummaryView": {
+      "empty": {
+        "status": "added"
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "The summary is five regions rendered at once, so a one-item state is not a state of this screen - it belongs to the individual cards, and BulletCard, NextStepsTrack and BuildSequence each cover it in isolation."
+      },
+      "typical": {
+        "status": "added"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Composition only - this component sorts nothing and truncates nothing. Overflow is each region's own state and is covered where the rendering actually happens."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Server-rendered from the map's nodes, which the route has already loaded. There is no fetch on this screen to be pending."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No failure path here. A region with nothing to show renders its own hint, which is the NoSlices and Empty scenarios rather than an error."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Read-only composition with no handlers. The one place to act on this screen is KeepThinkingPanel, which sits outside SummaryView and is covered separately."
       }
     },
     "WebMcpBridge": {

@@ -152,6 +152,39 @@ describe('planMapMutations', () => {
     expect(plan.inserts).toEqual([]);
   });
 
+  // A slice carries the node it would settle. Like parentRef this stays a REF
+  // here — resolving it to a real id is applyToolCalls' job — so the plan must
+  // hand it through untouched rather than validating it against a map it
+  // cannot see.
+  it('carries a slice tests ref through as testsRef', () => {
+    const plan = planMapMutations([
+      addNodes([
+        { ref: 'a', kind: 'assumption', label: 'People reread their notes' },
+        { ref: 'b', kind: 'slice', label: 'Capture-only build', tests: 'a' },
+      ]),
+    ]);
+    expect(plan.inserts[1].testsRef).toBe('a');
+  });
+
+  // An increment that settles nothing is a real state the summary screen
+  // reports, so the absent link must survive as null rather than being
+  // invented or dropped.
+  it('leaves testsRef null when a slice names nothing', () => {
+    const plan = planMapMutations([
+      addNodes([{ ref: 'a', kind: 'slice', label: 'Admin console' }]),
+    ]);
+    expect(plan.inserts[0].testsRef).toBeNull();
+  });
+
+  // A slice's purpose usually sharpens once the whole sequence is laid out, so
+  // the link is editable after the fact.
+  it('plans an update to what a slice settles', () => {
+    const plan = planMapMutations([
+      { name: 'update_node', input: { id: 'n-b1', tests: 'n-u2' } },
+    ]);
+    expect(plan.updates[0].data.testsNodeId).toBe('n-u2');
+  });
+
   // One turn routinely adds nodes, resolves a question, and moves the phase on.
   it('handles adds, updates and a phase change in one turn', () => {
     const plan = planMapMutations([

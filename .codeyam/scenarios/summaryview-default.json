@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "SummaryView",
   "scenarioType": "component",
-  "description": "The whole final screen: know, don't know, directions, and five next steps."
+  "description": "The whole final screen: know, don't know, directions, a build sequence starting with paper cards, and five next steps - what you build first sitting above what you go and find out."
 }

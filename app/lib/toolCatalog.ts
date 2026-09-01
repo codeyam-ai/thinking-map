@@ -81,6 +81,12 @@ const nodeShape = z.object({
   detail: z.string().optional(),
   status: z.enum(NODE_STATUSES).optional(),
   sourceUrl: z.string().optional(),
+  tests: z
+    .string()
+    .optional()
+    .describe(
+      'Only for a "slice": the ref or real id of the ONE node this slice would settle — the assumption, risk, or open question that building it would answer. If it settles nothing, leave this off rather than picking the nearest node; an increment that tests nothing is shown as proving nothing, which is the honest answer.',
+    ),
 });
 
 export interface ToolSpec {
@@ -152,6 +158,12 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
       detail: z.string().optional(),
       kind: z.enum(NODE_KINDS).optional(),
       status: z.enum(NODE_STATUSES).optional(),
+      tests: z
+        .string()
+        .optional()
+        .describe(
+          'The id of the node this slice would settle. A slice\'s purpose usually sharpens once the whole sequence is laid out, so this is editable after the fact.',
+        ),
       expectedRevision: z
         .number()
         .int()

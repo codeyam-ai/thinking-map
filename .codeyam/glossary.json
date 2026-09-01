@@ -159,6 +159,18 @@
     ]
   },
   {
+    "description": "What to build first, and what building it would prove. A numbered list of next steps is indistinguishable from a plan to build the whole thing in order - the failure this product exists to prevent - so this region leads with the smallest increment that would settle something, and a slice that settles nothing is marked in place rather than quietly filtered out. Sits above the next-steps track: what you build comes before what you go and find out.",
+    "filePath": "app/components/BuildSequence.tsx",
+    "name": "BuildSequence",
+    "scenarios": [
+      "buildsequence-default",
+      "buildsequence-provesnothing",
+      "buildsequence-danglinglink",
+      "buildsequence-firstsliceonly",
+      "buildsequence-empty"
+    ]
+  },
+  {
     "description": "A what-we-know or what-we-don't-know card on the summary screen, falling back to the keep-talking hint when its bucket is empty.",
     "filePath": "app/components/BulletCard.tsx",
     "name": "BulletCard",
@@ -345,6 +357,7 @@
       "grounded-research-and-its-gaps",
       "pivoted-now-it-is-for-teachers",
       "complete-what-to-do-next",
+      "a-plan-with-a-gap-one-slice-proves-nothing",
       "sprawling-a-deep-wide-map"
     ]
   },
@@ -500,6 +513,17 @@
     ]
   },
   {
+    "description": "One increment in the build sequence: what you build, what it would prove, and roughly what it costs. Its own component so each state - validated, proves nothing, dangling link - gets an isolated scenario, following the BulletCard / DirectionsCard split. The effort note is the agent's own sentence printed as written: nothing parses or validates it, because a rough claim a human can argue with is more honest than a number that merely looks computed.",
+    "filePath": "app/components/SliceCard.tsx",
+    "name": "SliceCard",
+    "scenarios": [
+      "slicecard-default",
+      "slicecard-provesnothing",
+      "slicecard-danglinglink",
+      "slicecard-noeffortstated"
+    ]
+  },
+  {
     "description": "The four starter chips. Clicking one fills the prompt rather than submitting it, so the person finishes the sentence in their own words.",
     "filePath": "app/components/SuggestionChips.tsx",
     "name": "SuggestionChips",
@@ -524,11 +548,12 @@
     ]
   },
   {
-    "description": "The final screen composed whole: the declaration, the three cards, and the next-steps track. Composition only - the sorting lives in groupSummaryNodes.",
+    "description": "The final screen composed whole: the declaration, the three cards, the build sequence and the next-steps track - what you build first coming before what you go and find out. Composition only; the sorting lives in groupSummaryNodes and the slice resolution in buildSequence.",
     "filePath": "app/components/SummaryView.tsx",
     "name": "SummaryView",
     "scenarios": [
       "summaryview-default",
+      "summaryview-noslices",
       "summaryview-empty"
     ]
   },
@@ -587,7 +612,7 @@
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
-    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. All the rules live in planMapMutations, which is pure and tested. It now has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
+    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. A slice's testsRef goes through the same resolution as parentRef, since a slice usually names an assumption created moments earlier in the same call; an unresolvable value is written through rather than dropped, because a dangling link is reported on screen and losing it silently would hide that the slice claimed to settle anything. All the rules live in planMapMutations, which is pure and tested. It has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
     "filePath": "app/lib/mapStore.ts",
     "name": "applyToolCalls",
     "scenarios": [
@@ -635,6 +660,12 @@
       "justification": "Registration only: it constructs an SDK server object and attaches handlers that delegate to runTool, whose behaviour is covered by its own entry and the mid-exchange scenario, and to createMap/listMaps which have theirs. The catalog it loops over is covered by app/lib/toolCatalog.test.ts. The wiring was verified end to end over both transports.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Resolves a finished map's slices into the order they should be built in, each entry carrying the node it would settle. The whole opinion of the build sequence lives in its provesNothing flag: an increment that tests no assumption is not a validating slice but work scheduled early, so it is marked rather than filtered out, and a slice whose target has since been deleted is reported as dangling rather than rendered as a blank. Pure - nodes in, an ordered list out - so every interesting case is a test rather than a screenshot.",
+    "filePath": "app/lib/buildSequence.ts",
+    "name": "buildSequence",
+    "testFile": "app/lib/buildSequence.test.ts"
   },
   {
     "description": "The descriptors handed to a browser agent, one per catalog tool. Separated from registration so that WHAT the agent is offered can be checked without a navigator.modelContext: registering is a boundary call, but the set being registered is a contract. Each descriptor is bound to its own tool name, and annotations are carried only where the catalog declares them.",
@@ -852,7 +883,7 @@
     ]
   },
   {
-    "description": "Sorts a finished map's nodes into the four regions of the summary screen - known, unknown, directions and next steps - ignoring every other kind and ordering each bucket by its stored order, because the next steps are numbered on screen.",
+    "description": "Sorts a finished map's nodes into the regions of the summary screen - known, unknown, directions, next steps and the build sequence's slices - ignoring every other kind and ordering each bucket by its stored order, because the steps and the slices are both numbered on screen. Slices sit beside the next steps rather than replacing them: a next step can be to interview three teachers, which is not something you build.",
     "filePath": "app/lib/summaryGroups.ts",
     "name": "groupSummaryNodes",
     "testFile": "app/lib/summaryGroups.test.ts"
@@ -1029,7 +1060,7 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
-    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase.",
+    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase. A slice's tests field is carried through as testsRef and deliberately NOT validated here: like parentRef it may name a node created earlier in the same call, so resolving it belongs to applyToolCalls, which can see the ids the database just handed back.",
     "filePath": "app/lib/nodePlan.ts",
     "name": "planMapMutations",
     "testFile": "app/lib/nodePlan.test.ts"

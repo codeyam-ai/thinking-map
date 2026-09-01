@@ -41,6 +41,7 @@ export const NODE_KINDS = [
   'unknown',
   'direction',
   'next-step',
+  'slice',
 ] as const;
 export type NodeKind = (typeof NODE_KINDS)[number];
 
@@ -63,6 +64,7 @@ export const KIND_EYEBROW: Record<NodeKind, string> = {
   unknown: 'We don’t know',
   direction: 'Direction',
   'next-step': 'Next step',
+  slice: 'Build first',
 };
 
 export const NODE_STATUSES = ['open', 'answered', 'updated'] as const;
@@ -74,6 +76,9 @@ export const ACCENT_KINDS: Partial<Record<NodeKind, 'pro' | 'risk' | 'find'>> = 
   risk: 'risk',
   // A research node wears the lime — it is what the partner just went and found.
   research: 'find',
+  // A slice is the one thing you actually go and build, so it earns the same
+  // weight rather than sitting in the neutral treatment with everything else.
+  slice: 'find',
 };
 
 export function isPhase(value: string): value is Phase {

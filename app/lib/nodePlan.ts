@@ -18,6 +18,13 @@ export interface PlannedInsert {
   detail: string | null;
   status: NodeStatus;
   sourceUrl: string | null;
+  /**
+   * What this slice would settle. Like `parentRef`, this is either a ref from
+   * earlier in this same plan or the real id of an existing node — a slice
+   * usually names an assumption the agent created moments before it — so it
+   * has to survive the same resolution pass rather than being written raw.
+   */
+  testsRef: string | null;
   order: number;
 }
 
@@ -29,6 +36,7 @@ export interface PlannedUpdate {
     detail: string;
     kind: NodeKind;
     status: NodeStatus;
+    testsNodeId: string;
   }>;
 }
 
@@ -88,6 +96,7 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           detail: node.detail ? String(node.detail) : null,
           status: isNodeStatus(status) ? status : 'answered',
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
+          testsRef: node.tests ? String(node.tests) : null,
           order: order++,
         });
       }
@@ -106,6 +115,7 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
       if (input.status && isNodeStatus(String(input.status))) {
         data.status = String(input.status) as NodeStatus;
       }
+      if (input.tests) data.testsNodeId = String(input.tests);
       if (Object.keys(data).length === 0) continue;
       updates.push({ id, data });
     }

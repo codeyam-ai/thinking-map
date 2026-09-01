@@ -1,0 +1,12 @@
+{
+  "name": "SummaryView - NoSlices",
+  "id": "f2057579-34a1-45d1-b09b-7ac7c67d1b2d",
+  "url": "/isolated-components/SummaryView?s=NoSlices",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SummaryView",
+  "scenarioType": "component",
+  "description": "The summary as it looked before there was a build sequence, and as it still looks on a map whose agent never proposed anything to build: know, don't know, directions and five next steps, with the build region showing its hint rather than a blank."
+}
