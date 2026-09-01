@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingMapView - Empty",
+  "id": "f5f9f70f-b038-4060-b061-8697e813cb61",
+  "url": "/isolated-components/ThinkingMapView?s=Empty",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingMapView",
+  "scenarioType": "component",
+  "description": "Day one, inviting the next answer rather than showing a void."
+}

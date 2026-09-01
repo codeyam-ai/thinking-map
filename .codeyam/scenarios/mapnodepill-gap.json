@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - Gap",
+  "id": "f0863231-3f33-499b-9a3b-6fd840d4bad1",
+  "url": "/isolated-components/MapNodePill?s=Gap",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "A gap - deliberately neutral, because a gap is the research phase's most valuable finding, not a warning."
+}

@@ -1,0 +1,24 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-game",
+      "title": "Educational game for kids",
+      "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+      "phase": "explore"
+    }
+  ],
+  "message": [
+    { "id": "msg-1", "mapId": "map-game", "role": "user", "content": "Actually, what if this isn't for kids, what if it's for teachers instead?" },
+    { "id": "msg-2", "mapId": "map-game", "role": "assistant", "content": "That changes a few things, not everything. I kept your original idea and updated who it's for. Here are three directions this could go." }
+  ],
+  "mapNode": [
+    { "id": "n-idea", "mapId": "map-game", "parentId": null, "kind": "idea", "label": "Educational game", "status": "answered", "order": 0 },
+    { "id": "n-user", "mapId": "map-game", "parentId": "n-idea", "kind": "user", "label": "For: Teachers", "detail": "Changed from children. The vocabulary problem and the research below still hold.", "status": "updated", "order": 0 },
+    { "id": "n-a", "mapId": "map-game", "parentId": "n-user", "kind": "approach", "label": "Classroom vocabulary game", "status": "answered", "order": 0 },
+    { "id": "n-b", "mapId": "map-game", "parentId": "n-user", "kind": "approach", "label": "Teacher assessment tool", "status": "answered", "order": 1 },
+    { "id": "n-c", "mapId": "map-game", "parentId": "n-user", "kind": "approach", "label": "Shared parent-teacher app", "status": "answered", "order": 2 },
+    { "id": "n-ar", "mapId": "map-game", "parentId": "n-a", "kind": "risk", "label": "Another tool to learn", "status": "answered", "order": 0 },
+    { "id": "n-bn", "mapId": "map-game", "parentId": "n-b", "kind": "constraint", "label": "Needs district buy-in", "status": "answered", "order": 0 },
+    { "id": "n-cp", "mapId": "map-game", "parentId": "n-c", "kind": "pro", "label": "Reuses existing rapport", "status": "answered", "order": 0 }
+  ]
+}

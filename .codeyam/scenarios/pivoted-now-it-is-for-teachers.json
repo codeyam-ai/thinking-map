@@ -1,0 +1,111 @@
+{
+  "name": "Pivoted - now it is for teachers",
+  "id": "fbb6e99b-bf3a-4999-81f7-c7e2170ec701",
+  "url": "/map/map-game",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapNode": [
+      {
+        "id": "n-idea",
+        "kind": "idea",
+        "label": "Educational game",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "detail": "Changed from children. The vocabulary problem and the research below still hold.",
+        "id": "n-user",
+        "kind": "user",
+        "label": "For: Teachers",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": "n-idea",
+        "status": "updated"
+      },
+      {
+        "id": "n-a",
+        "kind": "approach",
+        "label": "Classroom vocabulary game",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": "n-user",
+        "status": "answered"
+      },
+      {
+        "id": "n-b",
+        "kind": "approach",
+        "label": "Teacher assessment tool",
+        "mapId": "map-game",
+        "order": 1,
+        "parentId": "n-user",
+        "status": "answered"
+      },
+      {
+        "id": "n-c",
+        "kind": "approach",
+        "label": "Shared parent-teacher app",
+        "mapId": "map-game",
+        "order": 2,
+        "parentId": "n-user",
+        "status": "answered"
+      },
+      {
+        "id": "n-ar",
+        "kind": "risk",
+        "label": "Another tool to learn",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": "n-a",
+        "status": "answered"
+      },
+      {
+        "id": "n-bn",
+        "kind": "constraint",
+        "label": "Needs district buy-in",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": "n-b",
+        "status": "answered"
+      },
+      {
+        "id": "n-cp",
+        "kind": "pro",
+        "label": "Reuses existing rapport",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": "n-c",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "Actually, what if this isn't for kids, what if it's for teachers instead?",
+        "id": "msg-1",
+        "mapId": "map-game",
+        "role": "user"
+      },
+      {
+        "content": "That changes a few things, not everything. I kept your original idea and updated who it's for. Here are three directions this could go.",
+        "id": "msg-2",
+        "mapId": "map-game",
+        "role": "assistant"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-game",
+        "phase": "explore",
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The direction changed and nothing was lost. The updated node wears the lime; three approaches branch beneath it with their pros and risks."
+}

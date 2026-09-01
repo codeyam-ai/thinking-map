@@ -1,0 +1,932 @@
+{
+  "tests": [
+    {
+      "description": "An aligned pair should get a straight line, not a degenerate dog-leg with zero-length segments.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "connectorPath › drops straight down when parent and child share a centre",
+      "line": 136,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Siblings share that bus, which is what makes the tree read as one structure rather than a set of unrelated lines.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "connectorPath › routes through a horizontal bus midway between the two levels",
+      "line": 143,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A connector that started inside the parent pill or stopped short of the child would leave visible gaps against the dotted stroke.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "connectorPath › starts at the parent bottom edge and ends at the child top edge",
+      "line": 151,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A refusal is thrown by the caller, so nothing should be queued for a request that will never be sent.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "followUpMessages › appends nothing for a refusal",
+      "line": 191,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty array is how the loop learns it is finished.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "followUpMessages › appends nothing when the turn is done",
+      "line": 155,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The API requires the tool_results in a single user message following the assistant turn that requested them.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "followUpMessages › appends the assistant turn then all tool results in one user message",
+      "line": 173,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A paused server tool needs the assistant's partial content echoed back, and nothing else, or the search cannot resume.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "followUpMessages › echoes the assistant content back to resume a paused turn",
+      "line": 163,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The seed idea is preserved verbatim through the whole product; the MCP view must not be where it gets paraphrased away.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapDetail › includes the title, phase and verbatim seed idea",
+      "line": 59,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A map created through MCP has no conversation yet; an empty section would read as a truncated response.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapDetail › marks an empty conversation explicitly",
+      "line": 77,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A map whose nodes have all been removed still has to render.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapDetail › renders a map with no nodes",
+      "line": 83,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A client needs both views to reason about the map the way the UI does.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapDetail › renders the conversation and the node tree under their own headings",
+      "line": 67,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Without the id the client cannot open or modify the map it just listed.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapList › leads each row with the id in brackets",
+      "line": 21,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "One map per line keeps the response parseable by a client or a person.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapList › puts each map on its own line",
+      "line": 34,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Phase and counts are how a client picks which map is worth opening.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapList › reports the phase and the node and message counts",
+      "line": 26,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A client asking for maps on a fresh install needs a sentence, not a blank response it might read as a failure.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatMapList › says so plainly when there are no maps",
+      "line": 16,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A finished map still holds every working node; only the four summary kinds belong on this screen.",
+      "file": "app/lib/summaryGroups.test.ts",
+      "format": "vitest",
+      "key": "groupSummaryNodes › ignores kinds that do not belong on the summary screen",
+      "line": 41,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The screen must render its empty hints rather than crash on a map that reached the phase with nothing filled in.",
+      "file": "app/lib/summaryGroups.test.ts",
+      "format": "vitest",
+      "key": "groupSummaryNodes › returns four empty buckets for an empty map",
+      "line": 55,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Next steps are numbered on screen, so their sequence is meaningful — rendering them in insertion order would mislabel the plan.",
+      "file": "app/lib/summaryGroups.test.ts",
+      "format": "vitest",
+      "key": "groupSummaryNodes › sorts each bucket by order, not by input position",
+      "line": 30,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The summary screen has four regions; each must draw from its own kind, or findings land in the wrong card.",
+      "file": "app/lib/summaryGroups.test.ts",
+      "format": "vitest",
+      "key": "groupSummaryNodes › splits nodes into the four summary buckets",
+      "line": 15,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Web search pauses the turn mid-flight; stopping here would silently drop the research the Research phase depends on.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › asks the caller to resume a paused turn",
+      "line": 83,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The main path when the model is building the map.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › collects tool calls and asks the caller to continue",
+      "line": 40,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Empty or whitespace-only blocks would render as blank bubbles.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › discards empty text blocks",
+      "line": 31,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The API requires one tool_result per tool_use; a missing one fails the next request outright.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › emits one tool_result per tool call, keyed by its id",
+      "line": 51,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "stop_details can be absent, and the caller still needs something to show.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › falls back to a readable reason when a refusal carries no explanation",
+      "line": 76,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A response can carry both a sentence and the map changes it describes.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › keeps text and tool calls from the same response",
+      "line": 103,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A safety decline is not an answer; treating it as one would put the refusal text into the map as though it were thinking.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › reports a refusal rather than treating it as an answer",
+      "line": 65,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary finish: the partner spoke and wants nothing more.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › stops on a plain end_turn and keeps the spoken text",
+      "line": 21,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A round where only the server-side web_search ran reports tool_use but leaves us nothing to answer — continuing would spin the loop forever.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › stops when tool_use is reported but no custom tool was called",
+      "line": 93,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A malformed or empty response must not throw and lose the turn.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "interpretTurnResponse › survives an empty or malformed content array",
+      "line": 113,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Depth is what puts a node on the right row; the database stores only parentId, so the tree has to be reconstructed correctly.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › assigns depth by ancestry",
+      "line": 31,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Centring is what makes the map look deliberate rather than left-piled; it is the single most visible property of the layout.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › centres a parent over its children",
+      "line": 49,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Overlapping pills would make the map unreadable, and long labels are the case most likely to cause it.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › never overlaps siblings",
+      "line": 64,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Rows arrive from the database in creation order, so left-to-right position has to come from the stored order instead.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › orders siblings by their order field, not insertion order",
+      "line": 79,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A tree reads as a tree only if each generation sits below the last.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › puts each level on its own row",
+      "line": 40,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported bounds drive the scale-to-fit calculation, so a node outside them would be clipped out of view.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › reports bounds that contain every node",
+      "line": 120,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The map panel renders before any node exists, so the empty case must be a clean zero rather than NaN bounds.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › returns an empty layout for no nodes",
+      "line": 25,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A malformed parent chain must not hang the render — the map is drawn on every keystroke of the conversation.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › terminates on a parent cycle instead of hanging",
+      "line": 113,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A half-written map should still draw; losing nodes silently would be worse than showing an extra root.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › treats a node whose parent is missing as a root rather than dropping it",
+      "line": 105,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Node width tracks its label so text stays on two lines at most, but an unbounded label must not stretch the pill into a paragraph.",
+      "file": "app/lib/mapLayout.test.ts",
+      "format": "vitest",
+      "key": "layoutMap › widens a node to fit a longer label, up to a cap",
+      "line": 92,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A real phase must pass, or the workspace falls back and shows the wrong step as active.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › accepts every phase in the loop",
+      "line": 10,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The kinds the map knows how to draw, including the four that only appear on the summary screen.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › accepts the node kinds the map can draw",
+      "line": 32,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Status drives the visual treatment, so only these three are meaningful.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › accepts the three node statuses",
+      "line": 54,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "applyToolCalls drops unknown kinds rather than storing them; this is the check that makes that possible.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › rejects a node kind the map has no treatment for",
+      "line": 48,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A typo or a model hallucination must not become the active phase.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › rejects a phase that is not part of the loop",
+      "line": 24,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything else would fall through to the default treatment silently.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "map vocabulary guards › rejects an unknown node status",
+      "line": 61,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Right after the deconstruct turn the map is all questions; the count is what tells the person how much is still unknown.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › counts open questions while nothing has been answered",
+      "line": 26,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A map that is only an idea has nothing to report yet, and claiming progress would be the first thing the person notices as false.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › describes a bare seed when only the idea exists",
+      "line": 12,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The caption renders before any node exists, so it must not divide by zero or read as though work had happened.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › describes an empty map as a bare seed too",
+      "line": 20,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The idea is the map's subject, not one of its findings — counting it would overstate progress by one on every single map.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › does not count the root idea as an answered node",
+      "line": 57,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A change the person just made is the most important thing on screen, so it outranks the arithmetic.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › prefers the just-updated line over the answered/open split",
+      "line": 75,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "After a direction change the reassurance matters more than the counts: the person needs to know their original idea survived.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › reports that nothing was lost when something was just updated",
+      "line": 64,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The mid-conversation state the mockups show: some answers in, some still outstanding.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › reports the answered/open split once both exist",
+      "line": 45,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "\"1 open questions\" would undercut the care the rest of the copy takes.",
+      "file": "app/lib/mapCaption.test.ts",
+      "format": "vitest",
+      "key": "mapCaption › singularises a lone open question",
+      "line": 37,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Pro and risk are the only kinds carrying colour; colour used more widely would stop meaning anything.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › accents risk and pro nodes, and only those",
+      "line": 54,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Dashed-and-unfilled is how the map says \"nobody has answered this\" — the provisional look is the whole point.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › draws an unanswered question dashed and unfilled",
+      "line": 26,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Most nodes are ordinary settled facts and must render as plain ink pills.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind",
+      "line": 74,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The root is the map's subject and the only dark shape on the page; losing that fill would leave the map without a visual anchor.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › fills the root idea solid, the one dark shape on the page",
+      "line": 18,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Lime marks exactly what just changed, which is what makes a direction change legible at a glance.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › gives the just-changed node the lime border",
+      "line": 34,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Gaps are the most valuable finding on the map, not a warning — the mockups draw them as plain pills, and an earlier build wrongly reddened them.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › leaves a gap node neutral",
+      "line": 61,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Exactly one thing per screen wears the lime, and it is what just changed — an accent colour must not steal it.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › lets \"updated\" win over an accent kind",
+      "line": 48,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A root that is somehow also \"updated\" is still the map's subject, so the root treatment has to win.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › lets the root treatment win over every other rule",
+      "line": 40,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A research node is what the partner just went and found, so it carries the lime outline and the magnifier.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › marks a research node as a find",
+      "line": 69,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A kind the map has no treatment for would render as an untyped blob, so it is dropped rather than stored.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › drops a node whose kind the map cannot draw",
+      "line": 25,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty pill is worse than no pill — it takes up map space saying nothing.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › drops a node with a blank label",
+      "line": 36,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An unrecognised status would fall through to the default treatment silently; normalising it makes the fallback explicit.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › falls back to answered for an unknown status",
+      "line": 48,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "One turn routinely adds nodes, resolves a question, and moves the phase on.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › handles adds, updates and a phase change in one turn",
+      "line": 156,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An invalid phase must leave the map where it was rather than break the nav.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › ignores a phase that is not part of the loop",
+      "line": 129,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An update naming no real change would be a pointless write.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › ignores an update that carries no valid fields",
+      "line": 105,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Without an id there is nothing to target.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › ignores an update with no id",
+      "line": 113,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "\"updated\" is how the map marks what just changed; it must survive intact.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › keeps a valid status",
+      "line": 56,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A root idea has no parent, and must not invent one.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › leaves parentRef null when none is given",
+      "line": 89,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Sibling position on screen comes from this index.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › numbers siblings in the order they arrive",
+      "line": 77,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary path: a valid node survives with its fields intact.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › plans an insert for a valid node",
+      "line": 10,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Resolving an answered question is the most common update.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › plans an update with only the fields supplied",
+      "line": 97,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A parent must be written before the child naming it, so the order the model sent has to be preserved exactly.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › preserves insert order so parents precede their children",
+      "line": 65,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The phase drives the nav and the summary-screen switch.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › records a valid phase change",
+      "line": 121,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A turn that only talks changes nothing on the map.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › returns an empty plan for no calls",
+      "line": 137,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A malformed tool call must not throw mid-turn and lose the whole reply.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations › survives a call with a missing or malformed input",
+      "line": 146,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Text spoken before a tool call must not be dropped when the loop continues.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › accumulates text across rounds",
+      "line": 71,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The core loop: a tool round must be answered and the conversation resumed.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › loops after a tool round and collects the calls",
+      "line": 56,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The map's current state is what lets the model target existing nodes by id.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › passes the map summary to the model as system context",
+      "line": 135,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Without credentials the route must be able to say so plainly rather than surface a generic 500 from a failed request.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › refuses up front when there are no credentials and no injected client",
+      "line": 36,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A paused server-side search must be resumed rather than treated as the end.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › resumes a turn paused by a server-side tool",
+      "line": 114,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A plain reply should cost exactly one request.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › returns the spoken text after a single round",
+      "line": 46,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The next request must carry the tool results, or the API rejects it.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › sends the tool results back on the following request",
+      "line": 84,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A model that keeps asking for tools must not spin forever and hang the request; the bound is the only thing standing between that and a hung page.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › stops after the iteration bound when tool calls never end",
+      "line": 126,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A refusal must reach the caller as an error, not be presented as thinking.",
+      "file": "app/lib/thinkingPartner.test.ts",
+      "format": "vitest",
+      "key": "runTurn › throws with the refusal explanation",
+      "line": 100,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Only a line that ENDS in \"?\" is being asked of the person; a question mark inside a sentence is usually quoting them back to themselves.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › does not treat a mid-line question mark as a question line",
+      "line": 59,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A model reply often carries blank lines; rendering them would open gaps in the bubble.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › drops blank lines rather than rendering empty paragraphs",
+      "line": 37,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Ordinary prose must stay ordinary — over-marking would flatten the distinction that makes questions stand out.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › leaves a statement unmarked",
+      "line": 17,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A question is what the partner is asking of the person, so it must be detected for the panel to give it weight.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › marks a line ending in a question mark as a question",
+      "line": 9,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty reply must render nothing rather than an empty bubble.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › returns nothing for empty or whitespace-only content",
+      "line": 52,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The real shape of an assistant reply: a lead-in sentence followed by the two or three questions worth asking.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › splits a multi-line reply and marks only the questions",
+      "line": 25,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Trailing spaces would otherwise defeat the \"?\" check and lose a question.",
+      "file": "app/lib/messageLines.test.ts",
+      "format": "vitest",
+      "key": "splitAssistantLines › trims surrounding whitespace on each line",
+      "line": 45,
+      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Without the id, the model cannot target a node with update_node.",
+      "file": "app/lib/summarizeMap.test.ts",
+      "format": "vitest",
+      "key": "summarizeMap › includes each node id in brackets",
+      "line": 23,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Indentation is how the flat list conveys the tree; without it the model cannot tell a child from a sibling.",
+      "file": "app/lib/summarizeMap.test.ts",
+      "format": "vitest",
+      "key": "summarizeMap › indents children beneath their parent",
+      "line": 40,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Depth must keep increasing so a three-level map does not read as flat.",
+      "file": "app/lib/summarizeMap.test.ts",
+      "format": "vitest",
+      "key": "summarizeMap › indents deeper for a grandchild",
+      "line": 50,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Kind and status tell the model what is settled and what is still open.",
+      "file": "app/lib/summarizeMap.test.ts",
+      "format": "vitest",
+      "key": "summarizeMap › names each node kind and status",
+      "line": 29,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Nodes arrive flat and unordered from the database; every one must appear exactly once regardless of input order.",
+      "file": "app/lib/summarizeMap.test.ts",
+      "format": "vitest",
+      "key": "summarizeMap › renders every node exactly once, whatever order they arrive in",
+      "line": 61,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The model must be told plainly when there is nothing yet, rather than receiving an empty string it might read as a truncation.",
+      "file": "app/lib/summarizeMap.test.ts",
+      "format": "vitest",
+      "key": "summarizeMap › says so explicitly when the map is empty",
+      "line": 18,
+      "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The stored role column is a free string; an assistant turn must survive as one or the conversation loses its shape on the next request.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "toMessageParams › preserves assistant and user turns",
+      "line": 125,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A brand-new map has no history yet.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "toMessageParams › returns nothing for an empty history",
+      "line": 146,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything unexpected must land somewhere rather than throw mid-conversation and lose the turn the person just typed.",
+      "file": "app/lib/turnInterpreter.test.ts",
+      "format": "vitest",
+      "key": "toMessageParams › treats an unrecognised role as a user turn",
+      "line": 139,
+      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "runner": "tests"
+    }
+  ],
+  "version": 2
+}

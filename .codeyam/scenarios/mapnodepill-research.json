@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - Research",
+  "id": "bedfa878-16eb-4990-b6fb-5fdb9c02dac8",
+  "url": "/isolated-components/MapNodePill?s=Research",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "A research node with its lime outline and magnifier - what the partner just went and found."
+}

@@ -1,0 +1,15 @@
+{
+  "name": "ThinkingMapView - NoCaption",
+  "id": "fb676d5c-5187-4cf2-9aa1-ab5e3e24140b",
+  "url": "/isolated-components/ThinkingMapView?s=NoCaption",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingMapView",
+  "scenarioType": "component",
+  "description": "The optional caption omitted, so the header shows only the LIVE MAP eyebrow. Proves the header does not collapse or leave a gap on the null branch.",
+  "demonstratesState": {
+    "caption": "false"
+  }
+}

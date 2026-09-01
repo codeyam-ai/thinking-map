@@ -1,0 +1,36 @@
+{
+  "surface": "ThinkingMapView",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "nodes",
+      "value": "empty",
+      "rationale": "source-derived state nodes=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "nodes",
+      "value": "one",
+      "rationale": "source-derived state nodes=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "nodes",
+      "value": "many",
+      "rationale": "source-derived state nodes=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "caption",
+      "value": "true",
+      "rationale": "source-derived state caption=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "caption",
+      "value": "false",
+      "rationale": "source-derived state caption=false",
+      "status": "planned"
+    }
+  ]
+}

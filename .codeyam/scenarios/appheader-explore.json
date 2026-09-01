@@ -1,0 +1,12 @@
+{
+  "name": "AppHeader - Explore",
+  "id": "97bc831b-eff0-40b8-a366-0376f1b9813c",
+  "url": "/isolated-components/AppHeader?s=Explore",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AppHeader",
+  "scenarioType": "component",
+  "description": "The same header once the conversation has reached Explore."
+}

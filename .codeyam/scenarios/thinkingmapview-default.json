@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingMapView - Default",
+  "id": "a19f364c-144d-4903-87b6-ae297b390a55",
+  "url": "/isolated-components/ThinkingMapView?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingMapView",
+  "scenarioType": "component",
+  "description": "The map at the research phase, scaled to fit its panel."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "LandingScreen - DayOne",
+  "id": "56307b7e-0781-47b1-8991-07c55e76d99f",
+  "url": "/isolated-components/LandingScreen?s=DayOne",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "LandingScreen",
+  "scenarioType": "component",
+  "description": "The production default: no maps yet, so only the question and the chips."
+}

@@ -1,0 +1,7 @@
+{
+  "appFormats": [],
+  "defaultDevice": "Desktop",
+  "designApproach": "files",
+  "techStackId": "nextjs-prisma-sqlite",
+  "startingSurface": "primary-interaction"
+}

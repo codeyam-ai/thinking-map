@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - RootIdea",
+  "id": "29921071-0512-48d2-85b3-39f6d03acd80",
+  "url": "/isolated-components/MapNodePill?s=RootIdea",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "The root idea - solid black, the one dark shape on the page."
+}

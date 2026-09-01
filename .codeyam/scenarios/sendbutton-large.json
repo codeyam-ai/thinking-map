@@ -1,0 +1,12 @@
+{
+  "name": "SendButton - Large",
+  "id": "7c204922-7225-4b84-b5d3-cb68fe214af7",
+  "url": "/isolated-components/SendButton?s=Large",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SendButton",
+  "scenarioType": "component",
+  "description": "The landing-page size, in the taller idea input."
+}

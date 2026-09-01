@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - OpenQuestion",
+  "id": "02269bff-71ff-449b-84c6-281f7cc19097",
+  "url": "/isolated-components/MapNodePill?s=OpenQuestion",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "Dashed and unfilled, because nobody has answered it."
+}

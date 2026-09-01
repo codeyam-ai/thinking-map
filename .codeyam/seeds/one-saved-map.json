@@ -1,0 +1,38 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-solo",
+      "title": "Should the bakery deliver?",
+      "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.",
+      "phase": "deconstruct"
+    }
+  ],
+  "message": [
+    {
+      "id": "s1",
+      "mapId": "map-solo",
+      "role": "user",
+      "content": "I have an idea for a business."
+    }
+  ],
+  "mapNode": [
+    {
+      "id": "s-idea",
+      "mapId": "map-solo",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Weekday morning bread",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-q",
+      "mapId": "map-solo",
+      "parentId": "s-idea",
+      "kind": "open-question",
+      "label": "Who actually buys at 7am?",
+      "status": "open",
+      "order": 0
+    }
+  ]
+}

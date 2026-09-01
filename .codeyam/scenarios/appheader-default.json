@@ -1,0 +1,12 @@
+{
+  "name": "AppHeader - Default",
+  "id": "ac41bb0c-bfe0-4e04-8e25-c06466b74489",
+  "url": "/isolated-components/AppHeader?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AppHeader",
+  "scenarioType": "component",
+  "description": "Wordmark left, phase track right, at the Idea phase."
+}

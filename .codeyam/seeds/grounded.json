@@ -1,0 +1,25 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-game",
+      "title": "Educational game for kids",
+      "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+      "phase": "research"
+    }
+  ],
+  "message": [
+    { "id": "msg-1", "mapId": "map-game", "role": "user", "content": "I want to build an educational game for kids, but I don't know what it should be." },
+    { "id": "msg-2", "mapId": "map-game", "role": "assistant", "content": "Before we think about the game itself: who is this actually for, what should they learn, and what are they doing today instead?" },
+    { "id": "msg-3", "mapId": "map-game", "role": "user", "content": "Probably kids around 6 to 8, and I want them to learn vocabulary." },
+    { "id": "msg-4", "mapId": "map-game", "role": "assistant", "content": "Got it. I looked at what already exists for that age and skill, found three apps worth knowing about, and added them to the map. Two gaps stood out right away." }
+  ],
+  "mapNode": [
+    { "id": "n-idea", "mapId": "map-game", "parentId": null, "kind": "idea", "label": "Educational game for kids", "status": "answered", "order": 0 },
+    { "id": "n-age", "mapId": "map-game", "parentId": "n-idea", "kind": "assumption", "label": "Ages 6-8", "status": "answered", "order": 0 },
+    { "id": "n-prob", "mapId": "map-game", "parentId": "n-idea", "kind": "problem", "label": "Vocabulary", "status": "answered", "order": 1 },
+    { "id": "n-goal", "mapId": "map-game", "parentId": "n-idea", "kind": "goal", "label": "Not yet explored", "status": "open", "order": 2 },
+    { "id": "n-res", "mapId": "map-game", "parentId": "n-prob", "kind": "research", "label": "3 existing apps found", "status": "answered", "order": 0 },
+    { "id": "n-gap1", "mapId": "map-game", "parentId": "n-res", "kind": "gap", "label": "No parent involvement", "detail": "All three treat the child as the only user. Nobody surfaces what was learned to the adult who bought the app.", "status": "answered", "order": 0 },
+    { "id": "n-gap2", "mapId": "map-game", "parentId": "n-res", "kind": "gap", "label": "Fixed difficulty level", "detail": "Word lists are age-banded, not ability-banded, so a strong reader is bored within a week.", "status": "answered", "order": 1 }
+  ]
+}

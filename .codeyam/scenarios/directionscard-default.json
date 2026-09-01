@@ -1,0 +1,12 @@
+{
+  "name": "DirectionsCard - Default",
+  "id": "5a83d444-ecf2-4e68-b9fd-4547bd973375",
+  "url": "/isolated-components/DirectionsCard?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "DirectionsCard",
+  "scenarioType": "component",
+  "description": "The three strongest directions, lettered A to C."
+}

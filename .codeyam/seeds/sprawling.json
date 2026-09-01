@@ -1,0 +1,215 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-sprawl",
+      "title": "A platform that helps small clinics coordinate follow-up care",
+      "seedIdea": "I keep hearing that small clinics lose track of follow-up care, and I think there's something to build there, but every time I try to describe it I end up describing an EHR.",
+      "phase": "explore"
+    }
+  ],
+  "message": [
+    {
+      "id": "sm-1",
+      "mapId": "map-sprawl",
+      "role": "user",
+      "content": "I keep hearing that small clinics lose track of follow-up care, and I think there's something to build there, but every time I try to describe it I end up describing an EHR."
+    },
+    {
+      "id": "sm-2",
+      "mapId": "map-sprawl",
+      "role": "assistant",
+      "content": "Interesting - and the fact that you keep landing on an EHR is itself information. Before we go near a product shape, three things I'd like to understand:\nWho inside the clinic feels this pain first?\nIs this a coordination problem or a staffing problem wearing a coordination costume?\nAnd what happens today when a follow-up gets missed?"
+    }
+  ],
+  "mapNode": [
+    {
+      "id": "s-idea",
+      "mapId": "map-sprawl",
+      "parentId": null,
+      "kind": "idea",
+      "label": "A platform that helps small clinics coordinate follow-up care",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-who",
+      "mapId": "map-sprawl",
+      "parentId": "s-idea",
+      "kind": "user",
+      "label": "Who this is for",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-who-0",
+      "mapId": "map-sprawl",
+      "parentId": "s-who",
+      "kind": "assumption",
+      "label": "Rural clinics with under 12 staff",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-who-1",
+      "mapId": "map-sprawl",
+      "parentId": "s-who",
+      "kind": "assumption",
+      "label": "Practice managers, not clinicians",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "s-who-2",
+      "mapId": "map-sprawl",
+      "parentId": "s-who",
+      "kind": "open-question",
+      "label": "Do patients ever touch it directly?",
+      "status": "open",
+      "order": 2
+    },
+    {
+      "id": "s-prob",
+      "mapId": "map-sprawl",
+      "parentId": "s-idea",
+      "kind": "problem",
+      "label": "The actual problem",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "s-prob-0",
+      "mapId": "map-sprawl",
+      "parentId": "s-prob",
+      "kind": "assumption",
+      "label": "Follow-ups fall through at handoff",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-prob-1",
+      "mapId": "map-sprawl",
+      "parentId": "s-prob",
+      "kind": "assumption",
+      "label": "No shared view of who called whom",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "s-prob-2",
+      "mapId": "map-sprawl",
+      "parentId": "s-prob",
+      "kind": "open-question",
+      "label": "Is it coordination or is it staffing?",
+      "status": "open",
+      "order": 2
+    },
+    {
+      "id": "s-res",
+      "mapId": "map-sprawl",
+      "parentId": "s-idea",
+      "kind": "research",
+      "label": "7 existing tools found",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "s-res-0",
+      "mapId": "map-sprawl",
+      "parentId": "s-res",
+      "kind": "finding",
+      "label": "Every one assumes an EHR integration budget",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-res-1",
+      "mapId": "map-sprawl",
+      "parentId": "s-res",
+      "kind": "finding",
+      "label": "Two are hospital-scale only",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "s-res-2",
+      "mapId": "map-sprawl",
+      "parentId": "s-res",
+      "kind": "finding",
+      "label": "None handle the phone-call reality",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "s-appr",
+      "mapId": "map-sprawl",
+      "parentId": "s-idea",
+      "kind": "approach",
+      "label": "Possible directions",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "s-appr-0",
+      "mapId": "map-sprawl",
+      "parentId": "s-appr",
+      "kind": "approach",
+      "label": "A shared follow-up queue",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-appr-1",
+      "mapId": "map-sprawl",
+      "parentId": "s-appr",
+      "kind": "approach",
+      "label": "A reminder layer over the existing EHR",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "s-appr-2",
+      "mapId": "map-sprawl",
+      "parentId": "s-appr",
+      "kind": "approach",
+      "label": "Nothing software - a better paper protocol",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "s-appr-0-pro",
+      "mapId": "map-sprawl",
+      "parentId": "s-appr-0",
+      "kind": "pro",
+      "label": "Works with a whiteboard mindset",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-appr-0-risk",
+      "mapId": "map-sprawl",
+      "parentId": "s-appr-0",
+      "kind": "risk",
+      "label": "Yet another screen to check",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "s-appr-1-risk",
+      "mapId": "map-sprawl",
+      "parentId": "s-appr-1",
+      "kind": "risk",
+      "label": "Integration budget is the thing they don't have",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "s-res-2-gap",
+      "mapId": "map-sprawl",
+      "parentId": "s-res-2",
+      "kind": "gap",
+      "label": "The phone call is where it breaks",
+      "status": "answered",
+      "order": 0
+    }
+  ]
+}

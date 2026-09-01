@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - Default",
+  "id": "3a2df925-de1c-4b36-bb62-6fbe86403755",
+  "url": "/isolated-components/MapNodePill?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "A settled fact: plain ink pill under its kind eyebrow."
+}

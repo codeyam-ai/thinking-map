@@ -1,0 +1,12 @@
+{
+  "name": "PhaseNav - Default",
+  "id": "5bb2cc3d-54af-41c6-a9e3-f3b2926e4809",
+  "url": "/isolated-components/PhaseNav?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "PhaseNav",
+  "scenarioType": "component",
+  "description": "The six-phase track at the start of the loop, with Idea active."
+}

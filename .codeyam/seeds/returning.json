@@ -1,0 +1,26 @@
+{
+  "thinkingMap": [
+    { "id": "map-game", "title": "Educational game for kids", "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.", "phase": "explore" },
+    { "id": "map-events", "title": "A better way for my team to plan events", "seedIdea": "I want to improve how my team plans events. Right now it's four spreadsheets and a group chat.", "phase": "research" },
+    { "id": "map-bakery", "title": "Should the bakery deliver?", "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.", "phase": "deconstruct" },
+    { "id": "map-garden", "title": "Something for my kids to do outside", "seedIdea": "I want to create something for my family, maybe a garden project my kids would actually stick with.", "phase": "map" }
+  ],
+  "message": [
+    { "id": "msg-1", "mapId": "map-game", "role": "user", "content": "Actually, what if this isn't for kids, what if it's for teachers instead?" },
+    { "id": "msg-2", "mapId": "map-events", "role": "user", "content": "I want to improve how my team plans events." },
+    { "id": "msg-3", "mapId": "map-bakery", "role": "user", "content": "I have an idea for a business." },
+    { "id": "msg-4", "mapId": "map-garden", "role": "user", "content": "I want to create something for my family." }
+  ],
+  "mapNode": [
+    { "id": "g-idea", "mapId": "map-game", "parentId": null, "kind": "idea", "label": "Educational game", "status": "answered", "order": 0 },
+    { "id": "g-user", "mapId": "map-game", "parentId": "g-idea", "kind": "user", "label": "For: Teachers", "status": "answered", "order": 0 },
+    { "id": "g-a", "mapId": "map-game", "parentId": "g-user", "kind": "approach", "label": "Classroom vocabulary game", "status": "answered", "order": 0 },
+    { "id": "e-idea", "mapId": "map-events", "parentId": null, "kind": "idea", "label": "Better event planning", "status": "answered", "order": 0 },
+    { "id": "e-prob", "mapId": "map-events", "parentId": "e-idea", "kind": "problem", "label": "Four spreadsheets, one group chat", "status": "answered", "order": 0 },
+    { "id": "e-res", "mapId": "map-events", "parentId": "e-prob", "kind": "research", "label": "5 existing tools found", "status": "answered", "order": 0 },
+    { "id": "b-idea", "mapId": "map-bakery", "parentId": null, "kind": "idea", "label": "Weekday morning bread", "status": "answered", "order": 0 },
+    { "id": "b-q", "mapId": "map-bakery", "parentId": "b-idea", "kind": "open-question", "label": "Who actually buys at 7am?", "status": "open", "order": 0 },
+    { "id": "r-idea", "mapId": "map-garden", "parentId": null, "kind": "idea", "label": "Garden project with the kids", "status": "answered", "order": 0 },
+    { "id": "r-goal", "mapId": "map-garden", "parentId": "r-idea", "kind": "goal", "label": "Something they stick with", "status": "answered", "order": 0 }
+  ]
+}

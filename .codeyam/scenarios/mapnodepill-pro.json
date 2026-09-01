@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - Pro",
+  "id": "7040c3f1-55f9-4f94-bca4-8e17744af81c",
+  "url": "/isolated-components/MapNodePill?s=Pro",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "A pro, the other coloured kind."
+}

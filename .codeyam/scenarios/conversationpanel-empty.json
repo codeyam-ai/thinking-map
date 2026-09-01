@@ -1,0 +1,12 @@
+{
+  "name": "ConversationPanel - Empty",
+  "id": "c95f9f3a-66e3-440a-97d3-e0b795dac493",
+  "url": "/isolated-components/ConversationPanel?s=Empty",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ConversationPanel",
+  "scenarioType": "component",
+  "description": "A map opened before anyone has spoken."
+}

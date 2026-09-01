@@ -1,0 +1,12 @@
+{
+  "name": "MapNodePill - JustUpdated",
+  "id": "ac1db61c-4dc0-47f8-9335-069ad1178a94",
+  "url": "/isolated-components/MapNodePill?s=JustUpdated",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapNodePill",
+  "scenarioType": "component",
+  "description": "The lime treatment marking the one thing that just changed."
+}

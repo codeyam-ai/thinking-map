@@ -1,0 +1,12 @@
+{
+  "name": "PhaseNav - NextSteps",
+  "id": "89466e02-c611-46f8-a179-de900dd4ff3d",
+  "url": "/isolated-components/PhaseNav?s=NextSteps",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "PhaseNav",
+  "scenarioType": "component",
+  "description": "The end of the loop, with Next steps active at the far right."
+}

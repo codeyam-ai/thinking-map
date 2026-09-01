@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - Default",
+  "id": "3da8fed2-9060-4d6d-a620-b012003ac823",
+  "url": "/isolated-components/MapWorkspace?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "Both panels side by side - the conversation and the map as two views of the same thinking."
+}

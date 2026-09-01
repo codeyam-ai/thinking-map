@@ -1,0 +1,12 @@
+{
+  "name": "EmptyHint - Default",
+  "id": "8359500e-70d5-410f-9adf-c587a1a26735",
+  "url": "/isolated-components/EmptyHint?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "EmptyHint",
+  "scenarioType": "component",
+  "description": "The empty state, which describes the next action rather than the absence of data."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "UserBubble - Long",
+  "id": "7d6c7062-ad3b-4ff4-b9c9-c0dca8b81913",
+  "url": "/isolated-components/UserBubble?s=Long",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "UserBubble",
+  "scenarioType": "component",
+  "description": "A rambling opening idea across several lines - the shape people actually arrive with."
+}

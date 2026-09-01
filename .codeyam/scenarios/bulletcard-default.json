@@ -1,0 +1,12 @@
+{
+  "name": "BulletCard - Default",
+  "id": "624383e0-8d50-47f7-ac63-33a1a0ca6da3",
+  "url": "/isolated-components/BulletCard?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BulletCard",
+  "scenarioType": "component",
+  "description": "The what-we-know card with three findings."
+}

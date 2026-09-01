@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingMapView - Seeded",
+  "id": "0f6c266f-34b1-4c1f-8b2f-501b92bfca8f",
+  "url": "/isolated-components/ThinkingMapView?s=Seeded",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingMapView",
+  "scenarioType": "component",
+  "description": "One idea and the three questions the partner asked, all dashed."
+}

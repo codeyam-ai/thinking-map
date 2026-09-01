@@ -1,0 +1,12 @@
+{
+  "name": "Wordmark - Default",
+  "id": "8c7087ce-974a-4c5d-a6bf-e2918a7b677f",
+  "url": "/isolated-components/Wordmark?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "Wordmark",
+  "scenarioType": "component",
+  "description": "The mark and wordmark: three nodes and the connectors between them."
+}

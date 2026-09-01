@@ -1,0 +1,12 @@
+{
+  "name": "BulletCard - Empty",
+  "id": "39dee672-5a60-4366-9a6f-5189f21741b7",
+  "url": "/isolated-components/BulletCard?s=Empty",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "BulletCard",
+  "scenarioType": "component",
+  "description": "The same card before anything is settled, showing the keep-talking hint."
+}

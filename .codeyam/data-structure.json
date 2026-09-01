@@ -1,0 +1,62 @@
+[
+  {
+    "name": "ThinkingMap",
+    "description": "One session of thinking. Holds the user's original unstructured idea verbatim and tracks which stage of the loop the session has reached. Everything else hangs off this root, so a saved map can be reopened and continued later.",
+    "category": "datastore",
+    "order": 1,
+    "fields": [
+      { "name": "id", "type": "string", "isId": true, "required": true },
+      { "name": "title", "type": "string", "required": true },
+      { "name": "seedIdea", "type": "string", "required": true },
+      { "name": "phase", "type": "string", "required": true },
+      { "name": "createdAt", "type": "datetime", "required": true },
+      { "name": "updatedAt", "type": "datetime", "required": true }
+    ]
+  },
+  {
+    "name": "Message",
+    "description": "One turn of the conversation, in order. The conversation panel on the left of every screen renders these. Paired with MapNode: the two are different views of the same thinking process.",
+    "category": "datastore",
+    "order": 2,
+    "fields": [
+      { "name": "id", "type": "string", "isId": true, "required": true },
+      { "name": "mapId", "type": "string", "required": true },
+      { "name": "role", "type": "string", "required": true },
+      { "name": "content", "type": "string", "required": true },
+      { "name": "createdAt", "type": "datetime", "required": true }
+    ]
+  },
+  {
+    "name": "MapNode",
+    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step) and 'status' drives the dashed / solid / highlighted treatment from the mockups. Self-referencing, so parents must precede children in seed input order.",
+    "category": "datastore",
+    "order": 3,
+    "fields": [
+      { "name": "id", "type": "string", "isId": true, "required": true },
+      { "name": "mapId", "type": "string", "required": true },
+      { "name": "parentId", "type": "string", "required": false },
+      { "name": "kind", "type": "string", "required": true },
+      { "name": "label", "type": "string", "required": true },
+      { "name": "detail", "type": "string", "required": false },
+      { "name": "status", "type": "string", "required": true },
+      { "name": "sourceUrl", "type": "string", "required": false },
+      { "name": "order", "type": "number", "required": true },
+      { "name": "createdAt", "type": "datetime", "required": true },
+      { "name": "updatedAt", "type": "datetime", "required": true }
+    ]
+  },
+  {
+    "name": "AnthropicMessagesAPI",
+    "description": "The single external dependency: POST https://api.anthropic.com/v1/messages on claude-opus-5. It drives the whole loop — deconstructing the idea into questions, emitting map updates as tool calls, and writing the final plan. The Research phase needs no separate search provider: Anthropic's server-side web_search tool runs inside this same call, so its findings arrive as content blocks in the response. Mocked per scenario via mocks.http, which is why every screen renders without credentials.",
+    "category": "mock-api",
+    "order": 4,
+    "fields": [
+      { "name": "model", "type": "string", "required": true },
+      { "name": "messages", "type": "array", "required": true },
+      { "name": "system", "type": "string", "required": false },
+      { "name": "tools", "type": "array", "required": false },
+      { "name": "thinking", "type": "object", "required": false },
+      { "name": "max_tokens", "type": "number", "required": true }
+    ]
+  }
+]

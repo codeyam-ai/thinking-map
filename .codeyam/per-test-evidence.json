@@ -1,0 +1,3646 @@
+{
+  "connectorPath › drops straight down when parent and child share a centre": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "connectorPath › routes through a horizontal bus midway between the two levels": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "connectorPath › starts at the parent bottom edge and ends at the child top edge": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "followUpMessages › appends nothing for a refusal": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "followUpMessages › appends nothing when the turn is done": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "followUpMessages › appends the assistant turn then all tool results in one user message": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "followUpMessages › echoes the assistant content back to resume a paused turn": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapDetail › includes the title, phase and verbatim seed idea": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapDetail › marks an empty conversation explicitly": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapDetail › renders a map with no nodes": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapDetail › renders the conversation and the node tree under their own headings": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapList › leads each row with the id in brackets": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapList › puts each map on its own line": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapList › reports the phase and the node and message counts": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "formatMapList › says so plainly when there are no maps": {
+    "file": "app/lib/mcpFormat.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "groupSummaryNodes › ignores kinds that do not belong on the summary screen": {
+    "file": "app/lib/summaryGroups.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "groupSummaryNodes › returns four empty buckets for an empty map": {
+    "file": "app/lib/summaryGroups.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "groupSummaryNodes › sorts each bucket by order, not by input position": {
+    "file": "app/lib/summaryGroups.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "groupSummaryNodes › splits nodes into the four summary buckets": {
+    "file": "app/lib/summaryGroups.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › asks the caller to resume a paused turn": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › collects tool calls and asks the caller to continue": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › discards empty text blocks": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › emits one tool_result per tool call, keyed by its id": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › falls back to a readable reason when a refusal carries no explanation": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › keeps text and tool calls from the same response": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › reports a refusal rather than treating it as an answer": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › stops on a plain end_turn and keeps the spoken text": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › stops when tool_use is reported but no custom tool was called": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "interpretTurnResponse › survives an empty or malformed content array": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › assigns depth by ancestry": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › centres a parent over its children": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › never overlaps siblings": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › orders siblings by their order field, not insertion order": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › puts each level on its own row": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › reports bounds that contain every node": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › returns an empty layout for no nodes": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › terminates on a parent cycle instead of hanging": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › treats a node whose parent is missing as a root rather than dropping it": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "layoutMap › widens a node to fit a longer label, up to a cap": {
+    "file": "app/lib/mapLayout.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "map vocabulary guards › accepts every phase in the loop": {
+    "file": "app/lib/mapKinds.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "map vocabulary guards › accepts the node kinds the map can draw": {
+    "file": "app/lib/mapKinds.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "map vocabulary guards › accepts the three node statuses": {
+    "file": "app/lib/mapKinds.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "map vocabulary guards › rejects a node kind the map has no treatment for": {
+    "file": "app/lib/mapKinds.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "map vocabulary guards › rejects a phase that is not part of the loop": {
+    "file": "app/lib/mapKinds.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "map vocabulary guards › rejects an unknown node status": {
+    "file": "app/lib/mapKinds.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › counts open questions while nothing has been answered": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › describes a bare seed when only the idea exists": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › describes an empty map as a bare seed too": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › does not count the root idea as an answered node": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › prefers the just-updated line over the answered/open split": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › reports that nothing was lost when something was just updated": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › reports the answered/open split once both exist": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "mapCaption › singularises a lone open question": {
+    "file": "app/lib/mapCaption.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › accents risk and pro nodes, and only those": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › draws an unanswered question dashed and unfilled": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › fills the root idea solid, the one dark shape on the page": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › gives the just-changed node the lime border": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › leaves a gap node neutral": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › lets \"updated\" win over an accent kind": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › lets the root treatment win over every other rule": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "nodeShellClasses › marks a research node as a find": {
+    "file": "app/lib/nodeAppearance.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › drops a node whose kind the map cannot draw": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › drops a node with a blank label": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › falls back to answered for an unknown status": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › handles adds, updates and a phase change in one turn": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › ignores a phase that is not part of the loop": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › ignores an update that carries no valid fields": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › ignores an update with no id": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › keeps a valid status": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › leaves parentRef null when none is given": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › numbers siblings in the order they arrive": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › plans an insert for a valid node": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › plans an update with only the fields supplied": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › preserves insert order so parents precede their children": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › records a valid phase change": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › returns an empty plan for no calls": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "planMapMutations › survives a call with a missing or malformed input": {
+    "file": "app/lib/nodePlan.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › accumulates text across rounds": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › loops after a tool round and collects the calls": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › passes the map summary to the model as system context": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › refuses up front when there are no credentials and no injected client": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › resumes a turn paused by a server-side tool": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › returns the spoken text after a single round": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › sends the tool results back on the following request": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › stops after the iteration bound when tool calls never end": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "runTurn › throws with the refusal explanation": {
+    "file": "app/lib/thinkingPartner.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › does not treat a mid-line question mark as a question line": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › drops blank lines rather than rendering empty paragraphs": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › leaves a statement unmarked": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › marks a line ending in a question mark as a question": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › returns nothing for empty or whitespace-only content": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › splits a multi-line reply and marks only the questions": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "splitAssistantLines › trims surrounding whitespace on each line": {
+    "file": "app/lib/messageLines.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:00.892174784+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:20:58.854204903+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:19:44.789701647+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "summarizeMap › includes each node id in brackets": {
+    "file": "app/lib/summarizeMap.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "summarizeMap › indents children beneath their parent": {
+    "file": "app/lib/summarizeMap.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "summarizeMap › indents deeper for a grandchild": {
+    "file": "app/lib/summarizeMap.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "summarizeMap › names each node kind and status": {
+    "file": "app/lib/summarizeMap.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "summarizeMap › renders every node exactly once, whatever order they arrive in": {
+    "file": "app/lib/summarizeMap.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "summarizeMap › says so explicitly when the map is empty": {
+    "file": "app/lib/summarizeMap.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:30.039305746+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:29:07.219514147+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:27:42.059000088+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:26:09.345685206+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:23:10.330657569+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "toMessageParams › preserves assistant and user turns": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "toMessageParams › returns nothing for an empty history": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  },
+  "toMessageParams › treats an unrecognised role as a user turn": {
+    "file": "app/lib/turnInterpreter.test.ts",
+    "lastRunAt": "2026-09-01T00:02:13.647896384+00:00",
+    "lastRunKind": "full",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-01T00:02:13.647896384+00:00",
+        "kind": "full",
+        "status": "pass"
+      },
+      {
+        "at": "2026-08-31T23:30:54.001172449+00:00",
+        "kind": "full",
+        "status": "pass"
+      }
+    ]
+  }
+}

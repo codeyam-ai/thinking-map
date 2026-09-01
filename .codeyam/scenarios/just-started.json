@@ -1,0 +1,41 @@
+{
+  "name": "Just started",
+  "id": "5f5ebdf0-9232-46e3-bed6-9ae80a4235cd",
+  "url": "/map/map-game",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapNode": [
+      {
+        "id": "j-idea",
+        "kind": "idea",
+        "label": "Educational game for kids",
+        "mapId": "map-game",
+        "order": 0,
+        "parentId": null,
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "I want to build an educational game for kids, but I don't know what it should be.",
+        "id": "j1",
+        "mapId": "map-game",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-game",
+        "phase": "deconstruct",
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "A map one second old: the seed idea alone on the map, before the partner has asked anything. The map panel has to invite the next answer rather than look broken."
+}

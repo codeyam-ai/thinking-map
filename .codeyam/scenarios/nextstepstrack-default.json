@@ -1,0 +1,12 @@
+{
+  "name": "NextStepsTrack - Default",
+  "id": "db705be5-b29c-4256-a760-9bc6beb8ba3a",
+  "url": "/isolated-components/NextStepsTrack?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "NextStepsTrack",
+  "scenarioType": "component",
+  "description": "Five arrowed steps, the first unboxed because it is where you start tomorrow."
+}

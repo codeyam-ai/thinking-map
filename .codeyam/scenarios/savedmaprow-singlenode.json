@@ -1,0 +1,12 @@
+{
+  "name": "SavedMapRow - SingleNode",
+  "id": "2c912a33-3685-4024-8334-ccf364e0a0fa",
+  "url": "/isolated-components/SavedMapRow?s=SingleNode",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SavedMapRow",
+  "scenarioType": "component",
+  "description": "A barely-started map, checking the singular 'node' rather than 'nodes'."
+}

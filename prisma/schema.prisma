@@ -1,0 +1,93 @@
+// Prisma 7 with SQLite via better-sqlite3 driver adapter.
+//
+// IMPORTANT: Use "prisma-client-js" (NOT "prisma-client").
+// The "prisma-client" generator requires a custom output path which
+// breaks Turbopack import resolution and seed script imports.
+// "prisma-client-js" outputs to node_modules/@prisma/client which
+// works everywhere with standard imports.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ──────────────────────────────────────────────
+// Thinking Map
+//
+// Three models carry the whole product. A ThinkingMap is one session of
+// thinking; Messages are the conversation view of it; MapNodes are the
+// visual view of the same thinking. The conversation and the map are two
+// renderings of one process, so they hang off the same root.
+//
+// SQLite has no enum support in Prisma, so `kind`, `phase`, and `status`
+// are Strings. Their allowed values live in app/lib/mapKinds.ts, which is
+// the single place they are defined.
+// ──────────────────────────────────────────────
+
+model ThinkingMap {
+  id       String @id @default(cuid())
+  /// Short label for the map, shown when returning to a saved session.
+  title    String
+  /// The user's original unstructured input, preserved verbatim. Even after
+  /// the direction changes, the seed idea is never overwritten.
+  seedIdea String
+  /// Which stage of the loop this map has reached:
+  /// idea | deconstruct | map | research | explore | next-steps
+  phase    String @default("idea")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+  nodes    MapNode[]
+}
+
+model Message {
+  id      String      @id @default(cuid())
+  mapId   String
+  map     ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  /// user | assistant
+  role    String
+  content String
+
+  createdAt DateTime @default(now())
+
+  @@index([mapId])
+}
+
+model MapNode {
+  id       String      @id @default(cuid())
+  mapId    String
+  map      ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  /// Null for the root idea node. The map is a tree, so parentage is the
+  /// only edge we need to store.
+  parentId String?
+  parent   MapNode?    @relation("NodeChildren", fields: [parentId], references: [id])
+  children MapNode[]   @relation("NodeChildren")
+
+  /// What this node represents. One of:
+  /// idea | user | problem | goal | constraint | assumption | open-question
+  /// | research | finding | gap | approach | pro | risk
+  /// | known | unknown | direction | next-step
+  kind      String
+  /// The short text shown inside the node pill.
+  label     String
+  /// Longer supporting text, shown when the node is inspected.
+  detail    String?
+  /// open | answered | updated — drives the dashed / solid / highlighted
+  /// node treatment in the mockups.
+  status    String  @default("open")
+  /// Where a research finding came from, when this node is a finding.
+  sourceUrl String?
+  /// Left-to-right position among siblings.
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([mapId])
+  @@index([parentId])
+}

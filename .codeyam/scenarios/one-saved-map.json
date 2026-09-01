@@ -1,0 +1,50 @@
+{
+  "name": "One saved map",
+  "id": "ef38af09-8f1b-4d4f-a8f3-d51ce18115e5",
+  "url": "/",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapNode": [
+      {
+        "id": "s-idea",
+        "kind": "idea",
+        "label": "Weekday morning bread",
+        "mapId": "map-solo",
+        "order": 0,
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "s-q",
+        "kind": "open-question",
+        "label": "Who actually buys at 7am?",
+        "mapId": "map-solo",
+        "order": 0,
+        "parentId": "s-idea",
+        "status": "open"
+      }
+    ],
+    "message": [
+      {
+        "content": "I have an idea for a business.",
+        "id": "s1",
+        "mapId": "map-solo",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-solo",
+        "phase": "deconstruct",
+        "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.",
+        "title": "Should the bakery deliver?"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/page.tsx",
+  "description": "Exactly one thinking map saved - the boundary between the day-one empty state and a populated list."
+}

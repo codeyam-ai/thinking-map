@@ -1,0 +1,12 @@
+{
+  "name": "SavedMapList - Default",
+  "id": "f844ccaa-1f99-41b9-a309-075e48364914",
+  "url": "/isolated-components/SavedMapList?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SavedMapList",
+  "scenarioType": "component",
+  "description": "Four maps in progress, each showing how far it got."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "IdeaForm - Busy",
+  "id": "a150c270-5554-4628-8581-6a1e82eba40a",
+  "url": "/isolated-components/IdeaForm?s=Busy",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "IdeaForm",
+  "scenarioType": "component",
+  "description": "Locked while the map is being created."
+}

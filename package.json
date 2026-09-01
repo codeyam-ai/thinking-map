@@ -1,0 +1,46 @@
+{
+  "name": "codeyam-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "playwright install chromium",
+    "setup": "npm install && npm run db:push && npm run db:seed",
+    "dev": "next dev --webpack -H 127.0.0.1",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:push": "npx prisma db push && npx prisma generate",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:reset": "rm -f dev.db && npm run db:push && npx tsx prisma/seed.ts",
+    "mcp": "npx tsx mcp/stdio.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@prisma/adapter-better-sqlite3": "^7.4.1",
+    "@prisma/client": "^7.4.1",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.2.0",
+    "next": "^16.1.7",
+    "prisma": "^7.4.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^15.3.3",
+    "playwright": "^1.58.2",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.4",
+    "typescript": "^5",
+    "vitest": "^3"
+  }
+}

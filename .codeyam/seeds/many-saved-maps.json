@@ -1,0 +1,743 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-a",
+      "title": "I want to build an educational game for children, but I honestly do not know what it should be or who it is really for",
+      "seedIdea": "I want to build an educational game for children, but I honestly do not know what it should be or who it is really for",
+      "phase": "explore"
+    },
+    {
+      "id": "map-b",
+      "title": "A better way for my team to plan events without four spreadsheets and a group chat",
+      "seedIdea": "A better way for my team to plan events without four spreadsheets and a group chat",
+      "phase": "research"
+    },
+    {
+      "id": "map-c",
+      "title": "Should the bakery deliver?",
+      "seedIdea": "Should the bakery deliver?",
+      "phase": "deconstruct"
+    },
+    {
+      "id": "map-d",
+      "title": "Caf\u00e9 Solst\u00edcio \u2014 a rotating menu that follows the season",
+      "seedIdea": "Caf\u00e9 Solst\u00edcio \u2014 a rotating menu that follows the season",
+      "phase": "map"
+    },
+    {
+      "id": "map-e",
+      "title": "Something my kids would actually stick with in the garden",
+      "seedIdea": "Something my kids would actually stick with in the garden",
+      "phase": "idea"
+    },
+    {
+      "id": "map-f",
+      "title": "Coordinating follow-up care across small rural clinics",
+      "seedIdea": "Coordinating follow-up care across small rural clinics",
+      "phase": "explore"
+    },
+    {
+      "id": "map-g",
+      "title": "Why does our onboarding lose half the people in week two?",
+      "seedIdea": "Why does our onboarding lose half the people in week two?",
+      "phase": "research"
+    },
+    {
+      "id": "map-h",
+      "title": "A quieter way to keep in touch with people I care about",
+      "seedIdea": "A quieter way to keep in touch with people I care about",
+      "phase": "next-steps"
+    }
+  ],
+  "message": [
+    {
+      "id": "map-a-m",
+      "mapId": "map-a",
+      "role": "user",
+      "content": "I want to build an educational game for children, but I honestly do not know what it should be or who it is really for"
+    },
+    {
+      "id": "map-b-m",
+      "mapId": "map-b",
+      "role": "user",
+      "content": "A better way for my team to plan events without four spreadsheets and a group chat"
+    },
+    {
+      "id": "map-c-m",
+      "mapId": "map-c",
+      "role": "user",
+      "content": "Should the bakery deliver?"
+    },
+    {
+      "id": "map-d-m",
+      "mapId": "map-d",
+      "role": "user",
+      "content": "Caf\u00e9 Solst\u00edcio \u2014 a rotating menu that follows the season"
+    },
+    {
+      "id": "map-e-m",
+      "mapId": "map-e",
+      "role": "user",
+      "content": "Something my kids would actually stick with in the garden"
+    },
+    {
+      "id": "map-f-m",
+      "mapId": "map-f",
+      "role": "user",
+      "content": "Coordinating follow-up care across small rural clinics"
+    },
+    {
+      "id": "map-g-m",
+      "mapId": "map-g",
+      "role": "user",
+      "content": "Why does our onboarding lose half the people in week two?"
+    },
+    {
+      "id": "map-h-m",
+      "mapId": "map-h",
+      "role": "user",
+      "content": "A quieter way to keep in touch with people I care about"
+    }
+  ],
+  "mapNode": [
+    {
+      "id": "map-a-root",
+      "mapId": "map-a",
+      "parentId": null,
+      "kind": "idea",
+      "label": "I want to build an educational game for ",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-a-n0",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-a-n1",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 2",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "map-a-n2",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 3",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "map-a-n3",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 4",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "map-a-n4",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 5",
+      "status": "answered",
+      "order": 4
+    },
+    {
+      "id": "map-a-n5",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 6",
+      "status": "answered",
+      "order": 5
+    },
+    {
+      "id": "map-a-n6",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 7",
+      "status": "answered",
+      "order": 6
+    },
+    {
+      "id": "map-a-n7",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 8",
+      "status": "answered",
+      "order": 7
+    },
+    {
+      "id": "map-a-n8",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 9",
+      "status": "answered",
+      "order": 8
+    },
+    {
+      "id": "map-a-n9",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 10",
+      "status": "answered",
+      "order": 9
+    },
+    {
+      "id": "map-a-n10",
+      "mapId": "map-a",
+      "parentId": "map-a-root",
+      "kind": "assumption",
+      "label": "Node 11",
+      "status": "answered",
+      "order": 10
+    },
+    {
+      "id": "map-b-root",
+      "mapId": "map-b",
+      "parentId": null,
+      "kind": "idea",
+      "label": "A better way for my team to plan events ",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-b-n0",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-b-n1",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 2",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "map-b-n2",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 3",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "map-b-n3",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 4",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "map-b-n4",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 5",
+      "status": "answered",
+      "order": 4
+    },
+    {
+      "id": "map-b-n5",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 6",
+      "status": "answered",
+      "order": 5
+    },
+    {
+      "id": "map-b-n6",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 7",
+      "status": "answered",
+      "order": 6
+    },
+    {
+      "id": "map-b-n7",
+      "mapId": "map-b",
+      "parentId": "map-b-root",
+      "kind": "assumption",
+      "label": "Node 8",
+      "status": "answered",
+      "order": 7
+    },
+    {
+      "id": "map-c-root",
+      "mapId": "map-c",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Should the bakery deliver?",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-c-n0",
+      "mapId": "map-c",
+      "parentId": "map-c-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-d-root",
+      "mapId": "map-d",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Caf\u00e9 Solst\u00edcio \u2014 a rotating menu that fo",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-d-n0",
+      "mapId": "map-d",
+      "parentId": "map-d-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-d-n1",
+      "mapId": "map-d",
+      "parentId": "map-d-root",
+      "kind": "assumption",
+      "label": "Node 2",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "map-d-n2",
+      "mapId": "map-d",
+      "parentId": "map-d-root",
+      "kind": "assumption",
+      "label": "Node 3",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "map-d-n3",
+      "mapId": "map-d",
+      "parentId": "map-d-root",
+      "kind": "assumption",
+      "label": "Node 4",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "map-e-root",
+      "mapId": "map-e",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Something my kids would actually stick w",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-f-root",
+      "mapId": "map-f",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Coordinating follow-up care across small",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-f-n0",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-f-n1",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 2",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "map-f-n2",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 3",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "map-f-n3",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 4",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "map-f-n4",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 5",
+      "status": "answered",
+      "order": 4
+    },
+    {
+      "id": "map-f-n5",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 6",
+      "status": "answered",
+      "order": 5
+    },
+    {
+      "id": "map-f-n6",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 7",
+      "status": "answered",
+      "order": 6
+    },
+    {
+      "id": "map-f-n7",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 8",
+      "status": "answered",
+      "order": 7
+    },
+    {
+      "id": "map-f-n8",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 9",
+      "status": "answered",
+      "order": 8
+    },
+    {
+      "id": "map-f-n9",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 10",
+      "status": "answered",
+      "order": 9
+    },
+    {
+      "id": "map-f-n10",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 11",
+      "status": "answered",
+      "order": 10
+    },
+    {
+      "id": "map-f-n11",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 12",
+      "status": "answered",
+      "order": 11
+    },
+    {
+      "id": "map-f-n12",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 13",
+      "status": "answered",
+      "order": 12
+    },
+    {
+      "id": "map-f-n13",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 14",
+      "status": "answered",
+      "order": 13
+    },
+    {
+      "id": "map-f-n14",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 15",
+      "status": "answered",
+      "order": 14
+    },
+    {
+      "id": "map-f-n15",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 16",
+      "status": "answered",
+      "order": 15
+    },
+    {
+      "id": "map-f-n16",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 17",
+      "status": "answered",
+      "order": 16
+    },
+    {
+      "id": "map-f-n17",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 18",
+      "status": "answered",
+      "order": 17
+    },
+    {
+      "id": "map-f-n18",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 19",
+      "status": "answered",
+      "order": 18
+    },
+    {
+      "id": "map-f-n19",
+      "mapId": "map-f",
+      "parentId": "map-f-root",
+      "kind": "assumption",
+      "label": "Node 20",
+      "status": "answered",
+      "order": 19
+    },
+    {
+      "id": "map-g-root",
+      "mapId": "map-g",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Why does our onboarding lose half the pe",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-g-n0",
+      "mapId": "map-g",
+      "parentId": "map-g-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-g-n1",
+      "mapId": "map-g",
+      "parentId": "map-g-root",
+      "kind": "assumption",
+      "label": "Node 2",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "map-g-n2",
+      "mapId": "map-g",
+      "parentId": "map-g-root",
+      "kind": "assumption",
+      "label": "Node 3",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "map-g-n3",
+      "mapId": "map-g",
+      "parentId": "map-g-root",
+      "kind": "assumption",
+      "label": "Node 4",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "map-g-n4",
+      "mapId": "map-g",
+      "parentId": "map-g-root",
+      "kind": "assumption",
+      "label": "Node 5",
+      "status": "answered",
+      "order": 4
+    },
+    {
+      "id": "map-g-n5",
+      "mapId": "map-g",
+      "parentId": "map-g-root",
+      "kind": "assumption",
+      "label": "Node 6",
+      "status": "answered",
+      "order": 5
+    },
+    {
+      "id": "map-h-root",
+      "mapId": "map-h",
+      "parentId": null,
+      "kind": "idea",
+      "label": "A quieter way to keep in touch with peop",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-h-n0",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 1",
+      "status": "answered",
+      "order": 0
+    },
+    {
+      "id": "map-h-n1",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 2",
+      "status": "answered",
+      "order": 1
+    },
+    {
+      "id": "map-h-n2",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 3",
+      "status": "answered",
+      "order": 2
+    },
+    {
+      "id": "map-h-n3",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 4",
+      "status": "answered",
+      "order": 3
+    },
+    {
+      "id": "map-h-n4",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 5",
+      "status": "answered",
+      "order": 4
+    },
+    {
+      "id": "map-h-n5",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 6",
+      "status": "answered",
+      "order": 5
+    },
+    {
+      "id": "map-h-n6",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 7",
+      "status": "answered",
+      "order": 6
+    },
+    {
+      "id": "map-h-n7",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 8",
+      "status": "answered",
+      "order": 7
+    },
+    {
+      "id": "map-h-n8",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 9",
+      "status": "answered",
+      "order": 8
+    },
+    {
+      "id": "map-h-n9",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 10",
+      "status": "answered",
+      "order": 9
+    },
+    {
+      "id": "map-h-n10",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 11",
+      "status": "answered",
+      "order": 10
+    },
+    {
+      "id": "map-h-n11",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 12",
+      "status": "answered",
+      "order": 11
+    },
+    {
+      "id": "map-h-n12",
+      "mapId": "map-h",
+      "parentId": "map-h-root",
+      "kind": "assumption",
+      "label": "Node 13",
+      "status": "answered",
+      "order": 12
+    }
+  ]
+}

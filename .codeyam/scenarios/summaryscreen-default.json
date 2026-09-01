@@ -1,0 +1,12 @@
+{
+  "name": "SummaryScreen - Default",
+  "id": "77b0c2e6-93f2-430e-8fbf-48e5fb5c9ae9",
+  "url": "/isolated-components/SummaryScreen?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SummaryScreen",
+  "scenarioType": "component",
+  "description": "The final screen with the Keep thinking panel beneath it, because the plan is a starting point rather than a dead end."
+}

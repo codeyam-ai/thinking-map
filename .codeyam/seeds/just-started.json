@@ -1,0 +1,29 @@
+{
+  "thinkingMap": [
+    {
+      "id": "map-game",
+      "title": "Educational game for kids",
+      "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+      "phase": "deconstruct"
+    }
+  ],
+  "message": [
+    {
+      "id": "j1",
+      "mapId": "map-game",
+      "role": "user",
+      "content": "I want to build an educational game for kids, but I don't know what it should be."
+    }
+  ],
+  "mapNode": [
+    {
+      "id": "j-idea",
+      "mapId": "map-game",
+      "parentId": null,
+      "kind": "idea",
+      "label": "Educational game for kids",
+      "status": "answered",
+      "order": 0
+    }
+  ]
+}

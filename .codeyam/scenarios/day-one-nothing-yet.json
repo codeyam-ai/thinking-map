@@ -1,0 +1,17 @@
+{
+  "name": "Day one - nothing yet",
+  "id": "4e28929a-9609-4fd3-b673-a6dd96fc6065",
+  "url": "/",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapNode": [],
+    "message": [],
+    "thinkingMap": []
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/page.tsx",
+  "description": "The production default. No maps exist yet, so the landing page is just the question and the starter chips - this is what a brand-new install actually looks like."
+}

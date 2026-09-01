@@ -1,0 +1,15 @@
+{
+  "name": "ThinkingMapView - Sprawling",
+  "id": "6358a29a-d708-4ea2-9c2c-e1bdced32ea9",
+  "url": "/isolated-components/ThinkingMapView?s=Sprawling",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingMapView",
+  "scenarioType": "component",
+  "description": "Seventeen nodes across four levels - past the legibility floor, so the panel scrolls a readable map rather than shrinking the labels into illegibility.",
+  "demonstratesState": {
+    "nodes": "many"
+  }
+}

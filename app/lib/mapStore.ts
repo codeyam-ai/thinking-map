@@ -1,0 +1,135 @@
+// Database access for thinking maps. Everything that reads or writes the map
+// goes through here so the API routes and the MCP server share one
+// implementation rather than drifting apart.
+
+import { prisma } from './prisma';
+import { KIND_EYEBROW } from './mapKinds';
+import { planMapMutations } from './nodePlan';
+import type { ToolInvocation } from './thinkingPartner';
+
+export async function listMaps() {
+  return prisma.thinkingMap.findMany({
+    orderBy: { updatedAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      seedIdea: true,
+      phase: true,
+      updatedAt: true,
+      _count: { select: { nodes: true, messages: true } },
+    },
+  });
+}
+
+export async function getMap(id: string) {
+  return prisma.thinkingMap.findUnique({
+    where: { id },
+    include: {
+      messages: { orderBy: { createdAt: 'asc' } },
+      nodes: { orderBy: [{ createdAt: 'asc' }, { order: 'asc' }] },
+    },
+  });
+}
+
+/** Start a new map from an unstructured idea. The seed idea becomes both the
+ *  root node and the person's first message — the conversation and the map are
+ *  two views of the same thing from the very first turn. */
+export async function createMap(seedIdea: string) {
+  const trimmed = seedIdea.trim();
+  const title = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+
+  return prisma.thinkingMap.create({
+    data: {
+      title,
+      seedIdea: trimmed,
+      phase: 'deconstruct',
+      messages: { create: [{ role: 'user', content: trimmed }] },
+      nodes: {
+        create: [
+          {
+            kind: 'idea',
+            label: title,
+            status: 'answered',
+            order: 0,
+          },
+        ],
+      },
+    },
+  });
+}
+
+/** A compact rendering of the current map, given to the model as context so it
+ *  can reference real node ids when it updates them. */
+export function summarizeMap(
+  nodes: { id: string; parentId: string | null; kind: string; label: string; status: string }[],
+): string {
+  if (nodes.length === 0) return '(empty — nothing on the map yet)';
+  const byParent = new Map<string | null, typeof nodes>();
+  for (const n of nodes) {
+    const list = byParent.get(n.parentId) ?? [];
+    list.push(n);
+    byParent.set(n.parentId, list);
+  }
+  const lines: string[] = [];
+  const walk = (parentId: string | null, depth: number) => {
+    for (const n of byParent.get(parentId) ?? []) {
+      const eyebrow = KIND_EYEBROW[n.kind as keyof typeof KIND_EYEBROW] ?? n.kind;
+      lines.push(
+        `${'  '.repeat(depth)}- [${n.id}] (${eyebrow}, ${n.status}) ${n.label}`,
+      );
+      walk(n.id, depth + 1);
+    }
+  };
+  walk(null, 0);
+  return lines.join('\n');
+}
+
+/**
+ * Apply the model's requested map mutations.
+ *
+ * The rules — which kinds are drawable, which statuses are real, what order
+ * siblings take — all live in `planMapMutations`, which is pure and tested.
+ * This function is the thin executor: it walks the plan in order, resolving
+ * each temporary ref to the real id the database just handed back, so one
+ * add_nodes call can create a parent and its children together.
+ */
+export async function applyToolCalls(mapId: string, calls: ToolInvocation[]) {
+  const { inserts, updates, phase } = planMapMutations(calls);
+  const refToId = new Map<string, string>();
+
+  for (const node of inserts) {
+    // A parentRef is either a ref from earlier in this same plan or the real
+    // id of a node already on the map.
+    const parentId = node.parentRef
+      ? (refToId.get(node.parentRef) ?? node.parentRef)
+      : null;
+
+    const created = await prisma.mapNode.create({
+      data: {
+        mapId,
+        parentId,
+        kind: node.kind,
+        label: node.label,
+        detail: node.detail,
+        status: node.status,
+        sourceUrl: node.sourceUrl,
+        order: node.order,
+      },
+    });
+    if (node.ref) refToId.set(node.ref, created.id);
+  }
+
+  for (const update of updates) {
+    const resolved = refToId.get(update.id) ?? update.id;
+    // A model can name a node that has since been deleted; updateMany skips
+    // a miss rather than failing the whole turn.
+    await prisma.mapNode.updateMany({
+      where: { id: resolved, mapId },
+      data: update.data,
+    });
+  }
+
+  if (phase) {
+    await prisma.thinkingMap.update({ where: { id: mapId }, data: { phase } });
+  }
+}

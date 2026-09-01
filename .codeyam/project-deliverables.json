@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "derivedFromHash": "1528d724ca0eeacdf7a5f33c6669ec090d81aaab427b095130d779a6bba52509",
+  "derivedAt": "2026-08-31T21:23:23.797988577+00:00",
+  "deliverables": [
+    {
+      "id": "enter-a-vague-idea-problem-or-goal-as-free-text",
+      "text": "Enter a vague idea, problem, or goal as free text and start immediately — no structured input required",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.351194138+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "One free-text pill plus four starter chips; clicking a chip fills the box rather than submitting. Shown by day-one-nothing-yet and the IdeaForm/SuggestionChips component scenarios.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "the-ai-deconstructs-instead-of-answering-it",
+      "text": "The AI deconstructs instead of answering: it asks a small number of high-value clarifying questions",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.365416215+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "System prompt instructs naming unknowns and asking two or three high-value questions instead of proposing a solution; questions render bold on their own lines. Shown by seed-planted-three-open-questions. NOT exercised against a live model - no API key in this environment.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "a-live-visual-map-that-grows-as-the",
+      "text": "A live visual map that grows as the conversation develops (idea, users, problem, goals, assumptions, open questions)",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.376508950+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Tidy-tree layout with dotted connectors and status-driven node treatments across all seventeen node kinds. Shown by eight application scenarios and eight MapNodePill component scenarios.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "ai-assisted-research-grounded-in-live-web",
+      "text": "AI-assisted research grounded in live web search, attached to the map as findings and gaps rather than a list of links",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.390160221+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Anthropic's server-side web_search tool is wired into the same Messages call, with findings and gaps modelled as research/finding/gap nodes. Shown by grounded-research-and-its-gaps. Code complete but NOT exercised live - no API key in this environment.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "changing-direction-updates-the-map-and-explains",
+      "text": "Changing direction updates the map and explains what changed, without losing the original idea",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.401904729+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Direction changes add and update rather than erase; the changed node wears the lime and the caption reads 'nothing gets lost, only added'. Shown by pivoted-now-it-is-for-teachers.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "a-final-actionable-output-what-we-know-what-we",
+      "text": "A final actionable output: what we know, what we do not know, the strongest directions, and concrete next steps",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.413860031+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Summary screen with know / don't-know / three directions / five numbered steps. Shown by complete-what-to-do-next and the SummaryView component scenarios.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "after-the-plan-is-produced-keep-discussing-and",
+      "text": "After the plan is produced, keep discussing and working — the conversation continues and the map keeps evolving",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.427833022+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "The summary screen keeps the conversation panel open beneath it under a Keep thinking heading, so the plan is a starting point rather than a dead end.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "thinking-maps-persist-so-you-can-leave-and",
+      "text": "Thinking maps persist so you can leave and return to one later",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.440494501+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Maps, messages and nodes persist in SQLite; the landing screen lists saved maps with the phase each reached. Shown by returning-four-saved-maps, one-saved-map and many-saved-maps.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "an-mcp-server-exposing-the-same-planning-tools",
+      "text": "An MCP server exposing the same planning tools over the same map data",
+      "status": "delivered",
+      "resolvedAt": "2026-09-01T00:01:12.453164882+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Six MCP tools over the same mapStore the web UI uses, on both HTTP (/api/mcp) and stdio (npm run mcp). Verified live: initialize, tools/list, and a create/add-node/read round trip.",
+      "decidedBy": "agent"
+    },
+    {
+      "id": "assist-track-not-this-build-flow-registering",
+      "text": "ASSIST TRACK (not this build flow): registering the MCP server in a client such as Claude Desktop",
+      "status": "deferred",
+      "resolvedAt": "2026-08-31T21:27:12.933841241+00:00",
+      "resolvedInFeature": "Thinking Map: idea to plan loop",
+      "planSlug": null,
+      "note": "Machine configuration and a walkthrough, not code — belongs to the assist track. User approved this deferral at the plan gate.",
+      "decidedBy": "user"
+    }
+  ]
+}

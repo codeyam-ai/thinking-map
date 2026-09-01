@@ -1,0 +1,138 @@
+{
+  "capabilities": {
+    "http-mocks": "verified",
+    "interactions-click": "verified",
+    "interactions-touch-gestures": "manual",
+    "layout-web": "verified",
+    "native-clipboard": "not-applicable",
+    "native-geolocation": "not-applicable",
+    "native-haptics": "not-applicable",
+    "native-network": "not-applicable",
+    "native-storage": "verified",
+    "real-device": "not-applicable",
+    "routing": "verified"
+  },
+  "commands": {
+    "dbPush": "npm run db:push",
+    "dev": "npm run dev",
+    "seedAdapter": "npx tsx .codeyam/seed-adapter.ts",
+    "setup": "npm run setup",
+    "test": "npx vitest run"
+  },
+  "components": {
+    "fileExtensions": [
+      ".tsx",
+      ".jsx"
+    ],
+    "primitives": [
+      "div",
+      "span",
+      "h1",
+      "h2",
+      "h3",
+      "p",
+      "img",
+      "ul",
+      "li",
+      "a",
+      "button",
+      "input",
+      "form"
+    ]
+  },
+  "data": {
+    "database": {
+      "type": "sqlite",
+      "url": "file:./dev.db"
+    },
+    "importStatement": "import { prisma } from '@/app/lib/prisma'",
+    "schemaFile": "prisma/schema.prisma",
+    "seedAdapterType": "prisma-sqlite",
+    "type": "prisma"
+  },
+  "defaultScreenSize": "Desktop",
+  "devServerRepair": [
+    {
+      "command": "npm rebuild better-sqlite3",
+      "label": "rebuild native modules (ABI mismatch)",
+      "match": [
+        "ERR_DLOPEN_FAILED",
+        "NODE_MODULE_VERSION",
+        "did not self-register"
+      ]
+    },
+    {
+      "commandRef": "dbPush",
+      "label": "regenerate Prisma client",
+      "match": [
+        "Cannot find module '.prisma/client",
+        "Failed to load external module @prisma/client"
+      ]
+    }
+  ],
+  "framework": "nextjs",
+  "frameworkHandlerExports": [
+    {
+      "filePattern": "app/api/**/route.ts",
+      "names": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "filePattern": "middleware.ts",
+      "names": [
+        "middleware",
+        "config"
+      ]
+    }
+  ],
+  "id": "nextjs-prisma-sqlite",
+  "name": "Next.js + Prisma + SQLite",
+  "preview": {
+    "defaultPort": 3000,
+    "kind": "iframe"
+  },
+  "routeDataExports": [
+    {
+      "filePattern": "app/**/page.tsx",
+      "names": [
+        "generateStaticParams",
+        "generateMetadata"
+      ]
+    }
+  ],
+  "routing": {
+    "isolationRoute": "app/isolated-components",
+    "pagesDir": "app",
+    "type": "file-based"
+  },
+  "scaffoldedFrom": "nextjs-prisma-sqlite",
+  "screenSizes": {
+    "Desktop": {
+      "height": 900,
+      "width": 1440
+    },
+    "Laptop": {
+      "height": 800,
+      "width": 1280
+    },
+    "Mobile": {
+      "height": 844,
+      "width": 390
+    },
+    "Tablet": {
+      "height": 1024,
+      "width": 768
+    }
+  },
+  "styling": {
+    "tokenFile": "app/globals.css",
+    "type": "css-custom-properties"
+  }
+}

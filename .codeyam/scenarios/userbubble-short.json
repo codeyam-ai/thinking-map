@@ -1,0 +1,12 @@
+{
+  "name": "UserBubble - Short",
+  "id": "9a3fb2ff-3259-4192-93ab-c3a4fcb665d9",
+  "url": "/isolated-components/UserBubble?s=Short",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "UserBubble",
+  "scenarioType": "component",
+  "description": "A two-word answer, to check the bubble does not stretch."
+}

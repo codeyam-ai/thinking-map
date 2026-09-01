@@ -1,0 +1,61 @@
+{
+  "views": {
+    "Home": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "added"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "added"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The landing route is server-rendered with force-dynamic: the saved-map list is resolved before any HTML is sent, so the page has no pending state to show."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "This route has no server-side failure mode - it renders a list. The only error surface is the inline create failure inside IdeaPrompt, which is client-transient and cannot be produced from a seed; the same inline treatment is captured on ReplyForm - WithError."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
+    "MapPage": {
+      "empty": {
+        "status": "n-a",
+        "reason": "A thinking map always carries its seed idea as the root node - the idea is what creates the map - so a map with zero nodes cannot occur. The nearest real state is the root alone, recorded under single as the Just started scenario."
+      },
+      "single": {
+        "status": "added"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The map route is server-rendered with force-dynamic: the conversation and node tree are resolved before any HTML is sent, so there is no pending state on the page."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "A missing map id is handled by notFound, which renders the framework 404 rather than a state of this view. The reply failure is client-transient and cannot be seeded; its inline treatment is captured on ReplyForm - WithError."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    }
+  }
+}

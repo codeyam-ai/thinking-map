@@ -1,0 +1,12 @@
+{
+  "name": "MapConnectors - Default",
+  "id": "68f276fd-0792-408b-bb77-a66e36797cae",
+  "url": "/isolated-components/MapConnectors?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapConnectors",
+  "scenarioType": "component",
+  "description": "Three siblings sharing one horizontal bus, which is what makes the tree read as a single structure."
+}

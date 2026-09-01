@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - Seeded",
+  "id": "6fc0fd74-5e28-4141-b3a8-cd2a80524268",
+  "url": "/isolated-components/MapWorkspace?s=Seeded",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "Day one inside the workspace: the seed idea with three unanswered questions, both panels showing a conversation that has only just begun."
+}

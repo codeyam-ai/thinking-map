@@ -1,0 +1,12 @@
+{
+  "name": "IdeaForm - Filled",
+  "id": "473b3ba2-2756-452f-8287-ce711d80fc98",
+  "url": "/isolated-components/IdeaForm?s=Filled",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "IdeaForm",
+  "scenarioType": "component",
+  "description": "Typed in, with the send button now live."
+}

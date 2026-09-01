@@ -1,0 +1,12 @@
+{
+  "name": "IdeaHero - Default",
+  "id": "4a28b800-74b1-488e-a01d-04e7bbb0f6f7",
+  "url": "/isolated-components/IdeaHero?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "IdeaHero",
+  "scenarioType": "component",
+  "description": "The question the whole product opens with, and its one-line invitation."
+}

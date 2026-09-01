@@ -1,0 +1,12 @@
+{
+  "name": "AgentAvatar - Default",
+  "id": "d9bba2fa-b3bf-4816-92f4-6faa777cd49f",
+  "url": "/isolated-components/AgentAvatar?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentAvatar",
+  "scenarioType": "component",
+  "description": "The small dark disc that marks a turn as the thinking partner's."
+}

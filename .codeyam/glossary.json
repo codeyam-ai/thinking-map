@@ -1,0 +1,507 @@
+[
+  {
+    "description": "The small dark disc preceding every assistant turn, marking it as the thinking partner rather than the person.",
+    "filePath": "app/components/AgentAvatar.tsx",
+    "name": "AgentAvatar",
+    "scenarios": [
+      "agentavatar-default"
+    ]
+  },
+  {
+    "description": "Wordmark left, phase track right. Shared by the landing screen and the map workspace so the two never drift.",
+    "filePath": "app/components/AppHeader.tsx",
+    "name": "AppHeader",
+    "scenarios": [
+      "appheader-default",
+      "appheader-explore"
+    ]
+  },
+  {
+    "description": "A turn the thinking partner took. Splits the reply into lines and gives each question bold weight on its own line, because the questions are what the product is for.",
+    "filePath": "app/components/AssistantBubble.tsx",
+    "name": "AssistantBubble",
+    "scenarios": [
+      "assistantbubble-default",
+      "assistantbubble-statement"
+    ]
+  },
+  {
+    "description": "A what-we-know or what-we-don't-know card on the summary screen, falling back to the keep-talking hint when its bucket is empty.",
+    "filePath": "app/components/BulletCard.tsx",
+    "name": "BulletCard",
+    "scenarios": [
+      "bulletcard-default",
+      "bulletcard-empty"
+    ]
+  },
+  {
+    "description": "Scaffold-shipped layout for the isolation-route tree, providing the centred capture frame and the production guard.",
+    "filePath": "app/codeyam-isolate/layout.tsx",
+    "name": "CodeYamIsolateLayout",
+    "untestabilityReason": {
+      "justification": "Shipped by the codeyam scaffolder and untouched by this project. It exists to host component captures; asserting anything about it would be testing the tooling rather than Thinking Map.",
+      "kind": "scaffold"
+    }
+  },
+  {
+    "description": "The left-hand panel. Owns the send state and renders each turn as its own bubble component.",
+    "filePath": "app/components/ConversationPanel.tsx",
+    "name": "ConversationPanel",
+    "scenarios": [
+      "conversationpanel-default",
+      "conversationpanel-empty"
+    ]
+  },
+  {
+    "description": "The strongest directions on the summary screen, lettered A onward so they can be referred to by name in conversation.",
+    "filePath": "app/components/DirectionsCard.tsx",
+    "name": "DirectionsCard",
+    "scenarios": [
+      "directionscard-default",
+      "directionscard-empty"
+    ]
+  },
+  {
+    "description": "The summary screen's empty state, phrased as the next action rather than the absence of data.",
+    "filePath": "app/components/EmptyHint.tsx",
+    "name": "EmptyHint",
+    "scenarios": [
+      "emptyhint-default"
+    ]
+  },
+  {
+    "description": "The landing route. Reads every saved map and composes the header with the landing screen - imports and composition only, no markup of its own.",
+    "filePath": "app/page.tsx",
+    "name": "Home",
+    "scenarios": [
+      "day-one-nothing-yet",
+      "returning-four-saved-maps"
+    ]
+  },
+  {
+    "description": "The single free-text input the whole product starts from, with its large send button. No structured fields - the point is that you can arrive with something vague.",
+    "filePath": "app/components/IdeaForm.tsx",
+    "name": "IdeaForm",
+    "scenarios": [
+      "ideaform-busy",
+      "ideaform-default",
+      "ideaform-filled"
+    ]
+  },
+  {
+    "description": "The oversized question the landing screen opens with, plus its one-line invitation. One of the two showcase moments in the design system.",
+    "filePath": "app/components/IdeaHero.tsx",
+    "name": "IdeaHero",
+    "scenarios": [
+      "ideahero-default"
+    ]
+  },
+  {
+    "description": "The entry point. Owns the submit state for the free-text idea input and the starter chips, and routes to the new map on success.",
+    "filePath": "app/components/IdeaPrompt.tsx",
+    "name": "IdeaPrompt",
+    "scenarios": [
+      "ideaprompt-default"
+    ]
+  },
+  {
+    "description": "The whole landing surface: the question, the idea input, and anything already saved.",
+    "filePath": "app/components/LandingScreen.tsx",
+    "name": "LandingScreen",
+    "scenarios": [
+      "landingscreen-dayone",
+      "landingscreen-default"
+    ]
+  },
+  {
+    "description": "The dotted edge layer beneath the node pills. Dotted because the structure is provisional - this is thinking in progress, not an org chart.",
+    "filePath": "app/components/MapConnectors.tsx",
+    "name": "MapConnectors",
+    "scenarios": [
+      "mapconnectors-default",
+      "mapconnectors-singlechild"
+    ]
+  },
+  {
+    "description": "One node on the map. Carries an eyebrow naming its kind so the map reads without a legend, and takes its shell treatment from nodeShellClasses where the status-precedence rule lives.",
+    "filePath": "app/components/MapNodePill.tsx",
+    "name": "MapNodePill",
+    "scenarios": [
+      "mapnodepill-default",
+      "mapnodepill-gap",
+      "mapnodepill-justupdated",
+      "mapnodepill-openquestion",
+      "mapnodepill-pro",
+      "mapnodepill-research",
+      "mapnodepill-risk",
+      "mapnodepill-rootidea"
+    ]
+  },
+  {
+    "description": "The map route. Loads one thinking map and switches between the two-panel workspace and the summary screen on the phase, deriving the live-map caption from the current nodes.",
+    "filePath": "app/map/[id]/page.tsx",
+    "name": "MapPage",
+    "scenarios": [
+      "grounded-research-and-its-gaps",
+      "pivoted-now-it-is-for-teachers",
+      "complete-what-to-do-next",
+      "sprawling-a-deep-wide-map"
+    ]
+  },
+  {
+    "description": "The working view - conversation left, map right - the two views of the same thinking placed side by side.",
+    "filePath": "app/components/MapWorkspace.tsx",
+    "name": "MapWorkspace",
+    "scenarios": [
+      "mapworkspace-default"
+    ]
+  },
+  {
+    "description": "Raised when no Anthropic credential is configured, carrying the sentence the message route shows the person. It exists so a missing key reads as a plain explanation of what to add and where, rather than a generic 500.",
+    "filePath": "app/lib/thinkingPartner.ts",
+    "name": "MissingCredentialsError",
+    "testFile": "app/lib/thinkingPartner.test.ts"
+  },
+  {
+    "description": "The concrete next steps, arrowed left to right. The first step is unboxed because it is where you start tomorrow rather than one option among several.",
+    "filePath": "app/components/NextStepsTrack.tsx",
+    "name": "NextStepsTrack",
+    "scenarios": [
+      "nextstepstrack-default",
+      "nextstepstrack-empty"
+    ]
+  },
+  {
+    "description": "The six-phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar.",
+    "filePath": "app/components/PhaseNav.tsx",
+    "name": "PhaseNav",
+    "scenarios": [
+      "phasenav-default",
+      "phasenav-nextsteps",
+      "phasenav-research"
+    ]
+  },
+  {
+    "description": "The reply box at the foot of the conversation, with the error region that explains a failed turn in place of a silent failure.",
+    "filePath": "app/components/ReplyForm.tsx",
+    "name": "ReplyForm",
+    "scenarios": [
+      "replyform-busy",
+      "replyform-default",
+      "replyform-witherror"
+    ]
+  },
+  {
+    "description": "The document shell: html and body, the global stylesheet, and the page metadata. Scaffold-shipped; this project changed only the title and description.",
+    "filePath": "app/layout.tsx",
+    "name": "RootLayout",
+    "untestabilityReason": {
+      "justification": "Framework-required document shell generated by the stack template. It renders its children inside html/body and carries the metadata export - there is no behaviour of this project's own to assert, and every application scenario renders through it.",
+      "kind": "scaffold"
+    }
+  },
+  {
+    "description": "The Pick up where you left off list. Renders nothing at all when there are no saved maps, so day one stays clean.",
+    "filePath": "app/components/SavedMapList.tsx",
+    "name": "SavedMapList",
+    "scenarios": [
+      "savedmaplist-default"
+    ]
+  },
+  {
+    "description": "One saved thinking map on the landing screen, showing the phase it reached and how many nodes it holds.",
+    "filePath": "app/components/SavedMapRow.tsx",
+    "name": "SavedMapRow",
+    "scenarios": [
+      "savedmaprow-default",
+      "savedmaprow-singlenode"
+    ]
+  },
+  {
+    "description": "Scaffold-shipped route that resolves a scenario slug to its url and redirects, so a scenario can be opened by name in development.",
+    "filePath": "app/scenario/[slug]/page.tsx",
+    "name": "ScenarioRedirectPage",
+    "untestabilityReason": {
+      "justification": "Shipped by the codeyam scaffolder and untouched by this project. It is development-only tooling - it calls notFound in production - and belongs to the editor's surface rather than the product's.",
+      "kind": "scaffold"
+    }
+  },
+  {
+    "description": "The lime circular send control with its arrow, positioned inside whichever input pill hosts it. Shared by the landing prompt and the conversation reply box.",
+    "filePath": "app/components/SendButton.tsx",
+    "name": "SendButton",
+    "scenarios": [
+      "sendbutton-default",
+      "sendbutton-disabled",
+      "sendbutton-large"
+    ]
+  },
+  {
+    "description": "The four starter chips. Clicking one fills the prompt rather than submitting it, so the person finishes the sentence in their own words.",
+    "filePath": "app/components/SuggestionChips.tsx",
+    "name": "SuggestionChips",
+    "scenarios": [
+      "suggestionchips-default"
+    ]
+  },
+  {
+    "description": "The summary screen's opening declaration that the product was not built - the honesty the whole tool is organised around.",
+    "filePath": "app/components/SummaryHeadline.tsx",
+    "name": "SummaryHeadline",
+    "scenarios": [
+      "summaryheadline-default"
+    ]
+  },
+  {
+    "description": "The end of the loop, and deliberately not a dead end: the summary with the conversation still open beneath it so the map can keep moving.",
+    "filePath": "app/components/SummaryScreen.tsx",
+    "name": "SummaryScreen",
+    "scenarios": [
+      "summaryscreen-default"
+    ]
+  },
+  {
+    "description": "The final screen composed whole: the declaration, the three cards, and the next-steps track. Composition only - the sorting lives in groupSummaryNodes.",
+    "filePath": "app/components/SummaryView.tsx",
+    "name": "SummaryView",
+    "scenarios": [
+      "summaryview-default",
+      "summaryview-empty"
+    ]
+  },
+  {
+    "description": "The right-hand panel: the conversation rendered as structure. Composes the connector layer and the node pills over a plane that scales to fit, down to a legibility floor.",
+    "filePath": "app/components/ThinkingMapView.tsx",
+    "name": "ThinkingMapView",
+    "scenarios": [
+      "thinkingmapview-default",
+      "thinkingmapview-empty",
+      "thinkingmapview-seeded"
+    ]
+  },
+  {
+    "description": "A turn the person took: ink-filled and right-aligned, the visual counterweight to the partner's warm bubbles.",
+    "filePath": "app/components/UserBubble.tsx",
+    "name": "UserBubble",
+    "scenarios": [
+      "userbubble-default",
+      "userbubble-long",
+      "userbubble-short"
+    ]
+  },
+  {
+    "description": "The product mark: three nodes and the connectors between them, doubling as the link home from every screen.",
+    "filePath": "app/components/Wordmark.tsx",
+    "name": "Wordmark",
+    "scenarios": [
+      "wordmark-default"
+    ]
+  },
+  {
+    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. All the rules live in planMapMutations, which is pure and tested.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "applyToolCalls",
+    "scenarios": [
+      "pivoted-now-it-is-for-teachers"
+    ]
+  },
+  {
+    "description": "Registers the six MCP tools on a server object, each delegating straight to the mapStore functions the web UI uses so the two front doors cannot drift apart. Response formatting lives in mcpFormat; this is registration only. Built fresh per request in the stateless HTTP mode.",
+    "filePath": "app/lib/mcpServer.ts",
+    "name": "buildMcpServer",
+    "untestabilityReason": {
+      "justification": "Registration only after the formatting moved to mcpFormat: it constructs an SDK server, attaches six handlers that each call one mapStore function, and returns it. The formatting is covered by app/lib/mcpFormat.test.ts and the store functions by their own entries. The wiring was verified end to end over both transports - initialize, tools/list, and a create/add-node/read round trip over HTTP, plus a stdio handshake.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Builds the orthogonal SVG path from a parent's bottom edge to a child's top edge, routed through a horizontal bus midway between the levels so siblings share it and the tree reads as one structure. Emits a straight line when the two are already aligned.",
+    "filePath": "app/lib/mapLayout.ts",
+    "name": "connectorPath",
+    "testFile": "app/lib/mapLayout.test.ts"
+  },
+  {
+    "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "createMap",
+    "scenarios": [
+      "day-one-nothing-yet"
+    ]
+  },
+  {
+    "description": "Decides what to append to the conversation before the next request. An empty array ends the loop; a paused turn gets the assistant's partial content echoed back so the server-side search can resume; a tool round additionally gets the matching tool_result blocks in the single user message the API requires.",
+    "filePath": "app/lib/turnInterpreter.ts",
+    "name": "followUpMessages",
+    "testFile": "app/lib/turnInterpreter.test.ts"
+  },
+  {
+    "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, and the indented node tree - so a client sees both views of the thinking the way the UI shows them side by side.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatMapDetail",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
+    "description": "Renders the map list for an MCP client, leading every row with the id because that is what the client passes back to every other tool, and saying so plainly when there are no maps yet.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatMapList",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
+    "description": "Reads one map with its full conversation and node tree in creation order. The single read behind the workspace, the summary screen and the MCP get_thinking_map tool.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "getMap",
+    "scenarios": [
+      "grounded-research-and-its-gaps",
+      "complete-what-to-do-next",
+      "sprawling-a-deep-wide-map"
+    ]
+  },
+  {
+    "description": "Sorts a finished map's nodes into the four regions of the summary screen - known, unknown, directions and next steps - ignoring every other kind and ordering each bucket by its stored order, because the next steps are numbered on screen.",
+    "filePath": "app/lib/summaryGroups.ts",
+    "name": "groupSummaryNodes",
+    "testFile": "app/lib/summaryGroups.test.ts"
+  },
+  {
+    "description": "The MCP HTTP endpoint. Builds a fresh server and transport per request so concurrent clients never share transport state, then hands the request to the transport.",
+    "filePath": "app/api/mcp/route.ts",
+    "name": "handle",
+    "untestabilityReason": {
+      "justification": "Four straight-line statements with no branching: construct server, construct transport, connect, delegate. The tools underneath are covered by their own entries, and the endpoint was verified end to end against a live MCP client - initialize, tools/list, and a create/add-node/read round trip.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Reports whether an Anthropic credential is present in the environment, so the message route can answer with a plain explanation instead of a generic 500 when the app has no way to reach a model.",
+    "filePath": "app/lib/thinkingPartner.ts",
+    "name": "hasCredentials",
+    "untestabilityReason": {
+      "justification": "Reads process.env directly and returns a boolean; the only behaviour worth asserting is what the environment already is, so a test would restate its one line rather than constrain it. Its consequence - the plain 503 explanation instead of a generic 500 - is covered by the message route.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Decides what one model response means for the agent loop: collects spoken text and custom tool calls, emits a tool_result per tool_use, and returns a disposition. Reports a refusal instead of passing it off as an answer, asks the caller to resume a turn a server-side web search paused, and stops when tool_use is reported but only server tools ran - which would otherwise spin the loop.",
+    "filePath": "app/lib/turnInterpreter.ts",
+    "name": "interpretTurnResponse",
+    "testFile": "app/lib/turnInterpreter.test.ts"
+  },
+  {
+    "description": "Type guard for the node kinds the map knows how to draw. Used to drop a hallucinated kind at the planning stage rather than storing a node no component has a treatment for.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "isNodeKind",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Type guard for the three node statuses. Status drives the visual treatment, so an unrecognised value is normalised rather than allowed to fall through to the default silently.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "isNodeStatus",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Type guard for the six phases of the loop. SQLite has no enums, so phase strings arrive from the database and from model tool calls unvalidated; this is what keeps an unknown value out of the phase nav.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "isPhase",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Tidy-tree layout for the thinking map. Rebuilds the tree from flat nodes joined only by parentId, sizes each pill to its label, centres every parent over its children, and returns absolute pixel positions plus overall bounds. Treats an orphaned node as a root and terminates on a parent cycle rather than hanging the render.",
+    "filePath": "app/lib/mapLayout.ts",
+    "name": "layoutMap",
+    "testFile": "app/lib/mapLayout.test.ts"
+  },
+  {
+    "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "listMaps",
+    "scenarios": [
+      "returning-four-saved-maps",
+      "day-one-nothing-yet"
+    ]
+  },
+  {
+    "description": "The stdio entrypoint for MCP clients that launch the server as a child process, such as Claude Desktop. Serves the same buildMcpServer over a stdio transport; only the transport differs from the HTTP route.",
+    "filePath": "mcp/stdio.ts",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "A process entrypoint: build the server, connect a stdio transport, log readiness to stderr because stdout is the JSON-RPC channel. No branching. Verified by driving a real initialize and tools/list handshake through the process over a pipe.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "The production seed entrypoint, deliberately a no-op. CodeYam projects start with an empty production database and let each scenario carry its own seed, so there is nothing to plant here.",
+    "filePath": "prisma/seed.ts",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "Scaffold-shipped entrypoint left as the no-op the CodeYam data model calls for: production starts empty and scenarios carry their own seeds. There is no behaviour to assert because the function deliberately does nothing.",
+      "kind": "scaffold"
+    }
+  },
+  {
+    "description": "Derives the line beside LIVE MAP from the current nodes so the map narrates itself truthfully: a bare seed, a count of open questions, an answered/open split, or the reassurance that nothing was lost after a direction change. Excludes the root idea from the answered count, and lets a just-updated node outrank the arithmetic.",
+    "filePath": "app/lib/mapCaption.ts",
+    "name": "mapCaption",
+    "testFile": "app/lib/mapCaption.test.ts"
+  },
+  {
+    "description": "Sizes a node pill to its label so text stays on two lines at most, capped so an unbounded label cannot stretch a pill into a paragraph. The root gets a fixed wider box.",
+    "filePath": "app/lib/mapLayout.ts",
+    "name": "measureWidth",
+    "testFile": "app/lib/mapLayout.test.ts"
+  },
+  {
+    "description": "Picks the shell classes for a map node, encoding the design system's status-precedence rule: root beats updated beats open beats accent kind beats plain answered. Gaps deliberately fall through to plain, because a gap is the research phase's most valuable finding rather than a warning.",
+    "filePath": "app/lib/nodeAppearance.ts",
+    "name": "nodeShellClasses",
+    "testFile": "app/lib/nodeAppearance.test.ts"
+  },
+  {
+    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase.",
+    "filePath": "app/lib/nodePlan.ts",
+    "name": "planMapMutations",
+    "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
+    "description": "Runs one turn of the conversation against claude-opus-5 with adaptive thinking, the three map tools and Anthropic's server-side web_search. A thin loop: every decision about what a response means - refusal, paused server tool, more tool calls, or done - is made by interpretTurnResponse, which is pure and tested.",
+    "filePath": "app/lib/thinkingPartner.ts",
+    "name": "runTurn",
+    "testFile": "app/lib/thinkingPartner.test.ts"
+  },
+  {
+    "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
+    "filePath": "app/lib/messageLines.ts",
+    "name": "splitAssistantLines",
+    "testFile": "app/lib/messageLines.test.ts"
+  },
+  {
+    "description": "Renders the current map as an indented outline carrying each node's real id, kind and status. This is the context the model reads before every turn, and the ids are what let it target an existing node with update_node.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "summarizeMap",
+    "testFile": "app/lib/summarizeMap.test.ts"
+  },
+  {
+    "description": "Wraps a string in the content envelope every MCP tool response takes. A one-line shape adapter with no branches; the strings it wraps are built by mcpFormat.",
+    "filePath": "app/lib/mcpServer.ts",
+    "name": "textResult",
+    "untestabilityReason": {
+      "justification": "A single return statement building the SDK's response literal - no branches, no transformation. The text it wraps comes from formatMapList and formatMapDetail, both covered by app/lib/mcpFormat.test.ts, and the envelope shape itself was verified against a live MCP client over both transports.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Converts stored conversation rows into the API's message array, treating any role that is not 'assistant' as a user turn so an unexpected value in the free-string column cannot throw mid-conversation.",
+    "filePath": "app/lib/turnInterpreter.ts",
+    "name": "toMessageParams",
+    "testFile": "app/lib/turnInterpreter.test.ts"
+  },
+  {
+    "description": "Scales a fixed-size plane to fit its frame down to a legibility floor, and opens an oversized map centred on its root. Seeing the whole shape at once is the point of the map, so fitting beats scrolling - but a map that would need shrinking past the floor scrolls instead.",
+    "filePath": "app/hooks/useFitToFrame.ts",
+    "name": "useFitToFrame",
+    "scenarios": [
+      "thinkingmapview-default",
+      "thinkingmapview-seeded",
+      "sprawling-a-deep-wide-map"
+    ]
+  }
+]

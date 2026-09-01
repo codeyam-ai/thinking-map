@@ -1,0 +1,12 @@
+{
+  "name": "SummaryView - Default",
+  "id": "d77f4493-678c-4237-8e94-d890a1aa0b46",
+  "url": "/isolated-components/SummaryView?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SummaryView",
+  "scenarioType": "component",
+  "description": "The whole final screen: know, don't know, directions, and five next steps."
+}

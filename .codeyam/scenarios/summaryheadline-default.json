@@ -1,0 +1,12 @@
+{
+  "name": "SummaryHeadline - Default",
+  "id": "427f91e2-fca2-4e62-9c67-b4a60481998c",
+  "url": "/isolated-components/SummaryHeadline?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "SummaryHeadline",
+  "scenarioType": "component",
+  "description": "The summary screen's opening admission that the product was not built - the honesty that is the point of the tool."
+}
