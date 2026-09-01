@@ -535,7 +535,8 @@
       "phasenav-default",
       "phasenav-nextsteps",
       "phasenav-research"
-    ]
+    ],
+    "testFile": "app/components/PhaseNav.render.test.tsx"
   },
   {
     "description": "The document shell: html and body, the global stylesheet, and the page metadata. Scaffold-shipped; this project changed only the title and description.",

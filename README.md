@@ -134,6 +134,10 @@ tools to it. This needs Chrome 146+ (`navigator.modelContext`), HTTPS or localho
 the top-level frame — WebMCP is unavailable inside an iframe, deliberately. When any of
 that is missing the page says so rather than pretending to be connected.
 
+The page is designed to sit beside the agent that drives it — most often as half a
+screen next to ChatGPT, rather than filling a monitor on its own. The chrome is built
+to hold from about 640px wide upward, and degrades rather than reflows below that.
+
 **Over HTTP** — `POST /api/mcp` (streamable HTTP; send
 `Accept: application/json, text/event-stream`).
 

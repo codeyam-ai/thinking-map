@@ -1,0 +1,455 @@
+{
+  "timestamp": "2026-09-01T18:05:39Z",
+  "title": "App Chrome That Fits a Half Screen",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe app chrome is sized for a 1440px desktop and breaks at the width it will\nactually be seen at. This is going to be driven mostly as an MCP from ChatGPT,\nwith the page open in the other half of the screen — roughly 700–1000px wide and\ntall — and at that width the header falls apart: the wordmark wraps to two lines\n(\"Thinking / Map\"), and the six-pill phase track runs straight off the right edge.\nBoth are visible in the screenshots below: on the landing screen `06 NEXT STEPS`\nis clipped at the window boundary, and on the map screen the track stops at\n`05 EXPLOR` with the sixth step gone entirely. Underneath that, `px-10 py-8`\nspends 80px of horizontal room on padding that the content needs. Make the chrome\nfluid: a wordmark that never wraps, a phase track that scrolls horizontally and\nkeeps the active step in view, a header that stacks when it must, and padding that\nsteps down with the width.\n\n![Landing screen at half width — the phase track is clipped and the wordmark wraps](assets/app-chrome-that-fits-a-half-screen/landing-half-screen.png)\n\n![Map screen at half width — the phase track loses two steps off the right edge](assets/app-chrome-that-fits-a-half-screen/map-half-screen.png)\n\n## Key Decisions\n\n- **Target down to ~640px, degrade below rather than redesign below.** Half of a\n  1280–1440px laptop is 640–720px, which is the real floor for \"ChatGPT on one\n  side, this on the other\". One breakpoint at `lg` (1024px) separates today's\n  desktop chrome from the fluid chrome; everything under it is the same layout,\n  just tighter. Below ~480px the layout still holds (nothing overflows) but is not\n  separately designed — a ChatGPT Apps SDK inline widget is not a surface this\n  product ships to today, and designing for it now would be speculative.\n- **The phase track scrolls; it does not collapse to a progress bar.** The design\n  system is explicit that this is a map of the process rather than a progress bar,\n  and completed steps are deliberately not distinguished from upcoming ones.\n  Replacing it with \"3 of 6\" at narrow widths would throw that away. A\n  horizontally scrollable track that auto-scrolls the active pill into view keeps\n  the whole process visible and reachable at any width. A fade mask on the\n  trailing edge is what says it scrolls.\n- **The wordmark shortens rather than wraps.** `Thinking Map` on one line with the\n  glyph, and under ~520px the words drop and the glyph stands alone — a mark that\n  wraps mid-name reads as broken in a way a mark alone does not.\n- **Add a `Half screen` screen size rather than reusing `Tablet`.** See the survey\n  under *Reused existing code*: `Tablet` (768×1024) already exists and is\n  dimensionally close, but the scenarios captured at it would be documenting a\n  tablet rather than the primary surface this product is used on. A purpose-named\n  entry makes the intent legible in the scenario gallery.\n- **No change to the fixed-size internals of the map plane.** `ROOT_WIDTH`,\n  `measureWidth`, `LEVEL_HEIGHT` in `app/lib/mapLayout.ts` stay exactly as they\n  are — the map already scales to its frame through `useFitToFrame`, and how much\n  frame it gets is the subject of a separate plan.\n\n## Implementation\n\n### 1. A wordmark that never wraps\n\n**File**: `app/components/Wordmark.tsx`\n\nAdd `whitespace-nowrap` and `shrink-0` to the anchor so the mark can never be\nsqueezed into two lines by a flex sibling. Wrap the `Thinking Map` text in a\n`hidden sm:inline` span (Tailwind `sm` = 640px; use an arbitrary\n`max-[520px]:hidden` if 640 proves too eager once it is on screen) so the glyph\nstands alone at the narrowest sizes. Step the text down from `text-[17px]` to\n`text-[15px]` below `lg`. Keep the `suppressHydrationWarning` — the preview proxy\nrewrites the `href` and the note in the README explains why.\n\n### 2. A phase track that scrolls, with the active step in view\n\n**File**: `app/components/PhaseNav.tsx`\n\nThis becomes a client component (`'use client'`) — it needs a ref and an effect.\n\n- Make the `nav` a scroll container: `flex-nowrap overflow-x-auto` with the\n  scrollbar hidden (`scrollbar-width: none` plus `::-webkit-scrollbar { display: none }`\n  — add the small utility class to `app/globals.css`, see change 5) and\n  `overscroll-x-contain` so a horizontal flick does not chain to the page.\n- Hold a ref on the active pill and `scrollIntoView({ inline: 'center', block: 'nearest' })`\n  it whenever `active` changes, so advancing a phase brings the new step into view\n  without anyone scrolling. Guard for `scrollIntoView` being absent so the jsdom\n  render test does not need a polyfill.\n- Add a trailing fade so the track reads as scrollable: a\n  `mask-image: linear-gradient(to right, black 85%, transparent)` applied only\n  under `lg` (the desktop track fits and should not be faded).\n- Tighten the pills under `lg`: `px-2.5` instead of `px-3.5`, and drop the\n  `tracking-[0.08em]` to `tracking-[0.04em]`. Keep the `01`–`06` numerals; they\n  are how the track reads as a sequence.\n\nAdd a render test asserting the active pill is scrolled into view when `active`\nchanges, alongside the existing component tests.\n\n### 3. A header that stacks instead of overflowing\n\n**File**: `app/components/AppHeader.tsx`\n\nReplace the single `flex items-center justify-between gap-8` row with a wrapping\ntwo-part header:\n\n- `flex flex-wrap items-center justify-between gap-x-4 gap-y-2` on the header.\n- `min-w-0` on the right-hand group so the phase track can actually shrink — a\n  flex item defaults to `min-width: auto`, which is the same trap already\n  documented on `ThinkingMapView`'s `min-w-0`.\n- Under `lg`, the `{status}` slot moves to its own full-width row beneath the\n  wordmark + track (`order-last basis-full lg:order-none lg:basis-auto`), so\n  agent presence never competes with the track for the same line.\n- Gap steps from `gap-6` to `gap-3` under `lg`.\n\n### 4. Page padding that steps down with the width\n\n**Files**: `app/components/MapScreen.tsx`, `app/page.tsx`\n\nBoth `main` elements carry `px-10 py-8`. Change to `px-4 py-4 sm:px-6 lg:px-10\nlg:py-8`, and on `MapScreen` step the column gap from `gap-6` to `gap-3 lg:gap-6`.\nAt 720px this returns 48px of usable width to the content and 32px of height —\nwhich on a half screen is the difference between the map fitting and not.\n\n`app/components/AgentStatus.tsx` also carries a `max-w-[190px]` truncated reason\nline; under `lg` hide the reason entirely (the `title` attribute already carries\n`UNAVAILABLE_HELP`, so nothing is lost) and keep the dot, the headline, and the\nrevision.\n\n### 5. The scrollbar-hiding utility\n\n**File**: `app/globals.css`\n\nAdd a `.no-scrollbar` utility beside the existing `.eyebrow` and `.node-in`\nrules — `scrollbar-width: none` and a `::-webkit-scrollbar { display: none }`\nchild rule. It goes here rather than inline because the phase track is not the\nlast place in this app that will want it, and the file already holds exactly this\nkind of app-wide, small, commented utility.\n\n### 6. Capture the half screen as a screen size\n\n**File**: `.codeyam/editor.json`\n\nRegister the target surface so it is captured rather than asserted:\n\n```bash\ncodeyam-editor editor configure-screen-size '{\"name\":\"Half screen\",\"width\":760,\"height\":1000}'\n```\n\nThen re-register the two whole-page scenarios at both dimensions, so the gallery\ncarries the half-screen proof next to the desktop one:\n\n- `day-one-nothing-yet` (`app/page.tsx`) — `\"dimensions\": [\"Desktop\", \"Half screen\"]`\n- `mid-exchange-agent-and-human-on-one-map` (`app/map/[id]/page.tsx`) — same\n\nThe remaining 160-odd component scenarios stay Desktop-only; they render one\ncomponent in isolation and gain nothing from a second viewport.\n\n### 7. Say what surface this is for\n\n**File**: `README.md`\n\nThe README documents the three front doors in detail but never says what shape of\nwindow the page is meant to be read in. Add two sentences to the section\ndescribing the page-side exchange: the page is designed to sit beside the agent\nthat drives it — most often as half a screen next to ChatGPT — and the chrome is\nbuilt to hold from about 640px up.\n\n## Reused existing code\n\n- `PHASES` / `PHASE_LABELS` from `app/lib/mapKinds.ts` (glossary entries: `PHASES`,\n  `PHASE_LABELS`) — the track keeps reading its content from the same source; only\n  its container changes.\n- `AppHeader` from `app/components/AppHeader.tsx` (glossary entry: `AppHeader`) —\n  already the one header shared by the landing and map screens, so fixing it once\n  fixes both. Its `status` slot is the seam the stacking rule uses.\n- `AgentStatusDot` from `app/components/AgentStatusDot.tsx` (glossary entry:\n  `AgentStatusDot`) — survives unchanged; only the prose beside it is hidden at\n  narrow widths.\n- `.eyebrow` and `.node-in` in `app/globals.css` — the precedent for adding a\n  small documented utility class app-wide rather than repeating the declarations.\n- `min-w-0` reasoning already written out at `app/components/ThinkingMapView.tsx:161`\n  — the same flex trap, applied to the header's right-hand group.\n- **Existing-implementation survey (screen sizes).** The `screenSizes` map in\n  `.codeyam/editor.json` already holds `Mobile` 390×844, `Desktop` 1440×900, `Tablet` 768×1024, and\n  `Laptop` 1280×800. `Tablet` is dimensionally within 8px of the proposed half\n  screen, so nothing new is technically required; the entry is added for naming,\n  not capability, and that trade is the Key Decision above. Every one of the 166\n  registered scenarios currently declares `[\"Desktop\"]` and nothing else, so no\n  existing scenario changes meaning.\n- **Existing-implementation survey (responsive breakpoints).** Grepped the whole of\n  `app/` for `sm:` / `md:` / `lg:` / `@media` outside the stylesheet: there are\n  none. This app has no responsive system today beyond `SummaryView`'s single\n  `lg:grid-cols-3`. Nothing is being duplicated — this plan introduces the first\n  one, which is why the breakpoint choice is stated as a decision rather than\n  inherited.\n\n## Reproduction Test\n\nThe phase track and the wordmark overflow their container below about 1100px.\n\n**Target**: no unit-level reproduction. Both failures are pure layout — an element\nwider than its container, and a flex child wrapping — and jsdom has no layout\nengine, so `getBoundingClientRect` returns zeros and an assertion about overflow\nwould pass whether or not the bug is present. A test asserting the presence of\n`overflow-x-auto` would be testing the fix rather than the defect.\n\nDemonstrate it instead with the two whole-page scenarios re-registered at the new\n`Half screen` dimension in change 6 — `day-one-nothing-yet` and\n`mid-exchange-agent-and-human-on-one-map`. The before/after captures at 760px are\nthe evidence, and they are the same two screenshots attached to this plan.\n\nOne genuinely testable behavior does ship with the fix and should get a test of\nits own (not a reproduction): `PhaseNav` scrolls the active pill into view when\n`active` changes. Add it to the component's render tests with a stubbed\n`Element.prototype.scrollIntoView`.\n\nStatus: PROPOSED — no red to confirm; visual regression demonstrated by scenario\ncapture.\n\n## Scenarios to Demonstrate\n\n- **Landing at half screen (760×1000)** — day one, no saved maps: wordmark on one\n  line, all six phase pills reachable, `01 IDEA` in view.\n- **Map screen at half screen (760×1000)** — mid-exchange, three open questions,\n  `02 DECONSTRUCT` active and scrolled into view, agent status on its own row.\n- **Map screen at half screen, last phase active** — `06 NEXT STEPS` active, so\n  the track is scrolled to its far end and the leading fade is what shows there is\n  more to the left.\n- **Landing at 480px** — narrower than the design target: the glyph stands alone\n  with no wordmark text, nothing overflows horizontally.\n- **Both screens at Desktop 1440×900** — unchanged from today. The `lg` breakpoint\n  means the existing desktop chrome is exactly what it was, which is the thing\n  most at risk of quietly regressing.\n- **Map screen with no agent attached** — the truncated `— no browser agent…`\n  reason is hidden under `lg` while the dot and headline remain, and the `title`\n  still carries the full explanation.",
+  "description": "Made the app chrome fluid so the page holds together at the width it is actually read at — roughly 640–1000px, sitting beside the agent that drives it rather than filling a monitor. The wordmark no longer wraps mid-name (and drops to the glyph alone under 520px); the six-phase track became a horizontally scrolling container that centers the active pill on change and carries a trailing fade under lg, rather than collapsing to a progress summary — the design system is explicit that the track is a map of the process, not a progress bar; the header wraps so agent status takes its own full-width row instead of competing with the track; and page padding steps down from px-10 py-8 to px-4 py-4, returning 48px of width and 32px of height at 720px. Desktop is deliberately untouched: one lg breakpoint separates today's chrome from the fluid chrome, and the Desktop captures are pixel-identical to before. SCOPE VERDICT: this cycle delivered the plan in full and DEFERRED none of the project's deliverables — all 10 were already resolved (9 delivered, 1 previously deferred by the user for the assist track), and this cycle opened no new one. DEVIATION FROM PLAN: change 6 specified a purpose-named 'Half screen' 760x1000 capture size. The size is registered in editor.json but is INERT — the editor server reads that file only at startup and runs as the container's main process, so it cannot be restarted from inside without killing the session. Captures at 'Half screen' silently fall back to Desktop (verified: the frame came back 1440x900). On the user's explicit decision, the two whole-page scenarios (day-one-nothing-yet, mid-exchange-agent-and-human-on-one-map) instead carry the existing Tablet 768x1024 dimension — 8px wider than the target, which the plan's own existing-implementation survey notes is dimensionally equivalent. The 'Half screen' entry becomes usable at the next natural editor restart, and re-pointing those two scenarios at it is a one-line change then. PRE-EXISTING BREAKAGE FIXED EN ROUTE, unrelated to this plan: the rebase brought in a schema change adding MapNode.sourceRef, but neither the generated Prisma client nor the SQLite database had it. tsc failed on three errors in app/lib/mapStore.ts, and every seeded scenario capture failed with 'The column sourceRef does not exist in the current database'. Fixed with npx prisma generate and npm run db:push. Without both, nothing in this repo compiled or captured. TESTING: layout itself is not unit-testable — jsdom has no layout engine, so getBoundingClientRect returns zeros and an overflow assertion would pass with or without the bug; the visual proof is the scenario captures at two viewports. The one genuinely testable behavior the fix ships, the track scrolling its active pill into view, got five render tests covering first paint, phase advance, the no-op re-render, all six steps staying in the DOM, and exactly one aria-current step.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/editor.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/app-chrome-that-fits-a-half-screen.md\t.codeyam/plans/completed/app-chrome-that-fits-a-half-screen.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/app-chrome-that-fits-a-half-screen/landing-half-screen.png\t.codeyam/plans/completed/assets/app-chrome-that-fits-a-half-screen/landing-half-screen.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/app-chrome-that-fits-a-half-screen/map-half-screen.png\t.codeyam/plans/completed/assets/app-chrome-that-fits-a-half-screen/map-half-screen.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/day-one-nothing-yet.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/mid-exchange-agent-and-human-on-one-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-explore--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-nextsteps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-research--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/wordmark-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/835c7344e5b035a2e9b02e54221703135a4f2859262da0d881d87c111d2899ec.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/9ac7c5e59ccb1efbf221330c68a809a6c28fcc6c4aeb2a359c2fc0d7e621772e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentStatus.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AppHeader.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/PhaseNav.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/Wordmark.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/globals.css",
+      "status": "modified"
+    },
+    {
+      "path": "app/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3505029340dd5b9634a209465aa3df702593e59ca0151370088725b6c75ef894.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5e061f120cabbfc942ef8684064aef9b527f1ae7e2e5eb84e6b2147a297ff2ac.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/65ccee7a6aabf0301328208553430faf969daef5e6323cefb2f7256c08741183.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/fcae79e05173800812a20ce833d52cb3d92e90b122b963a9253090015703b1cb.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/PhaseNav.render.test.tsx",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "Arranged - a map tidied by hand",
+      "screenshotPath": "arranged-a-map-tidied-by-hand--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--desktop.png"
+    },
+    {
+      "name": "AppHeader - Default",
+      "screenshotPath": "appheader-default--desktop.png"
+    },
+    {
+      "name": "AppHeader - Explore",
+      "screenshotPath": "appheader-explore--desktop.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--desktop.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--desktop.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--desktop.png"
+    },
+    {
+      "name": "PhaseNav - Default",
+      "screenshotPath": "phasenav-default--desktop.png"
+    },
+    {
+      "name": "PhaseNav - NextSteps",
+      "screenshotPath": "phasenav-nextsteps--desktop.png"
+    },
+    {
+      "name": "PhaseNav - Research",
+      "screenshotPath": "phasenav-research--desktop.png"
+    },
+    {
+      "name": "Wordmark - Default",
+      "screenshotPath": "wordmark-default--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 372,
+    "passed": 5,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 372,
+        "passed": 5
+      }
+    ]
+  }
+}

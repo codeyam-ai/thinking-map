@@ -4,7 +4,7 @@ export default function Wordmark() {
     <a
       href="/"
       suppressHydrationWarning
-      className="flex items-center gap-2.5"
+      className="flex shrink-0 items-center gap-2.5 whitespace-nowrap"
     >
       <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
         <path
@@ -18,7 +18,9 @@ export default function Wordmark() {
         <circle cx="4.5" cy="17.5" r="2.2" fill="var(--ink)" />
         <circle cx="17.5" cy="17.5" r="2.2" fill="var(--ink)" />
       </svg>
-      <span className="text-[17px] font-extrabold tracking-[-0.01em]">
+      {/* Under ~520px the glyph stands alone. A mark that wraps mid-name reads
+          as broken in a way a mark on its own does not. */}
+      <span className="hidden text-[15px] font-extrabold tracking-[-0.01em] min-[520px]:inline lg:text-[17px]">
         Thinking Map
       </span>
     </a>

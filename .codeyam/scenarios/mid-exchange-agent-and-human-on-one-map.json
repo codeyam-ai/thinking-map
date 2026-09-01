@@ -3,7 +3,8 @@
   "id": "bab49e26-8fc6-4912-affd-4a920e779c19",
   "url": "/map/map-exchange",
   "dimensions": [
-    "Desktop"
+    "Desktop",
+    "Tablet"
   ],
   "mocks": {},
   "seed": {

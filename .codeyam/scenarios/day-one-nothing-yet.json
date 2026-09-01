@@ -3,7 +3,8 @@
   "id": "4e28929a-9609-4fd3-b673-a6dd96fc6065",
   "url": "/",
   "dimensions": [
-    "Desktop"
+    "Desktop",
+    "Tablet"
   ],
   "mocks": {},
   "seed": {

@@ -30,7 +30,7 @@ export default function MapScreen({
   brief?: { sourceName: string; coverage: BriefCoverage };
 }) {
   return (
-    <main className="flex h-screen flex-col gap-6 px-10 py-8">
+    <main className="flex h-screen flex-col gap-3 px-4 py-4 sm:px-6 lg:gap-6 lg:px-10 lg:py-8">
       <AppHeader phase={phase} status={<AgentStatus />} />
       {phase === 'next-steps' ? (
         <SummaryScreen nodes={nodes} />

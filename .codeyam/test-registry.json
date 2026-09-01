@@ -190,6 +190,51 @@
       "runner": "tests"
     },
     {
+      "description": "The effect is keyed on the phase, not on every render. A re-render from an unrelated parent update must not yank the track back, which would fight a reader who has just scrolled it by hand.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav active-step visibility › does not re-scroll when the phase is unchanged",
+      "line": 60,
+      "registeredAt": "2026-09-01T17:49:44Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Exactly one pill carries `aria-current=\"step\"` — the hook the scroll effect targets and the only cue a screen reader gets, since the lime fill that marks the active step visually says nothing on its own.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav active-step visibility › marks only the active phase as the current step",
+      "line": 85,
+      "registeredAt": "2026-09-01T17:49:44Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The design decision this locks in: at narrow widths the track SCROLLS rather than collapsing to a \"3 of 6\" summary, because it is a map of the process rather than a progress bar. All six stay in the DOM at every width.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav active-step visibility › renders every phase, so the whole process stays reachable",
+      "line": 73,
+      "registeredAt": "2026-09-01T17:49:44Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A page can load with any phase active — a map resumed at Explore starts with the track already scrolled past the start. If the pill were only centered on CHANGE, that first paint would open scrolled to 01 with the real position off-screen.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav active-step visibility › scrolls the active pill into view on first render",
+      "line": 34,
+      "registeredAt": "2026-09-01T17:49:44Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The behavior the narrow track exists for: advancing a phase has to bring the new step into view on its own. Without it the active step can sit off the right edge with nothing telling the reader it moved.",
+      "file": "app/components/PhaseNav.render.test.tsx",
+      "format": "vitest",
+      "key": "PhaseNav active-step visibility › scrolls the newly active pill into view when the phase advances",
+      "line": 47,
+      "registeredAt": "2026-09-01T17:49:44Z",
+      "runner": "tests"
+    },
+    {
       "description": "Folding is a reading posture, so it has to be reversible in place.",
       "file": "app/components/ThinkingMapView.render.test.tsx",
       "format": "vitest",

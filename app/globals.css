@@ -67,6 +67,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* A scroll container that scrolls without showing a bar. The phase track is the
+   first user, and it will not be the last. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* The eyebrow that sits above every node and panel heading. */
 .eyebrow {
   font-size: 11px;
