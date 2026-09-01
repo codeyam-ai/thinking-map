@@ -37,6 +37,33 @@ const THREE = [
   ]),
 ];
 
+const stated = (
+  id: string,
+  kind: string,
+  label: string,
+  order: number,
+): FlatNode => ({
+  id,
+  parentId: "root",
+  kind,
+  label,
+  detail: null,
+  status: "answered",
+  sourceUrl: null,
+  order,
+});
+
+// Three of four cards are research kinds — a clear majority, so the row bands.
+// The gap is in the mix on purpose: it counts toward the band because it is a
+// fact about what already exists, even though it wears the question colour
+// because what it records is that nobody has an answer.
+const RESEARCH = [
+  stated("r-res", "research", "Looked at eleven tool libraries that lasted", 0),
+  stated("r-find", "finding", "Every one that survived had one named keyholder", 1),
+  stated("r-gap", "gap", "Nobody tracks what happens after the first winter", 2),
+  stated("r-goal", "goal", "Nobody on the street buys a second tile cutter", 3),
+];
+
 const noAnswers = new Map<string, string>();
 const noneAsked = new Set<string>();
 
@@ -111,6 +138,44 @@ const scenarios: Record<string, Props> = {
     totalRounds: 4,
     answers: noAnswers,
     askedIds: noneAsked,
+  },
+
+  // A round that is mostly research gets its own TERRITORY rather than just
+  // its own card colour: a tinted ground behind the whole row, a hairline
+  // enclosing it, and an eyebrow that says what the row is instead of which
+  // number it is. What already exists becomes legible before a single card on
+  // it is read.
+  ResearchBand: {
+    round: { index: 3, nodes: RESEARCH, phase: null },
+    totalRounds: 4,
+    answers: noAnswers,
+    askedIds: noneAsked,
+  },
+
+  // The boundary case, and the one most likely to be got wrong: research in
+  // the row but not a majority, so NO band. Otherwise the band would stop
+  // meaning "this round is about what exists" and start meaning "somebody
+  // looked something up once".
+  BelowResearchThreshold: {
+    round: {
+      index: 3,
+      nodes: [RESEARCH[1]!, question("q-key", "Who holds the second key?", 1), stated("s-con", "constraint", "It has to survive a wet winter", 2)],
+      phase: null,
+    },
+    totalRounds: 4,
+    answers: noAnswers,
+    askedIds: noneAsked,
+  },
+
+  // An older round, stepped back so the newest thinking sits forward of it.
+  // Recession, not perspective — opacity only, because a transform would move
+  // the answer boxes out from under the pointer.
+  Receded: {
+    round: { index: 2, nodes: THREE, phase: null },
+    totalRounds: 6,
+    answers: noAnswers,
+    askedIds: noneAsked,
+    receded: true,
   },
 };
 

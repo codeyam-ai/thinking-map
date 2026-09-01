@@ -1,0 +1,12 @@
+{
+  "name": "MapCardHeader - Risk",
+  "id": "2772a81a-abf3-4ef9-a4f6-b50bd30f8849",
+  "url": "/isolated-components/MapCardHeader?s=Risk",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapCardHeader",
+  "scenarioType": "component",
+  "description": "A risk card, in terracotta rather than a shared judgment hue — the same reason nodeShellClasses keeps pro and risk apart."
+}

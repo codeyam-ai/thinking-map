@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Found",
+  "id": "3ab91ff5-469a-4d6e-be26-d0ac4e6d91b2",
+  "url": "/isolated-components/CardIcon?s=Found",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "The magnifier, carried across from the retired node pill rather than redrawn — the one mark that reads as an activity, somebody went and looked, rather than as a category."
+}

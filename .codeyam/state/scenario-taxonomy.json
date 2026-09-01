@@ -90,6 +90,37 @@
         "reason": "The region is read-only: it renders slices and binds no handlers. The plan is something the client reads and argues with, not something they operate."
       }
     },
+    "CardIcon": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The mark is drawn from a kind string that is always present; there is no zero-data state. A kind the map does not recognise still gets a mark - the neutral ground glyph - which is the edge archetype, captured as UnknownKind."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It draws exactly one mark and never a list, so there is no overflow or truncation boundary. The breadth of the set is shown as six sibling scenarios rather than as a many state."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "A pure synchronous render from one string prop. Nothing is fetched and nothing is deferred, so there is no pending phase to picture."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "An unrecognised kind is not a failure here - it falls back to the neutral ground family deliberately, so a kind loses its precision and never its mark. That fallback is captured as UnknownKind under edge."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The icon is aria-hidden decoration and binds no handlers. It restates the family that the card eyebrow beneath it already names in words."
+      }
+    },
     "CopyablePrompt": {
       "empty": {
         "status": "n-a",
@@ -149,6 +180,38 @@
         "status": "covered"
       }
     },
+    "MapCardHeader": {
+      "empty": {
+        "status": "n-a",
+        "reason": "Both marks are always present: a card always belongs to a round and always has a kind, so there is no zero-data state to render."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "It renders two fixed marks rather than a list, so there is no empty-to-many boundary here. The one-of-each case IS the typical case."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Never a list - two marks at opposite corners, always exactly two. The widest the row can get is a double-digit round marker, which is the edge archetype rather than an overflow one."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "A synchronous render from four scalar props. Nothing here is fetched or deferred."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure state. An unrecognised kind falls back to the neutral family, which is a deliberate fallback rather than an error, and is captured on CardIcon - UnknownKind."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The header binds no handlers - a text span and an aria-hidden icon. The card's one action, answering a question, lives in MapCardAnswer and is recorded there."
+      }
+    },
     "MapPage": {
       "empty": {
         "status": "n-a",
@@ -176,6 +239,37 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "MapRow": {
+      "empty": {
+        "status": "n-a",
+        "reason": "A round always holds at least one node: groupIntoRounds only emits a round for a run of node-adds it actually found, so an empty row cannot occur."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The row is rendered from nodes already in hand - grouping is a pure function over an in-memory list, so there is no fetch that could be pending."
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "The row's own edges are its wrap boundary and its banded form, both captured as their own states. Long and missing text are a CARD concern and are captured on MapCard - LongLabel and MapCard - NoOptions."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The row has no failure state of its own. A failed answer write is rolled back inside useMapAnswers so the card returns to asking, and the row is unchanged throughout."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The row composes cards and binds no handlers itself. The key action - answering a question - happens on the card and is recorded on MapCardAnswer; PartlyAnswered shows the result of it landing in a row."
       }
     },
     "MapScreen": {
@@ -232,6 +326,35 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "RowThreads": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The layer measures the laid-out DOM in an effect and renders nothing until it has. That pre-measure moment is a single frame on mount, not a state a person can see or a capture can hold."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure path. A thread whose cards cannot be measured, or whose lane runs through other cards, is simply not drawn - the honest picture for it is the absence, which is captured as SomeUnattached and WrappedRow."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The overlay is pointer-events-none and aria-hidden. It restates a relationship the rows and eyebrows already carry in text, so nothing here is the only way to learn anything and nothing here can be operated."
       }
     },
     "SeedIdeaQuote": {
@@ -325,6 +448,35 @@
       "key-interaction": {
         "status": "n-a",
         "reason": "Read-only composition with no handlers. The one place to act on this screen is KeepThinkingPanel, which sits outside SummaryView and is covered separately."
+      }
+    },
+    "ThinkingMapView": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The map is server-rendered from nodes already read, and the rounds are derived by a pure function over them - so the view has no pending phase of its own."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The view renders whatever the map contains and has no failure state: a missing map is a 404 before it mounts, and a failed answer write is rolled back inside useMapAnswers so the card returns to asking."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The view composes rows and binds no handlers. The key action - answering a question on its own card - lives in MapCardAnswer and is recorded there."
       }
     },
     "WebMcpBridge": {

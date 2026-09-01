@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - UnknownKind",
+  "id": "66d71289-323b-459e-b421-d0135b61a53e",
+  "url": "/isolated-components/CardIcon?s=UnknownKind",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "A kind the map does not recognise. Kinds arrive from the database and from the model unvalidated, so an unknown one falls back to the neutral ground family — it loses its precision, never its mark."
+}

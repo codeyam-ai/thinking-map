@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Judgment",
+  "id": "a8a721fc-cc40-4ae7-9404-4484b0dbac98",
+  "url": "/isolated-components/CardIcon?s=Judgment",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "Plus over minus on a risk, in terracotta. Pro and risk share one glyph because they share a family; the colour is what separates them."
+}

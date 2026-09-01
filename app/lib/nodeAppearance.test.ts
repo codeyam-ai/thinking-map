@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nodeShellClasses } from './nodeAppearance';
+import { familyLineVar, nodeShellClasses } from './nodeAppearance';
 
 // Status drives the treatment — the single most important rule in the design
 // system. These assert the rule rather than the exact utility classes, so a
@@ -13,12 +13,14 @@ describe('nodeShellClasses', () => {
       ...over,
     });
 
-  // The root is the map's subject and the only dark shape on the page; losing
-  // that fill would leave the map without a visual anchor.
-  it('fills the root idea solid, the one dark shape on the page', () => {
+  // The root is the map's subject and has to be the heaviest shape on the
+  // page. It carries that with a doubled ink border rather than an ink fill:
+  // inverting 240px of card reads as a hole, and would take the eye before the
+  // one lime card that is supposed to have it.
+  it('gives the root idea the heaviest border on the page', () => {
     const cls = shell({ kind: 'idea', isRoot: true });
-    expect(cls).toContain('bg-ink');
-    expect(cls).toContain('text-white');
+    expect(cls).toContain('border-2');
+    expect(cls).toContain('border-fam-subject-line');
   });
 
   // Dashed-and-unfilled is how the map says "nobody has answered this" — the
@@ -39,7 +41,8 @@ describe('nodeShellClasses', () => {
   // root treatment has to win.
   it('lets the root treatment win over every other rule', () => {
     const cls = shell({ kind: 'idea', isRoot: true, status: 'updated' });
-    expect(cls).toContain('bg-ink');
+    expect(cls).toContain('border-fam-subject-line');
+    expect(cls).not.toContain('border-lime');
     expect(cls).not.toContain('border-dashed');
   });
 
@@ -49,31 +52,72 @@ describe('nodeShellClasses', () => {
     expect(shell({ kind: 'risk', status: 'updated' })).toContain('border-lime');
   });
 
-  // Pro and risk are the only kinds carrying colour; colour used more widely
-  // would stop meaning anything.
-  it('accents risk and pro nodes, and only those', () => {
+  // Pro and risk keep the two colours the design system gave them rather than
+  // being flattened into a shared judgment hue — the whole point of the pair
+  // is that they point opposite ways.
+  it('keeps pro and risk on their own two colours', () => {
     expect(shell({ kind: 'risk' })).toContain('border-risk');
     expect(shell({ kind: 'pro' })).toContain('border-pro');
   });
 
-  // Gaps are the most valuable finding on the map, not a warning — the mockups
-  // draw them as plain pills, and an earlier build wrongly reddened them.
-  it('leaves a gap node neutral', () => {
+  // Gaps are the most valuable finding on the map, not a warning — an earlier
+  // build wrongly reddened them. They read as questions, which is what a gap
+  // is: something nobody has answered.
+  it('draws a gap as a question rather than a warning', () => {
     const cls = shell({ kind: 'gap' });
     expect(cls).not.toContain('border-risk');
-    expect(cls).toContain('border-ink');
+    expect(cls).toContain('border-fam-question-line');
   });
 
-  // A research node is what the partner just went and found, so it carries the
-  // lime outline and the magnifier.
-  it('marks a research node as a find', () => {
-    expect(shell({ kind: 'research' })).toContain('border-lime-deep');
-  });
-
-  // Most nodes are ordinary settled facts and must render as plain ink pills.
-  it('falls back to the plain answered treatment for an ordinary kind', () => {
+  // Every kind now carries its family's colour, which is what makes the map
+  // legible as categories from across the room.
+  it('gives an ordinary kind its family colour and tint', () => {
     const cls = shell({ kind: 'problem' });
-    expect(cls).toContain('border-ink');
+    expect(cls).toContain('border-fam-ground-line');
+    expect(cls).toContain('bg-fam-ground-fill');
     expect(cls).not.toContain('border-dashed');
+  });
+
+  // This is the rule that must not break: kind colour slots in BELOW status,
+  // so an unanswered question is dashed and unfilled whatever it is about.
+  it('keeps status above kind for every family', () => {
+    for (const kind of ['research', 'risk', 'goal', 'slice', 'gap']) {
+      const cls = shell({ kind, status: 'open' });
+      expect(cls).toContain('border-dashed');
+      expect(cls).toContain('bg-transparent');
+    }
+  });
+
+  // Lime marks the one thing that just changed. No family may take it, or that
+  // card stops meaning anything.
+  it('never gives a family the lime', () => {
+    for (const kind of ['research', 'finding', 'pro', 'risk', 'slice', 'idea']) {
+      expect(shell({ kind })).not.toContain('lime');
+    }
+  });
+});
+
+// The paint value, for the SVG thread layer and the icon — the places that
+// need a colour rather than a class name.
+describe('familyLineVar', () => {
+  // A thread up to a risk should be the risk colour, not a family average.
+  it('resolves pro and risk to their own colours', () => {
+    expect(familyLineVar('risk')).toBe('var(--risk)');
+    expect(familyLineVar('pro')).toBe('var(--pro)');
+  });
+
+  // Everything else takes its family's line token.
+  it('resolves every other kind to its family token', () => {
+    expect(familyLineVar('finding')).toBe('var(--fam-found-line)');
+    expect(familyLineVar('goal')).toBe('var(--fam-ground-line)');
+    expect(familyLineVar('open-question')).toBe('var(--fam-question-line)');
+    expect(familyLineVar('slice')).toBe('var(--fam-forward-line)');
+    expect(familyLineVar('idea')).toBe('var(--fam-subject-line)');
+  });
+
+  // An unrecognised kind must still get a real colour rather than an undefined
+  // one, which would paint the thread black.
+  it('gives an unknown kind the neutral family colour', () => {
+    expect(familyLineVar('sticky-note')).toBe('var(--fam-ground-line)');
   });
 });

@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Gap",
+  "id": "1b528591-21b5-4025-8106-a77f33fb09b2",
+  "url": "/isolated-components/CardIcon?s=Gap",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "A gap wears the question mark, not the magnifier. It is a fact about what already exists — namely that part of it is missing — and what it records is that nobody has an answer."
+}

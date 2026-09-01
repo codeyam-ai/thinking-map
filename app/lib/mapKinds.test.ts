@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   ACCEPTED_PHASE_NAMES,
-  PHASES,
-  PHASE_ASK,
-  PHASE_LABELS,
+  familyOf,
   isNodeKind,
   isNodeStatus,
   isPhase,
+  KIND_FAMILY,
+  NODE_FAMILIES,
+  NODE_KINDS,
   normalizePhase,
+  PHASES,
+  PHASE_ASK,
+  PHASE_LABELS,
 } from './mapKinds';
 
 // SQLite has no enums, so these strings arrive from the database and from the
@@ -136,5 +140,70 @@ describe('map vocabulary guards', () => {
   it('rejects an unknown node status', () => {
     expect(isNodeStatus('pending')).toBe(false);
     expect(isNodeStatus('OPEN')).toBe(false);
+  });
+});
+
+// Colour is how the map is read from across the room, and a kind with no
+// family has no colour at all. This is the test that stops a nineteenth kind
+// shipping colourless.
+describe('node families', () => {
+  // The whole point of a total Record: every kind the map can draw has a
+  // family, so a card can never fall through to no colour.
+  it('gives every node kind a family', () => {
+    for (const kind of NODE_KINDS) {
+      expect(NODE_FAMILIES).toContain(KIND_FAMILY[kind]);
+    }
+  });
+
+  // Six is the claim — enough to be a system, few enough to hold without a
+  // legend. Eighteen hues would be a legend.
+  it('collapses eighteen kinds into six families', () => {
+    expect(NODE_KINDS).toHaveLength(18);
+    expect(new Set(Object.values(KIND_FAMILY)).size).toBe(6);
+  });
+
+  // Each family's membership, spelled out, because these groupings are a
+  // design decision rather than a derivation — moving a kind between them
+  // changes what the map says and should have to be done deliberately.
+  it('groups the kinds the way the design system says', () => {
+    expect(familyOf('idea')).toBe('subject');
+
+    for (const kind of ['open-question', 'unknown', 'gap']) {
+      expect(familyOf(kind)).toBe('question');
+    }
+    for (const kind of [
+      'user',
+      'problem',
+      'goal',
+      'constraint',
+      'assumption',
+      'known',
+    ]) {
+      expect(familyOf(kind)).toBe('ground');
+    }
+    for (const kind of ['research', 'finding']) {
+      expect(familyOf(kind)).toBe('found');
+    }
+    for (const kind of ['pro', 'risk']) {
+      expect(familyOf(kind)).toBe('judgment');
+    }
+    for (const kind of ['approach', 'direction', 'next-step', 'slice']) {
+      expect(familyOf(kind)).toBe('forward');
+    }
+  });
+
+  // A gap is a hole in what was found, and it belongs with the questions
+  // because what it records is that nobody has an answer — not that somebody
+  // looked something up.
+  it('puts a gap with the questions rather than with the findings', () => {
+    expect(familyOf('gap')).toBe('question');
+    expect(familyOf('finding')).toBe('found');
+  });
+
+  // Kinds arrive from the database and from the model unvalidated. An
+  // unrecognised one should lose its precision, never its colour.
+  it('falls back to the neutral family for an unknown kind', () => {
+    expect(familyOf('sticky-note')).toBe('ground');
+    expect(familyOf('')).toBe('ground');
   });
 });

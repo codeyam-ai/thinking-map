@@ -910,6 +910,78 @@
       "runner": "tests"
     },
     {
+      "description": "The thread is coloured by the CHILD's family — the card the eye is travelling toward — so the child's kind has to come back with it.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › carries the child kind, not the parent kind",
+      "line": 89,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The drawing layer needs every id in the child's round to work out which cards ended up on the row's first line after a wrap.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › carries the ids of every card in the child round",
+      "line": 100,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The root has nothing above it, and a node the agent added without a parent is legitimately unattached. Both draw nothing rather than reaching.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › draws nothing for a card with no parent",
+      "line": 56,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A map with only the root, and an empty map, are both ordinary states.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › draws nothing for a map with a single round",
+      "line": 110,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A whole round of user-added nodes attached to nothing is a real shape, and it should be silent rather than half-drawn.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › draws nothing for a round where nothing has a parent above",
+      "line": 78,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A parent that is not on the map at all — a half-written or partly-loaded map — must not produce a thread to nowhere.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › draws nothing when the parent is missing from the map",
+      "line": 67,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A line spanning several rounds is a claim about ancestry that the rows already record and that no reader could follow across the cards between.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › draws nothing when the parent is more than one round back",
+      "line": 44,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: the round above prompted the round below.",
+      "file": "app/lib/cardThreads.test.ts",
+      "format": "vitest",
+      "key": "cardThreads › threads a card to its parent in the round directly above",
+      "line": 32,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
       "description": "...unless something actually cites it, in which case the citation is real and the section is genuinely accounted for.",
       "file": "app/lib/briefCoverage.test.ts",
       "format": "vitest",
@@ -1105,6 +1177,24 @@
       "key": "currentRevision › throws for a map that does not exist",
       "line": 210,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Both control points must sit directly below/above their endpoints. A horizontal pull would bow the line into a rope slung between two cards instead of the S-travel the design calls for.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "curve › pulls its control points vertically, never sideways",
+      "line": 33,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The path has to start and end exactly on the card edges it was measured against, or the endpoint dot floats off the card.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "curve › starts and ends on the points it was given",
+      "line": 44,
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {
@@ -1393,6 +1483,78 @@
       "key": "extractionWarning › warns when no text came out",
       "line": 137,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unrecognised kind must still get a real colour rather than an undefined one, which would paint the thread black.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "familyLineVar › gives an unknown kind the neutral family colour",
+      "line": 120,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Everything else takes its family's line token.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "familyLineVar › resolves every other kind to its family token",
+      "line": 110,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A thread up to a risk should be the risk colour, not a family average.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "familyLineVar › resolves pro and risk to their own colours",
+      "line": 104,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A thread leaving at a rounded corner looks like it is falling off the card, so the fan stays inside the edge however many children there are.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "fanOrigins › keeps the fan inside the card edge when there are many children",
+      "line": 75,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A narrow card with two children must not produce a fan wider than itself, which would put the departures outside the card entirely.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "fanOrigins › never opens wider than a narrow card",
+      "line": 84,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Left to right, so the caller's left-to-right children get non-crossing threads — the whole reason the fan is ordered at all.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "fanOrigins › returns the departures in left-to-right order",
+      "line": 68,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One child is not a fan. It should leave from the middle of the card, which is what makes a single thread read as a straight drop.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "fanOrigins › sends a lone thread from the centre of the card",
+      "line": 53,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The fan has to stay symmetric about the card's centre, or a parent with three children looks like it is leaning.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "fanOrigins › spreads the departures evenly about the centre",
+      "line": 59,
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {
@@ -1918,6 +2080,60 @@
       "runner": "tests"
     },
     {
+      "description": "The headline case: a round that went and looked at what already exists.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "isResearchRound › bands a round that is all research",
+      "line": 333,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A research round that picked up one stray question along the way is still a research round; demanding purity would mean the band never appears.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "isResearchRound › bands a round that is mostly research",
+      "line": 339,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The boundary case, and the one most likely to be got wrong. One finding among three is not a round about what exists.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "isResearchRound › does not band a round with a research minority",
+      "line": 347,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round with nothing in it has no majority and must not divide by zero into a band.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "isResearchRound › does not band an empty round",
+      "line": 366,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An even split has no majority to name the row after, so it stays plain.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "isResearchRound › does not band an even split",
+      "line": 354,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The root round is the map's subject. Enclosing it as \"what already exists\" would misdescribe the one node the whole map hangs from.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "isResearchRound › never bands the opening round",
+      "line": 360,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
       "description": "The only configuration where a real agent can attach. If this goes false the feature is dead in the one place it is supposed to work.",
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
@@ -1958,7 +2174,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › accepts every phase in the loop",
-      "line": 19,
+      "line": 23,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1967,7 +2183,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › accepts the node kinds the map can draw",
-      "line": 107,
+      "line": 111,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1976,7 +2192,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › accepts the three node statuses",
-      "line": 129,
+      "line": 133,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -1985,7 +2201,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › has an ask for every phase, pointing only at real phases",
-      "line": 87,
+      "line": 91,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -1994,7 +2210,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › has five phases, with deconstruct no longer among them",
-      "line": 27,
+      "line": 31,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2003,7 +2219,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › numbers the labels in order from 01",
-      "line": 77,
+      "line": 81,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2012,7 +2228,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › offers no action at the two ends of the loop",
-      "line": 99,
+      "line": 103,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2021,7 +2237,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › rejects a node kind the map has no treatment for",
-      "line": 123,
+      "line": 127,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -2030,7 +2246,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › rejects a phase that is not part of the loop",
-      "line": 40,
+      "line": 44,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -2039,7 +2255,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › rejects an unknown node status",
-      "line": 136,
+      "line": 140,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -2048,7 +2264,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › resolves a current phase to itself",
-      "line": 54,
+      "line": 58,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2057,7 +2273,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › resolves an unknown phase to null",
-      "line": 62,
+      "line": 66,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2066,7 +2282,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › resolves the retired phase name to the phase that replaced it",
-      "line": 49,
+      "line": 53,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2075,7 +2291,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "map vocabulary guards › still accepts the retired name as a set_phase argument",
-      "line": 70,
+      "line": 74,
       "registeredAt": "2026-09-01T21:23:25Z",
       "runner": "tests"
     },
@@ -2188,12 +2404,57 @@
       "runner": "tests"
     },
     {
-      "description": "Pro and risk are the only kinds carrying colour; colour used more widely would stop meaning anything.",
+      "description": "Six is the claim — enough to be a system, few enough to hold without a legend. Eighteen hues would be a legend.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "node families › collapses eighteen kinds into six families",
+      "line": 160,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Kinds arrive from the database and from the model unvalidated. An unrecognised one should lose its precision, never its colour.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "node families › falls back to the neutral family for an unknown kind",
+      "line": 205,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point of a total Record: every kind the map can draw has a family, so a card can never fall through to no colour.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "node families › gives every node kind a family",
+      "line": 152,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Each family's membership, spelled out, because these groupings are a design decision rather than a derivation — moving a kind between them changes what the map says and should have to be done deliberately.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "node families › groups the kinds the way the design system says",
+      "line": 168,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A gap is a hole in what was found, and it belongs with the questions because what it records is that nobody has an answer — not that somebody looked something up.",
+      "file": "app/lib/mapKinds.test.ts",
+      "format": "vitest",
+      "key": "node families › puts a gap with the questions rather than with the findings",
+      "line": 198,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Gaps are the most valuable finding on the map, not a warning — an earlier build wrongly reddened them. They read as questions, which is what a gap is: something nobody has answered.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
-      "key": "nodeShellClasses › accents risk and pro nodes, and only those",
-      "line": 54,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "key": "nodeShellClasses › draws a gap as a question rather than a warning",
+      "line": 66,
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {
@@ -2201,26 +2462,17 @@
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
       "key": "nodeShellClasses › draws an unanswered question dashed and unfilled",
-      "line": 26,
+      "line": 28,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
     {
-      "description": "Most nodes are ordinary settled facts and must render as plain ink pills.",
+      "description": "Every kind now carries its family's colour, which is what makes the map legible as categories from across the room.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
-      "key": "nodeShellClasses › falls back to the plain answered treatment for an ordinary kind",
+      "key": "nodeShellClasses › gives an ordinary kind its family colour and tint",
       "line": 74,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The root is the map's subject and the only dark shape on the page; losing that fill would leave the map without a visual anchor.",
-      "file": "app/lib/nodeAppearance.test.ts",
-      "format": "vitest",
-      "key": "nodeShellClasses › fills the root idea solid, the one dark shape on the page",
-      "line": 18,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {
@@ -2228,17 +2480,35 @@
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
       "key": "nodeShellClasses › gives the just-changed node the lime border",
-      "line": 34,
+      "line": 36,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
     {
-      "description": "Gaps are the most valuable finding on the map, not a warning — the mockups draw them as plain pills, and an earlier build wrongly reddened them.",
+      "description": "The root is the map's subject and has to be the heaviest shape on the page. It carries that with a doubled ink border rather than an ink fill: inverting 240px of card reads as a hole, and would take the eye before the one lime card that is supposed to have it.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
-      "key": "nodeShellClasses › leaves a gap node neutral",
-      "line": 61,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "key": "nodeShellClasses › gives the root idea the heaviest border on the page",
+      "line": 20,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Pro and risk keep the two colours the design system gave them rather than being flattened into a shared judgment hue — the whole point of the pair is that they point opposite ways.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › keeps pro and risk on their own two colours",
+      "line": 58,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "This is the rule that must not break: kind colour slots in BELOW status, so an unanswered question is dashed and unfilled whatever it is about.",
+      "file": "app/lib/nodeAppearance.test.ts",
+      "format": "vitest",
+      "key": "nodeShellClasses › keeps status above kind for every family",
+      "line": 83,
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {
@@ -2246,7 +2516,7 @@
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
       "key": "nodeShellClasses › lets \"updated\" win over an accent kind",
-      "line": 48,
+      "line": 51,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
@@ -2255,17 +2525,17 @@
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
       "key": "nodeShellClasses › lets the root treatment win over every other rule",
-      "line": 40,
+      "line": 42,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
       "runner": "tests"
     },
     {
-      "description": "A research node is what the partner just went and found, so it carries the lime outline and the magnifier.",
+      "description": "Lime marks the one thing that just changed. No family may take it, or that card stops meaning anything.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
-      "key": "nodeShellClasses › marks a research node as a find",
-      "line": 69,
-      "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "key": "nodeShellClasses › never gives a family the lime",
+      "line": 93,
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {
@@ -3160,6 +3430,15 @@
       "runner": "tests"
     },
     {
+      "description": "A research round says what it IS, because \"what already exists\" is the thing somebody scanning the column is looking for and a node count is not.",
+      "file": "app/lib/mapRounds.test.ts",
+      "format": "vitest",
+      "key": "roundEyebrow › names a research round after what it holds",
+      "line": 313,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
       "description": "Once a round opened a phase, the phase is the more useful name for it than its position in the sequence.",
       "file": "app/lib/mapRounds.test.ts",
       "format": "vitest",
@@ -3616,6 +3895,33 @@
       "key": "the shared tool catalog › marks the three read-only tools as read-only",
       "line": 41,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A row gap of a few pixels still has to produce a visible bend; a straight line between two rows reads as a table rule, not a thread.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "threadPull › keeps a bend even when the two rows nearly touch",
+      "line": 11,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Between the two clamps the bend should track the gap, so a taller gap gets a proportionally lazier curve rather than the same one stretched.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "threadPull › scales with the gap between the clamps",
+      "line": 24,
+      "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Past the cap the control points overshoot their own endpoints and the curve loops back on itself.",
+      "file": "app/lib/threadGeometry.test.ts",
+      "format": "vitest",
+      "key": "threadPull › stops deepening once the gap is large",
+      "line": 18,
+      "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
     {

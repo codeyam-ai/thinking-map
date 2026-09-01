@@ -20,6 +20,41 @@
   --risk: #c4736a;
   --pro: #6b9e84;
 
+  /* The six card families — see KIND_FAMILY in app/lib/mapKinds.ts.
+     Two tokens each: a LINE for the mark and the thread, and a FILL for the
+     card itself.
+
+     The fills are near-white on purpose. A card is 240px of surface and the
+     reference's own cards are near-white, grey and one lime — saturation on
+     that much area would fight the text and, worse, fight the single lime card
+     that is supposed to be the one thing you look at. So the chroma lives on
+     the icon and the thread, where it is a few pixels wide and can afford it.
+
+     None of these is lime, and none may become lime: lime is reserved for the
+     one node that just changed, and a family wearing it would make that card
+     stop meaning anything. */
+  --fam-subject-line: #0f0f0f;
+  --fam-subject-fill: #ffffff;
+  /* Reuses the violet the retired tree connectors used — it was already this
+     product's "unresolved" colour and nothing else claims it now. */
+  --fam-question-line: #8b8bc8;
+  --fam-question-fill: #f6f5fb;
+  --fam-ground-line: #6f9aae;
+  --fam-ground-fill: #f1f6f8;
+  --fam-found-line: #c79a3f;
+  --fam-found-fill: #faf6ea;
+  /* Judgment has no hue of its own: pro and risk already own one each, and the
+     card resolves to those. This is the family's fill only — the neutral warm
+     tint both sit on. */
+  --fam-judgment-line: #a58f88;
+  --fam-judgment-fill: #f9f5f3;
+  --fam-forward-line: #b57ba6;
+  --fam-forward-fill: #faf3f8;
+
+  /* The research band's ground: the found family at a fraction of its strength,
+     so a whole row can wear it without any card on it going muddy. */
+  --fam-found-band: #f7f1e2;
+
   --background: var(--paper);
   --foreground: var(--ink);
   --font-sans: Manrope, ui-sans-serif, system-ui, -apple-system,
@@ -40,6 +75,19 @@
   --color-thread: var(--thread);
   --color-risk: var(--risk);
   --color-pro: var(--pro);
+  --color-fam-subject-line: var(--fam-subject-line);
+  --color-fam-subject-fill: var(--fam-subject-fill);
+  --color-fam-question-line: var(--fam-question-line);
+  --color-fam-question-fill: var(--fam-question-fill);
+  --color-fam-ground-line: var(--fam-ground-line);
+  --color-fam-ground-fill: var(--fam-ground-fill);
+  --color-fam-found-line: var(--fam-found-line);
+  --color-fam-found-fill: var(--fam-found-fill);
+  --color-fam-judgment-line: var(--fam-judgment-line);
+  --color-fam-judgment-fill: var(--fam-judgment-fill);
+  --color-fam-forward-line: var(--fam-forward-line);
+  --color-fam-forward-fill: var(--fam-forward-fill);
+  --color-fam-found-band: var(--fam-found-band);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -84,6 +132,29 @@ button:disabled {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+/* The ground the cards sit on. A very faint dot grid, which is what makes a
+   card read as PLACED on something rather than floating in white — the cards
+   are near-white themselves, so without it the only thing separating a card
+   from the page is a hairline border.
+
+   Faint enough to be deniable: at 1px on a 22px pitch it is texture rather than
+   graph paper, and it must never compete with the threads drawn over it. */
+.dot-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(15, 15, 15, 0.07) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}
+
+/* A round that is not one of the two newest, stepped back a little. Recession,
+   not perspective: opacity only, because a transform would move the cards'
+   answer boxes out from under the pointer. */
+.round-receded {
+  opacity: 0.96;
 }
 
 /* A node entering the map. Thought, not animated. */

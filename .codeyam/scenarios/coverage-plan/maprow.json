@@ -3,9 +3,27 @@
   "surface_kind": "component",
   "states": [
     {
-      "dimension": "default",
-      "value": "default",
-      "rationale": "source-derived state default=default",
+      "dimension": "receded",
+      "value": "true",
+      "rationale": "source-derived state receded=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "receded",
+      "value": "false",
+      "rationale": "source-derived state receded=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "research",
+      "value": "true",
+      "rationale": "source-derived state research=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "research",
+      "value": "false",
+      "rationale": "source-derived state research=false",
       "status": "covered"
     }
   ]

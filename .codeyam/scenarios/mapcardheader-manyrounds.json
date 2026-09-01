@@ -1,0 +1,12 @@
+{
+  "name": "MapCardHeader - ManyRounds",
+  "id": "4a7192ef-c6cb-4e0c-b072-599da902491e",
+  "url": "/isolated-components/MapCardHeader?s=ManyRounds",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapCardHeader",
+  "scenarioType": "component",
+  "description": "Double digits on both halves of the marker, on a long conversation. The row is a space-between, so the two marks stay at their corners rather than being pushed together."
+}

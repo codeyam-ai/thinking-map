@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - AllFamilies",
+  "id": "ca2a53c0-15a2-4bda-9c61-3dae396a9184",
+  "url": "/isolated-components/MapWorkspace?s=AllFamilies",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "All six colour families on one map, with the single lime card among them. The scenario exists to answer two questions that only a whole screen can answer: whether six families read as a system or as noise, and whether the one card that just changed still wins the page with five other colours competing for it."
+}

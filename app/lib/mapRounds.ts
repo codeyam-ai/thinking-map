@@ -189,15 +189,49 @@ export function groupIntoRounds(
 }
 
 /**
+/** The kinds that make a round a research round — what was gone and looked up,
+ *  what was found, and the holes in it. A gap belongs here even though it wears
+ *  the question colour: it is a fact about what already exists, namely that
+ *  part of it is missing. */
+const RESEARCH_KINDS = new Set(['research', 'finding', 'gap']);
+
+/**
+ * Whether this round is a round of research — the one round that gets its own
+ * territory rather than just its own colour.
+ *
+ * "Most of it" rather than "all of it": a research round that picked up one
+ * stray question along the way is still a research round, and demanding purity
+ * would mean the band almost never appears on a real map. Strictly more than
+ * half, so an even split does NOT band — a round that is half research and half
+ * something else has no majority to name it after.
+ *
+ * The root round is never a band whatever it contains: it is the map's subject,
+ * and enclosing it as "what already exists" would misdescribe the one node the
+ * whole map hangs from.
+ */
+export function isResearchRound(round: Round): boolean {
+  if (round.index === 1) return false;
+  const found = round.nodes.filter((node) =>
+    RESEARCH_KINDS.has(node.kind),
+  ).length;
+  return found * 2 > round.nodes.length;
+}
+
+/**
  * The line above a row, naming what the round was.
  *
  * The row has to say what it is without a legend, the same way every node
  * carries an eyebrow. A round that is all questions says so, because "three
  * questions" is what the person is being asked to deal with; a mixed round
  * counts nodes instead, because naming the majority kind would misdescribe it.
+ *
+ * A research round is the exception that says what it IS rather than how many
+ * of anything it holds: "what already exists" is the thing a person scanning
+ * the column is looking for, and a node count is not.
  */
 export function roundEyebrow(round: Round, total: number): string {
   if (round.index === 1 && round.nodes.length === 1) return 'The idea';
+  if (isResearchRound(round)) return 'What already exists';
 
   const questions = round.nodes.filter(
     (node) => node.kind === 'open-question',

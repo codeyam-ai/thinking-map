@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - MixedWithOneFinding",
+  "id": "dff55d75-7dfb-4c1e-8cf8-853c93f9441c",
+  "url": "/isolated-components/MapWorkspace?s=MixedWithOneFinding",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "One finding among three in the workspace: the card keeps its family colour and the row stays plain. The same threshold as MapRow - BelowResearchThreshold, shown where a person would actually meet it."
+}

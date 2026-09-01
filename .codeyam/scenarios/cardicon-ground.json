@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Ground",
+  "id": "f39cfc23-477b-44cc-b1ec-496dbfdf1c06",
+  "url": "/isolated-components/CardIcon?s=Ground",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "Strata, in dusty blue: what is already true about the world this idea sits in, stacked up underneath it. The largest family, covering user, problem, goal, constraint, assumption and known."
+}

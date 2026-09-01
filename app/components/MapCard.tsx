@@ -2,8 +2,9 @@
 
 import MapCardAnswer from './MapCardAnswer';
 import MapCardEyebrow from './MapCardEyebrow';
-import NodeAccentMark from './NodeAccentMark';
+import MapCardHeader from './MapCardHeader';
 import { parseOptions } from '../lib/mapAnswers';
+import { nodeShellClasses } from '../lib/nodeAppearance';
 import type { FlatNode } from '../lib/mapLayout';
 
 /**
@@ -14,13 +15,17 @@ import type { FlatNode } from '../lib/mapLayout';
  * one of three things: what a statement node says, the affordance for a
  * question nobody has answered, or the answer to one somebody has.
  *
- * Composition only: the eyebrow's wording, the accent mark, and the whole
+ * Composition only: the eyebrow's wording, the family icon, and the whole
  * answering affordance each live in their own file. What is here is the card's
  * shape and the choice of what goes in its body.
  *
- * Fill is deliberately neutral on every card. The status precedence that drove
- * the pill's treatment is right and transfers intact, but which card wears the
- * lime is the card-visual plan's question, not this one's.
+ * Fill is no longer neutral. Every card wears its FAMILY's line and tint, so
+ * the map can be read as categories from across the room and as sentences up
+ * close — and the treatment comes from `nodeShellClasses`, which is where the
+ * status-beats-kind precedence is written down. That matters more than it
+ * looks: the rule that an unanswered question stays dashed and unfilled
+ * whatever it is about, and that exactly one card wears the lime, is enforced
+ * by the ordering inside that function rather than by anything here.
  */
 export default function MapCard({
   node,
@@ -54,16 +59,24 @@ export default function MapCard({
 
   return (
     <article
-      className={`flex min-h-[240px] w-full min-w-[220px] max-w-[300px] flex-col rounded-[20px] border border-line bg-surface p-5 ${
-        entering ? 'node-in' : ''
-      }`}
+      // The thread layer measures cards by this attribute rather than by refs
+      // threaded down through the row — it draws over the WHOLE column and has
+      // no other way to find a card's box in that one coordinate space.
+      data-node-id={node.id}
+      // Border width comes from the shell too, not from here — root and the
+      // just-updated card are doubled and everything else is a hairline, and
+      // two competing width utilities on one element resolve by stylesheet
+      // order rather than by intent.
+      className={`flex min-h-[240px] w-full min-w-[220px] max-w-[300px] flex-col rounded-[20px] p-5 ${nodeShellClasses(
+        { kind: node.kind, status: node.status, isRoot },
+      )} ${entering ? 'node-in' : ''}`}
     >
-      <header className="flex items-start justify-between gap-3">
-        <span className="text-[12px] font-bold tabular-nums text-muted">
-          {round}/{totalRounds}
-        </span>
-        <NodeAccentMark kind={node.kind} />
-      </header>
+      <MapCardHeader
+        kind={node.kind}
+        round={round}
+        totalRounds={totalRounds}
+        isRoot={isRoot}
+      />
 
       {/* The reference pushes the reading matter to the bottom of the card and
           leaves the top open. The spacer is what does that, and it is why the

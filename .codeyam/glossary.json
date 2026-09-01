@@ -287,6 +287,22 @@
     }
   },
   {
+    "description": "The mark in a card's top-right corner, naming its colour family. One glyph per FAMILY rather than per kind: eighteen glyphs would be a legend to learn, and the eyebrow beneath already names the exact kind — so the icon is the same six categories said a second way, which costs the reader nothing new. Drawn as inline SVG in the manner of Wordmark rather than pulled from a package; the design references put emoji in this slot, and emoji render differently on every platform and would be the only mark in the product this codebase did not draw. The magnifier is carried across from the retired node pill rather than redrawn.",
+    "filePath": "app/components/CardIcon.tsx",
+    "name": "CardIcon",
+    "scenarios": [
+      "cardicon-subject",
+      "cardicon-question",
+      "cardicon-gap",
+      "cardicon-ground",
+      "cardicon-found",
+      "cardicon-judgment",
+      "cardicon-pro",
+      "cardicon-forward",
+      "cardicon-unknownkind"
+    ]
+  },
+  {
     "description": "Scaffold-shipped layout for the isolation-route tree, providing the centred capture frame and the production guard.",
     "filePath": "app/codeyam-isolate/layout.tsx",
     "name": "CodeYamIsolateLayout",
@@ -500,6 +516,18 @@
     ]
   },
   {
+    "description": "The top line of a card: which round it arrived in, and which family it is. The two marks sit at opposite corners and take the same colour on purpose — a card can be clipped by the edge of the column or by a narrow viewport, so putting the family colour at both ends means whichever corner survives still says what kind of thing this is. The root is the exception: its marker stays neutral grey, because the subject family's colour is ink and ink on a round number would read as emphasis on the number rather than as a category.",
+    "filePath": "app/components/MapCardHeader.tsx",
+    "name": "MapCardHeader",
+    "scenarios": [
+      "mapcardheader-default",
+      "mapcardheader-root",
+      "mapcardheader-risk",
+      "mapcardheader-found",
+      "mapcardheader-manyrounds"
+    ]
+  },
+  {
     "description": "The map on day one. Per the design system an empty state describes what happens next rather than reporting an absence, so it says the map fills in as you answer. Deliberately not EmptyHint, which renders an <li> for the summary screen's list and would be invalid markup inside the map's column.",
     "filePath": "app/components/MapEmptyState.tsx",
     "name": "MapEmptyState",
@@ -558,18 +586,6 @@
     "scenarios": [
       "nextstepstrack-default",
       "nextstepstrack-empty"
-    ]
-  },
-  {
-    "description": "The mark in a card's top-right corner, for the three kinds that carry one. It reads the accent from ACCENT_KINDS rather than a list of its own, so a kind added to that table cannot end up with a colour and no mark. Research and slice get the magnifier carried across from the node pill; pro and risk get a coloured dot, because there the colour IS the information.",
-    "filePath": "app/components/NodeAccentMark.tsx",
-    "name": "NodeAccentMark",
-    "scenarios": [
-      "nodeaccentmark-research",
-      "nodeaccentmark-slice",
-      "nodeaccentmark-pro",
-      "nodeaccentmark-risk",
-      "nodeaccentmark-none"
     ]
   },
   {
@@ -713,6 +729,19 @@
     ]
   },
   {
+    "description": "The curves between the card rows: one short thread per card, rising from the card above that prompted it, in the child's family colour. Drawn as ONE overlay across the whole column rather than a layer per row gap — the rows are a CSS flex wrap, so there are no computed coordinates anywhere and every thread has to be measured off the DOM either way; a single overlay does that in one coordinate space with one ResizeObserver. It holds the measurement and the rendering only, with the shape of a thread living in threadGeometry. Purely decorative and aria-hidden, since a thread restates what the rows and eyebrows already carry in text.",
+    "filePath": "app/components/RowThreads.tsx",
+    "name": "RowThreads",
+    "scenarios": [
+      "rowthreads-default",
+      "rowthreads-singlethread",
+      "rowthreads-parenttworoundsback",
+      "rowthreads-someunattached",
+      "rowthreads-wrappedrow",
+      "rowthreads-nothingtodraw"
+    ]
+  },
+  {
     "description": "A contiguous run of node-adds from one side of the exchange, with the revision span it covers so a phase set can be attributed to the round that closed it.",
     "filePath": "app/lib/mapRounds.ts",
     "name": "Run",
@@ -822,6 +851,15 @@
       "thinkingmapview-empty",
       "thinkingmapview-seeded"
     ]
+  },
+  {
+    "description": "A stand-in for the map column, so RowThreads can be looked at on its own. The overlay measures the DOM — it asks where the cards ended up after a flex wrap and draws between them — so it renders nothing without laid-out cards to measure, and mounting it bare would capture an empty frame. This gives it the two things it needs and nothing else: an element to hold the ref, and labelled boxes carrying data-node-id in a wrapping band. Plain rectangles rather than real MapCards, because what the scenarios are for is the threads, and full cards would put 240px of text in front of them.",
+    "filePath": "app/isolated-components/RowThreads/ThreadsHarness.tsx",
+    "name": "ThreadsHarness",
+    "untestabilityReason": {
+      "justification": "Capture harness under app/isolated-components/, existing only so RowThreads has cards to measure in isolation. Not reachable from the app.",
+      "kind": "scaffold"
+    }
   },
   {
     "description": "Mounts the page's own front door. Binds the tool catalog to the current map for as long as the map page is open, disposing on unmount and on map change because re-registering a live tool name throws InvalidStateError. Holds the pending ask_user state and resolves the agent's turn when the person answers, writing the answer to the log BEFORE releasing it so an agent that already gave up still finds it. Publishes the headless driver whether or not a real agent is present, which is the only way the tools are reachable inside a capture iframe. Reports connection state through the same context, and exposes the tool names from the catalog rather than from the published driver - a consumer's effect runs before its parent's, so reading the driver would race the binding that creates it.",
@@ -950,6 +988,12 @@
     "testFile": "app/lib/cardEyebrow.test.ts"
   },
   {
+    "description": "Which card prompted which — one thread per card, from the card in the round directly above it, and nothing otherwise. Deliberately narrower than the parent-child graph the retired tree drew: the layout is rows now, so the rows already carry the structure and a full edge graph would be a thicket crossing the column. A card whose parent is more than one round back, or has no parent, or whose parent is not on the map, draws nothing — the honest picture for 'nothing prompted this here' is no line.",
+    "filePath": "app/lib/cardThreads.ts",
+    "name": "cardThreads",
+    "testFile": "app/lib/cardThreads.test.ts"
+  },
+  {
     "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
     "filePath": "app/lib/briefCoverage.ts",
     "name": "computeBriefCoverage",
@@ -974,6 +1018,12 @@
     "filePath": "app/lib/exchange.ts",
     "name": "currentRevision",
     "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
+    "description": "The cubic path from a parent card's bottom edge to a child card's top edge. Both control points are pulled vertically off their endpoints and never horizontally, so the thread leaves the card it came from going down and arrives at the next one going down — that is what produces the S-travel of the design references instead of a rope slung between two points, and what keeps a thread readable when the two cards are far apart across a wide row.",
+    "filePath": "app/lib/threadGeometry.ts",
+    "name": "curve",
+    "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
     "description": "Turns a stored row into a readable event. SQLite has no JSON column, so payloads are strings that could be anything; a payload that will not parse degrades to null rather than throwing, because one bad row must not take down the whole catch-up read an agent depends on. The revision and kind survive regardless.",
@@ -1061,6 +1111,24 @@
     "filePath": "app/lib/briefFormat.ts",
     "name": "extractionWarning",
     "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "The colour a card's family draws its icon and its thread in, as a CSS variable reference rather than a class name — for the SVG thread layer and the icon, which need a paint value. Pro and risk resolve to their own two colours rather than a shared judgment hue, for the same reason nodeShellClasses keeps them apart: a thread rising to a risk should be the risk colour, not a family average.",
+    "filePath": "app/lib/nodeAppearance.ts",
+    "name": "familyLineVar",
+    "testFile": "app/lib/nodeAppearance.test.ts"
+  },
+  {
+    "description": "A node kind's colour family, via KIND_FAMILY. The eighteen kinds collapse into six families because one hue per kind would be a legend rather than a system, and the eyebrow above every card already names the exact kind for anyone who wants the precision. KIND_FAMILY is a total Record on purpose, so a nineteenth kind will not compile until it is given a family; this wrapper adds the runtime half of that safety, since kinds also arrive from the database and from the model unvalidated — an unrecognised one falls back to the neutral ground family rather than losing its colour entirely.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "familyOf",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Where along a parent card's bottom edge each of its threads departs. Every thread starting at the same point is what turns four curves into one frayed rope — they overlap for the first stretch and only separate once already travelling sideways — so the departures are fanned evenly across the card's own bottom edge, symmetric about its centre and inset from the rounded corners. The caller passes its threads in the order of the children they land on, which is what keeps one parent's threads from crossing each other.",
+    "filePath": "app/lib/threadGeometry.ts",
+    "name": "fanOrigins",
+    "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
     "description": "Read one non-empty string field off an event payload, or null. The single guard every rail reader goes through, so an unparseable row degrades to a plainer line rather than throwing.",
@@ -1208,6 +1276,12 @@
     "testFile": "app/lib/mapKinds.test.ts"
   },
   {
+    "description": "Whether a round is mostly research, finding or gap — the rule that decides which row gets its own banded territory rather than just its own card colour. Strictly more than half, so an even split does not band: a round with no majority has nothing to name it after. 'Mostly' rather than 'all' because a research round that picked up one stray question is still a research round, and demanding purity would mean the band never appeared on a real map. The root round never bands, since enclosing the map's subject as 'what already exists' would misdescribe it.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "isResearchRound",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
     "description": "Guard for the three kinds a browser is allowed to write. This is a trust boundary rather than a convenience: the page posts these directly, so accepting an agent-side kind here would let a page forge the other half of the conversation.",
     "filePath": "app/lib/exchange.ts",
     "name": "isUserEventKind",
@@ -1283,7 +1357,7 @@
     "testFile": "app/api/maps/[id]/exchange/route.integration.test.ts"
   },
   {
-    "description": "Picks the shell classes for a map node, encoding the design system's status-precedence rule: root beats updated beats open beats accent kind beats plain answered. Gaps deliberately fall through to plain, because a gap is the research phase's most valuable finding rather than a warning.",
+    "description": "Picks the shell classes for a map card, encoding the design system rule that must not break: status beats kind. The precedence is root, then updated, then open, then kind colour, then answered — so an unanswered question is dashed and unfilled whatever family it belongs to, and exactly one card wears the lime. Kind colour slots in at the accent tier and nowhere above it: pro and risk keep their own two colours because the pair points opposite ways, and every other kind takes its family line and near-white tint. The root gave up its ink FILL when the pill became a card — inverting 240px reads as a hole in the page and would take the eye before the lime card that should have it — and carries its weight with a doubled ink border instead.",
     "filePath": "app/lib/nodeAppearance.ts",
     "name": "nodeShellClasses",
     "testFile": "app/lib/nodeAppearance.test.ts"
@@ -1421,7 +1495,7 @@
     "testFile": "app/lib/agentDemo.test.ts"
   },
   {
-    "description": "The line above a row, naming what the round was. A round that is entirely questions says so, because the question count is what the person is being asked to deal with; a mixed round counts nodes instead, since naming the majority kind would misdescribe it. The opening round is named for the idea rather than numbered.",
+    "description": "The line above a row, naming what the round was. A round that is entirely questions says so, because the question count is what the person is being asked to deal with; a mixed round counts nodes instead, since naming the majority kind would misdescribe it. The opening round is named for the idea rather than numbered. A research round is the exception that says what it IS rather than how many of anything it holds - what already exists is the thing somebody scanning the column is looking for, and a node count is not.",
     "filePath": "app/lib/mapRounds.ts",
     "name": "roundEyebrow",
     "testFile": "app/lib/mapRounds.test.ts"
@@ -1526,6 +1600,12 @@
       "justification": "A single return statement building the SDK's response literal - no branches, no transformation. The text it wraps comes from formatMapList and formatMapDetail, both covered by app/lib/mcpFormat.test.ts, and the envelope shape itself was verified against a live MCP client over both transports.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "How deep a thread bends, given the vertical gap between two rows: two thirds of the gap, clamped at both ends. The floor exists because a straight line between two rows reads as a table rule rather than a thread; the ceiling exists because past it the control points overshoot their own endpoints and the curve loops back on itself. Between the clamps the bend tracks the gap, so a taller gap gets a lazier curve rather than the same one stretched.",
+    "filePath": "app/lib/threadGeometry.ts",
+    "name": "threadPull",
+    "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
     "description": "Clamps an agent's requested wait into milliseconds: a default when none is given, a ceiling so a confused agent cannot pin a connection open indefinitely, and a one-second floor so a wait never degrades into a busy loop.",

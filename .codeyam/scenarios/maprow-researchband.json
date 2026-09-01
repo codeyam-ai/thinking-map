@@ -1,0 +1,12 @@
+{
+  "name": "MapRow - ResearchBand",
+  "id": "1afb8251-a829-4925-aa74-551575af2391",
+  "url": "/isolated-components/MapRow?s=ResearchBand",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapRow",
+  "scenarioType": "component",
+  "description": "A round that is mostly research gets its own territory rather than just its own card colour: a tinted ground behind the whole row, a hairline enclosing it, and the eyebrow WHAT ALREADY EXISTS in place of the round number. Because a row is already a round, this costs almost nothing — a good sign the round was the right seam to have cut. The gap card counts toward the band while still wearing the question colour, since it is a fact about what exists that nobody has an answer to."
+}

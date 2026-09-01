@@ -1,0 +1,12 @@
+{
+  "name": "MapCardHeader - Default",
+  "id": "d5cf0fe0-1d50-4001-a195-2fc260d9faaa",
+  "url": "/isolated-components/MapCardHeader?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapCardHeader",
+  "scenarioType": "component",
+  "description": "The ordinary case: the round marker and the family icon at opposite corners of a card, both in the family's line colour. Two marks in the same colour at either end, so whichever corner survives a clip still says what kind of thing the card is."
+}

@@ -134,6 +134,75 @@ export const KIND_EYEBROW: Record<NodeKind, string> = {
   slice: 'Build first',
 };
 
+/**
+ * The six colour families the eighteen kinds collapse into.
+ *
+ * One hue per kind would be eighteen hues and no hierarchy at all — a legend,
+ * not a system. Six is what a person can hold without one, and `KIND_EYEBROW`
+ * above already names the exact kind on every card for anyone who wants the
+ * detail. So the family carries the glanceable category and the eyebrow carries
+ * the precision.
+ *
+ *   subject    the root idea; the map's own subject
+ *   question   what nobody has answered yet
+ *   ground     what is true about the world this idea sits in
+ *   found      what somebody went and looked up
+ *   judgment   a call about whether something is good or bad
+ *   forward    what to do about any of it
+ */
+export const NODE_FAMILIES = [
+  'subject',
+  'question',
+  'ground',
+  'found',
+  'judgment',
+  'forward',
+] as const;
+export type NodeFamily = (typeof NODE_FAMILIES)[number];
+
+/**
+ * Every kind's family.
+ *
+ * Total rather than Partial-with-a-fallback on purpose: a nineteenth kind added
+ * to `NODE_KINDS` will not compile until it is given a family, so a kind cannot
+ * ship colourless.
+ */
+export const KIND_FAMILY: Record<NodeKind, NodeFamily> = {
+  idea: 'subject',
+
+  'open-question': 'question',
+  unknown: 'question',
+  // A gap is a hole in what was found — and it belongs with the questions
+  // rather than with `found`, because what it records is that nobody has an
+  // answer, which is the question family's whole meaning.
+  gap: 'question',
+
+  user: 'ground',
+  problem: 'ground',
+  goal: 'ground',
+  constraint: 'ground',
+  assumption: 'ground',
+  known: 'ground',
+
+  research: 'found',
+  finding: 'found',
+
+  pro: 'judgment',
+  risk: 'judgment',
+
+  approach: 'forward',
+  direction: 'forward',
+  'next-step': 'forward',
+  slice: 'forward',
+};
+
+/** A node's family, for the kinds outside the vocabulary too — anything the
+ *  map does not recognise reads as `ground`, the neutral family, rather than
+ *  losing its colour entirely. */
+export function familyOf(kind: string): NodeFamily {
+  return KIND_FAMILY[kind as NodeKind] ?? 'ground';
+}
+
 export const NODE_STATUSES = ['open', 'answered', 'updated'] as const;
 export type NodeStatus = (typeof NODE_STATUSES)[number];
 

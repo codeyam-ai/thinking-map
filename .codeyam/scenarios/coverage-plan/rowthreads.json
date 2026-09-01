@@ -1,0 +1,72 @@
+{
+  "surface": "RowThreads",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "lines",
+      "value": "empty",
+      "rationale": "source-derived state lines=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "lines",
+      "value": "one",
+      "rationale": "source-derived state lines=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "lines",
+      "value": "many",
+      "rationale": "source-derived state lines=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "landings",
+      "value": "empty",
+      "rationale": "source-derived state landings=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "landings",
+      "value": "one",
+      "rationale": "source-derived state landings=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "landings",
+      "value": "many",
+      "rationale": "source-derived state landings=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "tops",
+      "value": "empty",
+      "rationale": "source-derived state tops=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "tops",
+      "value": "one",
+      "rationale": "source-derived state tops=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "tops",
+      "value": "many",
+      "rationale": "source-derived state tops=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "siblings",
+      "value": "true",
+      "rationale": "source-derived state siblings=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "siblings",
+      "value": "false",
+      "rationale": "source-derived state siblings=false",
+      "status": "covered"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "MapCardHeader - Found",
+  "id": "f24d346e-b4ab-4a2d-b0b3-90c654963832",
+  "url": "/isolated-components/MapCardHeader?s=Found",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapCardHeader",
+  "scenarioType": "component",
+  "description": "A research card, where the ochre and the magnifier show up together."
+}

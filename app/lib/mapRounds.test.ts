@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupIntoRounds, roundEyebrow } from './mapRounds';
+import { groupIntoRounds, isResearchRound, roundEyebrow } from './mapRounds';
 import type { ExchangeEvent } from './exchange';
 import type { FlatNode } from './mapLayout';
 
@@ -306,5 +306,64 @@ describe('roundEyebrow', () => {
     expect(roundEyebrow(round(2, nodes, 'brainstorm'), 4)).toBe(
       'brainstorm · 1 question',
     );
+  });
+
+  // A research round says what it IS, because "what already exists" is the
+  // thing somebody scanning the column is looking for and a node count is not.
+  it('names a research round after what it holds', () => {
+    const nodes = [
+      { ...node('r', 'root', 0), kind: 'research' },
+      { ...node('f', 'root', 1), kind: 'finding' },
+    ];
+    expect(roundEyebrow(round(2, nodes), 4)).toBe('What already exists');
+  });
+});
+
+// The band is the map's one piece of territory, so what earns it has to be a
+// stated rule rather than a look — a band that appears whenever somebody
+// happened to look something up would stop meaning anything.
+describe('isResearchRound', () => {
+  const round = (index: number, kinds: string[]) => ({
+    index,
+    nodes: kinds.map((kind, i) => ({ ...node(`n${i}`, 'root', i), kind })),
+    phase: null,
+  });
+
+  // The headline case: a round that went and looked at what already exists.
+  it('bands a round that is all research', () => {
+    expect(isResearchRound(round(2, ['research', 'finding', 'gap']))).toBe(true);
+  });
+
+  // A research round that picked up one stray question along the way is still
+  // a research round; demanding purity would mean the band never appears.
+  it('bands a round that is mostly research', () => {
+    expect(
+      isResearchRound(round(2, ['research', 'finding', 'open-question'])),
+    ).toBe(true);
+  });
+
+  // The boundary case, and the one most likely to be got wrong. One finding
+  // among three is not a round about what exists.
+  it('does not band a round with a research minority', () => {
+    expect(
+      isResearchRound(round(2, ['finding', 'open-question', 'constraint'])),
+    ).toBe(false);
+  });
+
+  // An even split has no majority to name the row after, so it stays plain.
+  it('does not band an even split', () => {
+    expect(isResearchRound(round(2, ['finding', 'constraint']))).toBe(false);
+  });
+
+  // The root round is the map's subject. Enclosing it as "what already exists"
+  // would misdescribe the one node the whole map hangs from.
+  it('never bands the opening round', () => {
+    expect(isResearchRound(round(1, ['research', 'finding']))).toBe(false);
+  });
+
+  // A round with nothing in it has no majority and must not divide by zero
+  // into a band.
+  it('does not band an empty round', () => {
+    expect(isResearchRound(round(2, []))).toBe(false);
   });
 });

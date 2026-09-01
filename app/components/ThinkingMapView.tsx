@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import MapEmptyState from './MapEmptyState';
 import MapRow from './MapRow';
 import PendingRow from './PendingRow';
 import RowFooter from './RowFooter';
+import RowThreads from './RowThreads';
 import { useOptionalWebMcpBridge } from './WebMcpBridge';
 import { useBoundedWait } from '../hooks/useBoundedWait';
 import { useFollowColumn } from '../hooks/useFollowColumn';
@@ -84,6 +85,11 @@ export default function ThinkingMapView({
     complete,
   );
 
+  // The box the threads are measured against and drawn over. It has to be the
+  // element the ROWS live in, not the scroll container, so the overlay scrolls
+  // with the content rather than sitting still over it.
+  const columnRef = useRef<HTMLDivElement>(null);
+
   // `min-w-0` below is load-bearing: a flex item defaults to `min-width: auto`,
   // so without it a long card label can push the column wider than its parent
   // instead of wrapping inside it.
@@ -96,15 +102,28 @@ export default function ThinkingMapView({
         ) : null}
       </header>
 
+      {/* `dot-grid` on the scroll container rather than on the column inside
+          it: the ground should fill the frame even when there is one card on
+          it, which is also what makes the empty state read as a place waiting
+          to be filled rather than as a blank panel. */}
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="min-h-0 flex-1 overflow-y-auto"
+        className="dot-grid -mx-2 min-h-0 flex-1 overflow-y-auto px-2"
       >
         {rounds.length === 0 ? (
           <MapEmptyState />
         ) : (
-          <>
+          <div ref={columnRef} className="relative isolate">
+            {/* Under the rows, so a thread passes BEHIND the cards it crosses
+                on its way rather than over their text.
+
+                `isolate` on the parent is load-bearing for that. The layer
+                sits below the cards, which claim `z-10`, and without a
+                stacking context here that ordering escapes this element
+                entirely and the threads land behind the panel's own opaque
+                background — invisible rather than merely low. */}
+            <RowThreads rounds={rounds} containerRef={columnRef} />
             {rounds.map((round) => (
               <MapRow
                 key={round.index}
@@ -117,6 +136,10 @@ export default function ThinkingMapView({
                    first paint would make an old map look like it had just been
                    written. */
                 entering={round.index === rounds.length}
+                // The two newest rounds stand forward; everything older steps
+                // back a little. Two rather than one because the round you are
+                // answering and the round that prompted it are both live.
+                receded={round.index < rounds.length - 1}
               />
             ))}
 
@@ -135,7 +158,7 @@ export default function ThinkingMapView({
             />
 
             <div ref={endRef} />
-          </>
+          </div>
         )}
       </div>
     </section>

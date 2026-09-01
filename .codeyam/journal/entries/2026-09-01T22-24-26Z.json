@@ -1,0 +1,1807 @@
+{
+  "timestamp": "2026-09-01T22:24:26Z",
+  "title": "A Card Map That Reads as Connected",
+  "type": "feature",
+  "userRequest": "## Summary\n\nA column of rows of cards is a clear way to answer questions and a poor way to see\nthat ideas connect. Once the card map is standing, every card looks the same\nweight, a research finding looks like an assumption looks like a goal, and the\nrows read as a list of batches rather than as one piece of thinking that grew.\nGive the cards a visual language: a colour family and an icon per kind, one lime\ncard per screen for the thing that just changed, a research round set apart as its\nown territory so what already exists is legible at a glance, and light threads\ndrawn between a card and the card above it that prompted it — so the map reads as\nconnected rather than merely stacked.\n\n### The card treatment\n\nFills doing the work — near-white, grey, and one lime card that is the thing to\nlook at — with a marker top-left and an icon top-right:\n\n![Staggered rows of tall rounded cards, one of them lime](assets/a-card-map-that-reads-as-connected/ref-cards.jpg)\n\n### Colour and connection\n\nFilled colour marks on a faint ground, joined by travelling lines; colour and\ndensity carrying meaning before you read a word:\n\n![Coloured dots on a grid joined by travelling lines](assets/a-card-map-that-reads-as-connected/ref-dots-on-grid.jpg)\n![Four cards where colour and density distinguish each at a glance](assets/a-card-map-that-reads-as-connected/ref-colour-density.jpg)\n\nLong curves that visibly carry the eye from one node to the next — the feeling the\nthreads between rows are after:\n\n![A white curve looping between three dots on black](assets/a-card-map-that-reads-as-connected/ref-organic-curve-dark.jpg)\n![A thick black curve through filled dots with one label highlighted](assets/a-card-map-that-reads-as-connected/ref-thick-curve-nodes.jpg)\n![Curved connectors routed between pill labels and cards](assets/a-card-map-that-reads-as-connected/ref-curves-between-pills.jpg)\n\nGrouped and enclosed regions — how a research round can read as its own territory:\n\n![A conceptual map using circles, groups and dotted enclosures](assets/a-card-map-that-reads-as-connected/ref-grouped-regions.jpg)\n\nIcons in outlined circles, chips and a single lime accent on a dark ground —\nalready close to this product's own system:\n\n![A dark project timeline with lime accent, circled icons and pill chips](assets/a-card-map-that-reads-as-connected/ref-lime-icons-chips.jpg)\n\n## Key Decisions\n\n- **Six colour families for eighteen node kinds.** One hue per kind is eighteen\n  hues and no hierarchy at all. Group them: *subject* (the root idea), *question*\n  (open-question, unknown, gap), *ground* (user, problem, goal, constraint,\n  assumption, known), *found* (research, finding), *judgment* (pro, risk), and\n  *forward* (approach, direction, next-step, slice). Six is what the reference\n  grids use and what a person can hold without a legend — and `KIND_EYEBROW`\n  already names the exact kind on every card for anyone who wants the detail.\n- **Status still beats kind. This is the rule that must not break.**\n  `nodeShellClasses` documents its precedence — root, then `updated`, then `open`,\n  then accent, then answered — and adding kind colour must slot in at the accent\n  tier only. An unanswered question is still the unfilled, dashed treatment\n  whatever family it belongs to, because \"nobody has answered this\" outranks \"this\n  is a question about users\". Extend the function's doc comment rather than\n  rewriting it.\n- **Lime stays reserved for the one thing that just changed.** The design system\n  is explicit and the reference agrees — exactly one lime card on screen. None of\n  the six families may use lime, which is a real constraint on the palette and the\n  reason the *found* family cannot simply inherit today's `lime-deep` accent.\n- **Threads, not a connector graph.** The old map drew every parent–child edge\n  because the tree was the layout. Here the layout is rows, so a full edge graph\n  would be noise crossing the column. Draw one short curve per card, from the\n  bottom of the card above that prompted it to the top of this one, in the child's\n  family colour — the vertical S-travel of the references, over a few tens of\n  pixels rather than the whole plane. A card with no parent in the previous row\n  draws nothing.\n- **Research is a region, not a swatch.** \"Make the competition differentiate from\n  the rest\" needs more than a colour. A round whose cards are mostly\n  research/finding/gap gets its own banded treatment: a tinted ground behind the\n  whole row, its own eyebrow — `WHAT ALREADY EXISTS` — and a hairline enclosure,\n  the way the grouped-regions reference encloses a cluster. Because a row is\n  already a round, this is nearly free, which is a good sign the card-map plan's\n  round grouping was the right seam.\n- **Icons are inline SVG, one per family, not per kind.** Six glyphs, drawn in the\n  manner of `Wordmark` and `SendButton` rather than pulled from an icon package.\n  The reference uses emoji in that slot; emoji render inconsistently across\n  platforms and would be the only non-drawn mark in the product.\n- **Extend the design system doc, do not silently diverge from it.**\n  `.codeyam/design/design_system.md` describes the map as a tidy top-down tree\n  with dotted `--thread` connectors and node pills. That map is gone as of the\n  card-map plan and this plan replaces its visual language. Section 4 has to be\n  rewritten or the record and the code disagree, which is worse than having no\n  record.\n\n## Implementation\n\n### 1. A family per kind\n\n**File**: `app/lib/mapKinds.ts`\n\nAdd `KIND_FAMILY: Record<NodeKind, NodeFamily>` mapping all eighteen kinds onto\nthe six families, and export the `NodeFamily` union. Keep `ACCENT_KINDS` — it\nanswers a narrower question (does this kind carry a pro/risk/find accent) and\n`nodeShellClasses` still consults it — but the family map becomes the primary\nsource of a card's colour. Add cases to `app/lib/mapKinds.test.ts` asserting every\nkind has a family, which is the test that stops a nineteenth kind shipping\ncolourless.\n\n### 2. The tokens\n\n**File**: `app/globals.css`\n\nOne fill token and one line token per family, beside the existing palette and\nexposed through the `@theme inline` block the way every existing token is. Draw\nthem from the references: the muted orange, sage, dusty blue, soft pink and warm\nyellow of the dots-on-grid reference sit naturally on `--paper` and are already in\nthe same tonal register as `--risk`, `--pro` and `--thread`. Constraint from the\nKey Decision: none may be lime.\n\nFills are light tints rather than saturated — a card is a large area and the\nreference's own cards are near-white, grey and one lime. Saturation belongs on the\nicon mark and the thread, not on 240px of card.\n\n### 3. Colour and icon on the card\n\n**Files**: `app/lib/nodeAppearance.ts`, `app/components/MapCard.tsx`\n\n`nodeShellClasses` gains the family fill at the accent tier, precedence unchanged,\ndoc comment extended to name the new tier's source.\n\n**New file**: `app/components/CardIcon.tsx` — six inline SVGs: a question mark, a\nmagnifier (lift the glyph currently drawn inline in the old pill rather than\nredrawing it, if the card-map plan has not already removed it), an arrow, a\nplus-minus, a dot, and a filled mark for the root. Sized to the card's top-right\nslot, in an outlined circle as in the lime-timeline reference.\n\nIn `MapCard`, render the icon in the top-right slot and tint the round marker in\nthe top-left with the family's line colour, so the card is legible as a category\nfrom across the room and as a sentence up close.\n\n### 4. Threads between the rows\n\n**New file**: `app/lib/cardThreads.ts`\n\nThe pure derivation: given the rounds and the nodes, return, for each card, the\nid of the card in the previous round that is its parent — or nothing. Unit-tested\nfor a card whose parent is in the previous round, a card whose parent is further\nback (no thread), a card with no parent, and a round with no parents at all.\n\n**New file**: `app/components/RowThreads.tsx`\n\nAn absolutely positioned SVG layer spanning the gap between two rows, drawing one\ncubic bezier per thread from the parent card's bottom edge to the child card's\ntop edge, stroked `1.75px` in the child's family line colour at roughly 55%\nopacity, with a small filled endpoint dot. Positions come from measuring the card\nelements — a `ResizeObserver` on the row plus refs on the cards, redrawn on\nresize — because the rows are a CSS flex wrap and there are no computed\ncoordinates to read.\n\nThat measurement is the one genuinely fiddly piece in this plan. If it proves\nunstable at execution, the honest fallback is a single centred connector per row\ngap rather than per card: it still says the rows are one thread and it needs no\nmeasurement at all. Decide that empirically, not now.\n\n### 5. The research round as its own territory\n\nEdit the row component the prerequisite card-map plan introduces at\n`app/components/MapRow.tsx` — it does not exist in the tree yet, which is why this\nplan declares that dependency.\n\nWhen most of a round's cards are `research` / `finding` / `gap`, the row renders\nin its banded form: a tinted ground in the *found* family at very low alpha, a\nhairline enclosure, and the eyebrow `WHAT ALREADY EXISTS` in place of the round\nmarker. The threshold and the eyebrow text belong in a small exported helper\nbeside the row so they are testable and so the rule lives in one place.\n\n### 6. Ground and depth\n\n**File**: `app/globals.css`\n\nA very faint dot-grid background on the map column, as in the dots-on-grid\nreference — it is what makes the cards read as placed on something rather than\nfloating. Add it as a utility class beside `.eyebrow` and `.no-scrollbar`.\n\nAlso in that same row component — step earlier rounds back very slightly:\n96% opacity on any round that is not one of the two newest. Recession, not\nperspective; no 3D transforms, which would break hit targets on the cards' inputs.\n\n### 7. Keep the record honest\n\n**File**: `.codeyam/design/design_system.md`\n\nRewrite section 4 (*The map*): the card, its anatomy and its shape; the six\nfamilies and their tokens; the status-beats-kind precedence stated explicitly,\nsince it is now carrying more weight than before; the thread; and the research\nband. Leave sections 1–3 (colour, typography, shape) intact — the pill radius, the\n20px card radius, the type scale and the no-shadows rule all still hold and the\ncards are built from them.\n\n## Reused existing code\n\n- `nodeShellClasses` from `app/lib/nodeAppearance.ts` (glossary entry:\n  `nodeShellClasses`) — its documented status precedence is exactly what stops\n  kind colour from breaking the open and updated treatments; the function is\n  extended at one tier and its nine existing unit tests keep their meaning.\n- `KIND_EYEBROW` and `ACCENT_KINDS` from `app/lib/mapKinds.ts` (glossary entries:\n  `KIND_EYEBROW`, `ACCENT_KINDS`) — the eyebrow already names each kind precisely,\n  which is what lets six colour families be enough, and `ACCENT_KINDS` keeps\n  serving the pro/risk/find question it was written for.\n- The `@theme inline` block in `app/globals.css` — every colour token is already\n  exposed to Tailwind through it, so the family tokens follow the same route\n  rather than putting arbitrary hex values into class strings.\n- `.eyebrow` and `.node-in` in `app/globals.css` — the precedent for adding a\n  small, commented, app-wide utility, which the dot-grid ground follows.\n- `.codeyam/design/design_system.md` — the record this plan updates rather than\n  bypasses; its contrast rules (never `--muted` on `--lime`, never lime as a text\n  colour) are binding on the new palette.\n- The `find` magnifier SVG currently drawn inline in the map node pill\n  (`app/components/MapNodePill.tsx`, which the prerequisite card-map plan removes)\n  — lifted into the icon set as the *found* glyph rather than redrawn. Take it\n  before that plan deletes the file, or recover it from history.\n- `Wordmark` from `app/components/Wordmark.tsx` (glossary entry: `Wordmark`) — the\n  established way an icon is drawn in this codebase: hand-written inline SVG with\n  `stroke=\"var(--ink)\"` and no dependency.\n- **Existing-implementation survey (per-kind colour).** `--risk` `#C4736A`,\n  `--pro` `#6B9E84`, `--thread` `#8B8BC8` and `--lime` `#D5F560` already exist with\n  meanings assigned by `ACCENT_KINDS` and the design system. The six families\n  **reuse** `--risk` and `--pro` for *judgment* and take `--thread`'s violet for\n  *question* rather than adding near-duplicates; three genuinely new hues are\n  added. No per-kind colour map or icon set exists in the codebase today —\n  grepped `app/` for both.\n- **Existing-implementation survey (curved edges).** The only edge-drawing code in\n  the project is the orthogonal `connectorPath` in `app/lib/mapLayout.ts`, which\n  the prerequisite card-map plan retires. There is no bezier or curve helper to\n  reuse, so the thread's path builder is genuinely new.\n- **Existing-implementation survey (grouping).** `app/lib/summaryGroups.ts` groups\n  nodes by kind for the summary screen's cards and returns lists rather than any\n  geometry; it is not reusable for the research band, which keys off the round the\n  card-map plan derives. Nothing is duplicated.\n\n## Scenarios to Demonstrate\n\n- **A research round** — the banded row with `WHAT ALREADY EXISTS`, distinct at a\n  glance from the rounds above and below it. The headline of the plan.\n- **A mixed round with one research card** — below the threshold, so no band. The\n  boundary case most likely to be got wrong.\n- **A round of open questions** — dashed, unfilled cards, proving status still\n  beats kind colour.\n- **A card that just updated** — the single lime card on screen, unchanged in\n  meaning, sitting among six families without competing with them.\n- **Threads across three rounds** — each card curving up to the card that prompted\n  it, and a card with no parent in the previous round drawing nothing.\n- **A round of six cards that wraps to two lines** — the case the thread\n  measurement is most likely to get wrong.\n- **All six families on one screen** — a map carrying at least one card of each,\n  to see whether six reads as a system or as noise.\n- **Half screen (760×1000)** — two cards abreast, threads still legible in the\n  narrower gaps.\n- **Desktop (1440×900)** — four abreast, the same language.\n- **`prefers-reduced-motion`** — colour and threads unaffected; only motion is.\n- **An empty map** — the dot-grid ground alone, so the ground is confirmed to\n  stand on its own rather than needing cards on top of it.",
+  "description": "The card map had a real problem: every card looked the same weight, so a research finding read like an assumption read like a goal, and the rows read as a list of batches rather than as one piece of thinking that grew. This cycle gave the cards a visual language. The eighteen node kinds collapse into six colour families (subject, question, ground, found, judgment, forward), each with a line token for its mark and a near-white fill for the card, plus one drawn inline-SVG glyph per family — six marks, not eighteen, because the eyebrow on every card already names the exact kind and a legend is what six avoids. Short cubic threads now run from each card to the card in the round above that prompted it, in the child's family colour, fanned across the parent's bottom edge so several read as a hand opening rather than one frayed rope. A round that is mostly research/finding/gap is set apart as its own territory — tinted ground, hairline enclosure, and the eyebrow WHAT ALREADY EXISTS in place of a round number. A faint dot grid under the column makes the near-white cards read as placed on something rather than floating.\n\nThe rule that governs all of it is that STATUS BEATS KIND, and it is enforced by ordering inside nodeShellClasses rather than by convention: an unanswered question is dashed and unfilled whatever family it belongs to, and exactly one card per screen wears the lime. Two treatments changed deliberately and are recorded in the design system doc: the root gave up its ink FILL for a doubled ink border (inverting 240px of card reads as a hole in the page and would take the eye before the lime card that should have it), and no family may use lime. Three judgement calls worth knowing: the thread layer draws as ONE overlay over the whole column rather than a layer per row gap, because the rows are a flex wrap with no computed coordinates and a single overlay measures everything into one coordinate space; a card that wrapped onto a second line gets NO thread, because the only lane to it runs straight through the cards above (an earlier build drew those and the map looked like it had sprung a leak); and the recession on older rounds sits on the cards rather than the row, because opacity on the row makes a stacking context that would trap the cards under the thread layer.\n\nSCOPE VERDICT — this cycle DELIVERED the whole of the plan: the family map, the tokens, the icon set, the thread layer, the research band, the dot grid and recession, and the rewrite of section 4 of the design system so the record and the code agree. NOTHING was deferred. All ten project deliverables were already resolved before this cycle opened; nine are delivered and the single outstanding deferral (registering the MCP server in a client, an assist-track item rather than this build flow) was decided by the user, not by the agent. Also removed: NodeAccentMark, superseded by CardIcon, which took over its slot in the card and lifted its magnifier glyph rather than redrawing it — component, isolation route, five scenarios and glossary entry all removed in one pass. 273 tests pass; audit clean at 0 findings.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/design/design_system.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/a-card-map-that-reads-as-connected.md\t.codeyam/plans/completed/a-card-map-that-reads-as-connected.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-cards.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-cards.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-colour-density.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-colour-density.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-curves-between-pills.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-curves-between-pills.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-dots-on-grid.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-dots-on-grid.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-grouped-regions.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-grouped-regions.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-lime-icons-chips.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-lime-icons-chips.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-organic-curve-dark.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-organic-curve-dark.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-card-map-that-reads-as-connected/ref-thick-curve-nodes.jpg\t.codeyam/plans/completed/assets/a-card-map-that-reads-as-connected/ref-thick-curve-nodes.jpg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/maprow.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/mapworkspace.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/nodeaccentmark.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/nodeaccentmark-none.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/nodeaccentmark-pro.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/nodeaccentmark-research.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/nodeaccentmark-risk.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/nodeaccentmark-slice.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-explore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-danglinglink--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-firstsliceonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-longsequence--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-provesnothing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-bigturn--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentadded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentaddedmany--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentnote--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-youranswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-asked--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-everything--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodekindpicker-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodekindpicker-risk--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-nextsteps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-research--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaplist-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaprow-singlenode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-danglinglink--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-noeffortstated--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-provesnothing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-noslices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/thinkingmapview-sprawling.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6fc8a60a5c5efcad49307687e41528b5975ab790aaf2164609a91c027af19467.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e804165fdbf60a8792d02ce58d427bced722160661a151ead3668a32d35ebe7e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapRow.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/NodeAccentMark.tsx",
+      "status": "deleted"
+    },
+    {
+      "path": "app/components/ThinkingMapView.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/globals.css",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapRow/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapWorkspace/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/NodeAccentMark/page.tsx",
+      "status": "deleted"
+    },
+    {
+      "path": "app/lib/mapKinds.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapKinds.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapRounds.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapRounds.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/nodeAppearance.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/nodeAppearance.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-forward.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-found.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-gap.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-ground.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-judgment.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-pro.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-question.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-subject.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardicon-unknownkind.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/cardicon.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/mapcardheader.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/rowthreads.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapcardheader-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapcardheader-found.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapcardheader-manyrounds.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapcardheader-risk.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapcardheader-root.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/maprow-belowresearchthreshold.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/maprow-receded.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/maprow-researchband.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapworkspace-allfamilies.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapworkspace-mixedwithonefinding.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapworkspace-researchround.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapworkspace-wrappinground.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/rowthreads-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/rowthreads-nothingtodraw.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/rowthreads-parenttworoundsback.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/rowthreads-singlethread.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/rowthreads-someunattached.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/rowthreads-wrappedrow.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-forward--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-forward--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-found--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-found--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-gap--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-gap--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-ground--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-ground--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-judgment--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-judgment--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-pro--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-pro--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-question--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-question--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-subject--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-subject--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-unknownkind--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-unknownkind--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-found--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-found--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-manyrounds--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-manyrounds--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-risk--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-risk--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-root--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-root--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-nothingtodraw--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-nothingtodraw--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-parenttworoundsback--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-parenttworoundsback--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-singlethread--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-singlethread--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-someunattached--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-someunattached--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-wrappedrow--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-wrappedrow--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/what-already-exists-a-research-round-set-apart.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/12fe33e773d6b69dcb8e8b376540ee47f8e342d84159fa6269995261c5196d18.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3f8080eaef6f44a7932dae0b0cd123518450b50aaf94de008d7d6b38c6c5f284.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/4681aca784ed31072af733a4156cdf42cc26c02e1fc20de901bdc09c181d37d1.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/736421dc67d8868d7aadb5689431ef63b1769ce0f7e93407a0a8accbc285328b.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7c5c28c98ff6ced4c744fd239639f0c3d7bf550a4fb35bdc6fb04ddb8eceb92c.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/aa93a07ede477b1cf17c00303c6053bd37148c59d8cbc3a402de3e1dc10a08f8.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CardIcon.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/MapCardHeader.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/RowThreads.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/CardIcon/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/MapCardHeader/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/RowThreads/ThreadsHarness.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/RowThreads/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/cardThreads.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/cardThreads.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/threadGeometry.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/threadGeometry.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "AppHeader - Default",
+      "screenshotPath": "appheader-default--tablet.png"
+    },
+    {
+      "name": "AppHeader - Explore",
+      "screenshotPath": "appheader-explore--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "BuildSequence - DanglingLink",
+      "screenshotPath": "buildsequence-danglinglink--tablet.png"
+    },
+    {
+      "name": "BuildSequence - Default",
+      "screenshotPath": "buildsequence-default--tablet.png"
+    },
+    {
+      "name": "BuildSequence - Empty",
+      "screenshotPath": "buildsequence-empty--tablet.png"
+    },
+    {
+      "name": "BuildSequence - FirstSliceOnly",
+      "screenshotPath": "buildsequence-firstsliceonly--tablet.png"
+    },
+    {
+      "name": "BuildSequence - LongSequence",
+      "screenshotPath": "buildsequence-longsequence--tablet.png"
+    },
+    {
+      "name": "BuildSequence - ProvesNothing",
+      "screenshotPath": "buildsequence-provesnothing--tablet.png"
+    },
+    {
+      "name": "CardIcon - Forward",
+      "screenshotPath": "cardicon-forward--tablet.png"
+    },
+    {
+      "name": "CardIcon - Found",
+      "screenshotPath": "cardicon-found--tablet.png"
+    },
+    {
+      "name": "CardIcon - Gap",
+      "screenshotPath": "cardicon-gap--tablet.png"
+    },
+    {
+      "name": "CardIcon - Ground",
+      "screenshotPath": "cardicon-ground--tablet.png"
+    },
+    {
+      "name": "CardIcon - Judgment",
+      "screenshotPath": "cardicon-judgment--tablet.png"
+    },
+    {
+      "name": "CardIcon - Pro",
+      "screenshotPath": "cardicon-pro--tablet.png"
+    },
+    {
+      "name": "CardIcon - Question",
+      "screenshotPath": "cardicon-question--tablet.png"
+    },
+    {
+      "name": "CardIcon - Subject",
+      "screenshotPath": "cardicon-subject--tablet.png"
+    },
+    {
+      "name": "CardIcon - UnknownKind",
+      "screenshotPath": "cardicon-unknownkind--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - BigTurn",
+      "screenshotPath": "exchangerail-bigturn--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Default",
+      "screenshotPath": "exchangerail-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Empty",
+      "screenshotPath": "exchangerail-empty--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered",
+      "screenshotPath": "exchangerail-justanswered--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded",
+      "screenshotPath": "exchangerow-agentadded--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany",
+      "screenshotPath": "exchangerow-agentaddedmany--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentNote",
+      "screenshotPath": "exchangerow-agentnote--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer",
+      "screenshotPath": "exchangerow-youranswer--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--tablet.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--tablet.png"
+    },
+    {
+      "name": "MapCard - Answered",
+      "screenshotPath": "mapcard-answered--tablet.png"
+    },
+    {
+      "name": "MapCard - Default",
+      "screenshotPath": "mapcard-default--tablet.png"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer",
+      "screenshotPath": "mapcard-editingananswer--tablet.png"
+    },
+    {
+      "name": "MapCard - Finding",
+      "screenshotPath": "mapcard-finding--tablet.png"
+    },
+    {
+      "name": "MapCard - LongLabel",
+      "screenshotPath": "mapcard-longlabel--tablet.png"
+    },
+    {
+      "name": "MapCard - NoOptions",
+      "screenshotPath": "mapcard-nooptions--tablet.png"
+    },
+    {
+      "name": "MapCard - RootIdea",
+      "screenshotPath": "mapcard-rootidea--tablet.png"
+    },
+    {
+      "name": "MapCard - Yours",
+      "screenshotPath": "mapcard-yours--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Answered",
+      "screenshotPath": "mapcardeyebrow-answered--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Asked",
+      "screenshotPath": "mapcardeyebrow-asked--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Default",
+      "screenshotPath": "mapcardeyebrow-default--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Everything",
+      "screenshotPath": "mapcardeyebrow-everything--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Finding",
+      "screenshotPath": "mapcardeyebrow-finding--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - FromBrief",
+      "screenshotPath": "mapcardeyebrow-frombrief--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Yours",
+      "screenshotPath": "mapcardeyebrow-yours--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Default",
+      "screenshotPath": "mapcardheader-default--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Found",
+      "screenshotPath": "mapcardheader-found--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - ManyRounds",
+      "screenshotPath": "mapcardheader-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Risk",
+      "screenshotPath": "mapcardheader-risk--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Root",
+      "screenshotPath": "mapcardheader-root--tablet.png"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold",
+      "screenshotPath": "maprow-belowresearchthreshold--tablet.png"
+    },
+    {
+      "name": "MapRow - Default",
+      "screenshotPath": "maprow-default--tablet.png"
+    },
+    {
+      "name": "MapRow - NamedByPhase",
+      "screenshotPath": "maprow-namedbyphase--tablet.png"
+    },
+    {
+      "name": "MapRow - PartlyAnswered",
+      "screenshotPath": "maprow-partlyanswered--tablet.png"
+    },
+    {
+      "name": "MapRow - Receded",
+      "screenshotPath": "maprow-receded--tablet.png"
+    },
+    {
+      "name": "MapRow - ResearchBand",
+      "screenshotPath": "maprow-researchband--tablet.png"
+    },
+    {
+      "name": "MapRow - TheIdea",
+      "screenshotPath": "maprow-theidea--tablet.png"
+    },
+    {
+      "name": "MapRow - Wrapping",
+      "screenshotPath": "maprow-wrapping--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeKindPicker - Default",
+      "screenshotPath": "nodekindpicker-default--tablet.png"
+    },
+    {
+      "name": "NodeKindPicker - Risk",
+      "screenshotPath": "nodekindpicker-risk--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "PhaseNav - Default",
+      "screenshotPath": "phasenav-default--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NextSteps",
+      "screenshotPath": "phasenav-nextsteps--tablet.png"
+    },
+    {
+      "name": "PhaseNav - Research",
+      "screenshotPath": "phasenav-research--tablet.png"
+    },
+    {
+      "name": "RowThreads - Default",
+      "screenshotPath": "rowthreads-default--tablet.png"
+    },
+    {
+      "name": "RowThreads - NothingToDraw",
+      "screenshotPath": "rowthreads-nothingtodraw--tablet.png"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack",
+      "screenshotPath": "rowthreads-parenttworoundsback--tablet.png"
+    },
+    {
+      "name": "RowThreads - SingleThread",
+      "screenshotPath": "rowthreads-singlethread--tablet.png"
+    },
+    {
+      "name": "RowThreads - SomeUnattached",
+      "screenshotPath": "rowthreads-someunattached--tablet.png"
+    },
+    {
+      "name": "RowThreads - WrappedRow",
+      "screenshotPath": "rowthreads-wrappedrow--tablet.png"
+    },
+    {
+      "name": "SavedMapList - Default",
+      "screenshotPath": "savedmaplist-default--tablet.png"
+    },
+    {
+      "name": "SavedMapRow - Default",
+      "screenshotPath": "savedmaprow-default--tablet.png"
+    },
+    {
+      "name": "SavedMapRow - SingleNode",
+      "screenshotPath": "savedmaprow-singlenode--tablet.png"
+    },
+    {
+      "name": "SliceCard - DanglingLink",
+      "screenshotPath": "slicecard-danglinglink--tablet.png"
+    },
+    {
+      "name": "SliceCard - Default",
+      "screenshotPath": "slicecard-default--tablet.png"
+    },
+    {
+      "name": "SliceCard - NoEffortStated",
+      "screenshotPath": "slicecard-noeffortstated--tablet.png"
+    },
+    {
+      "name": "SliceCard - ProvesNothing",
+      "screenshotPath": "slicecard-provesnothing--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "SummaryView - Default",
+      "screenshotPath": "summaryview-default--tablet.png"
+    },
+    {
+      "name": "SummaryView - Empty",
+      "screenshotPath": "summaryview-empty--tablet.png"
+    },
+    {
+      "name": "SummaryView - NoSlices",
+      "screenshotPath": "summaryview-noslices--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 273,
+    "passed": 273,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 273,
+        "passed": 273
+      }
+    ]
+  }
+}

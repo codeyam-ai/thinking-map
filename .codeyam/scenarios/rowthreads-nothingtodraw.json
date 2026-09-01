@@ -1,0 +1,12 @@
+{
+  "name": "RowThreads - NothingToDraw",
+  "id": "36fcd6fa-0101-43c2-9a0e-c9f2cb5d0918",
+  "url": "/isolated-components/RowThreads?s=NothingToDraw",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowThreads",
+  "scenarioType": "component",
+  "description": "A map of one round, so there is nothing to connect. The component renders no SVG at all rather than an empty one stretched over the column — the frame is the lone card and nothing else."
+}

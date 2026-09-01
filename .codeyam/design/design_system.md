@@ -33,9 +33,14 @@ Light only. This product is a sheet of paper you think on; there is no dark mode
 | `--line` | `#E2E0D9` | Hairline borders, inactive pill outlines. |
 | `--lime` | `#D5F560` | The single accent. Send buttons, active phase, "just updated". |
 | `--lime-deep` | `#C6EC44` | Lime pressed / border on a lime fill. |
-| `--thread` | `#8B8BC8` | The dotted connector between map nodes. |
-| `--risk` | `#C4736A` | Risk and warning node borders. Used sparingly. |
-| `--pro` | `#6B9E84` | Pro and opportunity node borders. Used sparingly. |
+| `--thread` | `#8B8BC8` | The violet of the `question` family; once the tree's connectors. |
+| `--risk` | `#C4736A` | Risk node borders and threads. Used sparingly. |
+| `--pro` | `#6B9E84` | Pro node borders and threads. Used sparingly. |
+
+The map's card families add a `line` and a near-white `fill` token each
+(`--fam-<family>-line` / `--fam-<family>-fill`, plus `--fam-found-band`). They reuse
+`--thread`, `--risk` and `--pro` rather than adding near-duplicates, and none of them is
+lime. See §4 for the table and the rule they sit under.
 
 **Contrast rules.** Ink on paper and ink on lime both clear AA comfortably. Never put
 `--muted` on `--lime`, and never use lime as a text color — it is a fill and a border only.
@@ -66,26 +71,79 @@ Sentence case everywhere except eyebrows, panel headings, and the one declaratio
 - Node pill, chip, button, input: `border-radius: 999px`.
 - Panel, card: `border-radius: 20px`.
 - Chat bubble: `border-radius: 18px`.
-- Border width is `1px` everywhere, `2px` only on a node that is currently highlighted.
+- Border width is `1px` everywhere; `2px` only on the two cards that outrank the rest — the
+  root idea, and the one node that just updated.
 - No shadows, no gradients. Depth comes from white-on-paper, not from blur.
 
 ## 4. The map
 
-The map is the product's signature. It is a top-down tree, centered on the root idea.
+The map is the product's signature. It is a **column of card rows, growing downward and
+scrolled like a page** — not a tree on a plane. It was a tidy top-down tree; zoom, pan,
+fit-to-frame and drag-to-nudge all existed to make a large 2D tree navigable, and a column
+is navigated by scrolling, so all of it went. The tree is still in the data (`parentId` and
+`order` are untouched, and the tool contract is unchanged); only the drawing changed.
 
-- **Connectors are dotted**, `--thread`, `1.5px`, with a small filled dot where a connector
-  meets a node. Dotted because the structure is provisional — this is thinking in progress,
-  not an org chart.
-- **Node status drives its treatment**, and this is the most important rule in the system:
-  - `open` — dashed border, no fill, `--muted` label. A question nobody has answered.
-  - `answered` — solid `--ink` border, white fill, ink label. Settled.
-  - `updated` — `--lime` border at 2px with a lime glow. Exactly what just changed.
-  - the root `idea` node — solid `--ink` fill, white label. The one dark shape on the page.
-- **Every node carries an eyebrow** naming its kind, so the map reads without a legend.
-- Nodes never overlap. Siblings distribute evenly under their parent; the tree grows
-  downward and outward, and the whole map scales to fit its panel rather than scrolling —
-  but only down to a legibility floor. A map too large to fit above that floor scrolls
-  instead, because a readable map you have to pan beats an illegible one that fits.
+**A row is a round** — the batch of nodes one write put on the map, read off the exchange
+log rather than off tree depth. Everything in a row arrived together, and the next one
+appears below it.
+
+**The card.** `20px` radius, `1px` border, `240px` minimum height, `220–300px` wide. Anatomy,
+top to bottom: the `round/total` marker top-left in the family's line colour and the family
+icon top-right; then open space; then the eyebrow, the label, and — for a question — the
+answer affordance or the answer itself. The open space is deliberate: the reading matter sits
+at the bottom of the card, as in the reference.
+
+**Six colour families, not eighteen kinds.** One hue per kind would be a legend. The kinds
+collapse into six families (`KIND_FAMILY` in `app/lib/mapKinds.ts`), each with a `line` token
+for its mark and thread and a near-white `fill` token for the card:
+
+| family | kinds | line |
+| --- | --- | --- |
+| `subject` | idea | `--fam-subject-line` (ink) |
+| `question` | open-question, unknown, gap | `--fam-question-line` (violet) |
+| `ground` | user, problem, goal, constraint, assumption, known | `--fam-ground-line` (dusty blue) |
+| `found` | research, finding | `--fam-found-line` (ochre) |
+| `judgment` | pro, risk | `--pro` / `--risk`, per kind |
+| `forward` | approach, direction, next-step, slice | `--fam-forward-line` (mauve) |
+
+Fills are near-white tints, never saturated: a card is a large area, and chroma belongs on
+the icon and the thread where it is a few pixels wide. **No family may use lime.**
+
+**Status still beats kind. This is the most important rule in the system**, and kind colour
+slots in below it, never above. The precedence, encoded in `nodeShellClasses`:
+
+- the root `idea` — `2px --ink` border on white. It is no longer a dark FILL: inverting a
+  30px pill read as emphasis, but inverting 240px of card reads as a hole in the page and
+  takes the eye before the lime card that should have it.
+- `updated` — `--lime` border at `2px` with a lime glow. **Exactly one per screen**: the
+  thing that just changed. Its family icon keeps its own colour underneath.
+- `open` — dashed border, no fill. A question nobody has answered is dashed *whatever family
+  it belongs to* — "nobody has answered this" outranks "this is a question about users".
+- otherwise — the family's line and fill.
+
+**Threads.** One short curve per card, from the bottom edge of the card in the previous round
+that prompted it to the top edge of this one, `1.75px` at ~55% opacity in the **child's**
+family colour, with a small filled endpoint dot. Not a full edge graph: the rows already
+carry the structure, so drawing every parent–child edge would be a thicket crossing the
+column. A card draws no thread when its parent is more than one round back, when it has no
+parent, or when the row wrapped and it sits on a second line — there is no honest lane to a
+wrapped card, and silence is the correct drawing. Threads from one parent **fan** across its
+bottom edge in the order of the children they land on, so they read as a hand opening rather
+than a frayed rope. They paint above the research band and below the cards.
+
+**The research band.** A round that is mostly `research` / `finding` / `gap` (strictly more
+than half) gets its own territory rather than just its own colour: a `--fam-found-band`
+ground, a hairline enclosure, and the eyebrow `WHAT ALREADY EXISTS` in place of the round
+number. The root round never bands.
+
+**The ground.** A faint dot grid (`.dot-grid`, 1px on a 22px pitch) under the column, which is
+what makes a near-white card read as placed on something rather than floating. It stands on
+its own in an empty map. Rounds older than the two newest step back to `96%` opacity —
+recession, not perspective; no transforms, which would move the answer boxes out from under
+the pointer.
+
+**Every card carries an eyebrow** naming its exact kind, which is what lets six families be
+enough.
 
 ## 5. Components
 

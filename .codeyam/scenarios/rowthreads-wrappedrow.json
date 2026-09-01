@@ -1,0 +1,12 @@
+{
+  "name": "RowThreads - WrappedRow",
+  "id": "34c63351-9c7a-43bd-90a3-837bf2e32e7c",
+  "url": "/isolated-components/RowThreads?s=WrappedRow",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowThreads",
+  "scenarioType": "component",
+  "description": "The case the measurement is most likely to get wrong: a narrow band, so six cards wrap onto three lines. Threads reach the first line only. There is no honest lane to a wrapped card, and the alternative — which an earlier build of this drew — was lines ploughing straight down through the cards above them."
+}
