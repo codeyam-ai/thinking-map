@@ -1,0 +1,12 @@
+{
+  "name": "KeepThinkingPanel - Quiet",
+  "id": "f2082096-9706-4b94-81a9-615834b6d0ea",
+  "url": "/isolated-components/KeepThinkingPanel?s=Quiet",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "KeepThinkingPanel",
+  "scenarioType": "component",
+  "description": "Reached the plan with nothing recorded on the way - possible when the map was built through a front door that never posted notes."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRow - AgentAdded",
+  "id": "712a1f41-b7a9-4a7c-b1c6-59a5fe5460d5",
+  "url": "/isolated-components/ExchangeRow?s=AgentAdded",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRow",
+  "scenarioType": "component",
+  "description": "The agent's plainest row, marked with the dark disc: a node landed on the map."
+}

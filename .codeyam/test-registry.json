@@ -1,11 +1,29 @@
 {
   "tests": [
     {
+      "description": "Every step is a REAL call against the bound catalog, so a step with no explanation would leave a viewer unable to tell what it demonstrated.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "DEMO_SEQUENCE › explains every step it runs",
+      "line": 42,
+      "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The sequence is the closest thing here to a written description of one agent turn: say what you are about to do, read, add, ask, report back. Losing the ask would make it a demo of writes rather than an exchange.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "DEMO_SEQUENCE › walks a full turn including the question that waits on the person",
+      "line": 30,
+      "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "The regression this file exists for: WebMcpBridge renders copy promising these tools are reachable, so all seven must actually appear beside it.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › renders every catalog tool rather than an empty list",
-      "line": 83,
+      "line": 92,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -14,7 +32,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › reports that no agent is attached, with a reason",
-      "line": 71,
+      "line": 80,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -23,7 +41,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › shows nothing awaiting an answer",
-      "line": 93,
+      "line": 102,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -32,7 +50,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › clears the questions and records the answer once the person replies",
-      "line": 153,
+      "line": 162,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -41,7 +59,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders a single outstanding question",
-      "line": 104,
+      "line": 113,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -50,7 +68,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders both questions and marks the agent as working",
-      "line": 117,
+      "line": 126,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -59,7 +77,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders every question when an agent asks several at once",
-      "line": 134,
+      "line": 143,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -190,6 +208,114 @@
       "runner": "tests"
     },
     {
+      "description": "A second root would read as a second idea rather than a contribution to this one, so an unparented node hangs off the root.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › attaches to the root when no parent is named",
+      "line": 159,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Without this the person's node would be logged as an intention and never appear on the map — the bug this module exists to fix.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › creates the node and logs it with the real id",
+      "line": 129,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The kind comes from a picker over NODE_KINDS, but the route is reachable by anything; an unknown kind the map cannot draw must not reach the tree.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › falls back to a drawable kind when the requested one is not real",
+      "line": 182,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The root fallback must not override a caller that knows where the node belongs — an answer elaborating on a question hangs under that question.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › honours an explicit parent",
+      "line": 170,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`origin: user` is the same fact the pill reads to badge the node and the tools read to avoid re-ingesting their own writes, so the badge and the tool contract agree by construction.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › marks the node as the person’s",
+      "line": 149,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Siblings are ordered, and a new one belongs after the ones already there.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › orders a new sibling after the existing ones",
+      "line": 205,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty label would put an unreadable pill on the map, so nothing is written and nothing is logged.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — adding a node › writes nothing for an empty label",
+      "line": 194,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The answer is the person's act; closing the question is its consequence. Both must be logged, because an agent reading the log has to see that the map changed, not just that something was said.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — answering › closes the answered question and logs both halves",
+      "line": 81,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Answering twice must not invent a second change. The second answer is still worth logging — the person said something — but the node moved once.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — answering › does not report a second close when the question is already answered",
+      "line": 94,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A node the agent has since deleted must not fail the write. The answer itself is the part worth keeping.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — answering › keeps the answer when the question node is gone",
+      "line": 107,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The payload arrives from a browser and is untrusted on this side of the wire; a malformed one must degrade to \"they said something\", not throw.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — answering › tolerates a malformed answers payload",
+      "line": 117,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A note is something said ABOUT the map, not a change to it. Writing a node here would put the person's aside into the tree.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "contributionEvents — leaving a note › logs the note and changes nothing on the map",
+      "line": 225,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
       "description": "The cheap cursor read the waiting tools report from.",
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
@@ -232,6 +358,96 @@
       "key": "decodeEvent › parses the stored payload back into an object",
       "line": 67,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A note's whole value is its text, so it comes through as the note field the row renders with question emphasis.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › carries a note through as text",
+      "line": 187,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The phase nav numbers its labels; a sentence should not.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › drops the phase number when reporting a phase change",
+      "line": 178,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A malformed payload must still produce a readable row: the rail is the person's only record, so degrading beats disappearing.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › falls back when the payload carries no label",
+      "line": 254,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A user.node carries the created node's real label, and quoting it back is what confirms to the person that what they typed reached the map.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › names a node the person added",
+      "line": 241,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One answer can be shown; several cannot, because the row has no way to say which question each belongs to.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › shows the answer text only when a single question was answered",
+      "line": 215,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "\"Agent asked 1 questions\" is the kind of seam that makes a surface read as machine output rather than an account of what happened.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeEvent › singularises one question and counts several",
+      "line": 199,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The entry keys off the LAST event so the revision is the cursor the run actually left the map at.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeRun › carries the last revision in the run",
+      "line": 167,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Past one, the count IS the information — an agent turn that wrote four nodes is one act, and four near-identical rows would bury the rest of the log.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeRun › counts them once there is more than one",
+      "line": 148,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Naming the thing beats counting it when there is only one.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeRun › names the node when the run is a single add",
+      "line": 139,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The map is co-authored, so a row has to say WHICH side acted and whether something was created or changed — both halves of \"who did what\".",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "describeRun › says \"You\" for the person and distinguishes an update",
+      "line": 158,
+      "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
     {
@@ -322,42 +538,6 @@
       "key": "findConflictingChanges › survives an event whose payload could not be decoded",
       "line": 85,
       "registeredAt": "2026-09-01T01:16:02Z",
-      "runner": "tests"
-    },
-    {
-      "description": "A refusal is thrown by the caller, so nothing should be queued for a request that will never be sent.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "followUpMessages › appends nothing for a refusal",
-      "line": 191,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "An empty array is how the loop learns it is finished.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "followUpMessages › appends nothing when the turn is done",
-      "line": 155,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The API requires the tool_results in a single user message following the assistant turn that requested them.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "followUpMessages › appends the assistant turn then all tool results in one user message",
-      "line": 173,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A paused server tool needs the assistant's partial content echoed back, and nothing else, or the search cannot resume.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "followUpMessages › echoes the assistant content back to resume a paused turn",
-      "line": 163,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
     {
@@ -466,96 +646,6 @@
       "key": "groupSummaryNodes › splits nodes into the four summary buckets",
       "line": 15,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Web search pauses the turn mid-flight; stopping here would silently drop the research the Research phase depends on.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › asks the caller to resume a paused turn",
-      "line": 83,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The main path when the model is building the map.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › collects tool calls and asks the caller to continue",
-      "line": 40,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Empty or whitespace-only blocks would render as blank bubbles.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › discards empty text blocks",
-      "line": 31,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The API requires one tool_result per tool_use; a missing one fails the next request outright.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › emits one tool_result per tool call, keyed by its id",
-      "line": 51,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "stop_details can be absent, and the caller still needs something to show.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › falls back to a readable reason when a refusal carries no explanation",
-      "line": 76,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A response can carry both a sentence and the map changes it describes.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › keeps text and tool calls from the same response",
-      "line": 103,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A safety decline is not an answer; treating it as one would put the refusal text into the map as though it were thinking.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › reports a refusal rather than treating it as an answer",
-      "line": 65,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The ordinary finish: the partner spoke and wants nothing more.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › stops on a plain end_turn and keeps the spoken text",
-      "line": 21,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A round where only the server-side web_search ran reports tool_use but leaves us nothing to answer — continuing would spin the loop forever.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › stops when tool_use is reported but no custom tool was called",
-      "line": 93,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A malformed or empty response must not throw and lose the turn.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "interpretTurnResponse › survives an empty or malformed content array",
-      "line": 113,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
     {
@@ -928,6 +1018,15 @@
       "runner": "tests"
     },
     {
+      "description": "Every reader is fed untrusted JSON from the log, where a row may predate the current shape or have failed to parse at all.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "payload readers › tolerate a missing, wrong-typed, or absent payload",
+      "line": 263,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
       "description": "An errored call has nothing to ask about — putting a prompt on screen off the back of a failure would be worse than showing nothing.",
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
@@ -1135,6 +1234,33 @@
       "runner": "tests"
     },
     {
+      "description": "Keys drive React reconciliation; a duplicate would drop a row.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "railEntries › gives every entry a distinct id",
+      "line": 309,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A map nobody has touched yet must produce no rows at all, so the rail can show its own explanation of how anything gets into it.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "railEntries › is empty for an empty log",
+      "line": 304,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole pipeline over a real give-and-take: the agent works, the person answers and contributes, and each act gets exactly one line.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "railEntries › renders a full exchange as one line per act",
+      "line": 275,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
       "description": "The payload round-trips through a text column, so a reader must get the object back rather than the string.",
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
@@ -1288,84 +1414,57 @@
       "runner": "tests"
     },
     {
-      "description": "Text spoken before a tool call must not be dropped when the loop continues.",
-      "file": "app/lib/thinkingPartner.test.ts",
+      "description": "A panel that silently renders nothing is worse than one that renders something ugly: the raw shape is at least debuggable.",
+      "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
-      "key": "runTurn › accumulates text across rounds",
-      "line": 71,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "key": "resultText › falls back to raw JSON when there is no text block",
+      "line": 19,
+      "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
       "runner": "tests"
     },
     {
-      "description": "The core loop: a tool round must be answered and the conversation resumed.",
-      "file": "app/lib/thinkingPartner.test.ts",
+      "description": "Tools answer in the MCP content shape, and the first text block is what an agent would read. Showing anything else would make the panel a paraphrase.",
+      "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
-      "key": "runTurn › loops after a tool round and collects the calls",
-      "line": 56,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "key": "resultText › reads the first text block of an MCP response",
+      "line": 11,
+      "registeredAt": "2026-09-01T12:04:37.193211998+00:00",
       "runner": "tests"
     },
     {
-      "description": "The map's current state is what lets the model target existing nodes by id.",
-      "file": "app/lib/thinkingPartner.test.ts",
+      "description": "An agent turn that writes four nodes is one thing that happened.",
+      "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
-      "key": "runTurn › passes the map summary to the model as system context",
-      "line": 135,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "key": "runLength › extends across consecutive same-kind, same-origin events",
+      "line": 101,
+      "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
     {
-      "description": "Without credentials the route must be able to say so plainly rather than surface a generic 500 from a failed request.",
-      "file": "app/lib/thinkingPartner.test.ts",
+      "description": "Notes and answers carry distinct text every time, so collapsing them would throw away the only part worth reading.",
+      "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
-      "key": "runTurn › refuses up front when there are no credentials and no injected client",
-      "line": 36,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "key": "runLength › never groups a kind that carries its own text",
+      "line": 122,
+      "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
     {
-      "description": "A paused server-side search must be resumed rather than treated as the end.",
-      "file": "app/lib/thinkingPartner.test.ts",
+      "description": "The caller advances by the result, so an out-of-range index must not return 0 and spin forever.",
+      "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
-      "key": "runTurn › resumes a turn paused by a server-side tool",
-      "line": 114,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "key": "runLength › returns 1 past the end",
+      "line": 132,
+      "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
     {
-      "description": "A plain reply should cost exactly one request.",
-      "file": "app/lib/thinkingPartner.test.ts",
+      "description": "A run must not span sides — that would credit the person's work to the agent, or the reverse.",
+      "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
-      "key": "runTurn › returns the spoken text after a single round",
-      "line": 46,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The next request must carry the tool results, or the API rejects it.",
-      "file": "app/lib/thinkingPartner.test.ts",
-      "format": "vitest",
-      "key": "runTurn › sends the tool results back on the following request",
-      "line": 84,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A model that keeps asking for tools must not spin forever and hang the request; the bound is the only thing standing between that and a hung page.",
-      "file": "app/lib/thinkingPartner.test.ts",
-      "format": "vitest",
-      "key": "runTurn › stops after the iteration bound when tool calls never end",
-      "line": 126,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A refusal must reach the caller as an error, not be presented as thinking.",
-      "file": "app/lib/thinkingPartner.test.ts",
-      "format": "vitest",
-      "key": "runTurn › throws with the refusal explanation",
-      "line": 100,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
+      "key": "runLength › stops at a change of side",
+      "line": 112,
+      "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
     {
@@ -1567,33 +1666,6 @@
       "runner": "tests"
     },
     {
-      "description": "The stored role column is a free string; an assistant turn must survive as one or the conversation loses its shape on the next request.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "toMessageParams › preserves assistant and user turns",
-      "line": 125,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "A brand-new map has no history yet.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "toMessageParams › returns nothing for an empty history",
-      "line": 146,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "Anything unexpected must land somewhere rather than throw mid-conversation and lose the turn the person just typed.",
-      "file": "app/lib/turnInterpreter.test.ts",
-      "format": "vitest",
-      "key": "toMessageParams › treats an unrecognised role as a user turn",
-      "line": 139,
-      "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
-      "runner": "tests"
-    },
-    {
       "description": "What a driver or a browser agent lists. It must match the catalog exactly, since a tool missing here is a tool the agent never knows it can call.",
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
@@ -1681,6 +1753,51 @@
       "key": "validateToolInput › rejects a tool the catalog does not define",
       "line": 19,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Answering closes the question. Both halves are the same act, and the answer is the half worth a row.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "visibleEvents › hides the node.updated that an answer closed",
+      "line": 58,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "ask_user writes the question nodes AND announces them. Showing both would report one act twice, and the bare adds are the half nobody can act on.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "visibleEvents › hides the question nodes that a question.asked announced",
+      "line": 35,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An open-question node put on the map WITHOUT an ask_user is a real contribution — nothing announced it, so nothing may hide it.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "visibleEvents › keeps a question node that nothing announced",
+      "line": 49,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A user update that is not the answer's own close — a relabel, say — is a real edit and is not bookkeeping.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "visibleEvents › keeps a user update that is not the answer close",
+      "line": 86,
+      "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The suppression is narrow on purpose: an AGENT closing the same node is a separate act by the other side and must still be reported.",
+      "file": "app/lib/exchangeRail.test.ts",
+      "format": "vitest",
+      "key": "visibleEvents › keeps an agent update to a node the person answered",
+      "line": 72,
+      "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
     {

@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - NoAgent",
+  "id": "736e55ae-ecff-4ea6-a624-044a7c78431c",
+  "url": "/isolated-components/MapScreen?s=NoAgent",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "No agent can bind inside a frame, and the map stays fully usable anyway - the state a person meets in every preview."
+}

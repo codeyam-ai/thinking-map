@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatus - Working",
+  "id": "5b443df8-ba4c-4bfc-8bd9-5c910742d916",
+  "url": "/isolated-components/AgentStatus?s=Working",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatus",
+  "scenarioType": "component",
+  "description": "A tool mid-flight: the agent's turn is parked on the person."
+}

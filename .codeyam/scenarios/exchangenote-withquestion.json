@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeNote - WithQuestion",
+  "id": "5aa051c3-0b91-44ef-ad6f-074d8526ebc7",
+  "url": "/isolated-components/ExchangeNote?s=WithQuestion",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeNote",
+  "scenarioType": "component",
+  "description": "A lead-in then two questions: the questions take the bold treatment, because they are the one thing the person is meant to act on."
+}

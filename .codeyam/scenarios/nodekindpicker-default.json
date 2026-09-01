@@ -1,0 +1,12 @@
+{
+  "name": "NodeKindPicker - Default",
+  "id": "c2a19f63-5bc8-4ff2-af13-fc5687e0b68e",
+  "url": "/isolated-components/NodeKindPicker?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "NodeKindPicker",
+  "scenarioType": "component",
+  "description": "The same controlled vocabulary the agent's tools are bound to, so a person's node is indistinguishable in kind from an agent's."
+}

@@ -16,6 +16,9 @@ export interface FlatNode {
   status: string;
   sourceUrl: string | null;
   order: number;
+  /** Which side of the exchange authored the node. Optional because a caller
+   *  that only draws geometry has no reason to carry it. */
+  origin?: string | null;
 }
 
 export interface LaidOutNode {
@@ -26,6 +29,9 @@ export interface LaidOutNode {
   detail: string | null;
   status: NodeStatus;
   sourceUrl: string | null;
+  /** The map is co-authored now, so a node carries the side that wrote it and
+   *  the pill can say so. */
+  origin: string | null;
   depth: number;
   /** Top-left corner, in map pixels. */
   x: number;
@@ -169,6 +175,7 @@ export function layoutMap(flat: FlatNode[]): MapLayout {
       detail: tn.node.detail,
       status: tn.node.status as NodeStatus,
       sourceUrl: tn.node.sourceUrl,
+      origin: tn.node.origin ?? null,
       depth: tn.depth,
       x,
       y,

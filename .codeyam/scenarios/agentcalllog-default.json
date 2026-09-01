@@ -1,0 +1,12 @@
+{
+  "name": "AgentCallLog - Default",
+  "id": "597c452f-029e-4f83-b48e-cdc85309e4a4",
+  "url": "/isolated-components/AgentCallLog?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentCallLog",
+  "scenarioType": "component",
+  "description": "Four real calls from a demo run, including read_map returning the map's actual contents."
+}

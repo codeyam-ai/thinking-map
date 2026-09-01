@@ -1,6 +1,6 @@
 {
   "name": "MapWorkspace - Seeded",
-  "id": "6fc0fd74-5e28-4141-b3a8-cd2a80524268",
+  "id": "4440ae88-ce62-4173-8776-094f37b44ab4",
   "url": "/isolated-components/MapWorkspace?s=Seeded",
   "dimensions": [
     "Desktop"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "MapWorkspace",
   "scenarioType": "component",
-  "description": "Day one inside the workspace: the seed idea with three unanswered questions, both panels showing a conversation that has only just begun."
+  "description": "Day one inside the workspace: the seed idea and the three questions the agent asked, none answered. Everything on the map is dashed and the column is entirely waiting-on-you."
 }

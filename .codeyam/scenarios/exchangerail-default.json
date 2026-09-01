@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRail - Default",
+  "id": "32d736f2-f975-443b-88c4-0e061ecf48f8",
+  "url": "/isolated-components/ExchangeRail?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRail",
+  "scenarioType": "component",
+  "description": "A map both sides have worked, agent and person interleaved. The question nodes ask_user created are hidden behind 'asked 2 questions'."
+}

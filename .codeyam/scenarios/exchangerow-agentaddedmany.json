@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRow - AgentAddedMany",
+  "id": "3807defd-ab29-4cc9-967d-a7cfb6bbd945",
+  "url": "/isolated-components/ExchangeRow?s=AgentAddedMany",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRow",
+  "scenarioType": "component",
+  "description": "A run collapsed into one line - a turn that wrote four nodes is one thing that happened."
+}

@@ -29,6 +29,10 @@ export default function MapNodePill({ node }: { node: LaidOutNode }) {
       >
         {KIND_EYEBROW[node.kind] ?? node.kind}
         {node.status === 'updated' ? ' · just updated' : ''}
+        {/* The map is co-authored, so the parts the person wrote say so. This
+            is the same fact the tools read to avoid re-ingesting their own
+            writes — badge and tool contract agree by construction. */}
+        {node.origin === 'user' ? ' · yours' : ''}
       </span>
       <div
         className={`flex items-center justify-center rounded-full border px-4 text-center ${shell}`}

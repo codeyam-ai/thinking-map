@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
-import AppHeader from '@/app/components/AppHeader';
-import MapWorkspace from '@/app/components/MapWorkspace';
-import SummaryScreen from '@/app/components/SummaryScreen';
+import AgentSimulator from '@/app/components/AgentSimulator';
+import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
 import { getMap } from '@/app/lib/mapStore';
-import { mapCaption } from '@/app/lib/mapCaption';
+import { readSince } from '@/app/lib/exchange';
 import { isPhase, type Phase } from '@/app/lib/mapKinds';
 
 export const dynamic = 'force-dynamic';
@@ -20,24 +19,22 @@ export default async function MapPage({
 
   const phase: Phase = isPhase(map.phase) ? map.phase : 'deconstruct';
 
+  // The whole log, so the rail is populated on first paint and the bridge
+  // starts holding a cursor it can resume from rather than one it has to go
+  // and fetch before it knows anything.
+  const { revision, events } = await readSince(map.id);
+
   return (
     // The bridge wraps the whole surface rather than one panel: the map is the
     // shared artifact, so an agent's tools stay bound for as long as the page
     // is open, whichever view of it is showing.
-    <WebMcpBridge mapId={map.id}>
-      <main className="flex h-screen flex-col gap-6 px-10 py-8">
-        <AppHeader phase={phase} />
-        {phase === 'next-steps' ? (
-          <SummaryScreen mapId={map.id} messages={map.messages} nodes={map.nodes} />
-        ) : (
-          <MapWorkspace
-            mapId={map.id}
-            messages={map.messages}
-            nodes={map.nodes}
-            caption={mapCaption(map.nodes)}
-          />
-        )}
-      </main>
+    <WebMcpBridge
+      mapId={map.id}
+      initialEvents={events}
+      initialRevision={revision}
+    >
+      <MapScreen phase={phase} nodes={map.nodes} />
+      {process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}
     </WebMcpBridge>
   );
 }

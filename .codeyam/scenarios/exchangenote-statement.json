@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeNote - Statement",
+  "id": "dad0b828-2682-4f24-9619-88d7a440f352",
+  "url": "/isolated-components/ExchangeNote?s=Statement",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeNote",
+  "scenarioType": "component",
+  "description": "A note with nothing to answer, so no line takes emphasis - the rule and its absence."
+}

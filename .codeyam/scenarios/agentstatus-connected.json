@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatus - Connected",
+  "id": "91b86bee-fd20-413f-a802-7b1b109e04f5",
+  "url": "/isolated-components/AgentStatus?s=Connected",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatus",
+  "scenarioType": "component",
+  "description": "An agent attached with all seven catalog tools bound, and the map's revision beside it."
+}

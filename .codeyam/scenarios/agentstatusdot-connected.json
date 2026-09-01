@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusDot - Connected",
+  "id": "dd62b73a-83fc-4ef6-950f-ff10bca81be8",
+  "url": "/isolated-components/AgentStatusDot?s=Connected",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusDot",
+  "scenarioType": "component",
+  "description": "Lime for a live agent."
+}

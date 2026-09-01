@@ -1,0 +1,12 @@
+{
+  "name": "AgentSimulator - Default",
+  "id": "9068a6e6-4b7f-4588-bd26-2c858adf0394",
+  "url": "/isolated-components/AgentSimulator?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentSimulator",
+  "scenarioType": "component",
+  "description": "The stand-in agent at rest. It renders outside production only, and is the only reason the exchange can be demonstrated where no real agent can attach."
+}

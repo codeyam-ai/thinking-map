@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - Working",
+  "id": "e26a8632-2d0c-43e8-9a5b-8fec60d586df",
+  "url": "/isolated-components/MapScreen?s=Working",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "The whole surface with an agent attached: the map takes the frame, two questions wait, and the rail records both sides."
+}

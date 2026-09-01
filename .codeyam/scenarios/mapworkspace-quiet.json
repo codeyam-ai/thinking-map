@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - Quiet",
+  "id": "165d3b5b-9561-4467-80a0-92e5134d34ce",
+  "url": "/isolated-components/MapWorkspace?s=Quiet",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "A map nobody has worked yet, with no agent attached - so the rail carries its own explanation of how anything gets into it."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeColumn - Default",
+  "id": "ab62507d-8a5b-44d0-b571-06f50e342767",
+  "url": "/isolated-components/ExchangeColumn?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeColumn",
+  "scenarioType": "component",
+  "description": "The page's whole half of the exchange, in the order that matters: what is waiting, how to contribute, what already happened."
+}

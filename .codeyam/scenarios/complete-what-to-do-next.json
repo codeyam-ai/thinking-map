@@ -317,5 +317,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "The summary screen: what we know, what we do not, three directions, and five concrete next steps - with the conversation still open beneath it."
+  "description": "The summary screen: what we know, what we do not, three directions, and five concrete next steps - with somewhere to put the next thought beneath it, because the plan is a starting point rather than a dead end."
 }

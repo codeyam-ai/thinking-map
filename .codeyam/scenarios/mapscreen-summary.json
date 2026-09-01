@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - Summary",
+  "id": "635114b0-e223-4b6e-99ae-f239818e47ec",
+  "url": "/isolated-components/MapScreen?s=Summary",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "The end of the loop: the plan above, with somewhere to keep going underneath it."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AgentToolRunner - WithInput",
+  "id": "11781df5-c218-49e6-8abe-cc641c0964cd",
+  "url": "/isolated-components/AgentToolRunner?s=WithInput",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentToolRunner",
+  "scenarioType": "component",
+  "description": "A call with real arguments typed in, which is the shape an agent actually sends."
+}

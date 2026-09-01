@@ -1,0 +1,19 @@
+{
+  "name": "OpenQuestionRow - Typed",
+  "id": "9fcdb1f6-5f2b-41f0-b597-d3a0da559b7a",
+  "url": "/isolated-components/OpenQuestionRow?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "OpenQuestionRow",
+  "scenarioType": "component",
+  "description": "An answer typed but not sent: the send control turns live on the draft, which is the only thing standing between the person and a resolved question.",
+  "interactions": [
+    {
+      "action": "fill",
+      "selector": "input[placeholder^=\"Answer\"]",
+      "value": "Almost never, which is probably the whole problem."
+    }
+  ]
+}

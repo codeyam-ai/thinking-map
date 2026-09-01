@@ -1,0 +1,12 @@
+{
+  "name": "AgentToolRunner - Busy",
+  "id": "b3a2f16e-e644-4ec8-8510-d4faeccf7d43",
+  "url": "/isolated-components/AgentToolRunner?s=Busy",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentToolRunner",
+  "scenarioType": "component",
+  "description": "Mid-call: Run is disabled so a second call cannot race the first."
+}

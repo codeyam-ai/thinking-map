@@ -1,0 +1,12 @@
+{
+  "name": "AgentToolRunner - Default",
+  "id": "201dad45-401d-4ba3-aa73-a454d5aa43d1",
+  "url": "/isolated-components/AgentToolRunner?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentToolRunner",
+  "scenarioType": "component",
+  "description": "The by-hand half of the dev panel, listing the tools actually bound rather than a hardcoded set."
+}

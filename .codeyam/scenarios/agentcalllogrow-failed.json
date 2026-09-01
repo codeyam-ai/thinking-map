@@ -1,0 +1,12 @@
+{
+  "name": "AgentCallLogRow - Failed",
+  "id": "5da66b5b-fe37-4da6-bf5a-84bfc5eda789",
+  "url": "/isolated-components/AgentCallLogRow?s=Failed",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentCallLogRow",
+  "scenarioType": "component",
+  "description": "A call that failed, in the risk colour - the panel's whole claim is that these are real tool calls, so a broken one must not read as a quiet one."
+}

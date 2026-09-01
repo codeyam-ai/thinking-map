@@ -1,0 +1,12 @@
+{
+  "name": "AgentToolRunner - NoDriver",
+  "id": "dfae56ba-eaa5-44bd-9b99-0643a3f10b24",
+  "url": "/isolated-components/AgentToolRunner?s=NoDriver",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentToolRunner",
+  "scenarioType": "component",
+  "description": "Nothing bound on the page, so the select falls back to the current name rather than rendering an empty list."
+}

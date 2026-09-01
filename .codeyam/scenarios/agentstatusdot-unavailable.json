@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusDot - Unavailable",
+  "id": "6c24da30-95c2-4139-bc93-1e12ebb6a10e",
+  "url": "/isolated-components/AgentStatusDot?s=Unavailable",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusDot",
+  "scenarioType": "component",
+  "description": "The neutral line colour: absence is the ordinary case here, so it is deliberately not a warning."
+}

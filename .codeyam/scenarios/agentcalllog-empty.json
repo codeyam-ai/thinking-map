@@ -1,0 +1,12 @@
+{
+  "name": "AgentCallLog - Empty",
+  "id": "3a634767-e7bb-4b9c-aade-4875affaf47c",
+  "url": "/isolated-components/AgentCallLog?s=Empty",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentCallLog",
+  "scenarioType": "component",
+  "description": "Before anything has run - the log says so rather than looking broken."
+}

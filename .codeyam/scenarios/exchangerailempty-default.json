@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRailEmpty - Default",
+  "id": "49625832-422a-4cc9-8805-c7d8f3a076c2",
+  "url": "/isolated-components/ExchangeRailEmpty?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRailEmpty",
+  "scenarioType": "component",
+  "description": "The empty state on its own: the only cue a person has that the map is something two parties write to."
+}

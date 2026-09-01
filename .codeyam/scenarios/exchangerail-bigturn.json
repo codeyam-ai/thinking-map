@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRail - BigTurn",
+  "id": "76dabd3d-2f2c-41ea-b18d-34cc88c318a7",
+  "url": "/isolated-components/ExchangeRail?s=BigTurn",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRail",
+  "scenarioType": "component",
+  "description": "A single agent turn that wrote six nodes, collapsed to a count rather than burying the rest of the log."
+}

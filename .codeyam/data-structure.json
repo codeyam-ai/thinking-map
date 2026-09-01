@@ -45,7 +45,7 @@
   },
   {
     "name": "Message",
-    "description": "One turn of the conversation, in order. The conversation panel on the left of every screen renders these. Paired with MapNode: the two are different views of the same thinking process. 'origin' records whether the user or the agent produced the turn.",
+    "description": "One turn of the conversation, in order. Nothing in the page renders these any more — the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
     "category": "datastore",
     "order": 2,
     "fields": [
@@ -196,44 +196,6 @@
       {
         "name": "createdAt",
         "type": "datetime",
-        "required": true
-      }
-    ]
-  },
-  {
-    "name": "AnthropicMessagesAPI",
-    "description": "The single external dependency: POST https://api.anthropic.com/v1/messages on claude-opus-5. It drives the whole loop \u2014 deconstructing the idea into questions, emitting map updates as tool calls, and writing the final plan. The Research phase needs no separate search provider: Anthropic's server-side web_search tool runs inside this same call, so its findings arrive as content blocks in the response. Mocked per scenario via mocks.http, which is why every screen renders without credentials.",
-    "category": "mock-api",
-    "order": 5,
-    "fields": [
-      {
-        "name": "model",
-        "type": "string",
-        "required": true
-      },
-      {
-        "name": "messages",
-        "type": "array",
-        "required": true
-      },
-      {
-        "name": "system",
-        "type": "string",
-        "required": false
-      },
-      {
-        "name": "tools",
-        "type": "array",
-        "required": false
-      },
-      {
-        "name": "thinking",
-        "type": "object",
-        "required": false
-      },
-      {
-        "name": "max_tokens",
-        "type": "number",
         "required": true
       }
     ]

@@ -1,0 +1,12 @@
+{
+  "name": "OpenQuestionRow - LongQuestion",
+  "id": "78d18064-d0af-48f4-81f8-e1fb90f08f0d",
+  "url": "/isolated-components/OpenQuestionRow?s=LongQuestion",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "OpenQuestionRow",
+  "scenarioType": "component",
+  "description": "A full-sentence question that wraps - the shape an agent deconstructing an idea actually produces."
+}

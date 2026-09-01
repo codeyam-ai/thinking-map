@@ -4,9 +4,8 @@
 
 import { prisma } from './prisma';
 import { KIND_EYEBROW } from './mapKinds';
-import { planMapMutations } from './nodePlan';
+import { planMapMutations, type ToolInvocation } from './nodePlan';
 import { recordEvents, type EventInput, type Origin } from './exchange';
-import type { ToolInvocation } from './thinkingPartner';
 
 export async function listMaps() {
   return prisma.thinkingMap.findMany({

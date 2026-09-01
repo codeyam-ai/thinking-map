@@ -1,0 +1,12 @@
+{
+  "name": "AgentPanelLauncher - Default",
+  "id": "2caabff6-debf-4dcc-ae6c-39f3836e59a0",
+  "url": "/isolated-components/AgentPanelLauncher?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentPanelLauncher",
+  "scenarioType": "component",
+  "description": "The collapsed dev panel, pinned to the corner: present enough to find, quiet enough to ignore."
+}

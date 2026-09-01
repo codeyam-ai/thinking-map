@@ -1,0 +1,12 @@
+{
+  "name": "OpenQuestions - Two",
+  "id": "335b2b32-3f11-4bfd-bfcd-093d6afa048a",
+  "url": "/isolated-components/OpenQuestions?s=Two",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "OpenQuestions",
+  "scenarioType": "component",
+  "description": "Two waiting, the ordinary shape of a deconstructing turn."
+}

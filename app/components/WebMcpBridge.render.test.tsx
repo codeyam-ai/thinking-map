@@ -18,6 +18,15 @@ import BridgeReadout from '../isolated-components/WebMcpBridge/BridgeReadout';
 // forward, then hand the questions to the page — with only the network faked,
 // so what is asserted is the state the code actually produces.
 
+// The bridge re-renders the server component when the log moves past what was
+// rendered — without that, a question answered in the panel would stay dashed
+// on the map. `useRouter` needs an App Router context that a bare jsdom render
+// has none of, so it is stubbed here; `refresh` being a no-op is correct for
+// these tests, which assert what the bridge renders rather than what Next does.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: () => {} }),
+}));
+
 const TOOL_NAMES = [
   'read_map',
   'add_nodes',

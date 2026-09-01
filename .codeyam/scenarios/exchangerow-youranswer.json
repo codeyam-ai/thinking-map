@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRow - YourAnswer",
+  "id": "c1aba354-2816-41aa-8052-f9a0fe4d19db",
+  "url": "/isolated-components/ExchangeRow?s=YourAnswer",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRow",
+  "scenarioType": "component",
+  "description": "The person's side: a hollow marker the same size as the agent's disc, so the rail reads as one column rather than two feeds."
+}

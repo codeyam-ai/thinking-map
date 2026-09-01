@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatus - NoAgent",
+  "id": "68bad75e-fcf9-471b-aae8-90109b82c79e",
+  "url": "/isolated-components/AgentStatus?s=NoAgent",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatus",
+  "scenarioType": "component",
+  "description": "The state every preview and capture genuinely produces. It reads as a fact about the page with a reason, not a fault."
+}

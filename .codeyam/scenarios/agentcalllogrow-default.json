@@ -1,0 +1,12 @@
+{
+  "name": "AgentCallLogRow - Default",
+  "id": "bef7fda4-b60a-414e-9ab0-2ec49ae3d4e9",
+  "url": "/isolated-components/AgentCallLogRow?s=Default",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentCallLogRow",
+  "scenarioType": "component",
+  "description": "A tool call and its reply: monospace on the name, prose on the result, because the reply is written for an agent to read."
+}

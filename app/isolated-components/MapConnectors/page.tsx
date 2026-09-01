@@ -3,12 +3,12 @@ import type { LaidOutNode } from "../../lib/mapLayout";
 
 const parent: LaidOutNode = {
   id: "p", parentId: null, kind: "idea", label: "Root", detail: null,
-  status: "answered", sourceUrl: null, depth: 0, x: 180, y: 24, width: 200, height: 62,
+  status: "answered", sourceUrl: null, origin: "user", depth: 0, x: 180, y: 24, width: 200, height: 62,
 };
 
 const child = (id: string, x: number): LaidOutNode => ({
   id, parentId: "p", kind: "problem", label: id, detail: null,
-  status: "answered", sourceUrl: null, depth: 1, x, y: 172, width: 160, height: 56,
+  status: "answered", sourceUrl: null, origin: "agent", depth: 1, x, y: 172, width: 160, height: 56,
 });
 
 const scenarios: Record<string, LaidOutNode[]> = {

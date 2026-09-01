@@ -6,11 +6,18 @@ space, and turn your thinking into a visual map and an actionable plan.
 You arrive with something you cannot yet describe — *"I want to build an educational
 game for kids, but I don't know what it should be"* — and instead of answering, the
 partner names what it doesn't know and asks the two or three questions that would
-change what you should build. Every answer becomes a node on a map that grows beside
-the conversation. When it helps, it searches the web for what already exists and hangs
-the findings, and the gaps in them, off the map. Change direction and nothing is lost:
-the map updates and tells you what changed. You leave with what you know, what you
-don't, the strongest directions, and where to start tomorrow.
+change what you should build. Every answer becomes a node on a map. When it helps, it
+searches the web for what already exists and hangs the findings, and the gaps in them,
+off the map. Change direction and nothing is lost: the map updates and tells you what
+changed. You leave with what you know, what you don't, the strongest directions, and
+where to start tomorrow.
+
+**The agent is your browser's agent, and the page is the shared artifact.** There is no
+chat in this app. The thinking partner runs wherever you already talk to it and reaches
+this page through its tools; the map is the thing you both write to. That is a
+deliberate consequence of how WebMCP works rather than a missing feature — the page has
+no access to the agent's conversation and under WebMCP never will, so it shows the half
+it genuinely owns instead of faking the other.
 
 The central principle: **don't just give me an answer — help me understand the problem
 well enough to find a better answer.**
@@ -37,16 +44,31 @@ The production database starts **empty** by design — you see the day-one state
 populate it by using the app. Each registered scenario carries its own seed data, so
 every screen can be viewed in every state without touching production data.
 
-### Talking to the model
+No API key is needed. The app never calls a model itself — the agent is the one you
+already have, and it brings its own credentials.
 
-The conversation needs an Anthropic API key. Put it in `.env.local` (gitignored):
+### What you can put into the map
 
-```bash
-ANTHROPIC_API_KEY=sk-ant-...
-```
+The page's half of the exchange is a narrow column beside the map:
 
-Without a key the app still runs and every seeded scenario renders; sending a message
-returns a plain explanation rather than a generic error.
+- **Waiting on you** — every open question the agent has asked, each with an answer
+  field. Answering writes it to the log and releases the agent's turn if one is blocked
+  on it; you never have to know which of those is happening.
+- **Note** — a line for the agent to read on its next turn. It is not a chat message:
+  the reply comes back in the agent's own surface, not here.
+- **Add node** — put something on the map yourself, under any of the node kinds the
+  agent's tools use. Nodes you wrote are badged *yours*, which is also what stops the
+  agent re-ingesting its own writes.
+- **Activity** — what has happened to the map, from both sides, oldest first.
+
+### Driving it without an agent
+
+WebMCP binds only in a top-level secure page in a browser with an agent (Chrome 146+),
+so no agent can attach inside an iframe — which is every preview and every captured
+scenario. Outside production the page therefore carries an **Agent panel** (bottom
+right). It calls `window.__thinkingMapAgent`, the same bound catalog a real agent uses,
+so its "run the demo sequence" button exercises the genuine tool paths rather than a
+mock of them.
 
 ## Three front doors
 
@@ -132,17 +154,22 @@ log itself — read it with `?since=`, and post a `user.answer`, `user.note`, or
 
 - **Next.js + Prisma + SQLite.** Four tables: `ThinkingMap`, `Message`, `MapNode`, and
   `MapEvent`. The map is a tree via a nullable `parentId`, so there is no separate edge
-  table.
+  table. `Message` is now history only — nothing renders it, and new thinking is
+  recorded as `MapEvent`.
 - **`app/lib/exchange.ts`** is the only place map revisions are minted. One append-only
   log answers all three forms of "what happened after revision N?" — the agent's delta,
   the unread user contributions, and the activity feed — and it is the only thing that
   can record a deletion, which a diff over `MapNode` rows cannot see.
 - **`app/lib/mapStore.ts`** is the only place that reads or writes a map; every front
   door goes through it, and each write also becomes an event on the log.
-- **`app/lib/thinkingPartner.ts`** is the only place that talks to a model
-  (`claude-opus-5`, adaptive thinking, plus Anthropic's server-side `web_search` — so
-  the Research phase needs no separate search provider). Every decision the agent loop
-  makes lives in `app/lib/turnInterpreter.ts`, which is pure and tested.
+- **`app/lib/contributions.ts`** turns a contribution from the page into what it
+  actually does to the map — a node that has to appear, a question that has to stop
+  being open — server-side, so every front door sees it rather than only the browser
+  that did it.
+- **`app/lib/exchangeRail.ts`** is how the log reads to a person, and
+  `app/lib/exchangeFormat.ts` how it reads to an agent. They are separate on purpose:
+  an agent needs the revision cursor on every line, a person needs to know what happened
+  to their map.
 - **The map's geometry** is `app/lib/mapLayout.ts` — a tidy-tree layout returning
   absolute pixel positions, tested for sibling non-overlap, parent centring, orphaned
   parents, and cycle termination.

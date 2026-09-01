@@ -1,0 +1,12 @@
+{
+  "name": "AgentCallLog - WithFailure",
+  "id": "108739ff-2432-443f-8ff9-a8627dcb819b",
+  "url": "/isolated-components/AgentCallLog?s=WithFailure",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentCallLog",
+  "scenarioType": "component",
+  "description": "A failed call among successful ones, which is how a bad input surfaces without stopping the sequence."
+}

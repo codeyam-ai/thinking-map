@@ -8,21 +8,79 @@
     ]
   },
   {
+    "description": "The transcript of what the stand-in agent actually called. This is the evidence that the panel drives the real bound catalog rather than a simulation: every reply is the tool's own, returned through the path a browser agent's call takes.",
+    "filePath": "app/components/AgentCallLog.tsx",
+    "name": "AgentCallLog",
+    "scenarios": [
+      "agentcalllog-default",
+      "agentcalllog-empty",
+      "agentcalllog-withfailure"
+    ]
+  },
+  {
+    "description": "One call and what it returned. Monospace on the name and prose on the result, because the reply is written for an agent to read and is worth reading. A failure takes the risk colour so a broken call cannot be mistaken for a quiet one.",
+    "filePath": "app/components/AgentCallLogRow.tsx",
+    "name": "AgentCallLogRow",
+    "scenarios": [
+      "agentcalllogrow-default",
+      "agentcalllogrow-failed"
+    ]
+  },
+  {
+    "description": "The collapsed dev panel, pinned to the corner: present enough to find, quiet enough to ignore. It sits over the map rather than in the layout because it is not part of the product.",
+    "filePath": "app/components/AgentPanelLauncher.tsx",
+    "name": "AgentPanelLauncher",
+    "scenarios": [
+      "agentpanellauncher-default"
+    ]
+  },
+  {
+    "description": "A stand-in agent for development and captures — not a mock. WebMCP is top-level-secure-context only and captures render in an iframe, so no real agent can ever attach where this product most needs demonstrating. It drives window.__thinkingMapAgent, the same bound catalog a real agent calls, so its scripted sequence exercises the genuine tool paths. Rendered outside production only.",
+    "filePath": "app/components/AgentSimulator.tsx",
+    "name": "AgentSimulator",
+    "scenarios": [
+      "agentsimulator-default",
+      "agentsimulator-open"
+    ]
+  },
+  {
+    "description": "Whether an agent can reach this page, stated plainly. Unavailable is the ordinary case rather than an error — WebMCP is top-level-secure-context only, so a preview iframe, Safari, and any page opened without a browser agent all land there. It sits in the header because presence is a fact about the whole page.",
+    "filePath": "app/components/AgentStatus.tsx",
+    "name": "AgentStatus",
+    "scenarios": [
+      "agentstatus-noagent",
+      "agentstatus-connected",
+      "agentstatus-working"
+    ]
+  },
+  {
+    "description": "The three states of agent presence as one dot: lime for attached, pulsing lime mid-call, and the plain line colour when none is attached. Absence gets a neutral treatment rather than a warning one, because here it is normal.",
+    "filePath": "app/components/AgentStatusDot.tsx",
+    "name": "AgentStatusDot",
+    "scenarios": [
+      "agentstatusdot-connected",
+      "agentstatusdot-working",
+      "agentstatusdot-unavailable"
+    ]
+  },
+  {
+    "description": "Call one bound tool by hand with a small JSON input. The tool list comes from the published driver rather than a hardcoded array, so what it offers is exactly what is bound — a tool that failed to register is missing here too, which is the point.",
+    "filePath": "app/components/AgentToolRunner.tsx",
+    "name": "AgentToolRunner",
+    "scenarios": [
+      "agenttoolrunner-default",
+      "agenttoolrunner-withinput",
+      "agenttoolrunner-busy",
+      "agenttoolrunner-nodriver"
+    ]
+  },
+  {
     "description": "Wordmark left, phase track right. Shared by the landing screen and the map workspace so the two never drift.",
     "filePath": "app/components/AppHeader.tsx",
     "name": "AppHeader",
     "scenarios": [
       "appheader-default",
       "appheader-explore"
-    ]
-  },
-  {
-    "description": "A turn the thinking partner took. Splits the reply into lines and gives each question bold weight on its own line, because the questions are what the product is for.",
-    "filePath": "app/components/AssistantBubble.tsx",
-    "name": "AssistantBubble",
-    "scenarios": [
-      "assistantbubble-default",
-      "assistantbubble-statement"
     ]
   },
   {
@@ -54,12 +112,21 @@
     }
   },
   {
-    "description": "The left-hand panel. Owns the send state and renders each turn as its own bubble component.",
-    "filePath": "app/components/ConversationPanel.tsx",
-    "name": "ConversationPanel",
+    "description": "The two direct ways to put something into the map: a note the agent reads on its next turn, or a node that lands on the map. Deliberately not a chat box — one line, no history under it, and what you send goes to the activity rail rather than into a thread.",
+    "filePath": "app/components/ContributionBar.tsx",
+    "name": "ContributionBar",
     "scenarios": [
-      "conversationpanel-default",
-      "conversationpanel-empty"
+      "contributionbar-default",
+      "contributionbar-addnode"
+    ]
+  },
+  {
+    "description": "Which of the two contributions the bar is composing. Two tabs rather than two stacked inputs, because the difference between them is what happens afterwards — that is a choice, not two separate controls.",
+    "filePath": "app/components/ContributionTabs.tsx",
+    "name": "ContributionTabs",
+    "scenarios": [
+      "contributiontabs-note",
+      "contributiontabs-node"
     ]
   },
   {
@@ -77,6 +144,55 @@
     "name": "EmptyHint",
     "scenarios": [
       "emptyhint-default"
+    ]
+  },
+  {
+    "description": "The page's half of the exchange, in the order that matters: what is being waited on, then the ways to put something in, then the record of what has happened. It holds no reconstruction of the agent's conversation because there is none to hold — the page cannot see it and under WebMCP never will.",
+    "filePath": "app/components/ExchangeColumn.tsx",
+    "name": "ExchangeColumn",
+    "scenarios": [
+      "exchangecolumn-default",
+      "exchangecolumn-nothingwaiting",
+      "exchangecolumn-quiet"
+    ]
+  },
+  {
+    "description": "Free text a side actually wrote, inside an activity row. A question keeps its weight here for the reason it did in the conversation panel this replaces: the questions are the product, and one buried in an agent's note is the line the person is meant to act on.",
+    "filePath": "app/components/ExchangeNote.tsx",
+    "name": "ExchangeNote",
+    "scenarios": [
+      "exchangenote-withquestion",
+      "exchangenote-statement"
+    ]
+  },
+  {
+    "description": "What has happened to this map, oldest first, from both sides in one ordered column. It records what was done to the artifact rather than reconstructing a conversation it cannot see, and scrolls to the end so the newest is where the attention goes.",
+    "filePath": "app/components/ExchangeRail.tsx",
+    "name": "ExchangeRail",
+    "scenarios": [
+      "exchangerail-default",
+      "exchangerail-empty",
+      "exchangerail-justanswered",
+      "exchangerail-bigturn"
+    ]
+  },
+  {
+    "description": "The activity rail before anything has happened. It describes the next action rather than the absence of data — and that matters more than usual here, because it is the only cue a person arriving without an agent has that the map is something two parties write to.",
+    "filePath": "app/components/ExchangeRailEmpty.tsx",
+    "name": "ExchangeRailEmpty",
+    "scenarios": [
+      "exchangerailempty-default"
+    ]
+  },
+  {
+    "description": "One thing that happened to the map. A record, not a turn in a conversation: one line, marked with the side that caused it, and it does not invite a reply. The agent gets its dark disc; the person a hollow counterpart of the same size, so the rail reads as one column rather than two feeds.",
+    "filePath": "app/components/ExchangeRow.tsx",
+    "name": "ExchangeRow",
+    "scenarios": [
+      "exchangerow-agentadded",
+      "exchangerow-agentaddedmany",
+      "exchangerow-agentnote",
+      "exchangerow-youranswer"
     ]
   },
   {
@@ -112,6 +228,15 @@
     "name": "IdeaPrompt",
     "scenarios": [
       "ideaprompt-default"
+    ]
+  },
+  {
+    "description": "Somewhere to put the next thought, under the finished plan. The summary is the end of the loop and deliberately not a dead end. There are no open questions on this screen by definition, so it is the contribution bar and the record without the waiting-on-you panel.",
+    "filePath": "app/components/KeepThinkingPanel.tsx",
+    "name": "KeepThinkingPanel",
+    "scenarios": [
+      "keepthinkingpanel-default",
+      "keepthinkingpanel-quiet"
     ]
   },
   {
@@ -159,18 +284,22 @@
     ]
   },
   {
+    "description": "The whole map surface: the header with agent presence, and whichever view the phase calls for. The working tree while the thinking is live, the plan once it has run out — the same map at two moments, which is why choosing between them lives here rather than in the route.",
+    "filePath": "app/components/MapScreen.tsx",
+    "name": "MapScreen",
+    "scenarios": [
+      "mapscreen-working",
+      "mapscreen-noagent",
+      "mapscreen-summary"
+    ]
+  },
+  {
     "description": "The working view - conversation left, map right - the two views of the same thinking placed side by side.",
     "filePath": "app/components/MapWorkspace.tsx",
     "name": "MapWorkspace",
     "scenarios": [
       "mapworkspace-default"
     ]
-  },
-  {
-    "description": "Raised when no Anthropic credential is configured, carrying the sentence the message route shows the person. It exists so a missing key reads as a plain explanation of what to add and where, rather than a generic 500.",
-    "filePath": "app/lib/thinkingPartner.ts",
-    "name": "MissingCredentialsError",
-    "testFile": "app/lib/thinkingPartner.test.ts"
   },
   {
     "description": "The concrete next steps, arrowed left to right. The first step is unboxed because it is where you start tomorrow rather than one option among several.",
@@ -182,6 +311,35 @@
     ]
   },
   {
+    "description": "Which kind of node the person is adding. It reads the same controlled vocabulary the agent's tools are bound to, so a node a person adds is indistinguishable in kind from one the agent added — which is what makes the map genuinely co-authored. Its labels are the map's own eyebrows.",
+    "filePath": "app/components/NodeKindPicker.tsx",
+    "name": "NodeKindPicker",
+    "scenarios": [
+      "nodekindpicker-default",
+      "nodekindpicker-risk"
+    ]
+  },
+  {
+    "description": "One question with an inline answer field. The row owns its own draft, since each row answers exactly one question, and its send control names that question — several sit in the panel at once, and one repeated label leaves a screen reader unable to tell them apart.",
+    "filePath": "app/components/OpenQuestionRow.tsx",
+    "name": "OpenQuestionRow",
+    "scenarios": [
+      "openquestionrow-default",
+      "openquestionrow-longquestion",
+      "openquestionrow-typed"
+    ]
+  },
+  {
+    "description": "The questions addressed to the person, with somewhere to answer them. An open-question node is a request, not a shape, so leaving it only as a dashed pill buries the one thing anybody is waiting on. Empties as they are answered, and renders nothing when none are open.",
+    "filePath": "app/components/OpenQuestions.tsx",
+    "name": "OpenQuestions",
+    "scenarios": [
+      "openquestions-one",
+      "openquestions-two",
+      "openquestions-many"
+    ]
+  },
+  {
     "description": "The six-phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar.",
     "filePath": "app/components/PhaseNav.tsx",
     "name": "PhaseNav",
@@ -189,16 +347,6 @@
       "phasenav-default",
       "phasenav-nextsteps",
       "phasenav-research"
-    ]
-  },
-  {
-    "description": "The reply box at the foot of the conversation, with the error region that explains a failed turn in place of a silent failure.",
-    "filePath": "app/components/ReplyForm.tsx",
-    "name": "ReplyForm",
-    "scenarios": [
-      "replyform-busy",
-      "replyform-default",
-      "replyform-witherror"
     ]
   },
   {
@@ -290,16 +438,6 @@
     ]
   },
   {
-    "description": "A turn the person took: ink-filled and right-aligned, the visual counterweight to the partner's warm bubbles.",
-    "filePath": "app/components/UserBubble.tsx",
-    "name": "UserBubble",
-    "scenarios": [
-      "userbubble-default",
-      "userbubble-long",
-      "userbubble-short"
-    ]
-  },
-  {
     "description": "Mounts the page's own front door. Binds the tool catalog to the current map for as long as the map page is open, disposing on unmount and on map change because re-registering a live tool name throws InvalidStateError. Holds the pending ask_user state and resolves the agent's turn when the person answers, writing the answer to the log BEFORE releasing it so an agent that already gave up still finds it. Publishes the headless driver whether or not a real agent is present, which is the only way the tools are reachable inside a capture iframe. Reports connection state through the same context, and exposes the tool names from the catalog rather than from the published driver - a consumer's effect runs before its parent's, so reading the driver would race the binding that creates it.",
     "filePath": "app/components/WebMcpBridge.tsx",
     "name": "WebMcpBridge",
@@ -320,10 +458,28 @@
     ]
   },
   {
+    "description": "Puts the person's node on the map, with origin 'user' — the same fact the pill reads to badge it and the tools read to avoid re-ingesting their own writes. With no parent named it hangs off the root, because a second root would read as a second idea; an unknown kind falls back to one the map can draw, and an empty label writes nothing.",
+    "filePath": "app/lib/contributions.ts",
+    "name": "addUserNode",
+    "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
+    "description": "The node ids a user.answer event closed. Same payload tolerance as questionIds, and the input to both the suppression rule and the answered-question count.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "answeredIds",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
     "description": "What the agent is told once the person has answered. Reports each question alongside its answer, because an agent that asked several cannot match them up from the answers alone.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "answeredResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "Reads the id/answer pairs out of a user.answer payload sent by the browser. Untrusted on this side of the wire, so a malformed payload yields an empty list rather than throwing.",
+    "filePath": "app/lib/contributions.ts",
+    "name": "answersOf",
+    "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
     "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. All the rules live in planMapMutations, which is pure and tested. It now has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
@@ -369,6 +525,12 @@
     "testFile": "app/lib/mapLayout.test.ts"
   },
   {
+    "description": "Turns one contribution from the page into the events that should be recorded for it, performing the map writes it implies. A note is only ever an event; an answer also closes its question, and a node is created first so the event can carry its real id.",
+    "filePath": "app/lib/contributions.ts",
+    "name": "contributionEvents",
+    "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
     "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title. The seed idea is the person's, so the root node and opening message are user-origin - an agent reading the log must not mistake the human's starting idea for something it wrote. Records the root as the map's first event, leaving it at revision 1: a new map at revision 0 with an empty log would give an agent no way to tell it from one it had already read to the end.",
     "filePath": "app/lib/mapStore.ts",
     "name": "createMap",
@@ -389,10 +551,28 @@
     "testFile": "app/lib/exchange.test.ts"
   },
   {
+    "description": "The rail line for one event that does not collapse — a note, an answer, a question, a phase change. The wording is the interface: it is the only account a person gets of what an agent did to their map, so it lives in one place and is pinned by tests.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "describeEvent",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "The rail line for a collapsed run of node adds or updates. A run of one keeps the node's label, because naming the thing beats counting it; past one the count is the information.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "describeRun",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
     "description": "Marks a response as a genuine fault. Deliberately narrow: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "errorResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "Read one non-empty string field off an event payload, or null. The single guard every rail reader goes through, so an unparseable row degrades to a plainer line rather than throwing.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "field",
+    "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
     "description": "The user-origin changes to one node that landed after the revision an agent last read. Empty means the write is safe; non-empty means the person touched this node and the caller must decline instead of overwriting. Narrowed twice on purpose: an agent's own earlier writes are not a conflict with itself, and a busy map moves constantly so only a change to THIS node can clobber THIS write.",
@@ -407,10 +587,10 @@
     "testFile": "app/lib/toolCatalog.test.ts"
   },
   {
-    "description": "Decides what to append to the conversation before the next request. An empty array ends the loop; a paused turn gets the assistant's partial content echoed back so the server-side search can resume; a tool round additionally gets the matching tool_result blocks in the single user message the API requires.",
-    "filePath": "app/lib/turnInterpreter.ts",
-    "name": "followUpMessages",
-    "testFile": "app/lib/turnInterpreter.test.ts"
+    "description": "The text of the first answer in a user.answer payload. Only shown when a single question was answered — with several, a row has no way to say which answer belongs to which question.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "firstAnswer",
+    "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
     "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, and the indented node tree - so a client sees both views of the thinking the way the UI shows them side by side.",
@@ -457,21 +637,6 @@
       "justification": "Four straight-line statements with no branching: construct server, construct transport, connect, delegate. The tools underneath are covered by their own entries, and the endpoint was verified end to end against a live MCP client - initialize, tools/list, and a create/add-node/read round trip.",
       "kind": "platform-glue"
     }
-  },
-  {
-    "description": "Reports whether an Anthropic credential is present in the environment, so the message route can answer with a plain explanation instead of a generic 500 when the app has no way to reach a model.",
-    "filePath": "app/lib/thinkingPartner.ts",
-    "name": "hasCredentials",
-    "untestabilityReason": {
-      "justification": "Reads process.env directly and returns a boolean; the only behaviour worth asserting is what the environment already is, so a test would restate its one line rather than constrain it. Its consequence - the plain 503 explanation instead of a generic 500 - is covered by the message route.",
-      "kind": "platform-glue"
-    }
-  },
-  {
-    "description": "Decides what one model response means for the agent loop: collects spoken text and custom tool calls, emits a tool_result per tool_use, and returns a disposition. Reports a refusal instead of passing it off as an answer, asks the caller to resume a turn a server-side web search paused, and stops when tool_use is reported but only server tools ran - which would otherwise spin the loop.",
-    "filePath": "app/lib/turnInterpreter.ts",
-    "name": "interpretTurnResponse",
-    "testFile": "app/lib/turnInterpreter.test.ts"
   },
   {
     "description": "Guard for the eight kinds the exchange log can record. A kind outside the set would become a row that nothing knows how to render or resume past.",
@@ -591,6 +756,12 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "A phase's name for use in a sentence. The phase nav numbers its labels; the rail strips the number, so a row reads 'moved to Explore' rather than 'moved to 05 Explore'.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "phaseName",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
     "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase.",
     "filePath": "app/lib/nodePlan.ts",
     "name": "planMapMutations",
@@ -612,6 +783,18 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
+    "description": "The node ids a question.asked event announced. Tolerates a malformed or absent payload, because the log carries untrusted JSON that may predate the current shape.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "questionIds",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Turns the raw exchange log into the lines the activity rail shows, oldest first. Composes the three rules below: drop the bookkeeping, collapse runs, word what is left.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "railEntries",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
     "description": "Everything that happened after a cursor. An omitted cursor means the whole log, which is what a fresh agent wants; a cursor means just the delta, which is what a returning one wants. Both return the map's current revision, so a caller always leaves holding a cursor it can resume from even when the delta is empty.",
     "filePath": "app/lib/exchange.ts",
     "name": "readSince",
@@ -630,18 +813,30 @@
     "testFile": "app/lib/exchangeFormat.test.ts"
   },
   {
+    "description": "Closes the open questions an answer resolved, logging one node.updated per node that actually moved. Answering the same question twice logs the second answer without inventing a second change, and a node the agent has since deleted is skipped rather than failing the write.",
+    "filePath": "app/lib/contributions.ts",
+    "name": "resolveAnswered",
+    "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
+    "description": "The readable part of an MCP tool response — the first text block, which is what an agent would actually read. Falls back to raw JSON rather than rendering nothing, because a silently empty panel is worse than an ugly one.",
+    "filePath": "app/lib/agentDemo.ts",
+    "name": "resultText",
+    "testFile": "app/lib/agentDemo.test.ts"
+  },
+  {
+    "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "runLength",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
     "description": "Validates and runs one catalog tool. Agent input is untrusted, so it is checked against the tool's own schema before reaching an implementation and a validation failure comes back as readable text. isError is reserved for genuine faults: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent. Every front door - page, HTTP, stdio - ends here, which is what stops the three drifting apart.",
     "filePath": "app/lib/toolRuntime.ts",
     "name": "runTool",
     "scenarios": [
       "mid-exchange-agent-and-human-on-one-map"
     ]
-  },
-  {
-    "description": "Runs one turn of the conversation against claude-opus-5 with adaptive thinking, the three map tools and Anthropic's server-side web_search. A thin loop: every decision about what a response means - refusal, paused server tool, more tool calls, or done - is made by interpretTurnResponse, which is pure and tested.",
-    "filePath": "app/lib/thinkingPartner.ts",
-    "name": "runTurn",
-    "testFile": "app/lib/thinkingPartner.test.ts"
   },
   {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
@@ -677,16 +872,22 @@
     "testFile": "app/lib/toolCatalog.test.ts"
   },
   {
-    "description": "Converts stored conversation rows into the API's message array, treating any role that is not 'assistant' as a user turn so an unexpected value in the free-string column cannot throw mid-conversation.",
-    "filePath": "app/lib/turnInterpreter.ts",
-    "name": "toMessageParams",
-    "testFile": "app/lib/turnInterpreter.test.ts"
-  },
-  {
     "description": "The catalog as a browser agent or the headless driver lists it. A tool missing here is a tool the agent never learns it can call, so it is derived from the catalog rather than restated.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "toolSummaries",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The ask_user promise lifecycle: park an agent's turn on a set of questions, and release it when they are answered or the clock runs out. Separate from the log because it is a different clock — the log is durable and outlives everyone, this is one turn held in memory. A second ask releases the first as unanswered rather than stranding its promise.",
+    "filePath": "app/hooks/useAskUser.ts",
+    "name": "useAskUser",
+    "testFile": "app/components/WebMcpBridge.render.test.tsx"
+  },
+  {
+    "description": "The page's own copy of the exchange log, kept current. Polls the log forward from the cursor it holds — the same way an agent reads it, because WebMCP is pull-only and there is no push channel — and re-renders the server component when the log moves past what was rendered, so the server-rendered map does not sit out of step with its own log.",
+    "filePath": "app/hooks/useExchangeLog.ts",
+    "name": "useExchangeLog",
+    "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
     "description": "Scales a fixed-size plane to fit its frame down to a legibility floor, and opens an oversized map centred on its root. Seeing the whole shape at once is the point of the map, so fitting beats scrolling - but a map that would need shrinking past the floor scrolls instead.",
@@ -714,6 +915,12 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "The events worth showing a person, with the bookkeeping dropped. Hides the open-question nodes that ask_user created when a question.asked announced them, and the node.updated that closes a question the person just answered — both are cases where one act produced two events. An agent's own update to the same node still shows.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "visibleEvents",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
     "description": "Blocks until the person contributes, or until the caller's timeout expires. Re-reads the log first because an event may already be waiting and a waiter that subscribed before checking would sleep through it; then races an in-process emitter against a ~500ms poll. The poll is what lets a write from the separate stdio process wake a waiter living in the web process - an emitter alone would be silently correct in dev and silently wrong across front doors. Always resolves: a timeout is a normal result carrying the cursor, never a hang.",
     "filePath": "app/lib/exchange.ts",
     "name": "waitForUserActivity",
@@ -724,5 +931,11 @@
     "filePath": "app/lib/webmcp.ts",
     "name": "webMcpUnavailableReason",
     "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
+    "description": "Names the side that acted — 'Agent' or 'You'. The map is co-authored, so every rail line has to attribute itself; an unrecognised origin falls through as itself rather than becoming an anonymous row.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "who",
+    "testFile": "app/lib/exchangeRail.test.ts"
   }
 ]

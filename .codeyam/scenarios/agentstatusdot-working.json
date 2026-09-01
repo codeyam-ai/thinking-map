@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusDot - Working",
+  "id": "aabddcdc-f451-4b49-9ce4-3d836c0939b8",
+  "url": "/isolated-components/AgentStatusDot?s=Working",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusDot",
+  "scenarioType": "component",
+  "description": "The same lime, pulsing, while a call is in flight."
+}

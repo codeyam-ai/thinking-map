@@ -1,0 +1,12 @@
+{
+  "name": "ExchangeRail - Empty",
+  "id": "3c2666fe-f055-4351-8386-878365f23928",
+  "url": "/isolated-components/ExchangeRail?s=Empty",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "componentName": "ExchangeRail",
+  "scenarioType": "component",
+  "description": "Nothing has happened yet, so the rail describes the next action rather than the absence of data."
+}

@@ -13,6 +13,7 @@ import {
   recordEvents,
   USER_EVENT_KINDS,
 } from '@/app/lib/exchange';
+import { contributionEvents } from '@/app/lib/contributions';
 import { prisma } from '@/app/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -90,11 +91,15 @@ export async function POST(
     );
   }
 
-  const result = await recordEvents(
-    id,
-    [{ kind, origin: 'user', payload: payload ?? {} }],
-    { requestId: typeof requestId === 'string' ? requestId : null },
-  );
+  // A contribution is an event, but the interesting ones are also a change to
+  // the map — a node that has to appear, a question that has to stop being
+  // open. Those writes happen first, and everything they produce is recorded in
+  // one batch so the act and its consequences share one run of revisions.
+  const events = await contributionEvents(id, kind, payload);
+
+  const result = await recordEvents(id, events, {
+    requestId: typeof requestId === 'string' ? requestId : null,
+  });
 
   return NextResponse.json({
     revision: result.revision,
