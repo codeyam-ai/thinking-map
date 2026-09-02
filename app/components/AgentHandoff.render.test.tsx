@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import AgentHandoff from './AgentHandoff';
 import BridgeFixture from '../isolated-components/BridgeFixture';
 import type { ExchangeEvent } from '../lib/exchange';
@@ -152,12 +152,45 @@ describe('AgentHandoff', () => {
     expect(screen.getByText(/Pick this back up/i)).toBeTruthy();
   });
 
-  // The full band gained the same command, at the foot rather than beside the
-  // prompt. An agent reading a first-meeting map needs the door as much as one
-  // reading a worked map does.
-  it('offers the MCP command on the full band too', () => {
+  // The full band opens on the route that works for EVERY agent — the bare
+  // endpoint — not on one client's command. This is the fact the panel used to
+  // get wrong: it offered `claude mcp add` and nothing else, so a reader
+  // holding ChatGPT desktop or Cursor was shown a command they cannot run and
+  // never shown the address they needed.
+  it('opens the full band on the endpoint every agent can use', () => {
     render(<AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />);
+    expect(screen.getByRole('button', { name: /Copy MCP URL/i })).toBeTruthy();
+    // And only ONE way in is on screen at a time — the reason these are tabs
+    // rather than a stack, and the thing a reader loses if someone later
+    // "helpfully" renders every panel at once.
+    expect(screen.queryByRole('button', { name: /Copy MCP command/i })).toBeNull();
+  });
+
+  // The command did not go away, it moved behind the tab that owns it. Driven
+  // rather than asserted on a hidden node: a tab that renders its panel but
+  // never responds to a click is the failure this catches, and it looks
+  // identical to a working one in any static query.
+  it('reaches the Claude Code command through its tab', () => {
+    render(<AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />);
+    fireEvent.click(screen.getByRole('tab', { name: /Claude Code/i }));
     expect(screen.getByRole('button', { name: /Copy MCP command/i })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /Copy MCP URL/i })).toBeNull();
+  });
+
+  // The deliberate subtraction. `HandoffReattach` is for someone who has
+  // attached before and knows which door they use, so it shows the command
+  // flat with no three-way choice around it. A tab strip appearing here would
+  // be the full band's onboarding leaking back into the screen that exists to
+  // not have it.
+  it('gives the reattach strip the command flat, with no tabs', () => {
+    render(
+      <BridgeFixture status="unavailable" events={[userEvent(), agentEvent()]}>
+        <AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />
+      </BridgeFixture>,
+    );
+    expect(screen.getByRole('button', { name: /Copy MCP command/i })).toBeTruthy();
+    expect(screen.queryAllByRole('tab')).toHaveLength(0);
+    expect(screen.queryByRole('button', { name: /Copy MCP URL/i })).toBeNull();
   });
 
   // No provider at all — an isolated scenario. useOptionalWebMcpBridge returns

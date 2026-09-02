@@ -1,0 +1,42 @@
+{
+  "claimStartedAt": "2026-09-02T20:33:54Z",
+  "completedAt": "2026-09-02T21:24:49Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "ui-step22",
+    "machine": "codeyam-editor-codeyam-editor-11",
+    "originId": "beb799c3-357e-4959-acb9-9a6c22b71b60",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "dr-design-changes--wrap-and-explain-the-mcp-handoff-block",
+    "sessionId": "3153113d-4ba9-43a6-acbe-4864afebc583",
+    "startedAt": "2026-09-02T20:33:54Z"
+  },
+  "createdAt": "2026-09-02T20:26:09Z",
+  "deliverables": [
+    ".claude/skills/codeyam-manual-tests/SKILL.md",
+    ".gitignore",
+    "app/components/AgentHandoff.render.test.tsx",
+    "app/components/AgentHandoff.tsx",
+    "app/components/AttachTabPanel.tsx",
+    "app/components/AttachTabStrip.tsx",
+    "app/components/CopyablePrompt.render.test.tsx",
+    "app/components/CopyablePrompt.tsx",
+    "app/components/FootnoteLine.tsx",
+    "app/components/HandoffAttachTabs.tsx",
+    "app/components/HandoffFootnote.tsx",
+    "app/isolated-components/AttachTabPanel/page.tsx",
+    "app/isolated-components/AttachTabStrip/page.tsx",
+    "app/isolated-components/FootnoteLine/page.tsx",
+    "app/isolated-components/HandoffAttachTabs/page.tsx",
+    "app/isolated-components/HandoffFootnote/page.tsx",
+    "app/lib/handoffCopy.test.ts",
+    "app/lib/handoffCopy.ts"
+  ],
+  "journalTimestamp": "2026-09-02T21:24:49Z",
+  "mode": "ui",
+  "planFile": "completed/dr-design-changes--wrap-and-explain-the-mcp-handoff-block.md",
+  "slug": "dr-design-changes--wrap-and-explain-the-mcp-handoff-block",
+  "title": "dr-design changes -- Wrap and Explain the MCP Handoff Block"
+}

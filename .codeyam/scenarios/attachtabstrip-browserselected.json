@@ -1,0 +1,12 @@
+{
+  "name": "AttachTabStrip - BrowserSelected",
+  "id": "cf8f282f-3a93-412f-a055-10e9c7910218",
+  "url": "/isolated-components/AttachTabStrip?s=BrowserSelected",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachTabStrip",
+  "scenarioType": "component",
+  "description": "First position selected. The active underline sits against the strip's left edge with nothing to its left, which is where it has the least around it to read as a selection rather than as a stray rule under the first label."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AttachTabPanel - Browser",
+  "id": "9f681db6-896a-4aa3-83e9-ee1964563d66",
+  "url": "/isolated-components/AttachTabPanel?s=Browser",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachTabPanel",
+  "scenarioType": "component",
+  "description": "The route with NOTHING to copy, and the absence of a box below the line is the entire frame. A placeholder or disabled mono box here would contradict the sentence above it in the most visible way available - and an empty box is exactly what no unit test can see, which is why this state is captured rather than asserted."
+}

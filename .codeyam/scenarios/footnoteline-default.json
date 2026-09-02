@@ -1,0 +1,12 @@
+{
+  "name": "FootnoteLine - Default",
+  "id": "01c9fe6b-7e62-48a2-8105-7d221ed6dfcf",
+  "url": "/isolated-components/FootnoteLine?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FootnoteLine",
+  "scenarioType": "component",
+  "description": "The real explanation string at the length it actually runs to, in the small grey type the whole component exists to guarantee. Quiet is a claim about size and weight relative to the action above it, which is the one property no unit test can read - this frame is where the demotion is either still true or has drifted back toward the heading weight it used to have."
+}

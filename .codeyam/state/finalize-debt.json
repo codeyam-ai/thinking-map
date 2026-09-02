@@ -1,7 +1,7 @@
 {
-  "lastFinalizedAt": "2026-09-02T20:29:27Z",
-  "lastFinalizedSha": "b19ad721925b5bfecc287bf9070b94df04695230",
-  "lastFullFinalizeSha": "61d39619e94de8589f466d102b70472b2fd17355",
-  "lastFullFinalizeTree": "d4a1e83dc5819e6fba25df33419464468967a0e636b68158277f63352447c8d2",
+  "lastFinalizedAt": "2026-09-02T21:36:04Z",
+  "lastFinalizedSha": "f5ead7dc43561ce34e5f475b08305033f910722e",
+  "lastFullFinalizeSha": "38ac4504ac748eb5399657206226316e990808cc",
+  "lastFullFinalizeTree": "53fc4ed39494472f753fad8af0f2f572dc31c0142dcf21a55d3a07f489db11ab",
   "deferred": []
 }

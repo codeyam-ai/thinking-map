@@ -19,6 +19,15 @@
       "runner": "tests"
     },
     {
+      "description": "The deliberate subtraction. `HandoffReattach` is for someone who has attached before and knows which door they use, so it shows the command flat with no three-way choice around it. A tab strip appearing here would be the full band's onboarding leaking back into the screen that exists to not have it.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › gives the reattach strip the command flat, with no tabs",
+      "line": 185,
+      "registeredAt": "2026-09-02T21:03:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "The default is the full strip — a component that silently rendered its compact form everywhere would pass the dense test above and still be wrong on every working map.",
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
@@ -37,12 +46,12 @@
       "runner": "tests"
     },
     {
-      "description": "The full band gained the same command, at the foot rather than beside the prompt. An agent reading a first-meeting map needs the door as much as one reading a worked map does.",
+      "description": "The full band opens on the route that works for EVERY agent — the bare endpoint — not on one client's command. This is the fact the panel used to get wrong: it offered `claude mcp add` and nothing else, so a reader holding ChatGPT desktop or Cursor was shown a command they cannot run and never shown the address they needed.",
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
-      "key": "AgentHandoff › offers the MCP command on the full band too",
-      "line": 158,
-      "registeredAt": "2026-09-02T13:54:01Z",
+      "key": "AgentHandoff › opens the full band on the endpoint every agent can use",
+      "line": 160,
+      "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
     {
@@ -50,8 +59,17 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › puts the instruction before the explanation in document order",
-      "line": 205,
+      "line": 238,
       "registeredAt": "2026-09-02T11:13:46Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The command did not go away, it moved behind the tab that owns it. Driven rather than asserted on a hidden node: a tab that renders its panel but never responds to a click is the failure this catches, and it looks identical to a working one in any static query.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › reaches the Claude Code command through its tab",
+      "line": 173,
+      "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
     {
@@ -77,7 +95,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders the instruction and both steps",
-      "line": 194,
+      "line": 227,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -86,7 +104,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders the steps as an ordered list",
-      "line": 221,
+      "line": 254,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -104,7 +122,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders without a bridge provider at all",
-      "line": 165,
+      "line": 198,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -113,7 +131,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › shows a start prompt naming this map",
-      "line": 171,
+      "line": 204,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -122,7 +140,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › shows no quoted idea for a map started from a brief",
-      "line": 182,
+      "line": 215,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -424,6 +442,15 @@
       "runner": "tests"
     },
     {
+      "description": "The counterpart, and the reason the fix is a per-tone decision rather than a blanket one: `inline` exists to hold ONE row inside the reattach strip, so wrapping it would defeat the only thing it is for.",
+      "file": "app/components/CopyablePrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyablePrompt › does not wrap the inline tone, which is a deliberate one-row control",
+      "line": 117,
+      "registeredAt": "2026-09-02T21:03:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "The label flip is the entire success signal there is.",
       "file": "app/components/CopyablePrompt.render.test.tsx",
       "format": "vitest",
@@ -457,6 +484,15 @@
       "key": "CopyablePrompt › renders the prompt text",
       "line": 36,
       "registeredAt": "2026-09-02T11:13:46Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported bug. A long origin-bearing MCP command is a single unbreakable token wider than the box that holds it, and the `default` tone was the one tone with no wrapping rule at all — so it rendered OUTSIDE its rounded border instead of inside it. A CLASS assertion rather than a measured overflow, deliberately: jsdom has no layout, so nothing in this suite can observe a box being overflowed. The class is the thing that is either there or not, and it is what the fix changed; the visual claim i",
+      "file": "app/components/CopyablePrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyablePrompt › wraps a long command inside the default tone box",
+      "line": 106,
+      "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
     {
@@ -3065,8 +3101,17 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › builds an MCP command naming the given origin",
-      "line": 115,
+      "line": 119,
       "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "On the server render the browser's own address is not knowable, so the endpoint degrades to the relative path — still true, still the right address, and it simply assumes the reader knows what host they are on.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › degrades the endpoint to a relative path with no origin",
+      "line": 161,
+      "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
     {
@@ -3074,7 +3119,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › does not claim nobody is on a map an agent has already worked",
-      "line": 135,
+      "line": 200,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -3083,8 +3128,17 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › falls back to npm run mcp when no origin is known",
-      "line": 127,
+      "line": 131,
       "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The claim the browser tab makes about itself. A tab whose entire point is \"this route needs nothing pasted anywhere\" would contradict itself the moment it carried something to copy, and an absent field is what a renderer reads to draw no box at all.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › gives the browser route nothing to copy",
+      "line": 171,
+      "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
     {
@@ -3092,8 +3146,17 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › gives the same instruction and steps for a brief-only map",
-      "line": 106,
+      "line": 110,
       "registeredAt": "2026-09-02T11:13:46Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The endpoint an agent that is NOT Claude Code needs. This is the fact the panel previously never stated: a reader holding ChatGPT desktop or Cursor cannot run `claude mcp add`, and the raw address is their half of it.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › hands any agent the bare endpoint for the given origin",
+      "line": 148,
+      "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
     {
@@ -3101,7 +3164,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › keeps the original wording for an untouched map",
-      "line": 143,
+      "line": 208,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -3110,7 +3173,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › leads with an instruction naming the agent handoff",
-      "line": 98,
+      "line": 102,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -3128,7 +3191,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › names await_new_map as the way to stop copying prompts by hand",
-      "line": 68,
+      "line": 71,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3151,6 +3214,15 @@
       "runner": "tests"
     },
     {
+      "description": "The three routes, in the order a reader meets them. Pinned as a list because the panel's whole shape depends on there being exactly three alternatives — a fourth appended without thought, or one quietly dropped, changes what the tab strip is claiming about the ways in.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › offers exactly the browser, any-agent and Claude Code routes",
+      "line": 140,
+      "registeredAt": "2026-09-02T21:03:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "A brief-only map has little or nothing in the seed idea, so read_map would show the agent the emptier of the two things it could read.",
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
@@ -3169,6 +3241,15 @@
       "runner": "tests"
     },
     {
+      "description": "The Claude Code tab is a SHORTCUT for the endpoint beside it, so the two must point at the same place. Spelled as a containment check because one is a bare address and the other wraps it in a command.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › points the Claude Code shortcut at the same endpoint as the any-agent tab",
+      "line": 182,
+      "registeredAt": "2026-09-02T21:03:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "The person's own words carry the context an agent needs, so a sentence-map prompt should hand them over rather than making the agent go and look.",
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
@@ -3182,7 +3263,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › returns non-empty copy for every field in both cases",
-      "line": 160,
+      "line": 225,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3200,7 +3281,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › states copying before pasting",
-      "line": 88,
+      "line": 92,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -3209,7 +3290,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › still names the map in the worked variant’s prompt",
-      "line": 151,
+      "line": 216,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -3218,7 +3299,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › tells the person to paste the prompt into an agent chat window",
-      "line": 77,
+      "line": 81,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },

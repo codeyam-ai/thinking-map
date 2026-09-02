@@ -1,0 +1,12 @@
+{
+  "name": "AttachTabPanel - ClaudeCodeLongOrigin",
+  "id": "e3bcd812-0b83-49db-b36b-15bfbbdf76c8",
+  "url": "/isolated-components/AttachTabPanel?s=ClaudeCodeLongOrigin",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachTabPanel",
+  "scenarioType": "component",
+  "description": "The longest copyable string this panel ever holds - a `claude mcp add` line for a deployment whose host is long enough that the command is wider than its box. The reported bug, rendered: the command has to wrap INSIDE the rounded border, which jsdom has no layout to observe and only a capture can settle."
+}

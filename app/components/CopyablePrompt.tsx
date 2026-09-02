@@ -6,9 +6,16 @@ import { useState } from 'react';
 // tones differ in several values each, and reading them side by side is the
 // only way to see that `primary` is a promotion of the same control and not a
 // different one.
+//
+// Every tone now states a wrapping rule, and that is the point. `default` holds
+// origin-bearing commands whose URL is a single unbreakable token wider than the
+// box, so having NO rule was never a third choice — it was the box being
+// overflowed by its own contents. `break-words` breaks such a token only when it
+// does not fit, which leaves every short caller looking exactly as it did.
+// `inline` opts out on purpose, for the reason it states below.
 const PROMPT_CLASS = {
   default:
-    'mt-4 rounded-2xl border border-line px-4 py-3 font-mono text-[12px] leading-[1.6]',
+    'mt-4 rounded-2xl border border-line px-4 py-3 font-mono text-[12px] leading-[1.6] break-words',
   primary:
     'mt-4 rounded-2xl border border-line bg-surface px-4 py-3 font-mono text-[13px] leading-[1.6] break-words',
   // `truncate` rather than `break-words`: this tone exists to hold ONE row, and

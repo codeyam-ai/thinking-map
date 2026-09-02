@@ -1,0 +1,12 @@
+{
+  "name": "FootnoteLine - Short",
+  "id": "fa5c2786-28c8-4a12-91d2-f984b1b2439b",
+  "url": "/isolated-components/FootnoteLine?s=Short",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FootnoteLine",
+  "scenarioType": "component",
+  "description": "The one-clause case, at the `none` spacing a container owns the gap for. Its pair with LongestLine is the point: a single short line at this size has to still read as part of a group rather than as a stray fragment left behind by something above it."
+}

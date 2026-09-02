@@ -92,4 +92,33 @@ describe('CopyablePrompt', () => {
     const button = container.querySelector('button');
     expect(button?.className).not.toMatch(/bg-lime/);
   });
+
+  // The reported bug. A long origin-bearing MCP command is a single unbreakable
+  // token wider than the box that holds it, and the `default` tone was the one
+  // tone with no wrapping rule at all — so it rendered OUTSIDE its rounded
+  // border instead of inside it.
+  //
+  // A CLASS assertion rather than a measured overflow, deliberately: jsdom has
+  // no layout, so nothing in this suite can observe a box being overflowed. The
+  // class is the thing that is either there or not, and it is what the fix
+  // changed; the visual claim is settled by the `HandoffFootnote - LongOrigin`
+  // scenario capture, which is narrow enough to make the wrap visible.
+  it('wraps a long command inside the default tone box', () => {
+    stubClipboard(() => Promise.resolve());
+    const { container } = render(
+      <CopyablePrompt text="claude mcp add --transport http thinking-map https://thinking-map.example.com/api/mcp" />,
+    );
+    expect(container.querySelector('p')?.className).toMatch(/break-words/);
+  });
+
+  // The counterpart, and the reason the fix is a per-tone decision rather than
+  // a blanket one: `inline` exists to hold ONE row inside the reattach strip,
+  // so wrapping it would defeat the only thing it is for.
+  it('does not wrap the inline tone, which is a deliberate one-row control', () => {
+    stubClipboard(() => Promise.resolve());
+    const { container } = render(<CopyablePrompt text={PROMPT} tone="inline" />);
+    const text = container.querySelector('p')?.className;
+    expect(text).toMatch(/truncate/);
+    expect(text).not.toMatch(/break-words/);
+  });
 });

@@ -1,0 +1,18 @@
+{
+  "surface": "app/components/AttachTabStrip.tsx",
+  "surface_kind": "file",
+  "states": [
+    {
+      "dimension": "selected",
+      "value": "true",
+      "rationale": "source-derived state selected=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "selected",
+      "value": "false",
+      "rationale": "source-derived state selected=false",
+      "status": "covered"
+    }
+  ]
+}

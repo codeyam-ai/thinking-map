@@ -1,0 +1,12 @@
+{
+  "name": "HandoffAttachTabs - ServerRender",
+  "id": "e117d88d-48f4-4c55-b4b8-bc63ba4d67c0",
+  "url": "/isolated-components/HandoffAttachTabs?s=ServerRender",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffAttachTabs",
+  "scenarioType": "component",
+  "description": "The server render, where the browser's own address is not knowable yet so the endpoint degrades to the relative path. The copyable block shrinks to a fraction of the width while the strip above it does not move - the arrangement where a small mono box is most at risk of reading as a stray fragment rather than as this tab's answer."
+}

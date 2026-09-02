@@ -3,10 +3,28 @@
   "surface_kind": "component",
   "states": [
     {
-      "dimension": "default",
-      "value": "default",
-      "rationale": "source-derived state default=default",
+      "dimension": "workedByAgent",
+      "value": "true",
+      "rationale": "source-derived state workedByAgent=true",
       "status": "covered"
+    },
+    {
+      "dimension": "workedByAgent",
+      "value": "false",
+      "rationale": "source-derived state workedByAgent=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "listening",
+      "value": "true",
+      "rationale": "source-derived state listening=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "listening",
+      "value": "false",
+      "rationale": "source-derived state listening=false",
+      "status": "planned"
     }
   ]
 }

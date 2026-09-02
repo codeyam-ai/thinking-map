@@ -154,6 +154,26 @@
     ]
   },
   {
+    "description": "What one way in actually says: a line, and at most one thing to copy. Its own component because of the decision it owns - that a tab with nothing to copy renders NO box, not an empty one. The browser tab's whole point is that a browser implementing WebMCP needs nothing pasted anywhere, and a disabled or blank mono box under that sentence would contradict it in the most visible way available. Encoding the absence in an optional `copy` field and honouring it here keeps that a structural fact rather than a branch someone later tidies up into a placeholder. The copy block stays at the default tone, because the start prompt above is the one control on the band asking to be pressed.",
+    "filePath": "app/components/AttachTabPanel.tsx",
+    "name": "AttachTabPanel",
+    "scenarios": [
+      "attachtabpanel-anyagent",
+      "attachtabpanel-browser",
+      "attachtabpanel-claudecodelongorigin"
+    ]
+  },
+  {
+    "description": "The row of three labels that choose which way in is on screen. Its own component because it is the half of the tab control that must stay an ARIA tablist: the panel below it is aria-controls-referenced from here, and splitting the two keeps the roles, ids and aria-selected wiring in one readable place rather than tangled with the panel's content. Underline rather than the filled pills ContributionTabs uses - that control is a two-value toggle in a compact composer bar, while this one sits inside a band that already carries a heavy lime border, where a second set of filled enclosing shapes would read as a panel within a panel. The two are deliberately different, not accidentally inconsistent.",
+    "filePath": "app/components/AttachTabStrip.tsx",
+    "name": "AttachTabStrip",
+    "scenarios": [
+      "attachtabstrip-default",
+      "attachtabstrip-browserselected",
+      "attachtabstrip-claudeselected"
+    ]
+  },
+  {
     "description": "The conversation, sitting over the whole map rather than in a bar beside it — a bar reads as one more widget by the zoom buttons and what you typed into it vanished with no trace that anyone had heard you. Its line mapper deliberately drops node.added, theme.added and phase.set: those are things you can SEE on the board, and repeating them here would make the panel a changelog of a picture the person is already looking at.",
     "filePath": "app/components/BoardChat.tsx",
     "name": "BoardChat",
@@ -421,7 +441,7 @@
     ]
   },
   {
-    "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original secondary appearance and promotes to a lime-filled primary for the handoff band, so promoting that one caller cannot restyle the others. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation.",
+    "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original secondary appearance and promotes to a lime-filled primary for the handoff band, so promoting that one caller cannot restyle the others. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation. Every tone states a wrapping rule and none leaves it unset: default and primary carry break-words so an origin-bearing command, which is one unbreakable token wider than its box, wraps inside the border instead of overflowing it, while inline carries truncate because that tone exists to hold exactly one row.",
     "filePath": "app/components/CopyablePrompt.tsx",
     "name": "CopyablePrompt",
     "scenarios": [
@@ -555,6 +575,16 @@
     }
   },
   {
+    "description": "One line of the quiet type at the foot of the handoff band. Its own component because quiet is the decision, and it was previously three identical class strings across two files. The panel used to LEAD with this prose; demoting it was the change, and a demotion asserted by copy-paste is one bad merge away from being partly undone - one paragraph creeping back to a larger size while its neighbours stay small is exactly the drift nobody would notice. Deliberately not a general-purpose text component: it takes no size, weight or colour prop, because a caller that could pass those could also make this loud, which is the one thing it exists to prevent. `spacing` (lead / tight / none) is the exception and is not the same kind of prop - where a line sits in a stack is genuinely the caller's business, and the type treatment it guards is identical at all three values.",
+    "filePath": "app/components/FootnoteLine.tsx",
+    "name": "FootnoteLine",
+    "scenarios": [
+      "footnoteline-default",
+      "footnoteline-longestline",
+      "footnoteline-short"
+    ]
+  },
+  {
     "description": "The galaxy the board sits in: thirty-four concentric ellipses, each slightly larger and slightly more rotated than the last. The progressive twist is the whole trick — individually they are plain ellipses, but the accumulating rotation makes their overlaps sweep outward into something the eye reads as an arm, where drawing actual spiral paths gives a tidier, deader figure. It rides under the board's own transform so it scales and pans with the cards; a backdrop that stayed fixed would slide against the map and destroy the sense that the galaxy is where the thinking lives.",
     "filePath": "app/components/GalaxyBackdrop.tsx",
     "name": "GalaxyBackdrop",
@@ -584,7 +614,17 @@
     ]
   },
   {
-    "description": "The honest paragraph about why nobody is attached, and the two ways to fix that for good - kept, and kept small. Its own component because of the decision it owns: these two travel together and they travel BELOW the action. The panel used to lead with the explanation, which answered a question someone who just pressed return had not asked yet; deleting it would have been the other mistake, since it is the only thing on the page that says a map cannot summon a thinking partner. So it is demoted rather than dropped, and grouping it here is what makes demoted a structural fact instead of two loose paragraphs that could drift back up the page one edit at a time.",
+    "description": "The ways to attach an agent, one at a time. Its own component because of the decision it owns: these are ALTERNATIVES, not steps. Stacked, they read as a list of things to do and a reader cannot tell which line is theirs - which is what made this panel feel like a wall of instructions. Someone arrives already knowing their situation (agentic browser / some agent / Claude Code), so the panel's job is to let them say which and then answer only that. Opens on the `agent` tab when present, because that is the only route whose answer works for every reader, and falls back to the first tab rather than asserting - this renderer does not own the copy list it is handed. The client boundary lives here rather than at HandoffFootnote, so the paragraphs above the strip stay server-rendered and the only thing shipped for interactivity is the tab control.",
+    "filePath": "app/components/HandoffAttachTabs.tsx",
+    "name": "HandoffAttachTabs",
+    "scenarios": [
+      "handoffattachtabs-default",
+      "handoffattachtabs-serverrender",
+      "handoffattachtabs-noagenttab"
+    ]
+  },
+  {
+    "description": "The honest paragraph about why nobody is attached, what attaching would buy, and the ways in as tabs - kept, and kept small. Its own component because of the decision it owns: these travel together and they travel BELOW the action. The panel used to lead with the explanation, which answered a question someone who just pressed return had not asked yet; deleting it would have been the other mistake, since it is the only thing on the page that says a map cannot summon a thinking partner. So it is demoted rather than dropped, and grouping it here is what makes demoted a structural fact instead of loose paragraphs that could drift back up the page one edit at a time. An earlier draft stacked three paragraphs and both endpoint spellings here and read as a wall of instructions in which a reader could not tell which line was theirs; the doors are alternatives, so HandoffAttachTabs now shows exactly one at a time.",
     "filePath": "app/components/HandoffFootnote.tsx",
     "name": "HandoffFootnote",
     "scenarios": [
@@ -1576,7 +1616,7 @@
     }
   },
   {
-    "description": "What a map with nobody working on it says for itself, in words — pure, and pinned by tests rather than left as strings inside a component. `hasBrief` decides which tool the start prompt names. `worked` selects the demoted wording for a map an agent has already left, because 'No one is on this yet' is false there. `origin` builds `mcpCommand`, the MCP door as something an agent can RUN rather than prose about it — the HTTP form when the origin is known, `npm run mcp` on the server render where it is not.",
+    "description": "What a map with nobody working on it says for itself, in words - pure, and pinned by tests rather than left as strings inside a component. `hasBrief` decides which tool the start prompt names. `worked` selects the demoted wording for a map an agent has already left, because 'No one is on this yet' is false there. `origin` builds both spellings of the MCP endpoint: the bare `<origin>/api/mcp` any agent puts in its connector settings, and `mcpCommand`, the `claude mcp add` shortcut - the HTTP form when the origin is known, `npm run mcp` on the server render where it is not. `attachTabs` returns the three ways in as alternatives rather than prose, ordered browser / any agent / Claude Code, with the browser tab carrying no copyable text at all because that route needs nothing pasted anywhere. `mcpCommand` stays flat beside them because HandoffReattach shows it with no tabs around it.",
     "filePath": "app/lib/handoffCopy.ts",
     "name": "handoffCopy",
     "testFile": "app/lib/handoffCopy.test.ts"

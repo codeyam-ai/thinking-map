@@ -64,10 +64,14 @@ describe('handoffCopy', () => {
   });
 
   // The panel is only useful if it names a way out, and the tool is what makes
-  // the next idea automatic rather than another copy-paste.
+  // the next idea automatic rather than another copy-paste. It moved from the
+  // flat `attachHint` into the `agent` tab when the doors became tabs — the
+  // fact still has to be SOMEWHERE a reader will meet it, which is what this
+  // asserts across the whole copy rather than at one field.
   it('names await_new_map as the way to stop copying prompts by hand', () => {
     const copy = handoffCopy({ mapId: MAP_ID, seedIdea: 'A chore app', hasBrief: false });
-    expect(copy.attachHint).toContain('await_new_map');
+    const prose = [copy.attachHint, ...copy.attachTabs.map((t) => t.body)].join(' ');
+    expect(prose).toContain('await_new_map');
   });
 
   // The sentence the panel never said. Someone who has just pressed return
@@ -127,6 +131,67 @@ describe('handoffCopy', () => {
   it('falls back to npm run mcp when no origin is known', () => {
     const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false });
     expect(copy.mcpCommand).toBe('npm run mcp');
+  });
+
+  // The three routes, in the order a reader meets them. Pinned as a list
+  // because the panel's whole shape depends on there being exactly three
+  // alternatives — a fourth appended without thought, or one quietly dropped,
+  // changes what the tab strip is claiming about the ways in.
+  it('offers exactly the browser, any-agent and Claude Code routes', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false });
+    expect(copy.attachTabs.map((t) => t.id)).toEqual(['browser', 'agent', 'claude']);
+  });
+
+  // The endpoint an agent that is NOT Claude Code needs. This is the fact the
+  // panel previously never stated: a reader holding ChatGPT desktop or Cursor
+  // cannot run `claude mcp add`, and the raw address is their half of it.
+  it('hands any agent the bare endpoint for the given origin', () => {
+    const copy = handoffCopy({
+      mapId: MAP_ID,
+      hasBrief: false,
+      origin: 'https://maps.example.com',
+    });
+    const agent = copy.attachTabs.find((t) => t.id === 'agent');
+    expect(agent?.copy?.text).toBe('https://maps.example.com/api/mcp');
+  });
+
+  // On the server render the browser's own address is not knowable, so the
+  // endpoint degrades to the relative path — still true, still the right
+  // address, and it simply assumes the reader knows what host they are on.
+  it('degrades the endpoint to a relative path with no origin', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false });
+    const agent = copy.attachTabs.find((t) => t.id === 'agent');
+    expect(agent?.copy?.text).toBe('/api/mcp');
+  });
+
+  // The claim the browser tab makes about itself. A tab whose entire point is
+  // "this route needs nothing pasted anywhere" would contradict itself the
+  // moment it carried something to copy, and an absent field is what a renderer
+  // reads to draw no box at all.
+  it('gives the browser route nothing to copy', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false, origin: 'https://x.example' });
+    const browser = copy.attachTabs.find((t) => t.id === 'browser');
+    expect(browser?.copy).toBeUndefined();
+    // And it must not overpromise: WebMCP is the requirement, not a nicety.
+    expect(browser?.body).toMatch(/WebMCP/);
+  });
+
+  // The Claude Code tab is a SHORTCUT for the endpoint beside it, so the two
+  // must point at the same place. Spelled as a containment check because one
+  // is a bare address and the other wraps it in a command.
+  it('points the Claude Code shortcut at the same endpoint as the any-agent tab', () => {
+    const copy = handoffCopy({
+      mapId: MAP_ID,
+      hasBrief: false,
+      origin: 'https://maps.example.com',
+    });
+    const url = copy.attachTabs.find((t) => t.id === 'agent')?.copy?.text ?? '';
+    const command = copy.attachTabs.find((t) => t.id === 'claude')?.copy?.text ?? '';
+    expect(url).toBeTruthy();
+    expect(command).toContain(url);
+    // And the flat field the reattach strip reads is that same command, so the
+    // two surfaces cannot drift apart.
+    expect(copy.mcpCommand).toBe(command);
   });
 
   // The reason the `worked` flag exists. "No one is on this yet" is simply

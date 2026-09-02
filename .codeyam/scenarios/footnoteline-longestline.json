@@ -1,0 +1,12 @@
+{
+  "name": "FootnoteLine - LongestLine",
+  "id": "fcc76a4d-be68-4af3-ab87-6adafa1575b0",
+  "url": "/isolated-components/FootnoteLine?s=LongestLine",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FootnoteLine",
+  "scenarioType": "component",
+  "description": "The longest line the band ever shows - the WebMCP requirement with all four of its conditions spelled out. This is where quiet type is most at risk of turning into a grey slab: if it reads as a wall rather than as a footnote, the wording is too long, not the type too small."
+}

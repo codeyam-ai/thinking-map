@@ -1,4 +1,6 @@
-import CopyablePrompt from './CopyablePrompt';
+import FootnoteLine from './FootnoteLine';
+import HandoffAttachTabs from './HandoffAttachTabs';
+import type { HandoffAttachTab } from '../lib/handoffCopy';
 
 /**
  * The honest paragraph about why nobody is attached, and the two ways to fix
@@ -14,25 +16,28 @@ import CopyablePrompt from './CopyablePrompt';
  * So it is demoted rather than dropped, and grouping it here is what makes
  * "demoted" a structural fact instead of two loose paragraphs that could drift
  * back up the page one edit at a time.
+ *
+ * What the group holds, in the order it reads: why nobody is attached, what
+ * attaching would buy — and then the ways in, as tabs. Two sentences and a tab
+ * strip, deliberately: an earlier draft stacked three paragraphs and both
+ * endpoint spellings here, and the result read as a wall of instructions in
+ * which a reader could not tell which line was theirs. The doors are
+ * alternatives, so `HandoffAttachTabs` shows exactly one at a time.
  */
 export default function HandoffFootnote({
   explanation,
   attachHint,
-  mcpCommand,
+  attachTabs,
 }: {
   explanation: string;
   attachHint: string;
-  mcpCommand: string;
+  attachTabs: readonly HandoffAttachTab[];
 }) {
   return (
     <>
-      <p className="mt-4 text-[12px] leading-[1.6] text-muted">{explanation}</p>
-      <p className="mt-2 text-[12px] leading-[1.6] text-muted">{attachHint}</p>
-      {/* The hint above names the MCP door; this is the door. It stays at the
-          default tone so the start prompt keeps being the one thing on the
-          screen asking to be pressed — the paragraph explains the choice, and
-          this is here for the reader who has already made it. */}
-      <CopyablePrompt text={mcpCommand} label="Copy MCP command" />
+      <FootnoteLine spacing="lead">{explanation}</FootnoteLine>
+      <FootnoteLine>{attachHint}</FootnoteLine>
+      <HandoffAttachTabs tabs={attachTabs} />
     </>
   );
 }

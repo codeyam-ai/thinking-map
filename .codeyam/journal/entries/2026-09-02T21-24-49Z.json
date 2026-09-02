@@ -1,0 +1,1653 @@
+{
+  "timestamp": "2026-09-02T21:24:49Z",
+  "title": "Wrap and explain the MCP handoff block",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe handoff panel's MCP block is both visually broken and under-explained. The\nlong origin-bearing command (`claude mcp add --transport http thinking-map\nhttps://…/api/mcp`) renders in `CopyablePrompt`'s `default` tone, which is the\none tone with no wrapping rule at all — so the URL runs straight out of its\nrounded box. And the copy around it never says what the command is *for*, or\nthat it is Claude Code-specific: someone attaching a different agent (ChatGPT\ndesktop, Cursor) needs the endpoint URL for their own connector settings, not a\n`claude mcp` invocation they cannot run. Fix the overflow in the shared tone,\nsurface the bare `<origin>/api/mcp` endpoint as its own copyable block, and\nrewrite the surrounding paragraph to say plainly what attaching buys you and\nwhich door is which.\n\n## Key Decisions\n\n- **Fix the wrap in `CopyablePrompt`'s `default` tone, not at a call site.**\n  `primary` already carries `break-words` and `inline` deliberately carries\n  `truncate`; `default` is the only tone with no rule, which is why the same\n  bug would reappear at any other caller handing it a long token. One class on\n  the shared constant fixes the footnote and both `HandoffReattach` grid cells\n  at once.\n- **Add `mcpUrl` beside `mcpCommand` rather than replacing it.** The command is\n  genuinely the fastest path for a Claude Code user and there are registered\n  tests pinning its presence on both the full band and the reattach strip.\n  Removing it to make room for the URL would trade one audience's convenience\n  for another's. Both are cheap; show both.\n- **The new URL block goes in `HandoffFootnote` only.** `HandoffReattach` is\n  for someone who has already attached an agent once and knows which door they\n  use — and its `dense` variant is a deliberate one-row budget on the\n  finished-plan screen, where a third block would cost the summary a row for a\n  fact that reader already has.\n- **Say what is true about the browser-agent door, including its limit.** The\n  in-page bridge needs `navigator.modelContext` (Chrome 146+, top-level, secure\n  context — see `webMcpUnavailableReason`). Opening the app in an agent that\n  does not implement WebMCP does *not* attach it, so the copy must not imply\n  \"any agentic browser and you're done\". The honest framing is: if an agent can\n  already reach this page, this panel is hidden entirely; if you are reading\n  this, it cannot, and one of these two blocks is how you fix that.\n- **Keep the existing \"Copy MCP command\" label.** Registered render tests find\n  the block by that label; renaming it is churn with no reader benefit when a\n  second, differently-labelled block is arriving next to it.\n\n## Implementation\n\n### 1. Let the default tone wrap\n\n**File**: `app/components/CopyablePrompt.tsx`\n\nAdd `break-words` to `PROMPT_CLASS.default`, matching `primary`. Extend the\nexisting comment above the constants to record why: `default` holds\norigin-bearing commands whose URL is a single unbreakable token wider than the\nbox, and `overflow-wrap: break-word` is the rule that breaks it only when it\ndoes not fit — unlike `inline`'s `truncate`, which is a deliberate one-row\nchoice, and unlike leaving it unset, which is not a choice at all.\n\nNothing else in the tone changes. The registered test `CopyablePrompt › renders\nthe default tone when none is given` asserts only that the *button* lacks\n`bg-lime`, so it is unaffected.\n\n### 2. Give the copy an endpoint and a reason\n\n**File**: `app/lib/handoffCopy.ts`\n\n- Add `mcpUrl: string` to `HandoffCopy` — `${origin}/api/mcp` when `origin` is\n  known, and the relative `/api/mcp` on the server render, mirroring how\n  `mcpCommand` already degrades to `npm run mcp`. Document on the field that it\n  is the portable half: the address is the same fact every MCP client needs,\n  while the command is one client's spelling of it.\n- Add `mcpPurpose: string` — one short paragraph stating what attaching does\n  (an agent gets this map's tools, so it can read the brief, add nodes and ask\n  questions without anything being pasted back and forth), and that the command\n  below is the Claude Code shortcut while any other agent takes the URL in its\n  own connector settings.\n- Rewrite `attachHint` so it stops being a single dense sentence carrying four\n  facts. It should name the two doors and be honest that the browser-agent door\n  needs a browser that implements WebMCP (Chrome 146+, top level, secure\n  context) — an agentic browser without it cannot see this page, which is why\n  this panel is on screen at all. Keep the `await_new_map` reference: a\n  registered test pins it, and it is the one sentence explaining why the MCP\n  door needs nothing copied on the *next* idea.\n\nWording lives here rather than in the components for the reason the module\nheader already gives — it is the interface, and it is pinned by tests.\n\n### 3. Render the endpoint and the reason\n\n**File**: `app/components/HandoffFootnote.tsx`\n\nAccept `mcpPurpose` and `mcpUrl` alongside the existing props. Render, in\norder: `explanation`, `attachHint`, `mcpPurpose`, then the two copy blocks —\n`mcpUrl` labelled `Copy MCP URL`, then `mcpCommand` at its existing\n`Copy MCP command` label. Keep both at the `default` tone: the start prompt\nabove stays the only promoted control on the band, which is the arrangement\nthis component's docstring exists to defend.\n\nExtend the docstring to cover what is now grouped here — the explanation, the\ntwo doors, and the two spellings of the same endpoint — so the grouping stays a\nstated decision rather than an accumulation.\n\n### 4. Pass the new copy through\n\n**File**: `app/components/AgentHandoff.tsx`\n\nPass `copy.mcpPurpose` and `copy.mcpUrl` into `HandoffFootnote`. No change to\nthe `HandoffReattach` branch or to the `listening` / `workedByAgent` logic.\n\n### 5. Capture the states that would regress\n\n**File**: `app/isolated-components/HandoffFootnote/page.tsx`\n\nUpdate `Default` and `ServerRender` with the new props, and add a third\nscenario — a narrow-column or long-origin frame whose URL is comfortably wider\nthan the box — so the wrap is something a capture can *see*. The current\n`Default` fixture already carries the long\n`https://thinking-map.example.com/api/mcp` form, which is exactly the string\nthat reproduces the reported overflow; the new frame exists so a regression\ncannot hide behind a short origin.\n\n### 6. Tests\n\n**File**: `app/lib/handoffCopy.test.ts`\n\nPin `mcpUrl` in both forms (origin known → `https://maps.example.com/api/mcp`;\norigin absent → `/api/mcp`), and pin that `mcpPurpose` names the non-Claude\npath — the fact a rewrite would most plausibly drop, and the one this change\nexists to add.\n\n**File**: `app/components/AgentHandoff.render.test.tsx`\n\nAssert the full band offers the endpoint URL as well as the command, and that\nthe reattach strip still offers only the command — the deliberate subtraction\nfrom decision three, which a presence-only test elsewhere cannot see come\nundone.\n\n## Reused existing code\n\n- `CopyablePrompt` from `app/components/CopyablePrompt.tsx` (glossary entry:\n  `CopyablePrompt`) — the new URL block is another instance of it at the\n  existing `default` tone, not a new control.\n- `handoffCopy` from `app/lib/handoffCopy.ts` — every new string is a field on\n  the existing return type; no second copy module.\n- `HandoffFootnote` from `app/components/HandoffFootnote.tsx` — the grouping\n  component the new paragraph and block belong to by its own stated remit.\n- `webMcpUnavailableReason` from `app/lib/webmcp.ts` — the authority for what\n  the browser-agent door actually requires (secure context, top-level frame,\n  `navigator.modelContext`). The new `attachHint` wording must not claim more\n  than this function can return.\n- Existing-implementation survey: there is no existing wrapping utility,\n  truncation helper, or second copy-block component — `PROMPT_CLASS` in\n  `app/components/CopyablePrompt.tsx` is the only place wrapping is decided, and `handoffCopy`\n  is the only source of handoff wording. Nothing equivalent to `mcpUrl` exists\n  today; `/api/mcp` is spelled out only inside the `attachHint` prose and in\n  `mcpCommand`.\n\n## Reproduction Test\n\nThe `default` tone carries no wrapping rule, so a long unbroken URL overflows\nits box instead of wrapping inside it.\n\n**Target**: `app/components/CopyablePrompt.render.test.tsx` — run with\n`codeyam-editor editor refresh-tests --test copyable-prompt-default-tone-wraps`.\n\n```tsx\n// A long origin-bearing MCP command is a single unbreakable token wider than\n// the box that holds it. Without a wrapping rule it renders OUTSIDE that box —\n// the reported bug — and only `break-words` puts it back inside.\nit('wraps a long command inside the default tone box', () => {\n  stubClipboard(() => Promise.resolve());\n  const { container } = render(\n    <CopyablePrompt text=\"claude mcp add --transport http thinking-map https://thinking-map.example.com/api/mcp\" />,\n  );\n  expect(container.querySelector('p')?.className).toMatch(/break-words/);\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: `PROMPT_CLASS.default`\nis `'mt-4 rounded-2xl border border-line px-4 py-3 font-mono text-[12px] leading-[1.6]'`,\nso the `toMatch(/break-words/)` assertion fails on a className with no wrapping\nrule in it.\n\nA class assertion rather than a measured layout one is deliberate: jsdom has no\nlayout, so nothing in this suite can observe an actual overflow. The class is\nthe thing that is either there or not, and it is what the fix changes. The\nvisual claim is settled by the scenario capture in step 5, not here.\n\n## Scenarios to Demonstrate\n\n- Full band, origin known — the long HTTPS command wrapped inside its box, with\n  the endpoint URL block and the purpose paragraph beneath the start prompt.\n- Full band, server render — the `npm run mcp` / `/api/mcp` fallback pair, where\n  neither string is long enough to wrap and the group must still read as one.\n- Narrow viewport — the frame where the URL is widest relative to its box, and\n  the one that reproduces the reported overflow before the fix.\n- Reattach strip, default — unchanged: start prompt and command, no endpoint\n  block, heading intact.\n- Reattach strip, dense — the finished-plan one-row variant, still one row.\n- Agent attached — the panel renders nothing at all, which is the state that\n  makes \"if you can read this, no agent can reach the page\" a true sentence.",
+  "description": "The handoff panel's MCP block was both visually broken and under-explained: the long origin-bearing `claude mcp add` command rendered in CopyablePrompt's `default` tone, the one tone with no wrapping rule, so the URL ran straight out of its rounded box - and the surrounding copy never said what the command was for, or that it was Claude Code-specific, leaving someone attaching ChatGPT desktop or Cursor with a command they cannot run and no sight of the endpoint they actually need. Fixed the overflow by adding `break-words` to the shared `default` tone (so it cannot reappear at any other caller), and replaced the stack of explanatory paragraphs with three tabs showing one route at a time: MCP-enabled browser (nothing to copy, and honest that WebMCP - Chrome 146+, top level, secure context - is a real requirement, so if you can read the panel yours does not have it), Any agent (the bare `/api/mcp` endpoint, opened by default as the only route that works for every reader), and Claude Code (the `claude mcp add` shortcut).\n\nThe tabbed shape came from the user at the demo gate - the first build stacked three paragraphs and both endpoint spellings, which they called too intense - so `handoffCopy` now returns `attachTabs` (typed `HandoffAttachTab[]`) instead of loose prose fields, with the browser tab carrying NO `copy` field at all, encoding as structure the claim that its route needs nothing pasted anywhere. Extracted four components: HandoffAttachTabs (state + composition), AttachTabStrip (the ARIA tablist), AttachTabPanel (the one line and at most one copy block), and FootnoteLine (the quiet type, previously three copy-pasted class strings across two files). Removed the now-dead `mcpUrl` field from HandoffCopy; `mcpCommand` stays flat because HandoffReattach shows it with no tabs around it, and that strip is deliberately left unchanged.\n\nSCOPE VERDICT: this cycle DELIVERED the full plan as approved plus the user's tabbed redesign, and DEFERRED nothing. The project's deliverables list had no open rows at the confirm gate (all 10 already resolved: 9 delivered, 1 deferred with `decidedBy: user`), so this cycle neither closed nor deferred a deliverable. Worth flagging for the trail: the 9 `delivered` rows all carry `decidedBy: agent` from earlier cycles and have never been user-confirmed - unchanged by this cycle, but not user-ratified either.\n\nTests: 5 added. The plan's reproduction test was confirmed genuinely RED before being accepted - `break-words` was removed, the test failed 1-of-1 attributed change-introduced, then the fix was restored - rather than being written green over an already-landed fix. Three registered render tests that asserted the MCP command is always on the band were genuinely invalidated by the tab redesign and were rewritten to assert the new structure: the band opens on the URL with the command NOT present, the command is reachable by driving its tab, and the reattach strip keeps the command flat with zero tabs. 13 scenarios registered across the four new components plus a HandoffFootnote - LongOrigin frame; the wrap fix is a claim jsdom has no layout to observe, so that narrow-column long-origin capture is where it is settled.\n\nFOOTPRINT OVERLAP, RESOLVED IN FLIGHT: the sibling plan `restore-the-agent-handoff-surface-the-merge-dropped` was in flight against four of the same files and was flagged as a risk at the confirm gate. It landed upstream as 662815f during this cycle's pre-commit-sync, which pulled 10 commits and rebased this work on top. That commit restores AgentHandoff onto MapScreen - so where this band was unreachable from any route while it was being built (MapScreen imported AgentHandoff and never rendered it), these tabs are now live on the real map route. The combination was verified after the rebase rather than assumed: tsc passes and 56 tests pass, including that plan's new MapScreen and AgentStatus tests running alongside this one's rewritten AgentHandoff tests.\n\nOne unrelated environmental repair was needed to finish: `dev.db` was missing the `Theme` table and `ThinkingMap.attachments` entirely (last written hours before this session), which blocked every application-scenario recapture and had also produced 18 stale-Prisma-client tsc errors at session start. Fixed additively with `npm run db:push`; `dev.db` is gitignored so it contributes nothing to the diff. The 15 affected app scenarios then recaptured pixel-identical to their committed frames - true at the time, and measured BEFORE the rebase mounted the band on MapScreen, so the map-route scenarios legitimately change again in the finalize recapture.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/dr-design-changes--wrap-and-explain-the-mcp-handoff-block.md\t.codeyam/plans/completed/dr-design-changes--wrap-and-explain-the-mcp-handoff-block.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/agenthandoff.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-defaultlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-inline--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-primary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-shortprompt--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-serverrender--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-serverrender--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-dense--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-serverrender--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/0bfb2a77fdce3505e5c4a2016abd9d91c1eb9d48b4c8502161e57308269ba0a8.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ad3e65795f1d50d2c819ace0292db49fd3f157d0a9cdd2a4e30f81fe9b89e326.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentHandoff.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentHandoff.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CopyablePrompt.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CopyablePrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/HandoffFootnote.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/HandoffFootnote/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/handoffCopy.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/handoffCopy.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/attachtabpanel-anyagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachtabpanel-browser.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachtabpanel-claudecodelongorigin.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachtabstrip-browserselected.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachtabstrip-claudeselected.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachtabstrip-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/app-components-attachtabpanel-tsx.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/app-components-attachtabstrip-tsx.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/app-components-footnoteline-tsx.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/app-components-handoffattachtabs-tsx.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/footnoteline-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/footnoteline-longestline.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/footnoteline-short.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffattachtabs-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffattachtabs-noagenttab.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffattachtabs-serverrender.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handofffootnote-longorigin.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabpanel-anyagent--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabpanel-anyagent--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabpanel-browser--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabpanel-browser--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabpanel-claudecodelongorigin--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabpanel-claudecodelongorigin--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabstrip-browserselected--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabstrip-browserselected--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabstrip-claudeselected--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabstrip-claudeselected--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabstrip-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachtabstrip-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/footnoteline-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/footnoteline-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/footnoteline-longestline--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/footnoteline-longestline--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/footnoteline-short--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/footnoteline-short--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffattachtabs-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffattachtabs-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffattachtabs-noagenttab--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffattachtabs-noagenttab--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffattachtabs-serverrender--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffattachtabs-serverrender--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-longorigin--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-longorigin--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1198f5b5ded0c31ee49882db26a576a48fc08ba217938fcfc4d6443f52bec87a.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ff6dfbe0c0a99992ae6e4c25a97df73ec31ef624e7ab23e1f503272b42b2853f.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AttachTabPanel.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AttachTabStrip.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FootnoteLine.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/HandoffAttachTabs.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AttachTabPanel/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AttachTabStrip/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FootnoteLine/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/HandoffAttachTabs/page.tsx",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing"
+    },
+    {
+      "name": "AgentAvatar - Default"
+    },
+    {
+      "name": "AgentCallLog - Default"
+    },
+    {
+      "name": "AgentCallLog - Empty"
+    },
+    {
+      "name": "AgentCallLog - WithFailure"
+    },
+    {
+      "name": "AgentCallLogRow - Default"
+    },
+    {
+      "name": "AgentCallLogRow - Failed"
+    },
+    {
+      "name": "AgentHandoff - Default"
+    },
+    {
+      "name": "AgentHandoff - FromBrief"
+    },
+    {
+      "name": "AgentHandoff - LongIdea"
+    },
+    {
+      "name": "AgentPanelLauncher - Default"
+    },
+    {
+      "name": "AgentSimulator - Default"
+    },
+    {
+      "name": "AgentSimulator - Open"
+    },
+    {
+      "name": "AgentStatus - Connected"
+    },
+    {
+      "name": "AgentStatus - NoAgent"
+    },
+    {
+      "name": "AgentStatus - Working"
+    },
+    {
+      "name": "AgentStatusDot - Connected"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable"
+    },
+    {
+      "name": "AgentStatusDot - Working"
+    },
+    {
+      "name": "AgentToolRunner - Busy"
+    },
+    {
+      "name": "AgentToolRunner - Default"
+    },
+    {
+      "name": "AgentToolRunner - NoDriver"
+    },
+    {
+      "name": "AgentToolRunner - WithInput"
+    },
+    {
+      "name": "An older question, three rounds up, still open"
+    },
+    {
+      "name": "AnswerChips - Default"
+    },
+    {
+      "name": "AnswerChips - Empty"
+    },
+    {
+      "name": "AnswerChips - Picked"
+    },
+    {
+      "name": "AnswerChips - Single"
+    },
+    {
+      "name": "AnswerChips - Wrapping"
+    },
+    {
+      "name": "AnswerComposer - Default"
+    },
+    {
+      "name": "AnswerComposer - EditingOnDark"
+    },
+    {
+      "name": "AnswerComposer - LongAnswer"
+    },
+    {
+      "name": "AnswerComposer - NothingToCancel"
+    },
+    {
+      "name": "AnswerComposer - Typed"
+    },
+    {
+      "name": "AppErrorBoundary - NoDigest"
+    },
+    {
+      "name": "AppErrorBoundary - WithDigest"
+    },
+    {
+      "name": "AppHeader - Default"
+    },
+    {
+      "name": "AppHeader - Explore"
+    },
+    {
+      "name": "AskAboutSectionButton - Default"
+    },
+    {
+      "name": "AskAboutSectionButton - DoubleDigitSection"
+    },
+    {
+      "name": "AskAboutSectionButton - LongHeading"
+    },
+    {
+      "name": "AskPresenceNote - Listening"
+    },
+    {
+      "name": "AskPresenceNote - NoAgent"
+    },
+    {
+      "name": "AttachTabPanel - AnyAgent"
+    },
+    {
+      "name": "AttachTabPanel - Browser"
+    },
+    {
+      "name": "AttachTabPanel - ClaudeCodeLongOrigin"
+    },
+    {
+      "name": "AttachTabStrip - BrowserSelected"
+    },
+    {
+      "name": "AttachTabStrip - ClaudeSelected"
+    },
+    {
+      "name": "AttachTabStrip - Default"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly"
+    },
+    {
+      "name": "BoardChat - Default"
+    },
+    {
+      "name": "BoardChat - Empty"
+    },
+    {
+      "name": "BoardChat - JustOpened"
+    },
+    {
+      "name": "BoardMenu - Default"
+    },
+    {
+      "name": "BoardMenu - Many"
+    },
+    {
+      "name": "BoardMenu - NoneCurrent"
+    },
+    {
+      "name": "BoardMenu - NoOtherBoards"
+    },
+    {
+      "name": "BoardMenu - OneOther"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent"
+    },
+    {
+      "name": "BoardWorkspace - Working"
+    },
+    {
+      "name": "Brief attached, nothing cited yet"
+    },
+    {
+      "name": "Brief fully accounted for"
+    },
+    {
+      "name": "BriefCoverageHeadline - FullyAccountedFor"
+    },
+    {
+      "name": "BriefCoverageHeadline - NothingCited"
+    },
+    {
+      "name": "BriefCoverageHeadline - OneSectionLeft"
+    },
+    {
+      "name": "BriefCoverageHeadline - PartlyCovered"
+    },
+    {
+      "name": "BriefDanglingNote - OneDangling"
+    },
+    {
+      "name": "BriefDanglingNote - SeveralDangling"
+    },
+    {
+      "name": "BriefDrop - Attached"
+    },
+    {
+      "name": "BriefDrop - Pasting"
+    },
+    {
+      "name": "BriefExcerpt - Default"
+    },
+    {
+      "name": "BriefExcerpt - NothingExtracted"
+    },
+    {
+      "name": "BriefMenu - Attached"
+    },
+    {
+      "name": "BriefMenu - Busy"
+    },
+    {
+      "name": "BriefMenu - Default"
+    },
+    {
+      "name": "BriefMenu - LongFilename"
+    },
+    {
+      "name": "BriefPanel - DanglingReference"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet"
+    },
+    {
+      "name": "BriefPanelHeader - Default"
+    },
+    {
+      "name": "BriefPanelHeader - LongSourceName"
+    },
+    {
+      "name": "BriefPanelHeader - NothingAccountedFor"
+    },
+    {
+      "name": "BriefPasteBox - Default"
+    },
+    {
+      "name": "BriefPasteBox - Filled"
+    },
+    {
+      "name": "BriefReadout - Default"
+    },
+    {
+      "name": "BriefReadout - Pasted"
+    },
+    {
+      "name": "BriefReadout - ScannedPdf"
+    },
+    {
+      "name": "BriefSectionRow - Covered"
+    },
+    {
+      "name": "BriefSectionRow - EmptySection"
+    },
+    {
+      "name": "BriefSectionRow - LongHeading"
+    },
+    {
+      "name": "BriefSectionRow - Untouched"
+    },
+    {
+      "name": "BriefSectionRow - UntouchedAlreadyAsked"
+    },
+    {
+      "name": "BriefWarning - Default"
+    },
+    {
+      "name": "BriefWarning - Unsupported"
+    },
+    {
+      "name": "BuildSequence - DanglingLink"
+    },
+    {
+      "name": "BuildSequence - Default"
+    },
+    {
+      "name": "BuildSequence - Empty"
+    },
+    {
+      "name": "BuildSequence - FirstSliceOnly"
+    },
+    {
+      "name": "BuildSequence - LongSequence"
+    },
+    {
+      "name": "BuildSequence - ProvesNothing"
+    },
+    {
+      "name": "BulletCard - Default"
+    },
+    {
+      "name": "BulletCard - Empty"
+    },
+    {
+      "name": "CardChoiceList - Default"
+    },
+    {
+      "name": "CardChoiceList - LongOptions"
+    },
+    {
+      "name": "CardChoiceList - OnDarkCard"
+    },
+    {
+      "name": "CardChoiceList - Overflowing"
+    },
+    {
+      "name": "CardChoiceList - Single"
+    },
+    {
+      "name": "CardDiagram - Default"
+    },
+    {
+      "name": "CardDiagram - LongSteps"
+    },
+    {
+      "name": "CardDiagram - MagentaTheme"
+    },
+    {
+      "name": "CardDiagram - NoNote"
+    },
+    {
+      "name": "CardDiagram - Shortest"
+    },
+    {
+      "name": "CardIcon - Forward"
+    },
+    {
+      "name": "CardIcon - Found"
+    },
+    {
+      "name": "CardIcon - Gap"
+    },
+    {
+      "name": "CardIcon - Ground"
+    },
+    {
+      "name": "CardIcon - Judgment"
+    },
+    {
+      "name": "CardIcon - Pro"
+    },
+    {
+      "name": "CardIcon - Question"
+    },
+    {
+      "name": "CardIcon - Subject"
+    },
+    {
+      "name": "CardIcon - UnknownKind"
+    },
+    {
+      "name": "Complete - what to do next"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived"
+    },
+    {
+      "name": "ContributionBar - AddNode"
+    },
+    {
+      "name": "ContributionBar - Default"
+    },
+    {
+      "name": "ContributionTabs - Node"
+    },
+    {
+      "name": "ContributionTabs - Note"
+    },
+    {
+      "name": "ConvergenceNode - Composing"
+    },
+    {
+      "name": "ConvergenceNode - Ready"
+    },
+    {
+      "name": "ConvergenceNode - ReadyNoChoices"
+    },
+    {
+      "name": "ConvergenceNode - ReadyNoDetail"
+    },
+    {
+      "name": "ConvergenceNode - Waiting"
+    },
+    {
+      "name": "CopyablePrompt - Default"
+    },
+    {
+      "name": "CopyablePrompt - DefaultLabel"
+    },
+    {
+      "name": "CopyablePrompt - Inline"
+    },
+    {
+      "name": "CopyablePrompt - Primary"
+    },
+    {
+      "name": "CopyablePrompt - ShortPrompt"
+    },
+    {
+      "name": "CoreAttachments - Default"
+    },
+    {
+      "name": "CoreAttachments - Empty"
+    },
+    {
+      "name": "CoreAttachments - Many"
+    },
+    {
+      "name": "CoreAttachments - Single"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne"
+    },
+    {
+      "name": "CoreIdeaCard - Default"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments"
+    },
+    {
+      "name": "CoreIdeaCard - WithInsight"
+    },
+    {
+      "name": "Day one - nothing yet"
+    },
+    {
+      "name": "DirectionsCard - Default"
+    },
+    {
+      "name": "DirectionsCard - Empty"
+    },
+    {
+      "name": "Disclosure - Default"
+    },
+    {
+      "name": "Disclosure - Open"
+    },
+    {
+      "name": "Disclosure - WithCount"
+    },
+    {
+      "name": "EmptyHint - Default"
+    },
+    {
+      "name": "ErrorScreen - NotFound"
+    },
+    {
+      "name": "ErrorScreen - SchemaDrift"
+    },
+    {
+      "name": "ErrorScreen - SchemaDriftProduction"
+    },
+    {
+      "name": "ErrorScreen - Unreachable"
+    },
+    {
+      "name": "ErrorScreen - Unrecognised"
+    },
+    {
+      "name": "ExchangeNote - Statement"
+    },
+    {
+      "name": "ExchangeNote - WithQuestion"
+    },
+    {
+      "name": "ExchangeRail - BigTurn"
+    },
+    {
+      "name": "ExchangeRail - Default"
+    },
+    {
+      "name": "ExchangeRail - Empty"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered"
+    },
+    {
+      "name": "ExchangeRailEmpty - Default"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany"
+    },
+    {
+      "name": "ExchangeRow - AgentNote"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer"
+    },
+    {
+      "name": "FootnoteLine - Default"
+    },
+    {
+      "name": "FootnoteLine - LongestLine"
+    },
+    {
+      "name": "FootnoteLine - Short"
+    },
+    {
+      "name": "GalaxyBackdrop - Close"
+    },
+    {
+      "name": "GalaxyBackdrop - Default"
+    },
+    {
+      "name": "GalaxyBackdrop - Whole"
+    },
+    {
+      "name": "GalaxyBoard - Default"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes"
+    },
+    {
+      "name": "GlobalError - Default"
+    },
+    {
+      "name": "Grounded - research and its gaps"
+    },
+    {
+      "name": "HandoffAttachTabs - Default"
+    },
+    {
+      "name": "HandoffAttachTabs - NoAgentTab"
+    },
+    {
+      "name": "HandoffAttachTabs - ServerRender"
+    },
+    {
+      "name": "HandoffFootnote - Default"
+    },
+    {
+      "name": "HandoffFootnote - LongOrigin"
+    },
+    {
+      "name": "HandoffFootnote - ServerRender"
+    },
+    {
+      "name": "HandoffInstruction - Default"
+    },
+    {
+      "name": "HandoffInstruction - LongWording"
+    },
+    {
+      "name": "HandoffReattach - Default"
+    },
+    {
+      "name": "HandoffReattach - Dense"
+    },
+    {
+      "name": "HandoffReattach - FromBrief"
+    },
+    {
+      "name": "HandoffReattach - ServerRender"
+    },
+    {
+      "name": "IdeaForm - Busy"
+    },
+    {
+      "name": "IdeaForm - Default"
+    },
+    {
+      "name": "IdeaForm - Filled"
+    },
+    {
+      "name": "IdeaForm - WithBrief"
+    },
+    {
+      "name": "IdeaHero - Default"
+    },
+    {
+      "name": "IdeaPrompt - Bad Gateway"
+    },
+    {
+      "name": "IdeaPrompt - Default"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift In Production"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift"
+    },
+    {
+      "name": "IdeaPrompt - Server Failure"
+    },
+    {
+      "name": "InlineError - Default"
+    },
+    {
+      "name": "InlineError - Diagnosis In Production"
+    },
+    {
+      "name": "InlineError - Diagnosis"
+    },
+    {
+      "name": "InlineError - Silent"
+    },
+    {
+      "name": "InlineError - Upload"
+    },
+    {
+      "name": "IntakeHint - Default"
+    },
+    {
+      "name": "IntakeHint - Reading"
+    },
+    {
+      "name": "Just started"
+    },
+    {
+      "name": "KeepThinkingPanel - Default"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet"
+    },
+    {
+      "name": "LandingScreen - DayOne"
+    },
+    {
+      "name": "LandingScreen - Default"
+    },
+    {
+      "name": "Many saved maps"
+    },
+    {
+      "name": "MapCard - Answered"
+    },
+    {
+      "name": "MapCard - Default"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer"
+    },
+    {
+      "name": "MapCard - Finding"
+    },
+    {
+      "name": "MapCard - LongLabel"
+    },
+    {
+      "name": "MapCard - NoOptions"
+    },
+    {
+      "name": "MapCard - RootIdea"
+    },
+    {
+      "name": "MapCard - Yours"
+    },
+    {
+      "name": "MapCardAnswer - Answered"
+    },
+    {
+      "name": "MapCardAnswer - ChipFilledTheBox"
+    },
+    {
+      "name": "MapCardAnswer - Default"
+    },
+    {
+      "name": "MapCardAnswer - LongAnswer"
+    },
+    {
+      "name": "MapCardAnswer - ManyOptions"
+    },
+    {
+      "name": "MapCardAnswer - NoOptions"
+    },
+    {
+      "name": "MapCardEyebrow - Answered"
+    },
+    {
+      "name": "MapCardEyebrow - Asked"
+    },
+    {
+      "name": "MapCardEyebrow - Default"
+    },
+    {
+      "name": "MapCardEyebrow - Everything"
+    },
+    {
+      "name": "MapCardEyebrow - Finding"
+    },
+    {
+      "name": "MapCardEyebrow - FromBrief"
+    },
+    {
+      "name": "MapCardEyebrow - Yours"
+    },
+    {
+      "name": "MapCardHeader - Default"
+    },
+    {
+      "name": "MapCardHeader - Found"
+    },
+    {
+      "name": "MapCardHeader - ManyRounds"
+    },
+    {
+      "name": "MapCardHeader - Risk"
+    },
+    {
+      "name": "MapCardHeader - Root"
+    },
+    {
+      "name": "MapEmptyState - Default"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold"
+    },
+    {
+      "name": "MapRow - Default"
+    },
+    {
+      "name": "MapRow - NamedByPhase"
+    },
+    {
+      "name": "MapRow - PartlyAnswered"
+    },
+    {
+      "name": "MapRow - Receded"
+    },
+    {
+      "name": "MapRow - ResearchBand"
+    },
+    {
+      "name": "MapRow - TheIdea"
+    },
+    {
+      "name": "MapRow - Wrapping"
+    },
+    {
+      "name": "MapScreen - FromBrief"
+    },
+    {
+      "name": "MapScreen - JustArrived"
+    },
+    {
+      "name": "MapScreen - NoAgent"
+    },
+    {
+      "name": "MapScreen - Reattach"
+    },
+    {
+      "name": "MapScreen - Summary"
+    },
+    {
+      "name": "MapScreen - SummaryReattach"
+    },
+    {
+      "name": "MapScreen - Working"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer"
+    },
+    {
+      "name": "MapWorkspace - Default"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding"
+    },
+    {
+      "name": "MapWorkspace - Quiet"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound"
+    },
+    {
+      "name": "MapWorkspace - Seeded"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map"
+    },
+    {
+      "name": "NextStepsTrack - Default"
+    },
+    {
+      "name": "NextStepsTrack - Empty"
+    },
+    {
+      "name": "Nobody has picked this up yet"
+    },
+    {
+      "name": "NodeKindPicker - Default"
+    },
+    {
+      "name": "NodeKindPicker - Risk"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent"
+    },
+    {
+      "name": "NodeQuestionHeader - Default"
+    },
+    {
+      "name": "NodeQuestionHeader - LongLabel"
+    },
+    {
+      "name": "NotFound - Default"
+    },
+    {
+      "name": "Old arrangement data, now inert"
+    },
+    {
+      "name": "One saved map"
+    },
+    {
+      "name": "Partly answered - two settled, one open"
+    },
+    {
+      "name": "PendingCards - Default"
+    },
+    {
+      "name": "PendingCards - Two"
+    },
+    {
+      "name": "PendingNote - AgentIdle"
+    },
+    {
+      "name": "PendingNote - AgentWorking"
+    },
+    {
+      "name": "PendingNote - NoAgent"
+    },
+    {
+      "name": "PendingRow - SettledAgentIdle"
+    },
+    {
+      "name": "PendingRow - SettledAgentWorking"
+    },
+    {
+      "name": "PendingRow - SettledNoAgent"
+    },
+    {
+      "name": "PendingRow - Waiting"
+    },
+    {
+      "name": "PhaseAdvance - EndOfExplore"
+    },
+    {
+      "name": "PhaseAdvance - EndOfMap"
+    },
+    {
+      "name": "PhaseAdvance - EndOfResearch"
+    },
+    {
+      "name": "PhaseAdvance - NoMapToAdvance"
+    },
+    {
+      "name": "PhaseNav - Default"
+    },
+    {
+      "name": "PhaseNav - NarrowAtEnd"
+    },
+    {
+      "name": "PhaseNav - NarrowAtStart"
+    },
+    {
+      "name": "PhaseNav - NarrowScrolled"
+    },
+    {
+      "name": "PhaseNav - NextSteps"
+    },
+    {
+      "name": "PhaseNav - Research"
+    },
+    {
+      "name": "Pivoted - now it is for teachers"
+    },
+    {
+      "name": "QuestionCard - Answered"
+    },
+    {
+      "name": "QuestionCard - Choices"
+    },
+    {
+      "name": "QuestionCard - Diagram"
+    },
+    {
+      "name": "QuestionCard - Focused"
+    },
+    {
+      "name": "QuestionCard - Insight"
+    },
+    {
+      "name": "QuestionCard - Open"
+    },
+    {
+      "name": "QuestionCard - Reference"
+    },
+    {
+      "name": "RecordedAnswer - Default"
+    },
+    {
+      "name": "RecordedAnswer - LongAnswer"
+    },
+    {
+      "name": "RecordedAnswer - Terse"
+    },
+    {
+      "name": "Returning - four saved maps"
+    },
+    {
+      "name": "RoundControl - AllAnswered"
+    },
+    {
+      "name": "RoundControl - Default"
+    },
+    {
+      "name": "RoundControl - NothingAnswered"
+    },
+    {
+      "name": "RoundControl - OneLeft"
+    },
+    {
+      "name": "RoundControl - Waiting"
+    },
+    {
+      "name": "RowFooter - ReadyToResearch"
+    },
+    {
+      "name": "RowFooter - RoundOfStatements"
+    },
+    {
+      "name": "RowFooter - StillAnswering"
+    },
+    {
+      "name": "RowProgress - Default"
+    },
+    {
+      "name": "RowProgress - LongRound"
+    },
+    {
+      "name": "RowProgress - NoneAnswered"
+    },
+    {
+      "name": "RowProgress - SingleQuestion"
+    },
+    {
+      "name": "RowThreads - Default"
+    },
+    {
+      "name": "RowThreads - NothingToDraw"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack"
+    },
+    {
+      "name": "RowThreads - SingleThread"
+    },
+    {
+      "name": "RowThreads - SomeUnattached"
+    },
+    {
+      "name": "RowThreads - WrappedRow"
+    },
+    {
+      "name": "SavedMapList - Default"
+    },
+    {
+      "name": "SavedMapRow - Default"
+    },
+    {
+      "name": "SavedMapRow - LegacyPhase"
+    },
+    {
+      "name": "SavedMapRow - SingleNode"
+    },
+    {
+      "name": "Seed planted - three open questions"
+    },
+    {
+      "name": "SeedIdeaQuote - Default"
+    },
+    {
+      "name": "SeedIdeaQuote - LongIdea"
+    },
+    {
+      "name": "SeedIdeaQuote - ShortIdea"
+    },
+    {
+      "name": "SendButton - Default"
+    },
+    {
+      "name": "SendButton - Disabled"
+    },
+    {
+      "name": "SendButton - Large"
+    },
+    {
+      "name": "SliceCard - DanglingLink"
+    },
+    {
+      "name": "SliceCard - Default"
+    },
+    {
+      "name": "SliceCard - NoEffortStated"
+    },
+    {
+      "name": "SliceCard - ProvesNothing"
+    },
+    {
+      "name": "Sprawling - a deep, wide map"
+    },
+    {
+      "name": "Started from a client brief"
+    },
+    {
+      "name": "SuggestionChips - Default"
+    },
+    {
+      "name": "SummaryHeadline - Default"
+    },
+    {
+      "name": "SummaryScreen - Default"
+    },
+    {
+      "name": "SummaryView - Default"
+    },
+    {
+      "name": "SummaryView - Empty"
+    },
+    {
+      "name": "SummaryView - NoSlices"
+    },
+    {
+      "name": "The dev panel, deliberately opted into"
+    },
+    {
+      "name": "The map builds downward - four rounds"
+    },
+    {
+      "name": "The round is answered, and the map reaches on"
+    },
+    {
+      "name": "ThemeParticles - Blue"
+    },
+    {
+      "name": "ThemeParticles - Default"
+    },
+    {
+      "name": "ThemeParticles - Green"
+    },
+    {
+      "name": "ThemeParticles - HueZero"
+    },
+    {
+      "name": "ThemeParticles - Muted"
+    },
+    {
+      "name": "ThinkingIndicator - Default"
+    },
+    {
+      "name": "ThinkingIndicator - FurtherOut"
+    },
+    {
+      "name": "ThinkingIndicator - LongLabel"
+    },
+    {
+      "name": "ThinkingIndicator - Thinking"
+    },
+    {
+      "name": "ThinkingMapView - Default"
+    },
+    {
+      "name": "ThinkingMapView - Empty"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption"
+    },
+    {
+      "name": "ThinkingMapView - Seeded"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion"
+    },
+    {
+      "name": "What already exists - a research round set apart"
+    },
+    {
+      "name": "Wordmark - Default"
+    }
+  ],
+  "testResults": {
+    "total": 48,
+    "passed": 48,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 48,
+        "passed": 48
+      }
+    ]
+  }
+}

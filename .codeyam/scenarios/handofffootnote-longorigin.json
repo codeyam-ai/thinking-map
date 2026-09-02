@@ -1,0 +1,12 @@
+{
+  "name": "HandoffFootnote - LongOrigin",
+  "id": "4f75cfbc-833f-444f-8fe7-30c7a0e5274a",
+  "url": "/isolated-components/HandoffFootnote?s=LongOrigin",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffFootnote",
+  "scenarioType": "component",
+  "description": "The frame the wrap fix exists for: a long staging host in a narrowed column, so the endpoint is comfortably wider than its box from both directions at once. Default happens to reproduce the overflow today only because its example origin is long - this frame makes that a property of the scenario rather than a coincidence a shorter origin could quietly remove."
+}

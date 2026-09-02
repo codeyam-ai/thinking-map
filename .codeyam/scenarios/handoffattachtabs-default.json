@@ -1,0 +1,12 @@
+{
+  "name": "HandoffAttachTabs - Default",
+  "id": "856f3100-cb69-4957-905b-9a9eef4c70c5",
+  "url": "/isolated-components/HandoffAttachTabs?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffAttachTabs",
+  "scenarioType": "component",
+  "description": "The resting state: opened on `Any agent` without being told to, one endpoint on screen, and the other two routes named but not spelled out. The subtraction is the claim - two of the three ways in are deliberately off screen, and a stack of all three is both what this replaced and what a careless edit would restore."
+}

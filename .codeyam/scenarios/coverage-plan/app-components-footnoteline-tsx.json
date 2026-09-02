@@ -1,0 +1,18 @@
+{
+  "surface": "app/components/FootnoteLine.tsx",
+  "surface_kind": "file",
+  "states": [
+    {
+      "dimension": "spacing",
+      "value": "tight",
+      "rationale": "source-derived state spacing=tight",
+      "status": "planned"
+    },
+    {
+      "dimension": "spacing",
+      "value": "lead",
+      "rationale": "source-derived state spacing=lead",
+      "status": "covered"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AttachTabStrip - ClaudeSelected",
+  "id": "65d2a0fa-ae0d-490c-a3ab-53df3b846794",
+  "url": "/isolated-components/AttachTabStrip?s=ClaudeSelected",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachTabStrip",
+  "scenarioType": "component",
+  "description": "Last position selected. The end of the row is where a selected tab is most at risk of reading as an overflow rather than a choice, and its pair with BrowserSelected pins that the underline tracks the label at both extremes of the strip."
+}

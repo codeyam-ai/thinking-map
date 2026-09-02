@@ -116,7 +116,7 @@ export default function AgentHandoff({
       <HandoffFootnote
         explanation={copy.explanation}
         attachHint={copy.attachHint}
-        mcpCommand={copy.mcpCommand}
+        attachTabs={copy.attachTabs}
       />
     </section>
   );

@@ -1,0 +1,12 @@
+{
+  "name": "AttachTabStrip - Default",
+  "id": "d66ad217-f0a0-4e76-8e58-5cf02b98bc6d",
+  "url": "/isolated-components/AttachTabStrip?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachTabStrip",
+  "scenarioType": "component",
+  "description": "The strip as the band opens it, with `Any agent` selected - the middle position and the only route that works for every reader. Which tab is active is expressed purely as weight plus an underline, so this is where `the active one is legible as active` is either true or not."
+}

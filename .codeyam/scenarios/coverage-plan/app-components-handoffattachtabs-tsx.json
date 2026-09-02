@@ -1,0 +1,12 @@
+{
+  "surface": "app/components/HandoffAttachTabs.tsx",
+  "surface_kind": "file",
+  "states": [
+    {
+      "dimension": "default",
+      "value": "default",
+      "rationale": "source-derived state default=default",
+      "status": "covered"
+    }
+  ]
+}
