@@ -38,9 +38,12 @@ function Harness() {
       mediaType: 'application/pdf',
       warning: null,
     },
-    // Mid-paste: the person chose "Paste a brief" from the `+` menu and the box
-    // is open. This is the state the menu's second item leads to.
+    // Mid-paste: the person chose "Paste a brief" from the attach menu and the
+    // box is open. This is the state the menu's second item leads to.
     Pasting: null,
+    // The third door, open: an address field instead of a textarea, because a
+    // page is neither a file you can pick nor text you would paste.
+    Linking: null,
   };
   // The hook runs unconditionally — an early return above it would break the
   // rules of hooks — so an unknown scenario is caught after state is set up.
@@ -52,9 +55,12 @@ function Harness() {
         <Component
           brief={brief}
           pasting={s === 'Pasting'}
+          linking={s === 'Linking'}
           onAttach={setBrief}
+          onAttachLink={() => {}}
           onClear={() => setBrief(null)}
           onCancelPaste={() => {}}
+          onCancelLink={() => {}}
         />
       </div>
     </div>

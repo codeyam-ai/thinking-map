@@ -1,0 +1,2190 @@
+{
+  "timestamp": "2026-09-02T22:16:05Z",
+  "title": "A Link Is a Brief Too",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe intake accepts a file or pasted text. A great many briefs are neither —\nthey are a page: a Notion doc, a public spec, a client's landing page. Add a\nlink as a third door into the same pipeline, so a URL becomes brief text the\nsame way a `.docx` does, and rename the attach control so the door is visible\nbefore it is used.\n\nThis plan is deliberately the *text-shaped* half of the intake widening. Images\nare a separate plan (`an-image-the-agent-can-look-at`) because they cannot\nbecome text and therefore cannot reuse any of this.\n\n## What already exists — do not rebuild it\n\nInvestigated before planning, because two of the four capabilities requested\nare already shipped and a plan that re-adds them would be pure waste:\n\n- **Drag-and-drop already works.** `app/components/IdeaForm.tsx` makes the\n  whole `<form>` the drop target (`onDragOver` / `onDragLeave` / `onDrop`),\n  with a `dragging` state that swaps the input's border and background. The\n  dashed panel that used to advertise it was removed on purpose —\n  `app/components/BriefFileInput.tsx` and `app/components/BriefDrop.tsx` both\n  document why. This plan EXTENDS that handler; it does not add it.\n- **Choosing a file already works.** `BriefMenu`'s \"Upload a file\" item calls\n  up a hidden `<input type=\"file\">` in `BriefFileInput`, gated by an `ACCEPT`\n  list kept next to the extractor so the two cannot drift.\n\nWhat is genuinely missing is the URL: no component collects one, no route\nfetches one, and `app/lib/briefText.ts` has no HTML branch.\n\n## Key Decisions\n\n- **A third menu item and a small box, mirroring the paste door exactly.**\n  `BriefPasteBox` is already the pattern for \"a second way in that needs one\n  field and two buttons\"; `BriefLinkBox` is that shape with a URL field. The\n  alternative — sniffing a URL out of the main idea input — was rejected: that\n  input's job is the question you are asking, and a person who types a sentence\n  containing a link would have a document attached without asking for one.\n\n- **The server fetches the page, not the browser.** A browser `fetch` of an\n  arbitrary third-party URL is blocked by CORS for almost every page worth\n  attaching, so the request has to originate server-side. This is also the\n  decision that makes the next bullet mandatory.\n\n- **A server that fetches a user-supplied URL is an SSRF hole until it is\n  closed, so the guard is part of this plan, not a follow-up.** Without it,\n  anyone can point the intake at `http://169.254.169.254/`, `http://localhost`,\n  or a private-range address and read the response back out of the attached\n  brief. `app/lib/briefUrl.ts` (new) is the single place that decides a URL is\n  allowed: https/http scheme only, no credentials in the URL, hostname resolved\n  and rejected if it lands on loopback, link-local, or any private range —\n  **re-checked after every redirect**, since a permitted host can 302 to\n  `127.0.0.1`. Its own module for the same reason `briefInput.ts` is one: this\n  is real logic worth testing directly rather than `if`s buried in a handler.\n\n- **Extract readable article text, not the whole DOM.** A brief pulled off a\n  page carrying nav, cookie banner and footer is mostly noise, and the noise\n  then flows into `briefSections.ts` and becomes sections an agent reads. Use\n  `@mozilla/readability` over a `linkedom` document, falling back to body text\n  when Readability declines to parse. This adds two dependencies — acceptable\n  precisely here, because `briefText.ts` is the module whose stated job is to\n  keep every format-specific dependency in one file. The cheaper alternative\n  (one dep, `cheerio`, strip `script`/`style` and take `.text()`) is a real\n  option if the reviewer would rather not take two; it produces a noticeably\n  worse brief.\n\n- **A fetched page needs no schema change.** `MapBrief` already stores\n  `sourceName` and `mediaType` as free strings, so the URL goes in\n  `sourceName` and `text/html` in `mediaType`, and `parseBriefInput` accepts it\n  unchanged. This is the whole reason links are a small plan and images are\n  not.\n\n- **Relabel the trigger now, and accept that the label changes again.** The\n  bare `+` says nothing about what it takes, which is why drag-and-drop reads\n  as missing when it has worked all along. It becomes a labelled control. The\n  label states what is TRUE when this plan lands — a doc or a link — and the\n  images plan updates it. Shipping the eventual \"docs, images, etc.\" wording\n  today would advertise a capability that does not exist yet.\n\n## Implementation\n\n### 1. Decide whether a URL may be fetched\n\n**New file**: `app/lib/briefUrl.ts`\n\nA pure-ish validator returning either a normalized `URL` or a sentence the\nperson can act on. Rejects: any scheme but http/https; a URL carrying\ncredentials; a hostname that resolves to loopback, link-local (`169.254/16`,\n`fe80::/10`), private ranges (`10/8`, `172.16/12`, `192.168/16`, `fc00::/7`),\nor unspecified. Exported separately from the fetch so the redirect check can\ncall it again per hop.\n\n### 2. Fetch it and hand back text\n\n**New file**: `app/api/briefs/fetch/route.ts`\n\n`runtime = 'nodejs'`, `dynamic = 'force-dynamic'`, wrapped in `withFailure`\nfrom `app/lib/apiFailure.ts` — the same shape as\n`app/api/briefs/extract/route.ts`, which this should read as a sibling of.\nPOST `{ url }`; validate via `briefUrl`; fetch with `redirect: 'manual'` so\neach hop is re-validated, an abort timeout (~10s), and the same 10MB ceiling\nthe upload route uses. Responds with the identical body shape the upload route\nreturns — `{ text, sourceName, mediaType, charCount, warning }` — so the client\nneeds no second code path for the result. Errors follow the existing house\nstyle: a sentence naming what to do instead, never a stack.\n\n`sourceName` is the page's `<title>` when it has one, falling back to\n`host + pathname`; the full URL belongs in there too if the title is short\nenough, since it is the only record of where the brief came from.\n\n### 3. Add an HTML branch to the extractor\n\n**File**: `app/lib/briefText.ts`\n\nA private `extractHtml(bytes | string)` alongside `extractPdf` and\n`extractDocx`, dispatched from `extractBriefText` on `text/html` or an `html`\nextension — which also makes a dropped or picked `.html` file work, for free\nand consistently. Route the result through `normalizeBriefText` and\n`extractionWarning` from `app/lib/briefFormat.ts` exactly as the other formats\ndo, so a thin page produces the same warning a thin PDF does. Extend `ACCEPT`\nin `app/components/BriefFileInput.tsx` with `.html,text/html` in the same\nchange, since that constant exists to stay in step with this function.\n\n### 4. Collect the URL\n\n**New file**: `app/components/BriefLinkBox.tsx`\n\nModeled on `app/components/BriefPasteBox.tsx`: one `type=\"url\"` input focused\non mount through a ref (not `autoFocus` — the comment there explains that\ncaptures render in a cross-origin frame), an \"Attach it\" button disabled while\nempty, and a Cancel. Reports the URL up; it does not fetch.\n\n**File**: `app/components/BriefDrop.tsx`\n\nIt already renders exactly one of readout / paste box / nothing. Add the link\nbox as a fourth branch driven by a `linking` prop, keeping the component's\nsingle-question shape.\n\n### 5. Wire it and extend the drop target\n\n**File**: `app/components/IdeaPrompt.tsx`\n\nAdd a `linking` state beside `pasting`, and a `fetchLink(url)` beside\n`upload(file)` — same `readJson` handling, same `setBrief`, same `reading`\nflag, because the response shape is deliberately identical.\n\n**File**: `app/components/BriefMenu.tsx`\n\nA third `role=\"menuitem\"`, \"Add a link\". Replace the icon-only trigger with a\nlabelled control — a paperclip plus text reading \"Add a doc or link\" — keeping\nthe existing attached-name chip state, the `aria-haspopup`/`aria-expanded`\nwiring, and the close-on-outside-click/Escape effect untouched. Note the\nbutton is absolutely positioned inside the input frame at `left-3` with the\ninput reserving `pl-16`; a wider trigger means that padding has to grow with\nit, or the placeholder will run underneath. Keep the neutral tokens\n(`surface`/`line`/`ink-soft`) — the design system reserves `--lime` for the\nsingle node that just changed, and spending it here would retire that meaning.\n\n**File**: `app/components/IdeaForm.tsx`\n\nThe `onDrop` handler currently reads `e.dataTransfer.files?.[0]` only. Dragging\na link out of another tab yields no file — it yields `text/uri-list`. Check\nfiles first, then fall back to `getData('text/uri-list')` (or `text/plain`\nwhen it parses as a URL) and route that to `onDropLink`. Grow the `pl-16`\npadding to match the new trigger width.\n\n**File**: `app/components/IntakeHint.tsx`\n\nThe muted line under the input names the accepted formats. Add links to it, so\nthe sentence and the menu agree.\n\n## Reused existing code\n\n- `BriefPasteBox` from `app/components/BriefPasteBox.tsx` — the exact shape\n  `app/components/BriefLinkBox.tsx` (new) copies, including the\n  focus-through-a-ref workaround.\n- `BriefDrop` from `app/components/BriefDrop.tsx` (glossary entry: `BriefDrop`)\n  and its `AttachedBrief` interface — the attached-brief shape is unchanged by\n  this plan.\n- `BriefMenu` from `app/components/BriefMenu.tsx` (glossary entry: `BriefMenu`)\n  — extended, not replaced.\n- `IdeaForm` from `app/components/IdeaForm.tsx` and `IdeaPrompt` from\n  `app/components/IdeaPrompt.tsx` — the drop target and the intake state owner.\n- `withFailure` from `app/lib/apiFailure.ts` and `readJson` from\n  `app/lib/readJson.ts` — the error contract both ends of this already speak.\n- `extractBriefText` from `app/lib/briefText.ts`, plus `normalizeBriefText` and\n  `extractionWarning` from `app/lib/briefFormat.ts`.\n- `parseBriefInput` from `app/lib/briefInput.ts` — unchanged, and the check\n  that a fetched brief needs no new validation.\n- `ACCEPT` from `app/components/BriefFileInput.tsx` — extended in step 3.\n- `app/api/briefs/extract/route.ts` — the sibling route the new one mirrors.\n\n**Existing-implementation survey.** Checked before writing: there is no URL or\nlink intake anywhere in the tree — no `fetch` of a user-supplied address, no\nuri-list drop handling, no HTML branch in `extractBriefText`, and no\nSSRF/host-allowlist helper to reuse. `app/lib/briefUrl.ts` (new) has nothing\nequivalent to reuse or duplicate.\nThe drop handler and the file picker, by contrast, both exist and are extended\nrather than created.\n\n## Scenarios to Demonstrate\n\n- The attach control at rest, labelled — the state that has to read as \"you can\n  add things here\" without being opened.\n- The menu open, showing three doors: upload, paste, link.\n- `BriefLinkBox` empty, with the button disabled.\n- A link attached: the readout naming the page title, the chip on the trigger.\n- A fetched page that came back thin — the `extractionWarning` path, shown on a\n  link rather than a PDF.\n- A refused URL: `http://localhost:3000` rejected by the guard, with the\n  sentence the person sees. This is the security behaviour made visible rather\n  than asserted.\n- A page that redirects to a private address — refused at the hop, not at\n  entry.\n- The form mid-drag with a link dragged over it.",
+  "description": "A link is now a third way into the intake, alongside typing an idea and attaching a file. The server fetches the page (the browser cannot: CORS blocks almost any third-party document), reduces it to its readable article with Readability over a linkedom document so nav, cookie banners and footers never become sections an agent reads, and hands back the identical body shape the upload route returns — so the client has one reader for both. A fetched page becomes a real brief: its text travels to the board, and a brief alone is enough to start one, so the typed sentence becomes optional.\n\nSCOPE VERDICT. This cycle delivered no new project deliverable and deferred none. It widens the existing 'Enter a vague idea, problem, or goal as free text and start immediately' deliverable, which was already marked delivered. All 10 deliverables remain resolved: 9 delivered, and the single standing deferral (ASSIST TRACK: registering the MCP server in a client) is unchanged and was the user's own earlier decision, not this cycle's. No deferral was recorded by this cycle, and none was decided by the agent.\n\nSCOPE CHANGE MID-CYCLE, approved by the user. The plan targeted IdeaPrompt / BriefMenu / BriefDrop — but that intake is no longer on any route: app/page.tsx renders FirstCard, and LandingScreen (IdeaPrompt's only parent) is imported by nothing except its own isolation harness. The plan was written after FirstCard had already become the landing screen, and plan-staleness-check missed it because every cited path does exist — nothing checks that a route reaches them. Surfaced to the user, who chose to wire the link door into FirstCard as well, so the feature is reachable at '/'. FirstCard keeps its existing two-kind attachment model: a browsed file still travels as a name only, while a link travels as text, and the chips are visually different for exactly that reason.\n\nSECURITY. A server that fetches a user-supplied URL is an SSRF hole until it is closed, so the guard shipped with the feature rather than after it. app/lib/briefUrl.ts is the single place that decides an address is allowed: https/http only, no credentials in the URL, and every address the hostname resolves to checked against loopback, link-local (including the cloud metadata endpoint), the private and carrier-NAT ranges, multicast and reserved space — in IPv4 and IPv6, unwrapping IPv4-mapped IPv6 so a blocked range cannot pass wearing a v6 hat. fetchGuarded lives in that same module rather than in the route, because redirect: 'follow' would let a permitted host bounce to 127.0.0.1 with nothing left to check; every hop is re-validated as if the person had typed it. Verified against eight probes (169.254.169.254, localhost, 10.0.0.5, [::1], octal 0177.0.0.1, file://, credentials-in-URL, malformed) — all refused with a sentence, and the refusal is deliberately identical whatever the address resolved to, so it cannot be used as a port scanner. KNOWN RESIDUAL LIMIT, documented in the source: the name is resolved by the guard and again by fetch, so a DNS answer that changes between the two can still slip past. Closing it means pinning the resolved address into the connection via a custom undici dispatcher, which is a bigger change than this intake justified today.\n\nA FIX THE FEATURE SURFACED. A board started from a Wikipedia article was named 'From Wikipedia, the free encyclopedia' — extraction flattens a page's heading structure, so deriveTitle fell through to the first line of prose, which on that site is boilerplate identical for every article. extractHtmlPage now opens a page-derived brief with the page's own title as a markdown heading, which restores something extraction dropped rather than inventing anything. It also gives briefSections.ts something to split a page on, where before a whole page was one section.\n\nEXTRACTION. Two components were independently doing the same fetch/readJson/map dance, so readBriefResponse moved into app/lib/briefFetch.ts and both call it; AttachedBrief is now an alias of its FetchedBrief so the two shapes cannot drift. briefSourceName and classifyFetchedContent moved out of the route into briefFormat.ts where they are testable. extractHtmlPage lives in a new briefHtml.ts rather than briefText.ts specifically because briefText imports server-only, which throws under vitest — the feature's central branch would otherwise have been untestable. FirstCard went from 346 lines to state-plus-composition over three new components.\n\nTESTS: the full flag-free suite passes at 807. 65 of those are this feature's — the suite went 713 to 778 as they were written, and the remainder arrived with four upstream commits rebased in at pre-commit-sync. They cover the blocked address ranges one by one (including the 172.16/12 edges and IPv4-mapped IPv6), the URL syntax and credential rules, the HTML extractor and its non-article fallback, the shared response reader over constructed Responses, the link box's contract that it reports an address and fetches nothing itself, and the attachment chips. One test deliberately pins a KNOWN LIMIT rather than hiding it: Readability keeps an unmarked cookie-banner div, because beating it would mean class-name heuristics that go stale per site and silently eat real content.\n\nONE REGISTRY SLIP, caught by the strict audit rather than by me: renaming BriefMenu's 'offers both ways in once opened' to 'offers all three ways in once opened' left the old key in the test registry as a phantom. Removed at finalize.\n\nNOT VERIFIED IN A BROWSER: dragging a link out of another tab onto the older IdeaForm intake is built (text/uri-list, falling back to text/plain only when it parses as a URL) but confirmed by reading the code — the capture browser cannot perform a cross-window drag. That surface is not on the home screen anyway; the home card has no drop target today.\n\nSCREENSHOT CORPUS: the recapture passes during this cycle cleared a long-standing backlog, taking the project from 123 stale and 22 obsolete candidates to 0 stale, 0 obsolete and 0 duplicates across 120 targets. The rebase then reintroduced 84 stale from the four upstream commits, which were recaptured before commit.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/a-link-is-a-brief-too.md\t.codeyam/plans/completed/a-link-is-a-brief-too.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-doubledigitsection--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askaboutsectionbutton-longheading--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-nothingcited--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-onesectionleft--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefcoverageheadline-partlycovered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-attached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-pasting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-nothingextracted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-attached--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-attached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-busy--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-busy--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-longfilename--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-longfilename--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-pasted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-scannedpdf--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-covered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-emptysection--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-longheading--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-untouched--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefsectionrow-untouchedalreadyasked--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-bad-gateway--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-bad-gateway--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift-in-production--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift-in-production--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-server-failure--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-server-failure--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-reading--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-asked--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-everything--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/683c6ab7324100956cf1f05ac7fe8d44d4dad3ad2a231274ad505880db5d6292.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/71efea0751e3bfa9a3bee1ec0272a9474f41abde8a0ceeb676bed9c2e0adc92f.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefDrop.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefFileInput.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefMenu.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefMenu.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaForm.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaPrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IntakeHint.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BriefDrop/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BriefMenu/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/IdeaForm/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/briefFormat.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/briefFormat.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/briefText.ts",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": "package.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdrop-linking.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/brieflinkbox-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/brieflinkbox-filled.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-both.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-filesonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-linkattached.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-longfilename.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-shortname.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardcontrols-briefonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardcontrols-busy.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardcontrols-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardcontrols-ready.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardlinkbox-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardlinkbox-filled.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardlinkbox-reading.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-linking--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-linking--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brieflinkbox-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brieflinkbox-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brieflinkbox-filled--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brieflinkbox-filled--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-both--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-both--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-filesonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-filesonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-linkattached--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-linkattached--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-longfilename--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-longfilename--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-shortname--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-shortname--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-briefonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-briefonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-busy--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-busy--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-ready--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-ready--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkbox-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkbox-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkbox-filled--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkbox-filled--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkbox-reading--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkbox-reading--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c49b25330504e988423888f0c355477046b98d3c1f9783fd17105f9d74905e29.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f60814f0c9643cd80444cfd2661c31d6e826a3712eb87a64b2f528fe62a31f88.json",
+      "status": "added"
+    },
+    {
+      "path": "app/api/briefs/fetch/route.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefLinkBox.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefLinkBox.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardControls.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardLinkBox.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefLinkBox/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardAttachments/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardControls/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardLinkBox/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefFetch.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefFetch.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefHtml.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefHtml.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefUrl.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefUrl.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing"
+    },
+    {
+      "name": "AgentAvatar - Default"
+    },
+    {
+      "name": "AgentCallLog - Default"
+    },
+    {
+      "name": "AgentCallLog - Empty"
+    },
+    {
+      "name": "AgentCallLog - WithFailure"
+    },
+    {
+      "name": "AgentCallLogRow - Default"
+    },
+    {
+      "name": "AgentCallLogRow - Failed"
+    },
+    {
+      "name": "AgentHandoff - Default"
+    },
+    {
+      "name": "AgentHandoff - FromBrief"
+    },
+    {
+      "name": "AgentHandoff - LongIdea"
+    },
+    {
+      "name": "AgentPanelLauncher - Default"
+    },
+    {
+      "name": "AgentSimulator - Default"
+    },
+    {
+      "name": "AgentSimulator - Open"
+    },
+    {
+      "name": "AgentStatus - Connected"
+    },
+    {
+      "name": "AgentStatus - NoAgent"
+    },
+    {
+      "name": "AgentStatus - Working"
+    },
+    {
+      "name": "AgentStatusDot - Connected"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable"
+    },
+    {
+      "name": "AgentStatusDot - Working"
+    },
+    {
+      "name": "AgentToolRunner - Busy"
+    },
+    {
+      "name": "AgentToolRunner - Default"
+    },
+    {
+      "name": "AgentToolRunner - NoDriver"
+    },
+    {
+      "name": "AgentToolRunner - WithInput"
+    },
+    {
+      "name": "An older question, three rounds up, still open"
+    },
+    {
+      "name": "AnswerChips - Default"
+    },
+    {
+      "name": "AnswerChips - Empty"
+    },
+    {
+      "name": "AnswerChips - Picked"
+    },
+    {
+      "name": "AnswerChips - Single"
+    },
+    {
+      "name": "AnswerChips - Wrapping"
+    },
+    {
+      "name": "AnswerComposer - Default"
+    },
+    {
+      "name": "AnswerComposer - EditingOnDark"
+    },
+    {
+      "name": "AnswerComposer - LongAnswer"
+    },
+    {
+      "name": "AnswerComposer - NothingToCancel"
+    },
+    {
+      "name": "AnswerComposer - Typed"
+    },
+    {
+      "name": "AppErrorBoundary - NoDigest"
+    },
+    {
+      "name": "AppErrorBoundary - WithDigest"
+    },
+    {
+      "name": "AppHeader - Default"
+    },
+    {
+      "name": "AppHeader - Explore"
+    },
+    {
+      "name": "AskAboutSectionButton - Default"
+    },
+    {
+      "name": "AskAboutSectionButton - DoubleDigitSection"
+    },
+    {
+      "name": "AskAboutSectionButton - LongHeading"
+    },
+    {
+      "name": "AskPresenceNote - Listening"
+    },
+    {
+      "name": "AskPresenceNote - NoAgent"
+    },
+    {
+      "name": "AttachTabPanel - AnyAgent"
+    },
+    {
+      "name": "AttachTabPanel - Browser"
+    },
+    {
+      "name": "AttachTabPanel - ClaudeCodeLongOrigin"
+    },
+    {
+      "name": "AttachTabStrip - BrowserSelected"
+    },
+    {
+      "name": "AttachTabStrip - ClaudeSelected"
+    },
+    {
+      "name": "AttachTabStrip - Default"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly"
+    },
+    {
+      "name": "BoardChat - Default"
+    },
+    {
+      "name": "BoardChat - Empty"
+    },
+    {
+      "name": "BoardChat - JustOpened"
+    },
+    {
+      "name": "BoardMenu - Default"
+    },
+    {
+      "name": "BoardMenu - Many"
+    },
+    {
+      "name": "BoardMenu - NoneCurrent"
+    },
+    {
+      "name": "BoardMenu - NoOtherBoards"
+    },
+    {
+      "name": "BoardMenu - OneOther"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent"
+    },
+    {
+      "name": "BoardWorkspace - Working"
+    },
+    {
+      "name": "Brief attached, nothing cited yet"
+    },
+    {
+      "name": "Brief fully accounted for"
+    },
+    {
+      "name": "BriefCoverageHeadline - FullyAccountedFor"
+    },
+    {
+      "name": "BriefCoverageHeadline - NothingCited"
+    },
+    {
+      "name": "BriefCoverageHeadline - OneSectionLeft"
+    },
+    {
+      "name": "BriefCoverageHeadline - PartlyCovered"
+    },
+    {
+      "name": "BriefDanglingNote - OneDangling"
+    },
+    {
+      "name": "BriefDanglingNote - SeveralDangling"
+    },
+    {
+      "name": "BriefDrop - Attached"
+    },
+    {
+      "name": "BriefDrop - Linking"
+    },
+    {
+      "name": "BriefDrop - Pasting"
+    },
+    {
+      "name": "BriefExcerpt - Default"
+    },
+    {
+      "name": "BriefExcerpt - NothingExtracted"
+    },
+    {
+      "name": "BriefLinkBox - Default"
+    },
+    {
+      "name": "BriefLinkBox - Filled"
+    },
+    {
+      "name": "BriefMenu - Attached"
+    },
+    {
+      "name": "BriefMenu - Busy"
+    },
+    {
+      "name": "BriefMenu - Default"
+    },
+    {
+      "name": "BriefMenu - LongFilename"
+    },
+    {
+      "name": "BriefPanel - DanglingReference"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet"
+    },
+    {
+      "name": "BriefPanelHeader - Default"
+    },
+    {
+      "name": "BriefPanelHeader - LongSourceName"
+    },
+    {
+      "name": "BriefPanelHeader - NothingAccountedFor"
+    },
+    {
+      "name": "BriefPasteBox - Default"
+    },
+    {
+      "name": "BriefPasteBox - Filled"
+    },
+    {
+      "name": "BriefReadout - Default"
+    },
+    {
+      "name": "BriefReadout - Pasted"
+    },
+    {
+      "name": "BriefReadout - ScannedPdf"
+    },
+    {
+      "name": "BriefSectionRow - Covered"
+    },
+    {
+      "name": "BriefSectionRow - EmptySection"
+    },
+    {
+      "name": "BriefSectionRow - LongHeading"
+    },
+    {
+      "name": "BriefSectionRow - Untouched"
+    },
+    {
+      "name": "BriefSectionRow - UntouchedAlreadyAsked"
+    },
+    {
+      "name": "BriefWarning - Default"
+    },
+    {
+      "name": "BriefWarning - Unsupported"
+    },
+    {
+      "name": "BuildSequence - DanglingLink"
+    },
+    {
+      "name": "BuildSequence - Default"
+    },
+    {
+      "name": "BuildSequence - Empty"
+    },
+    {
+      "name": "BuildSequence - FirstSliceOnly"
+    },
+    {
+      "name": "BuildSequence - LongSequence"
+    },
+    {
+      "name": "BuildSequence - ProvesNothing"
+    },
+    {
+      "name": "BulletCard - Default"
+    },
+    {
+      "name": "BulletCard - Empty"
+    },
+    {
+      "name": "CardChoiceList - Default"
+    },
+    {
+      "name": "CardChoiceList - LongOptions"
+    },
+    {
+      "name": "CardChoiceList - OnDarkCard"
+    },
+    {
+      "name": "CardChoiceList - Overflowing"
+    },
+    {
+      "name": "CardChoiceList - Single"
+    },
+    {
+      "name": "CardDiagram - Default"
+    },
+    {
+      "name": "CardDiagram - LongSteps"
+    },
+    {
+      "name": "CardDiagram - MagentaTheme"
+    },
+    {
+      "name": "CardDiagram - NoNote"
+    },
+    {
+      "name": "CardDiagram - Shortest"
+    },
+    {
+      "name": "CardIcon - Forward"
+    },
+    {
+      "name": "CardIcon - Found"
+    },
+    {
+      "name": "CardIcon - Gap"
+    },
+    {
+      "name": "CardIcon - Ground"
+    },
+    {
+      "name": "CardIcon - Judgment"
+    },
+    {
+      "name": "CardIcon - Pro"
+    },
+    {
+      "name": "CardIcon - Question"
+    },
+    {
+      "name": "CardIcon - Subject"
+    },
+    {
+      "name": "CardIcon - UnknownKind"
+    },
+    {
+      "name": "Complete - what to do next"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived"
+    },
+    {
+      "name": "ContributionBar - AddNode"
+    },
+    {
+      "name": "ContributionBar - Default"
+    },
+    {
+      "name": "ContributionTabs - Node"
+    },
+    {
+      "name": "ContributionTabs - Note"
+    },
+    {
+      "name": "ConvergenceNode - Composing"
+    },
+    {
+      "name": "ConvergenceNode - Ready"
+    },
+    {
+      "name": "ConvergenceNode - ReadyNoChoices"
+    },
+    {
+      "name": "ConvergenceNode - ReadyNoDetail"
+    },
+    {
+      "name": "ConvergenceNode - Waiting"
+    },
+    {
+      "name": "CopyablePrompt - Default"
+    },
+    {
+      "name": "CopyablePrompt - DefaultLabel"
+    },
+    {
+      "name": "CopyablePrompt - Inline"
+    },
+    {
+      "name": "CopyablePrompt - Primary"
+    },
+    {
+      "name": "CopyablePrompt - ShortPrompt"
+    },
+    {
+      "name": "CoreAttachments - Default"
+    },
+    {
+      "name": "CoreAttachments - Empty"
+    },
+    {
+      "name": "CoreAttachments - Many"
+    },
+    {
+      "name": "CoreAttachments - Single"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne"
+    },
+    {
+      "name": "CoreIdeaCard - Default"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments"
+    },
+    {
+      "name": "CoreIdeaCard - WithInsight"
+    },
+    {
+      "name": "Day one - nothing yet"
+    },
+    {
+      "name": "DirectionsCard - Default"
+    },
+    {
+      "name": "DirectionsCard - Empty"
+    },
+    {
+      "name": "Disclosure - Default"
+    },
+    {
+      "name": "Disclosure - Open"
+    },
+    {
+      "name": "Disclosure - WithCount"
+    },
+    {
+      "name": "EmptyHint - Default"
+    },
+    {
+      "name": "ErrorScreen - NotFound"
+    },
+    {
+      "name": "ErrorScreen - SchemaDrift"
+    },
+    {
+      "name": "ErrorScreen - SchemaDriftProduction"
+    },
+    {
+      "name": "ErrorScreen - Unreachable"
+    },
+    {
+      "name": "ErrorScreen - Unrecognised"
+    },
+    {
+      "name": "ExchangeNote - Statement"
+    },
+    {
+      "name": "ExchangeNote - WithQuestion"
+    },
+    {
+      "name": "ExchangeRail - BigTurn"
+    },
+    {
+      "name": "ExchangeRail - Default"
+    },
+    {
+      "name": "ExchangeRail - Empty"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered"
+    },
+    {
+      "name": "ExchangeRailEmpty - Default"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany"
+    },
+    {
+      "name": "ExchangeRow - AgentNote"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer"
+    },
+    {
+      "name": "FirstCardAttachments - Both"
+    },
+    {
+      "name": "FirstCardAttachments - FilesOnly"
+    },
+    {
+      "name": "FirstCardAttachments - LinkAttached"
+    },
+    {
+      "name": "FirstCardAttachments - LongFilename"
+    },
+    {
+      "name": "FirstCardAttachments - ShortName"
+    },
+    {
+      "name": "FirstCardControls - BriefOnly"
+    },
+    {
+      "name": "FirstCardControls - Busy"
+    },
+    {
+      "name": "FirstCardControls - Default"
+    },
+    {
+      "name": "FirstCardControls - Ready"
+    },
+    {
+      "name": "FirstCardLinkBox - Default"
+    },
+    {
+      "name": "FirstCardLinkBox - Filled"
+    },
+    {
+      "name": "FirstCardLinkBox - Reading"
+    },
+    {
+      "name": "FootnoteLine - Default"
+    },
+    {
+      "name": "FootnoteLine - LongestLine"
+    },
+    {
+      "name": "FootnoteLine - Short"
+    },
+    {
+      "name": "GalaxyBackdrop - Close"
+    },
+    {
+      "name": "GalaxyBackdrop - Default"
+    },
+    {
+      "name": "GalaxyBackdrop - Whole"
+    },
+    {
+      "name": "GalaxyBoard - Default"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes"
+    },
+    {
+      "name": "GlobalError - Default"
+    },
+    {
+      "name": "Grounded - research and its gaps"
+    },
+    {
+      "name": "HandoffAttachTabs - Default"
+    },
+    {
+      "name": "HandoffAttachTabs - NoAgentTab"
+    },
+    {
+      "name": "HandoffAttachTabs - ServerRender"
+    },
+    {
+      "name": "HandoffFootnote - Default"
+    },
+    {
+      "name": "HandoffFootnote - LongOrigin"
+    },
+    {
+      "name": "HandoffFootnote - ServerRender"
+    },
+    {
+      "name": "HandoffInstruction - Default"
+    },
+    {
+      "name": "HandoffInstruction - LongWording"
+    },
+    {
+      "name": "HandoffReattach - Default"
+    },
+    {
+      "name": "HandoffReattach - Dense"
+    },
+    {
+      "name": "HandoffReattach - FromBrief"
+    },
+    {
+      "name": "HandoffReattach - ServerRender"
+    },
+    {
+      "name": "IdeaForm - Busy"
+    },
+    {
+      "name": "IdeaForm - Default"
+    },
+    {
+      "name": "IdeaForm - Filled"
+    },
+    {
+      "name": "IdeaForm - WithBrief"
+    },
+    {
+      "name": "IdeaHero - Default"
+    },
+    {
+      "name": "IdeaPrompt - Bad Gateway"
+    },
+    {
+      "name": "IdeaPrompt - Default"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift In Production"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift"
+    },
+    {
+      "name": "IdeaPrompt - Server Failure"
+    },
+    {
+      "name": "InlineError - Default"
+    },
+    {
+      "name": "InlineError - Diagnosis In Production"
+    },
+    {
+      "name": "InlineError - Diagnosis"
+    },
+    {
+      "name": "InlineError - Silent"
+    },
+    {
+      "name": "InlineError - Upload"
+    },
+    {
+      "name": "IntakeHint - Default"
+    },
+    {
+      "name": "IntakeHint - Reading"
+    },
+    {
+      "name": "Just started"
+    },
+    {
+      "name": "KeepThinkingPanel - Default"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet"
+    },
+    {
+      "name": "LandingScreen - DayOne"
+    },
+    {
+      "name": "LandingScreen - Default"
+    },
+    {
+      "name": "Many saved maps"
+    },
+    {
+      "name": "MapCard - Answered"
+    },
+    {
+      "name": "MapCard - Default"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer"
+    },
+    {
+      "name": "MapCard - Finding"
+    },
+    {
+      "name": "MapCard - LongLabel"
+    },
+    {
+      "name": "MapCard - NoOptions"
+    },
+    {
+      "name": "MapCard - RootIdea"
+    },
+    {
+      "name": "MapCard - Yours"
+    },
+    {
+      "name": "MapCardAnswer - Answered"
+    },
+    {
+      "name": "MapCardAnswer - ChipFilledTheBox"
+    },
+    {
+      "name": "MapCardAnswer - Default"
+    },
+    {
+      "name": "MapCardAnswer - LongAnswer"
+    },
+    {
+      "name": "MapCardAnswer - ManyOptions"
+    },
+    {
+      "name": "MapCardAnswer - NoOptions"
+    },
+    {
+      "name": "MapCardEyebrow - Answered"
+    },
+    {
+      "name": "MapCardEyebrow - Asked"
+    },
+    {
+      "name": "MapCardEyebrow - Default"
+    },
+    {
+      "name": "MapCardEyebrow - Everything"
+    },
+    {
+      "name": "MapCardEyebrow - Finding"
+    },
+    {
+      "name": "MapCardEyebrow - FromBrief"
+    },
+    {
+      "name": "MapCardEyebrow - Yours"
+    },
+    {
+      "name": "MapCardHeader - Default"
+    },
+    {
+      "name": "MapCardHeader - Found"
+    },
+    {
+      "name": "MapCardHeader - ManyRounds"
+    },
+    {
+      "name": "MapCardHeader - Risk"
+    },
+    {
+      "name": "MapCardHeader - Root"
+    },
+    {
+      "name": "MapEmptyState - Default"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold"
+    },
+    {
+      "name": "MapRow - Default"
+    },
+    {
+      "name": "MapRow - NamedByPhase"
+    },
+    {
+      "name": "MapRow - PartlyAnswered"
+    },
+    {
+      "name": "MapRow - Receded"
+    },
+    {
+      "name": "MapRow - ResearchBand"
+    },
+    {
+      "name": "MapRow - TheIdea"
+    },
+    {
+      "name": "MapRow - Wrapping"
+    },
+    {
+      "name": "MapScreen - FromBrief"
+    },
+    {
+      "name": "MapScreen - JustArrived"
+    },
+    {
+      "name": "MapScreen - NoAgent"
+    },
+    {
+      "name": "MapScreen - Reattach"
+    },
+    {
+      "name": "MapScreen - Summary"
+    },
+    {
+      "name": "MapScreen - SummaryReattach"
+    },
+    {
+      "name": "MapScreen - Working"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer"
+    },
+    {
+      "name": "MapWorkspace - Default"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding"
+    },
+    {
+      "name": "MapWorkspace - Quiet"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound"
+    },
+    {
+      "name": "MapWorkspace - Seeded"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map"
+    },
+    {
+      "name": "NextStepsTrack - Default"
+    },
+    {
+      "name": "NextStepsTrack - Empty"
+    },
+    {
+      "name": "Nobody has picked this up yet"
+    },
+    {
+      "name": "NodeKindPicker - Default"
+    },
+    {
+      "name": "NodeKindPicker - Risk"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent"
+    },
+    {
+      "name": "NodeQuestionHeader - Default"
+    },
+    {
+      "name": "NodeQuestionHeader - LongLabel"
+    },
+    {
+      "name": "NotFound - Default"
+    },
+    {
+      "name": "Old arrangement data, now inert"
+    },
+    {
+      "name": "One saved map"
+    },
+    {
+      "name": "Partly answered - two settled, one open"
+    },
+    {
+      "name": "PendingCards - Default"
+    },
+    {
+      "name": "PendingCards - Two"
+    },
+    {
+      "name": "PendingNote - AgentIdle"
+    },
+    {
+      "name": "PendingNote - AgentWorking"
+    },
+    {
+      "name": "PendingNote - NoAgent"
+    },
+    {
+      "name": "PendingRow - SettledAgentIdle"
+    },
+    {
+      "name": "PendingRow - SettledAgentWorking"
+    },
+    {
+      "name": "PendingRow - SettledNoAgent"
+    },
+    {
+      "name": "PendingRow - Waiting"
+    },
+    {
+      "name": "PhaseAdvance - EndOfExplore"
+    },
+    {
+      "name": "PhaseAdvance - EndOfMap"
+    },
+    {
+      "name": "PhaseAdvance - EndOfResearch"
+    },
+    {
+      "name": "PhaseAdvance - NoMapToAdvance"
+    },
+    {
+      "name": "PhaseNav - Default"
+    },
+    {
+      "name": "PhaseNav - NarrowAtEnd"
+    },
+    {
+      "name": "PhaseNav - NarrowAtStart"
+    },
+    {
+      "name": "PhaseNav - NarrowScrolled"
+    },
+    {
+      "name": "PhaseNav - NextSteps"
+    },
+    {
+      "name": "PhaseNav - Research"
+    },
+    {
+      "name": "Pivoted - now it is for teachers"
+    },
+    {
+      "name": "QuestionCard - Answered"
+    },
+    {
+      "name": "QuestionCard - Choices"
+    },
+    {
+      "name": "QuestionCard - Diagram"
+    },
+    {
+      "name": "QuestionCard - Focused"
+    },
+    {
+      "name": "QuestionCard - Insight"
+    },
+    {
+      "name": "QuestionCard - Open"
+    },
+    {
+      "name": "QuestionCard - Reference"
+    },
+    {
+      "name": "RecordedAnswer - Default"
+    },
+    {
+      "name": "RecordedAnswer - LongAnswer"
+    },
+    {
+      "name": "RecordedAnswer - Terse"
+    },
+    {
+      "name": "Returning - four saved maps"
+    },
+    {
+      "name": "RoundControl - AllAnswered"
+    },
+    {
+      "name": "RoundControl - Default"
+    },
+    {
+      "name": "RoundControl - NothingAnswered"
+    },
+    {
+      "name": "RoundControl - OneLeft"
+    },
+    {
+      "name": "RoundControl - Waiting"
+    },
+    {
+      "name": "RowFooter - ReadyToResearch"
+    },
+    {
+      "name": "RowFooter - RoundOfStatements"
+    },
+    {
+      "name": "RowFooter - StillAnswering"
+    },
+    {
+      "name": "RowProgress - Default"
+    },
+    {
+      "name": "RowProgress - LongRound"
+    },
+    {
+      "name": "RowProgress - NoneAnswered"
+    },
+    {
+      "name": "RowProgress - SingleQuestion"
+    },
+    {
+      "name": "RowThreads - Default"
+    },
+    {
+      "name": "RowThreads - NothingToDraw"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack"
+    },
+    {
+      "name": "RowThreads - SingleThread"
+    },
+    {
+      "name": "RowThreads - SomeUnattached"
+    },
+    {
+      "name": "RowThreads - WrappedRow"
+    },
+    {
+      "name": "SavedMapList - Default"
+    },
+    {
+      "name": "SavedMapRow - Default"
+    },
+    {
+      "name": "SavedMapRow - LegacyPhase"
+    },
+    {
+      "name": "SavedMapRow - SingleNode"
+    },
+    {
+      "name": "Seed planted - three open questions"
+    },
+    {
+      "name": "SeedIdeaQuote - Default"
+    },
+    {
+      "name": "SeedIdeaQuote - LongIdea"
+    },
+    {
+      "name": "SeedIdeaQuote - ShortIdea"
+    },
+    {
+      "name": "SendButton - Default"
+    },
+    {
+      "name": "SendButton - Disabled"
+    },
+    {
+      "name": "SendButton - Large"
+    },
+    {
+      "name": "SliceCard - DanglingLink"
+    },
+    {
+      "name": "SliceCard - Default"
+    },
+    {
+      "name": "SliceCard - NoEffortStated"
+    },
+    {
+      "name": "SliceCard - ProvesNothing"
+    },
+    {
+      "name": "Sprawling - a deep, wide map"
+    },
+    {
+      "name": "Started from a client brief"
+    },
+    {
+      "name": "SuggestionChips - Default"
+    },
+    {
+      "name": "SummaryHeadline - Default"
+    },
+    {
+      "name": "SummaryScreen - Default"
+    },
+    {
+      "name": "SummaryView - Default"
+    },
+    {
+      "name": "SummaryView - Empty"
+    },
+    {
+      "name": "SummaryView - NoSlices"
+    },
+    {
+      "name": "The dev panel, deliberately opted into"
+    },
+    {
+      "name": "The map builds downward - four rounds"
+    },
+    {
+      "name": "The round is answered, and the map reaches on"
+    },
+    {
+      "name": "ThemeParticles - Blue"
+    },
+    {
+      "name": "ThemeParticles - Default"
+    },
+    {
+      "name": "ThemeParticles - Green"
+    },
+    {
+      "name": "ThemeParticles - HueZero"
+    },
+    {
+      "name": "ThemeParticles - Muted"
+    },
+    {
+      "name": "ThinkingIndicator - Default"
+    },
+    {
+      "name": "ThinkingIndicator - FurtherOut"
+    },
+    {
+      "name": "ThinkingIndicator - LongLabel"
+    },
+    {
+      "name": "ThinkingIndicator - Thinking"
+    },
+    {
+      "name": "ThinkingMapView - Default"
+    },
+    {
+      "name": "ThinkingMapView - Empty"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption"
+    },
+    {
+      "name": "ThinkingMapView - Seeded"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion"
+    },
+    {
+      "name": "What already exists - a research round set apart"
+    },
+    {
+      "name": "Wordmark - Default"
+    }
+  ],
+  "testResults": {
+    "total": 778,
+    "passed": 778,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 778,
+        "passed": 778
+      }
+    ]
+  }
+}

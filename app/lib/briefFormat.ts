@@ -18,6 +18,65 @@ const CHARS_PER_PAGE = 1800;
 const THIN_EXTRACTION_CHARS = 200;
 const LARGE_FILE_BYTES = 50_000;
 
+/** Past this, a page title stops naming the brief and starts crowding out the
+ *  address in a chip that has to truncate somewhere. */
+const MAX_TITLE_CHARS = 80;
+
+/**
+ * The name a brief pulled off the web carries into the map.
+ *
+ * The page itself is not kept — only its words are — so this string is the
+ * ONLY record of where a fetched brief came from. That is why the address is
+ * the half that always survives and the title is the half that is optional:
+ * a title can be re-read from the page, and the page can only be found again
+ * through the address.
+ *
+ * Pure, and here rather than in the fetch route, because "what do we call
+ * this?" is a question about presenting a brief rather than about retrieving
+ * one — and because a rule buried in a handler is a rule nobody can test.
+ */
+export function briefSourceName(url: URL, title: string | null): string {
+  // `host`, not `hostname`: a non-default port is part of where the page
+  // lives, and dropping it would name two different pages the same thing.
+  const address = `${url.host}${url.pathname === '/' ? '' : url.pathname}`;
+  const named = title?.trim() ?? '';
+
+  if (named.length === 0 || named.length > MAX_TITLE_CHARS) return address;
+  return `${named} — ${address}`;
+}
+
+/** What a fetched response turns out to be, and therefore what to do with it. */
+export type FetchedContentKind = 'page' | 'text' | 'unsupported';
+
+/**
+ * Decide how to read what came back from a URL.
+ *
+ * Three answers, because there are three real cases: markup whose words are
+ * buried in nav and footers, a text or Markdown file that already IS the
+ * brief, and a binary this door cannot turn into words at all. Stated once,
+ * here, rather than as conditions inside the handler — the distinction decides
+ * whether a person gets a clean brief, a brief full of angle brackets, or an
+ * honest refusal.
+ *
+ * A missing content-type reads as a page: it is the web's most common
+ * omission, HTML is overwhelmingly the truth behind it, and the extractor's
+ * own body fallback copes when it is not.
+ */
+export function classifyFetchedContent(contentType: string): FetchedContentKind {
+  const type = contentType.toLowerCase();
+
+  if (type.trim().length === 0) return 'page';
+  if (type.includes('html') || type.includes('xml')) return 'page';
+  if (
+    type.startsWith('text/') ||
+    type.includes('markdown') ||
+    type.includes('json')
+  ) {
+    return 'text';
+  }
+  return 'unsupported';
+}
+
 /**
  * Decide whether an extraction looks like it failed, and say so in a sentence
  * the person can act on.

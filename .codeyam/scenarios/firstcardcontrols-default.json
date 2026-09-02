@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardControls - Default",
+  "id": "490a0e9d-19be-4346-8f68-2cf4ba8bb9bb",
+  "url": "/isolated-components/FirstCardControls?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardControls",
+  "scenarioType": "component",
+  "description": "What almost every arrival sees along the bottom of the card: Browse and Add a link side by side, and a dimmed send. Two buttons rather than a menu, because two choices is not a menu's worth of choice and hiding them would hide the very thing the labels exist to say."
+}

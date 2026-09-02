@@ -1,0 +1,12 @@
+{
+  "name": "BriefLinkBox - Default",
+  "id": "e143984a-977c-48e7-afd9-8660c575a929",
+  "url": "/isolated-components/BriefLinkBox?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefLinkBox",
+  "scenarioType": "component",
+  "description": "The third door, empty and waiting. Attach it is correctly dead until there is an address to fetch, and the line underneath says what will actually happen to the page - the words are kept, the layout is not - because that is the thing nobody can guess from a URL field."
+}

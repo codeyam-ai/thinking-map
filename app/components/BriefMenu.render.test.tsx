@@ -18,29 +18,86 @@ describe('BriefMenu', () => {
   // At rest it is a single button and nothing else. If the menu rendered its
   // items eagerly the collapse would have bought no space at all.
   it('shows no menu items until it is opened', () => {
-    render(<BriefMenu busy={false} onChooseFile={vi.fn()} onPaste={vi.fn()} />);
+    render(
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
+    );
 
     expect(screen.queryByRole('menu')).toBeNull();
     expect(screen.queryByText('Upload a file')).toBeNull();
   });
 
-  // Both capabilities the dashed panel advertised have to survive the collapse,
-  // which means both must appear on the one click that opens the menu.
-  it('offers both ways in once opened', () => {
-    render(<BriefMenu busy={false} onChooseFile={vi.fn()} onPaste={vi.fn()} />);
+  // Every capability the dashed panel advertised has to survive the collapse,
+  // and the link door added to it, which means all three must appear on the one
+  // click that opens the menu.
+  it('offers all three ways in once opened', () => {
+    render(
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
+    );
 
     fireEvent.click(screen.getByLabelText('Attach a brief'));
 
     expect(screen.getByRole('menu')).toBeTruthy();
     expect(screen.getByText('Upload a file')).toBeTruthy();
     expect(screen.getByText('Paste a brief')).toBeTruthy();
+    expect(screen.getByText('Add a link')).toBeTruthy();
+  });
+
+  // The link route is the one that reaches a page nobody can upload — a Notion
+  // doc, a client's own site — and it closes behind itself like the others.
+  it('reports the link choice and closes behind it', () => {
+    const onLink = vi.fn();
+    render(
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={onLink}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Attach a brief'));
+    fireEvent.click(screen.getByText('Add a link'));
+
+    expect(onLink).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('menu')).toBeNull();
+  });
+
+  // The trigger stopped being a bare `+` and started saying what it takes.
+  // That label IS the fix for drag-and-drop reading as missing: a symbol with
+  // no noun invites nobody to drop anything on it.
+  it('says what it accepts rather than showing a bare plus', () => {
+    render(
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Add a doc or link')).toBeTruthy();
   });
 
   // The file picker is the panel's "Choose a file" button, one level deeper.
   it('reports the file choice and closes behind it', () => {
     const onChooseFile = vi.fn();
     render(
-      <BriefMenu busy={false} onChooseFile={onChooseFile} onPaste={vi.fn()} />,
+      <BriefMenu
+        busy={false}
+        onChooseFile={onChooseFile}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
     );
 
     fireEvent.click(screen.getByLabelText('Attach a brief'));
@@ -56,7 +113,12 @@ describe('BriefMenu', () => {
   it('reports the paste choice and closes behind it', () => {
     const onPaste = vi.fn();
     render(
-      <BriefMenu busy={false} onChooseFile={vi.fn()} onPaste={onPaste} />,
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={onPaste}
+        onLink={vi.fn()}
+      />,
     );
 
     fireEvent.click(screen.getByLabelText('Attach a brief'));
@@ -69,7 +131,14 @@ describe('BriefMenu', () => {
   // Escape is the gesture someone reaches for when a popover appeared over the
   // thing they were reading. The old panel needed no dismissal; this does.
   it('closes on Escape', () => {
-    render(<BriefMenu busy={false} onChooseFile={vi.fn()} onPaste={vi.fn()} />);
+    render(
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
+    );
 
     fireEvent.click(screen.getByLabelText('Attach a brief'));
     expect(screen.getByRole('menu')).toBeTruthy();
@@ -82,7 +151,12 @@ describe('BriefMenu', () => {
   it('closes when the click lands outside it', () => {
     render(
       <div>
-        <BriefMenu busy={false} onChooseFile={vi.fn()} onPaste={vi.fn()} />
+        <BriefMenu
+          busy={false}
+          onChooseFile={vi.fn()}
+          onPaste={vi.fn()}
+          onLink={vi.fn()}
+        />
         <button type="button">elsewhere</button>
       </div>,
     );
@@ -103,6 +177,7 @@ describe('BriefMenu', () => {
         attachedName="northgate-renewal-brief.pdf"
         onChooseFile={vi.fn()}
         onPaste={vi.fn()}
+        onLink={vi.fn()}
       />,
     );
 
@@ -115,7 +190,14 @@ describe('BriefMenu', () => {
   // While a file is being read, offering to read another is a way to lose the
   // first one.
   it('cannot be opened while a file is being read', () => {
-    render(<BriefMenu busy onChooseFile={vi.fn()} onPaste={vi.fn()} />);
+    render(
+      <BriefMenu
+        busy
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
+    );
 
     const button = screen.getByLabelText('Attach a brief') as HTMLButtonElement;
     expect(button.disabled).toBe(true);
@@ -127,7 +209,14 @@ describe('BriefMenu', () => {
   // The popover is a real menu to a screen reader, and the button says whether
   // it is open — the panel's two plain buttons needed neither, this does.
   it('states its expanded state on the trigger', () => {
-    render(<BriefMenu busy={false} onChooseFile={vi.fn()} onPaste={vi.fn()} />);
+    render(
+      <BriefMenu
+        busy={false}
+        onChooseFile={vi.fn()}
+        onPaste={vi.fn()}
+        onLink={vi.fn()}
+      />,
+    );
 
     const button = screen.getByLabelText('Attach a brief');
     expect(button.getAttribute('aria-haspopup')).toBe('menu');

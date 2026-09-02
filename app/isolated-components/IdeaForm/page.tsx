@@ -45,7 +45,9 @@ function Harness() {
           onSubmit={(e) => e.preventDefault()}
           onChooseFile={() => {}}
           onPaste={() => {}}
+          onLink={() => {}}
           onDropFile={() => {}}
+          onDropLink={() => {}}
         />
       </div>
     </div>

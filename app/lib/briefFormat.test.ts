@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   approxPages,
+  briefSourceName,
+  classifyFetchedContent,
   extractionWarning,
   firstLines,
   formatCharCount,
@@ -239,5 +241,119 @@ describe('untouchedNoteText', () => {
   // to get the section dealt with on the agent's next turn.
   it('asks the agent to act rather than only reporting the gap', () => {
     expect(untouchedNoteText({ id: 's4', heading: 'Timeline' })).toMatch(/\?$/);
+  });
+});
+
+// The name a brief pulled off the web carries into the map.
+//
+// It is the ONLY record of where those words came from — the page itself is
+// not kept — so the address always has to survive and the title is the part
+// that is optional. Getting that backwards would leave someone holding
+// "Untitled document" with no way back to the source.
+describe('briefSourceName', () => {
+  // Both halves when the page named itself: the title reads, the address
+  // proves where it came from.
+  it('pairs the page title with its address', () => {
+    const name = briefSourceName(
+      new URL('https://example.gov/board/renewal-brief'),
+      'Digital Membership Renewal',
+    );
+    expect(name).toBe(
+      'Digital Membership Renewal — example.gov/board/renewal-brief',
+    );
+  });
+
+  // An untitled page still has to be identifiable, so the address stands alone
+  // rather than the name falling back to something generic.
+  it('falls back to the bare address when the page has no title', () => {
+    expect(briefSourceName(new URL('https://example.gov/spec'), null)).toBe(
+      'example.gov/spec',
+    );
+  });
+
+  // A root URL's path is a bare slash, which reads as a stray character on the
+  // end of a hostname rather than as a location.
+  it('drops the path when it is just the root slash', () => {
+    expect(briefSourceName(new URL('https://example.com/'), null)).toBe(
+      'example.com',
+    );
+  });
+
+  // Some pages carry a whole sentence as their title. Past the limit the title
+  // stops helping and starts pushing the address out of a chip, so the address
+  // wins — it is the half that cannot be re-derived.
+  it('drops an over-long title rather than the address', () => {
+    const long = 'A'.repeat(81);
+    expect(briefSourceName(new URL('https://example.com/spec'), long)).toBe(
+      'example.com/spec',
+    );
+  });
+
+  // The boundary itself, pinned: 80 characters is still a title worth keeping.
+  it('keeps a title exactly at the length limit', () => {
+    const exact = 'A'.repeat(80);
+    expect(
+      briefSourceName(new URL('https://example.com/spec'), exact),
+    ).toContain(exact);
+  });
+
+  // A whitespace-only title is the same as no title, and would otherwise
+  // render as a leading em dash with nothing before it.
+  it('treats a blank title as no title', () => {
+    expect(briefSourceName(new URL('https://example.com/spec'), '   ')).toBe(
+      'example.com/spec',
+    );
+  });
+
+  // A port is part of where the page lives, so `host` rather than `hostname`.
+  it('keeps a non-default port', () => {
+    expect(
+      briefSourceName(new URL('https://example.com:8443/spec'), null),
+    ).toBe('example.com:8443/spec');
+  });
+});
+
+// What a fetched response is, and therefore what to do with it.
+//
+// Separate from the fetching so the rule can be read in one place: an HTML
+// page needs its article pulled out of the markup, a text file already IS the
+// brief, and anything else is not something this door can turn into words.
+describe('classifyFetchedContent', () => {
+  // The ordinary case, and the one the whole door was built for: a web page,
+  // whose words are buried in markup and have to be dug out.
+  it('treats HTML as a page to extract an article from', () => {
+    expect(classifyFetchedContent('text/html; charset=utf-8')).toBe('page');
+  });
+
+  // XHTML and generic XML are markup too — running them through the plain
+  // branch would hand the section splitter a brief full of angle brackets.
+  it('treats XML markup as a page', () => {
+    expect(classifyFetchedContent('application/xhtml+xml')).toBe('page');
+  });
+
+  // A link straight to a spec in plain text or Markdown IS the brief. Parsing
+  // it as HTML would only strip tags it does not have.
+  it('treats plain text and Markdown as already-brief text', () => {
+    expect(classifyFetchedContent('text/plain')).toBe('text');
+    expect(classifyFetchedContent('text/markdown; charset=utf-8')).toBe('text');
+  });
+
+  // A PDF at a URL is a real thing to want and a real thing this door cannot
+  // do — the person has to be told to attach the file instead.
+  it('refuses a binary document', () => {
+    expect(classifyFetchedContent('application/pdf')).toBe('unsupported');
+    expect(classifyFetchedContent('image/png')).toBe('unsupported');
+  });
+
+  // Headers arrive in whatever case the origin felt like sending.
+  it('ignores header casing', () => {
+    expect(classifyFetchedContent('TEXT/HTML')).toBe('page');
+  });
+
+  // A response with no content-type at all is the web's most common omission.
+  // HTML is the overwhelmingly likely truth, and the extractor's own body
+  // fallback handles it safely when it is not.
+  it('assumes a page when the origin sent no type', () => {
+    expect(classifyFetchedContent('')).toBe('page');
   });
 });

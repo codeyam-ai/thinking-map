@@ -6,7 +6,7 @@ import InlineError from './InlineError';
 /** What the picker will offer, and what the extractor can actually read.
  *  Kept together so the two never drift apart. */
 export const ACCEPT =
-  '.pdf,.docx,.md,.txt,application/pdf,text/plain,text/markdown';
+  '.pdf,.docx,.md,.txt,.html,application/pdf,text/plain,text/markdown,text/html';
 
 /**
  * The intake, with the panel taken off it.

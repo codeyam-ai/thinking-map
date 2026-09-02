@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardControls - Ready",
+  "id": "fabcbbfe-ee01-41cb-89a7-282140132e7d",
+  "url": "/isolated-components/FirstCardControls?s=Ready",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardControls",
+  "scenarioType": "component",
+  "description": "Something typed, so the send goes solid black. That contrast is the only signal the card gives that it is ready to go."
+}

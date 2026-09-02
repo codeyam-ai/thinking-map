@@ -2,19 +2,28 @@
 
 // The first card.
 //
-// One card, centred on black, asking the only question the board can ask before
-// it knows anything. It carries the core idea's own yellow rather than the
-// theme colours, because what you type here becomes the yellow circle the whole
-// board ends up orbiting — the card and the thing it turns into are the same
-// object, seen before and after.
+// One card, centred on black, asking the only question the board can ask
+// before it knows anything. It carries the core idea's own yellow rather than
+// the theme colours, because what you type here becomes the yellow circle the
+// whole board ends up orbiting — the card and the thing it turns into are the
+// same object, seen before and after.
 //
 // Nothing is offered back at this stage. The partner's response to what you
-// type IS the questions it opens, not a paragraph about your idea — answering a
-// sentence with an insight would be the partner talking over you before it has
-// understood anything.
+// type IS the questions it opens, not a paragraph about your idea — answering
+// a sentence with an insight would be the partner talking over you before it
+// has understood anything.
+//
+// What remains here is the STATE and the composition: the question, what is
+// attached, and the trip to `/api/maps`. The three visible parts — the link
+// box, the attachment chips, the control row — are their own components, so
+// this file says what the card is rather than how each piece of it is drawn.
 
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { fetchBriefFromLink, type FetchedBrief } from '@/app/lib/briefFetch';
+import FirstCardAttachments from './FirstCardAttachments';
+import FirstCardControls from './FirstCardControls';
+import FirstCardLinkBox from './FirstCardLinkBox';
 
 export default function FirstCard() {
   const router = useRouter();
@@ -24,9 +33,46 @@ export default function FirstCard() {
   const [error, setError] = useState<string | null>(null);
   const picker = useRef<HTMLInputElement>(null);
 
+  const [linking, setLinking] = useState(false);
+  const [url, setUrl] = useState('');
+  const [reading, setReading] = useState(false);
+  const [brief, setBrief] = useState<FetchedBrief | null>(null);
+
+  /**
+   * Hand the address to the server and keep what comes back.
+   *
+   * The browser cannot make this request itself — CORS blocks a page fetching
+   * almost any third-party document — and it should not be trusted with the
+   * decision either: `/api/briefs/fetch` is where the address is checked
+   * against the private ranges it must never reach.
+   */
+  async function attachLink() {
+    const address = url.trim();
+    if (!address || reading) return;
+    setReading(true);
+    setError(null);
+    try {
+      const { brief: fetched, error: failed } =
+        await fetchBriefFromLink(address);
+      if (!fetched) {
+        setError(failed);
+        return;
+      }
+      setBrief(fetched);
+      setUrl('');
+      setLinking(false);
+    } finally {
+      setReading(false);
+    }
+  }
+
   async function start() {
     const seedIdea = value.trim();
-    if (!seedIdea || busy) return;
+    // A brief is enough on its own — the page you pointed at says what you
+    // want thought through. What the board cannot start from is neither. This
+    // is the same rule `/api/maps` already enforces, said here so the button
+    // agrees with the server instead of being stricter than it.
+    if ((!seedIdea && !brief) || busy) return;
     setBusy(true);
     setError(null);
     try {
@@ -35,9 +81,20 @@ export default function FirstCard() {
         headers: { 'Content-Type': 'application/json' },
         // Names travel, bytes do not. What the board needs to know is that a
         // scope doc is part of this thinking, so the partner can ask about it.
+        // A fetched page is the exception: its words are already text, so they
+        // travel in full as the brief.
         body: JSON.stringify({
           seedIdea,
           attachments: files.map((f) => ({ name: f.name })),
+          ...(brief
+            ? {
+                brief: {
+                  text: brief.text,
+                  sourceName: brief.sourceName,
+                  mediaType: brief.mediaType,
+                },
+              }
+            : {}),
         }),
       });
       const data = await res.json();
@@ -84,78 +141,36 @@ export default function FirstCard() {
           />
         </div>
 
-        {/* Attachments. Held on the client for now and named back to the person
-            so the card can show what it is carrying; nothing is uploaded until
-            there is a map to hang them on. */}
-        {files.length > 0 ? (
-          <ul className="mb-3 flex flex-wrap gap-2">
-            {files.map((f) => (
-              <li
-                key={f.name}
-                className="flex items-center gap-2 rounded-full bg-black/12 px-3 py-1.5 text-[12px] text-black"
-              >
-                {f.name.length > 26 ? `${f.name.slice(0, 24)}…` : f.name}
-                <button
-                  type="button"
-                  aria-label={`Remove ${f.name}`}
-                  onClick={() =>
-                    setFiles((prev) => prev.filter((x) => x.name !== f.name))
-                  }
-                  className="text-black/50 hover:text-black"
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
+        {linking ? (
+          <FirstCardLinkBox
+            url={url}
+            reading={reading}
+            onChange={setUrl}
+            onAttach={() => void attachLink()}
+            onCancel={() => {
+              setLinking(false);
+              setUrl('');
+            }}
+          />
         ) : null}
 
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => picker.current?.click()}
-            className="flex items-center gap-2 rounded-full bg-black/12 px-4 py-2 text-[13px] font-medium text-black hover:bg-black/20"
-          >
-            {/* A paperclip, so the control reads as "attach" before the label
-                is read at all. */}
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M21 11.5l-8.5 8.5a5.5 5.5 0 01-7.8-7.8l9-9a3.7 3.7 0 015.2 5.2l-9 9a1.8 1.8 0 01-2.6-2.6l8.3-8.3"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Browse
-          </button>
+        <FirstCardAttachments
+          brief={brief}
+          files={files}
+          onClearBrief={() => setBrief(null)}
+          onRemoveFile={(name) =>
+            setFiles((prev) => prev.filter((f) => f.name !== name))
+          }
+        />
 
-          {/* The affordance is a button, not a sentence. "Press enter" told you
-              the shortcut but gave you nothing to aim at — and on a card whose
-              whole job is to be filled in and sent, the send has to be a thing
-              you can hit. Enter still works. */}
-          <button
-            type="button"
-            onClick={() => void start()}
-            disabled={busy || !value.trim()}
-            aria-label="Start your board"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-[#e4ec4b] transition-opacity disabled:opacity-30"
-          >
-            {busy ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-[#e4ec4b]" />
-            ) : (
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M5 12h13M12 5l7 7-7 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
+        <FirstCardControls
+          busy={busy}
+          canStart={value.trim().length > 0 || brief !== null}
+          linkDisabled={brief !== null}
+          onBrowse={() => picker.current?.click()}
+          onLink={() => setLinking((was) => !was)}
+          onStart={() => void start()}
+        />
 
         <input
           ref={picker}

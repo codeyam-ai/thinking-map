@@ -41,7 +41,7 @@ well enough to find a better answer.**
 
 | Phase | What happens |
 | --- | --- |
-| 01 Idea | You type something vague into one free-text input. No structured fields. Or you arrive with a client's brief — paste it, or drop the `.pdf` / `.docx` / `.md` / `.txt` — and the document comes in whole. |
+| 01 Idea | You type something vague into one free-text input. No structured fields. Or you arrive with a client's brief — paste it, drop the `.pdf` / `.docx` / `.md` / `.txt` / `.html`, or point at a page and let the server read it — and the document comes in whole. A brief is enough on its own: with one attached, the sentence becomes optional. |
 | 02 Map | The partner asks a small number of high-value questions instead of answering, and your answers become the map: users, problems, goals, assumptions, open questions. Asking and mapping were once two phases; they are one activity, and the cards make that literal — a question and the node it becomes are the same card. `deconstruct` is still accepted everywhere a phase is read or set, and resolves to this one. |
 | 03 Research | A live web search grounds the map in what already exists, and in the gaps. |
 | 04 Explore | You change direction; the map adds and updates, and explains what changed. |

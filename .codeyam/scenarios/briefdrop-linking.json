@@ -1,0 +1,12 @@
+{
+  "name": "BriefDrop - Linking",
+  "id": "2ff3b5a6-dfc1-4486-987e-f0f81c94777d",
+  "url": "/isolated-components/BriefDrop?s=Linking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefDrop",
+  "scenarioType": "component",
+  "description": "The link box open, which is the fourth thing this component can render and the newest. An address field where the paste box puts a textarea, because a page is neither a file you can pick nor text you would paste."
+}

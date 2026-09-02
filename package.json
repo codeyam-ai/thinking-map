@@ -18,10 +18,12 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "@mozilla/readability": "^0.6.0",
     "@prisma/adapter-better-sqlite3": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "better-sqlite3": "^12.6.2",
     "dotenv": "^17.2.0",
+    "linkedom": "^0.18.13",
     "mammoth": "^1.12.2",
     "next": "^16.1.7",
     "prisma": "^7.4.1",

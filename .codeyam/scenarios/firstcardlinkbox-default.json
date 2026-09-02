@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardLinkBox - Default",
+  "id": "cc914300-9ef5-4317-a912-332a85779528",
+  "url": "/isolated-components/FirstCardLinkBox?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardLinkBox",
+  "scenarioType": "component",
+  "description": "The address field inside the landing card, empty. Shown against the card's own yellow because that is the whole design question here: the field carries a drawn border, unlike the card's borderless textarea, since a small input on a yellow panel reads as stray text without one."
+}

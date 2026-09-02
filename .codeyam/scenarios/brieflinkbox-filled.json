@@ -1,0 +1,12 @@
+{
+  "name": "BriefLinkBox - Filled",
+  "id": "f6613d94-c49c-48c1-afd1-6f71c09921fa",
+  "url": "/isolated-components/BriefLinkBox?s=Filled",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefLinkBox",
+  "scenarioType": "component",
+  "description": "A real address in the field and the Attach it button alive. A deep link into somebody's docs rather than a bare domain, because that is the shape of a link worth attaching and the one that tests whether the field holds it."
+}

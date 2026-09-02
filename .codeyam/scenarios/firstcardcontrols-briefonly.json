@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardControls - BriefOnly",
+  "id": "1a618437-5a3d-4dea-bac6-97df3a13b705",
+  "url": "/isolated-components/FirstCardControls?s=BriefOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardControls",
+  "scenarioType": "component",
+  "description": "A page attached and NOTHING typed, with the send live anyway - the opposite of every other state here. A page says what you want thought through, so the sentence becomes optional. Add a link dims because there is one brief per board, and offering a second is offering to lose the first."
+}

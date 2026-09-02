@@ -238,7 +238,7 @@
     ]
   },
   {
-    "description": "The way a twenty-page spec gets into a map. Owns one question - what document, if any, is attached - and shows exactly one of three things depending on the answer: the readout of an attached brief, the paste box, or the drop target. Extraction goes over the wire because reading a PDF is a server's job, and nothing is persisted by it, so a brief the person discards leaves nothing behind.",
+    "description": "The way a twenty-page spec or a public page gets into a map. Owns one question - what document, if any, is attached - and shows exactly one thing depending on the answer: the readout of an attached brief, the paste box, the link box, or nothing at all. Retrieval goes over the wire because reading a PDF and fetching a stranger's URL are both a server's job, and nothing is persisted by either, so a brief the person discards leaves nothing behind.",
     "filePath": "app/components/BriefDrop.tsx",
     "name": "BriefDrop",
     "scenarios": [
@@ -256,7 +256,7 @@
     ]
   },
   {
-    "description": "The brief intake with its dashed panel removed: a hidden file picker its parent opens plus the one error line an upload can produce, and the ACCEPT list keeping the picker and the extractor in step. Renders nothing at rest.",
+    "description": "The brief intake with its dashed panel removed: a hidden file picker its parent opens plus the one error line an upload can produce, and the ACCEPT list keeping the picker and the extractor in step - which is why .html joined it in the same change that taught the extractor to read a page. Renders nothing at rest.",
     "filePath": "app/components/BriefFileInput.tsx",
     "name": "BriefFileInput",
     "untestabilityReason": {
@@ -265,7 +265,16 @@
     }
   },
   {
-    "description": "The whole brief intake stated in 28px of width instead of 140px of height: a + button inside the input frame opening a two-item menu (Upload a file / Paste a brief), which becomes a chip naming the document once one is attached. Closes on outside click, Escape, and selection.",
+    "description": "The third way into the intake: point at the page. Deliberately the same shape as BriefPasteBox - one field, one primary button, one way out - so the intake does not become three different conversations depending on which menu item you picked. It reports the address and stops there; fetching a stranger's URL is a server's job, both because CORS blocks the browser and because the guard on that address cannot live in one. Focuses through a ref rather than autoFocus, which browsers refuse inside a cross-origin frame.",
+    "filePath": "app/components/BriefLinkBox.tsx",
+    "name": "BriefLinkBox",
+    "scenarios": [
+      "brieflinkbox-default",
+      "brieflinkbox-filled"
+    ]
+  },
+  {
+    "description": "The whole brief intake stated in a line of width instead of 140px of height: a labelled attach control inside the input frame opening a three-item menu (Upload a file / Paste a brief / Add a link), which becomes a chip naming the document once one is attached. The trigger says what it takes rather than showing a bare +, which is what had made drag-and-drop read as missing while it worked all along. Closes on outside click, Escape, and selection.",
     "filePath": "app/components/BriefMenu.tsx",
     "name": "BriefMenu",
     "testFile": "app/components/BriefMenu.render.test.tsx"
@@ -566,13 +575,46 @@
     }
   },
   {
-    "description": "Where a board begins: the single card on the landing screen that turns a typed sentence into a map. It autofocuses its field on mount, because the one thing a person arriving here should be able to do is start typing.",
+    "description": "Where a board begins: the single card on the landing screen that turns a typed sentence, an attached page, or both into a map. It autofocuses its field on mount, because the one thing a person arriving here should be able to do is start typing. Holds the state and the trip to /api/maps; the link box, the attachment chips and the control row are their own components. A browsed file travels as a name only, while a link travels as text - the server fetched the page, so the board gets a real brief the partner can quote - and a brief alone is enough to start a board, matching the rule /api/maps already enforces.",
     "filePath": "app/components/FirstCard.tsx",
     "name": "FirstCard",
     "untestabilityReason": {
       "justification": "It cannot be captured in isolation: the capture browser blocks autofocusing a textarea inside a cross-origin subframe, and this card autofocuses on mount by design. Unlike QuestionCard there is no variant of it without the field, so no scenario avoids the block. It is visible in the landing-page application scenarios, and its behaviour — starting a map, carrying files along, refusing an empty idea — is asserted in tests rather than pictured.",
       "kind": "no-isolation-harness"
     }
+  },
+  {
+    "description": "What the landing card is carrying, named back to the person. Two kinds of chip, and the difference is real rather than decorative: a browsed file travels as a name only, while a link travels as text the board can quote - so the link chip inverts to black on the card's yellow. Renders nothing at all when the card is carrying nothing, which is almost every arrival. Names truncate rather than widening a chip, because the controls sit on the row below.",
+    "filePath": "app/components/FirstCardAttachments.tsx",
+    "name": "FirstCardAttachments",
+    "scenarios": [
+      "firstcardattachments-linkattached",
+      "firstcardattachments-shortname",
+      "firstcardattachments-filesonly",
+      "firstcardattachments-both",
+      "firstcardattachments-longfilename"
+    ]
+  },
+  {
+    "description": "The row along the bottom of the landing card: the ways in on the left, the way on to the board at the right. Two attach buttons rather than a menu, because two choices is not a menu's worth of choice and hiding them would hide the very thing the labels exist to say - that this card takes a document or a page, not just a sentence. The send goes live on either a typed idea or an attached brief, matching the rule /api/maps already enforces rather than being stricter than it.",
+    "filePath": "app/components/FirstCardControls.tsx",
+    "name": "FirstCardControls",
+    "scenarios": [
+      "firstcardcontrols-default",
+      "firstcardcontrols-ready",
+      "firstcardcontrols-briefonly",
+      "firstcardcontrols-busy"
+    ]
+  },
+  {
+    "description": "The address field inside the landing card, opened by Add a link. Inline rather than a popover, because the card is mostly empty by design and that space is exactly the room to ask for one more thing without covering the question. Catches Enter so the keystroke attaches the link instead of reaching the card's send and starting a board on a half-typed idea. A sibling of BriefLinkBox in behaviour and a stranger to it in dress - the two live on opposite palettes, so sharing one component would mean threading a theme through it to serve two callers.",
+    "filePath": "app/components/FirstCardLinkBox.tsx",
+    "name": "FirstCardLinkBox",
+    "scenarios": [
+      "firstcardlinkbox-default",
+      "firstcardlinkbox-filled",
+      "firstcardlinkbox-reading"
+    ]
   },
   {
     "description": "One line of the quiet type at the foot of the handoff band. Its own component because quiet is the decision, and it was previously three identical class strings across two files. The panel used to LEAD with this prose; demoting it was the change, and a demotion asserted by copy-paste is one bad merge away from being partly undone - one paragraph creeping back to a larger size while its neighbours stay small is exactly the drift nobody would notice. Deliberately not a general-purpose text component: it takes no size, weight or colour prop, because a caller that could pass those could also make this loud, which is the one thing it exists to prevent. `spacing` (lead / tight / none) is the exception and is not the same kind of prop - where a line sits in a stack is genuinely the caller's business, and the type treatment it guards is identical at all three values.",
@@ -660,7 +702,7 @@
     ]
   },
   {
-    "description": "The single free-text input the whole product starts from, with its large send button. No structured fields - the point is that you can arrive with something vague.",
+    "description": "The single free-text input the whole product starts from, with its large send button. No structured fields - the point is that you can arrive with something vague. The form itself is the drop target: a dropped file is read, and a link dragged out of another tab arrives as text/uri-list rather than a file and is routed to the fetch instead, which is why dropping a page on it used to do nothing at all.",
     "filePath": "app/components/IdeaForm.tsx",
     "name": "IdeaForm",
     "scenarios": [
@@ -678,7 +720,7 @@
     ]
   },
   {
-    "description": "The entry point. Owns the submit state for the free-text idea input and the starter chips, and routes to the new map on success.",
+    "description": "The entry point. Owns the submit state for the free-text idea input, the starter chips, and which of the three intake doors is open - a file, pasted text, or a link. Routes to the new map on success. The reading of a brief route's answer belongs to briefFetch, shared with the landing card, so what stays here is only which flags to lower and where the error goes.",
     "filePath": "app/components/IdeaPrompt.tsx",
     "name": "IdeaPrompt",
     "scenarios": [
@@ -698,7 +740,7 @@
     ]
   },
   {
-    "description": "The muted line under the idea input saying what can be dropped on it, doubling as the reading indicator while a document is extracted - the person's attention is already there, and a second spinner elsewhere would only split it. Whether the line belongs on screen at all is the caller's decision, since that is a fact about the intake state rather than about this line.",
+    "description": "The muted line under the idea input saying what can be dropped on it - PDF, Word, Markdown, plain text or a link - doubling as the reading indicator while a document is extracted, since the person's attention is already there and a second spinner elsewhere would only split it. Whether the line belongs on screen at all is the caller's decision, since that is a fact about the intake state rather than about this line.",
     "filePath": "app/components/IntakeHint.tsx",
     "name": "IntakeHint",
     "scenarios": [
@@ -1302,6 +1344,12 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
+    "description": "Names a brief pulled off the web: the page title paired with its host and path, or the bare address when the page is untitled or its title runs past 80 characters. The address is the half that always survives because this string is the only record of where a fetched brief came from — the page itself is not kept.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "briefSourceName",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
     "description": "Builds the HTTP and stdio front doors from the shared tool catalog rather than a hand-written list, which is what stops the three doors drifting apart. Loops the catalog, splicing a mapId argument onto each tool's own schema and stripping it back off before handing the call to the shared runtime - out here the agent has no page, so it must name the map it means. Adds the two whole-collection tools that belong only to the server doors, list_thinking_maps and create_thinking_map, since a page is already scoped to one map. Built fresh per request in the stateless HTTP mode.",
     "filePath": "app/lib/mcpServer.ts",
     "name": "buildMcpServer",
@@ -1343,10 +1391,25 @@
     "testFile": "app/lib/cardThreads.test.ts"
   },
   {
+    "description": "The full verdict on whether a URL may be fetched: the syntax and scheme rules, then where the hostname actually resolves to, refusing if ANY of its addresses is private rather than only the first. Deliberately says the same sentence whatever it resolved to, because telling a stranger which guess hit something turns a refusal into a port scanner. Its residual limit is documented in the source: the name is resolved here and again by fetch, so a DNS answer that changes between the two can still slip past.",
+    "filePath": "app/lib/briefUrl.ts",
+    "name": "checkBriefUrl",
+    "untestabilityReason": {
+      "justification": "The uncovered half is the node:dns lookup itself, and this project has no DNS-stubbing harness — a test of it would be a test of the network. Both halves of the DECISION are pure and fully covered in app/lib/briefUrl.test.ts: parseBriefUrl for the syntax and scheme rules, isBlockedAddress for every range it refuses.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
     "description": "Holds the board's zoom inside its limits. Past the floor the board is a few pixels of noise with no way back; past the ceiling one card fills the screen and the shape of the thinking — the whole point of the board — is gone. It also guarantees the scale can never reach zero or invert, which matters because every drag delta is divided by it.",
     "filePath": "app/hooks/useBoardCamera.ts",
     "name": "clampScale",
     "testFile": "app/hooks/useBoardCamera.test.ts"
+  },
+  {
+    "description": "Decides how to read what came back from a URL: markup whose words need digging out of the page, text or Markdown that already is the brief, or a binary this door cannot turn into words. A missing content-type reads as a page, which is the web's most common omission and overwhelmingly HTML.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "classifyFetchedContent",
+    "testFile": "app/lib/briefFormat.test.ts"
   },
   {
     "description": "Turns a thrown database failure into what a person should be told: a title, a message, and in development the command that fixes it plus the column or table Prisma named. Recognises a Prisma error structurally (a string code beside a clientVersion) rather than by instanceof, because the thrown value has usually crossed a server component boundary by the time it arrives. P2022/P2021 become the schema-drift diagnosis with npm run db:push; P1001/P1003 point at DATABASE_URL; everything else falls through to a generic message that leaks nothing. The dev flag is a parameter rather than a read of NODE_ENV so the production behaviour - the half that withholds - is testable.",
@@ -1462,6 +1525,12 @@
     }
   },
   {
+    "description": "Expands any IPv6 form — :: compression, a zone id, an embedded dotted-quad tail — into eight 16-bit groups, or null when it is not IPv6 at all. The embedded-IPv4 handling is what stops every blocked v4 range from passing as a v6 address.",
+    "filePath": "app/lib/briefUrl.ts",
+    "name": "expandIpv6",
+    "testFile": "app/lib/briefUrl.test.ts"
+  },
+  {
     "description": "The lower-cased extension of a filename, or empty when it has none. Needed because browsers are inconsistent about the media type they attach to a .md - several send application/octet-stream - so the extension is the fallback the type dispatch falls back to.",
     "filePath": "app/lib/briefText.ts",
     "name": "extensionOf",
@@ -1471,7 +1540,16 @@
     }
   },
   {
-    "description": "Gets the words out of whatever the client sent - PDF via unpdf, .docx via mammoth, markdown and plain text decoded directly - dispatching on media type and falling back to the file extension, because browsers are inconsistent about the type they attach to a .md. Server-only, and the single place any format-specific dependency is reached. Reads the buffer's size before extracting, since pdfjs detaches it.",
+    "description": "Posts a chosen or dropped file to /api/briefs/extract and reads the answer. The bytes go over the wire because reading a PDF is a server's job, and nothing is persisted, so a document the person discards leaves nothing behind.",
+    "filePath": "app/lib/briefFetch.ts",
+    "name": "extractBriefFromFile",
+    "untestabilityReason": {
+      "justification": "It builds one multipart request and delegates: every decision in it belongs to readBriefResponse, which is fully covered in app/lib/briefFetch.test.ts.",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
+    "description": "Gets the words out of whatever the client sent - PDF via unpdf, .docx via mammoth, HTML through extractHtmlPage, markdown and plain text decoded directly - dispatching on media type and falling back to the file extension, because browsers are inconsistent about the type they attach to a .md. The HTML branch is checked before the general text/ branch, which would otherwise claim text/html and hand the markup through as if the tags were prose. Server-only, and the single place any format-specific dependency is reached. Reads the buffer's size before extracting, since pdfjs detaches it.",
     "filePath": "app/lib/briefText.ts",
     "name": "extractBriefText",
     "untestabilityReason": {
@@ -1487,6 +1565,12 @@
       "justification": "A wrapper around mammoth inside a server-only module that does not load under vitest. Verified against the running app with a real .docx upload, which extracted its four paragraphs intact.",
       "kind": "no-isolation-harness"
     }
+  },
+  {
+    "description": "Gets the readable article out of a web page — Readability over a linkedom document, falling back to a stripped body copy when Readability declines on a page that is not article-shaped. Opens the result with the page's own title as a markdown heading, which is what gives a page-derived brief something for the section splitter to split on and something better than boilerplate to name the board after. Lives outside briefText.ts so it can be tested at all: that module imports server-only, which throws under vitest.",
+    "filePath": "app/lib/briefHtml.ts",
+    "name": "extractHtmlPage",
+    "testFile": "app/lib/briefHtml.test.ts"
   },
   {
     "description": "Pulls the text out of a PDF through unpdf, merging pages into one string. unpdf rather than pdf-parse because pdf-parse runs a debug branch at import that reads a fixture off disk and fails in a bundled server runtime. Note that pdfjs transfers the buffer to its worker and detaches it, so the caller must read the size first.",
@@ -1526,6 +1610,24 @@
     "filePath": "app/lib/boardConnectors.ts",
     "name": "fanPath",
     "testFile": "app/lib/boardConnectors.test.ts"
+  },
+  {
+    "description": "Posts an address to /api/briefs/fetch and reads the answer. The retrieval is the server's job because CORS blocks a browser fetching almost any third-party page, and because the guard on a stranger's URL cannot live in a browser.",
+    "filePath": "app/lib/briefFetch.ts",
+    "name": "fetchBriefFromLink",
+    "untestabilityReason": {
+      "justification": "It builds one request and delegates: every decision in it belongs to readBriefResponse, which is fully covered in app/lib/briefFetch.test.ts, and to the route's own guard.",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
+    "description": "Fetches a URL while re-running the guard at every redirect hop, and reports the address that finally answered. Lives beside the guard rather than in the route that calls it precisely because redirect: 'follow' would let a permitted host bounce to 127.0.0.1 with nothing left to check — leaving the loop in a handler would mean the next route could call checkBriefUrl correctly and still reopen the hole.",
+    "filePath": "app/lib/briefUrl.ts",
+    "name": "fetchGuarded",
+    "untestabilityReason": {
+      "justification": "It exists to make real network requests, and this project has no HTTP-interception harness to drive redirect chains against. The per-hop decision it delegates to — checkBriefUrl, and through it isBlockedAddress — is covered in app/lib/briefUrl.test.ts; the loop itself was verified against a live http-to-https redirect.",
+      "kind": "no-isolation-harness"
+    }
   },
   {
     "description": "Read one non-empty string field off an event payload, or null. The single guard every rail reader goes through, so an unparseable row degrades to a plainer line rather than throwing.",
@@ -1671,6 +1773,12 @@
     "filePath": "app/lib/cardPresentation.ts",
     "name": "isAnsweredCard",
     "testFile": "app/lib/cardPresentation.test.ts"
+  },
+  {
+    "description": "Whether a resolved IP is somewhere the server refuses to fetch from: loopback, link-local (including the cloud metadata endpoint at 169.254.169.254), the private and carrier-NAT ranges, multicast and reserved space, in both IPv4 and IPv6 — unwrapping IPv4-mapped IPv6 so a blocked v4 range cannot slip through wearing a v6 hat. Pure and exported so the security boundary can be enumerated in tests rather than trusted by inspection; anything that is not a resolved address fails closed.",
+    "filePath": "app/lib/briefUrl.ts",
+    "name": "isBlockedAddress",
+    "testFile": "app/lib/briefUrl.test.ts"
   },
   {
     "description": "Guard for the eight kinds the exchange log can record. A kind outside the set would become a row that nothing knows how to render or resume past.",
@@ -1865,6 +1973,12 @@
     "testFile": "app/lib/briefInput.test.ts"
   },
   {
+    "description": "The half of the SSRF guard that needs no network: parses what the person typed, assumes https when no scheme was given, and refuses anything that is not http/https or that carries credentials in the URL. Returns a normalised URL or a sentence the person can act on, never a thrown error, because a bad address is something they typed rather than a fault.",
+    "filePath": "app/lib/briefUrl.ts",
+    "name": "parseBriefUrl",
+    "testFile": "app/lib/briefUrl.test.ts"
+  },
+  {
     "description": "Reads a question's shortlist back off the map. Stored as a JSON string because SQLite has no array column, so anything malformed degrades to an open-ended question rather than throwing — a card that cannot render its options is still a question worth asking, and a board that will not open is not.",
     "filePath": "app/components/MapScreen.tsx",
     "name": "parseChoices",
@@ -1956,6 +2070,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "railEntries",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Reads whatever a brief route answered with, from the browser: status before body, the route's own sentence preferred over a generic one, an omitted warning spelled as null rather than undefined, and never a parse error reaching a person. A 200 whose body carries no text is treated as the failure it is. Exists because the landing card and the older intake were each doing this independently, and two copies of one contract is one copy away from drifting.",
+    "filePath": "app/lib/briefFetch.ts",
+    "name": "readBriefResponse",
+    "testFile": "app/lib/briefFetch.test.ts"
   },
   {
     "description": "Validates a drawn shape a language model asked for, on its way into the map. A shape that cannot be drawn — fewer than two steps once blanks are dropped, or not an object at all — becomes null rather than a half-formed diagram, because a card announcing a shape and then showing nothing is worse than one that never claimed to have it. The note is omitted entirely rather than carried empty, since the card renders a caption line for anything truthy.",
@@ -2072,6 +2192,12 @@
     "filePath": "app/lib/pendingRow.ts",
     "name": "settledNote",
     "testFile": "app/lib/pendingRow.test.ts"
+  },
+  {
+    "description": "Truncates an attachment name for a chip that must not grow wide enough to push the first card's own controls out of line, keeping the ellipsis inside the budget rather than adding it on top. A page title runs to a sentence far more often than a filename does, which is what made this necessary once links could be attached.",
+    "filePath": "app/components/FirstCardAttachments.tsx",
+    "name": "shorten",
+    "testFile": "app/components/FirstCardAttachments.render.test.tsx"
   },
   {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
@@ -2215,6 +2341,12 @@
     }
   },
   {
+    "description": "Parses a dotted-quad IPv4 address into a 32-bit integer, or null when it is not one, so the CIDR checks in isBlockedAddress are mask arithmetic rather than string comparison. Rejects out-of-range octets and non-numeric parts rather than coercing them.",
+    "filePath": "app/lib/briefUrl.ts",
+    "name": "v4ToInt",
+    "testFile": "app/lib/briefUrl.test.ts"
+  },
+  {
     "description": "Checks an agent's call against the tool it named and returns either the parsed input or the response to send back. Runs on the page as well as the server - not redundantly, but because it turns a malformed call into an immediate readable answer rather than a round trip, and agent input is untrusted on both sides of the wire. The message names the offending field so the agent can correct itself instead of guessing.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "validateToolInput",
@@ -2261,5 +2393,11 @@
     "filePath": "app/lib/apiFailure.ts",
     "name": "withFailure",
     "testFile": "app/lib/apiFailure.test.ts"
+  },
+  {
+    "description": "Opens an extracted page with its own title as a markdown heading, skipping it when the article already starts with that title so the name is not said twice before the first sentence. Restores something extraction dropped rather than inventing it — without it a board started from a Wikipedia article was named 'From Wikipedia, the free encyclopedia', identical for every article on the site.",
+    "filePath": "app/lib/briefHtml.ts",
+    "name": "withTitleHeading",
+    "testFile": "app/lib/briefHtml.test.ts"
   }
 ]

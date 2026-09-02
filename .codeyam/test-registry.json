@@ -352,11 +352,65 @@
       "runner": "tests"
     },
     {
+      "description": "The box lives inside the form whose submit starts a map. Enter has to mean \"attach this link\" here, or the keystroke starts a board on a half-typed idea instead.",
+      "file": "app/components/BriefLinkBox.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefLinkBox › attaches on Enter instead of submitting the form",
+      "line": 73,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Enter on an empty box means nothing, the same as the dead button does.",
+      "file": "app/components/BriefLinkBox.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefLinkBox › does nothing on Enter with an empty box",
+      "line": 91,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A way out that does not attach anything is the difference between opening this by accident and being stuck in it.",
+      "file": "app/components/BriefLinkBox.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefLinkBox › reports a cancel without attaching",
+      "line": 104,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole job: report the address upward, trimmed, and retrieve nothing.",
+      "file": "app/components/BriefLinkBox.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefLinkBox › reports the address and fetches nothing itself",
+      "line": 50,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Whitespace is not an address. Someone who hits space then Attach should get the same nothing as someone who typed nothing.",
+      "file": "app/components/BriefLinkBox.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefLinkBox › treats whitespace as empty",
+      "line": 38,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty box has nothing to attach, and a live button that does nothing is worse than a dead one that explains itself by being dead.",
+      "file": "app/components/BriefLinkBox.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefLinkBox › will not attach an empty address",
+      "line": 25,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
       "description": "While a file is being read, offering to read another is a way to lose the first one.",
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › cannot be opened while a file is being read",
-      "line": 117,
+      "line": 192,
       "registeredAt": "2026-09-01T18:29:34Z",
       "runner": "tests"
     },
@@ -365,7 +419,7 @@
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › closes on Escape",
-      "line": 71,
+      "line": 133,
       "registeredAt": "2026-09-01T18:29:34Z",
       "runner": "tests"
     },
@@ -374,7 +428,7 @@
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › closes when the click lands outside it",
-      "line": 82,
+      "line": 151,
       "registeredAt": "2026-09-01T18:29:34Z",
       "runner": "tests"
     },
@@ -383,17 +437,17 @@
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › names the attached brief instead of inviting another",
-      "line": 99,
+      "line": 173,
       "registeredAt": "2026-09-01T18:29:34Z",
       "runner": "tests"
     },
     {
-      "description": "Both capabilities the dashed panel advertised have to survive the collapse, which means both must appear on the one click that opens the menu.",
+      "description": "Every capability the dashed panel advertised has to survive the collapse, and the link door added to it, which means all three must appear on the one click that opens the menu.",
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
-      "key": "BriefMenu › offers both ways in once opened",
-      "line": 29,
-      "registeredAt": "2026-09-01T18:29:34Z",
+      "key": "BriefMenu › offers all three ways in once opened",
+      "line": 37,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -401,8 +455,17 @@
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › reports the file choice and closes behind it",
-      "line": 40,
+      "line": 92,
       "registeredAt": "2026-09-01T18:29:34Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The link route is the one that reaches a page nobody can upload — a Notion doc, a client's own site — and it closes behind itself like the others.",
+      "file": "app/components/BriefMenu.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefMenu › reports the link choice and closes behind it",
+      "line": 57,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -410,8 +473,17 @@
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › reports the paste choice and closes behind it",
-      "line": 56,
+      "line": 113,
       "registeredAt": "2026-09-01T18:29:34Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The trigger stopped being a bare `+` and started saying what it takes. That label IS the fix for drag-and-drop reading as missing: a symbol with no noun invites nobody to drop anything on it.",
+      "file": "app/components/BriefMenu.render.test.tsx",
+      "format": "vitest",
+      "key": "BriefMenu › says what it accepts rather than showing a bare plus",
+      "line": 78,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -428,7 +500,7 @@
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
       "key": "BriefMenu › states its expanded state on the trigger",
-      "line": 129,
+      "line": 211,
       "registeredAt": "2026-09-01T18:29:34Z",
       "runner": "tests"
     },
@@ -583,6 +655,60 @@
       "key": "ErrorScreen › renders the command and detail when given them",
       "line": 31,
       "registeredAt": "2026-09-02T13:25:51.508924834+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A name that already fits is shown as it is — truncation is for names that need it, not a house style.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › leaves a short name alone",
+      "line": 60,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Almost every arrival is carrying nothing, and an empty list would still take vertical space in a card whose emptiness is the point.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › renders nothing when the card is carrying nothing",
+      "line": 28,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "There is one brief per board, so dropping it is how you attach a different one — which makes this the only way back out of a wrong link.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › reports dropping the brief",
+      "line": 75,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Files are named rather than indexed, because the list is re-ordered by nothing and identified by name everywhere else in this card.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › reports removing a browsed file by name",
+      "line": 92,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Both kinds at once is a real state — someone can browse for a doc and point at a page — and the two have to coexist rather than replace.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › shows a brief and browsed files together",
+      "line": 109,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A long source name truncates rather than growing. The full name stays in the label so it is still recoverable by anyone who needs it.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › truncates a long source name but keeps it whole in the label",
+      "line": 43,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -1373,7 +1499,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › counts an empty document as zero pages",
-      "line": 74,
+      "line": 76,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1382,7 +1508,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › counts any non-empty document as at least one page",
-      "line": 68,
+      "line": 70,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1391,7 +1517,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › never returns a negative page count",
-      "line": 79,
+      "line": 81,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1400,7 +1526,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "approxPages › scales with length",
-      "line": 84,
+      "line": 86,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -1627,6 +1753,69 @@
       "key": "bindTools › unregisters everything it registered when disposed",
       "line": 135,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Some pages carry a whole sentence as their title. Past the limit the title stops helping and starts pushing the address out of a chip, so the address wins — it is the half that cannot be re-derived.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › drops an over-long title rather than the address",
+      "line": 285,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A root URL's path is a bare slash, which reads as a stray character on the end of a hostname rather than as a location.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › drops the path when it is just the root slash",
+      "line": 276,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An untitled page still has to be identifiable, so the address stands alone rather than the name falling back to something generic.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › falls back to the bare address when the page has no title",
+      "line": 268,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A port is part of where the page lives, so `host` rather than `hostname`.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › keeps a non-default port",
+      "line": 309,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The boundary itself, pinned: 80 characters is still a title worth keeping.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › keeps a title exactly at the length limit",
+      "line": 293,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Both halves when the page named itself: the title reads, the address proves where it came from.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › pairs the page title with its address",
+      "line": 256,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A whitespace-only title is the same as no title, and would otherwise render as a leading em dash with nothing before it.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "briefSourceName › treats a blank title as no title",
+      "line": 302,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -1906,6 +2095,60 @@
       "key": "cardThreads › threads a card to its parent in the round directly above",
       "line": 32,
       "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A response with no content-type at all is the web's most common omission. HTML is the overwhelmingly likely truth, and the extractor's own body fallback handles it safely when it is not.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "classifyFetchedContent › assumes a page when the origin sent no type",
+      "line": 356,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Headers arrive in whatever case the origin felt like sending.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "classifyFetchedContent › ignores header casing",
+      "line": 349,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A PDF at a URL is a real thing to want and a real thing this door cannot do — the person has to be told to attach the file instead.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "classifyFetchedContent › refuses a binary document",
+      "line": 343,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, and the one the whole door was built for: a web page, whose words are buried in markup and have to be dug out.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "classifyFetchedContent › treats HTML as a page to extract an article from",
+      "line": 324,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "XHTML and generic XML are markup too — running them through the plain branch would hand the section splitter a brief full of angle brackets.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "classifyFetchedContent › treats XML markup as a page",
+      "line": 330,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A link straight to a spec in plain text or Markdown IS the brief. Parsing it as HTML would only strip tags it does not have.",
+      "file": "app/lib/briefFormat.test.ts",
+      "format": "vitest",
+      "key": "classifyFetchedContent › treats plain text and Markdown as already-brief text",
+      "line": 336,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -2566,11 +2809,92 @@
       "runner": "tests"
     },
     {
+      "description": "Titles that the extracted text already opens with must not be repeated — an article whose h1 survives extraction would otherwise say its own name twice before the first sentence.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › does not repeat a title the article already opens with",
+      "line": 120,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Navigation and footers are the bulk of what has to go, and the part Readability is reliably good at — they are structurally marked as chrome.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › drops navigation and the footer",
+      "line": 47,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Readability declines outright on pages that are not article-shaped — a bare spec with no <article>, a wiki, a docs page. Declining is not the same as there being nothing to read, so the body fallback has to catch it.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › falls back to the body when the page is not article-shaped",
+      "line": 90,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reason the heading is worth adding at all. `deriveTitle` in `mapStore.ts` names a brief-started map after its first markdown heading, and without one a board started from a Wikipedia article was called \"From Wikipedia, the free encyclopedia\" — boilerplate, identical for every article on the site. Asserted on the heading rather than by calling `deriveTitle`, which would drag a database client into a parsing test.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › gives a board started from a page a name worth reading",
+      "line": 134,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The core job, stated as the thing that would otherwise go wrong: the chrome around an article is the majority of most pages by volume, and all of it would become sections an agent reads and asks questions about.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › keeps the article",
+      "line": 38,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The page's own title becomes a heading in the brief. Two things depend on it: the section splitter, which has nothing else to split a page on, and the map's name.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › opens the brief with the page title as a heading",
+      "line": 109,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A page with no title is common enough — an internal doc export, a raw fragment — and has to come back as an honest absence rather than ''.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › reports no title as null rather than an empty string",
+      "line": 82,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The title is how the brief gets named, both in the chip and on the board.",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › reports the page title",
+      "line": 73,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A KNOWN LIMIT, pinned so it is a decision rather than a surprise. A cookie banner is an unmarked `<div>` of ordinary prose sitting next to the article, so Readability keeps it — nothing in the markup says it is furniture. Beating it would mean matching on class names and copy, which is a heuristic that goes stale site by site and silently eats real content when it misfires. The cost of leaving it is one short paragraph of noise at the top of a brief; the cost of the heuristic is losing a paragra",
+      "file": "app/lib/briefHtml.test.ts",
+      "format": "vitest",
+      "key": "extractHtmlPage › still keeps an unmarked cookie banner, which is a known limit",
+      "line": 66,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
       "description": "An unknown or unreadable size must not, on its own, make an empty extraction look healthy. This is the half of the detached-buffer bug that IS decidable here: with a zero size the thin-text rule cannot fire, so the empty-text rule has to stand on its own. The other half — that the size is measured BEFORE extraction, since pdfjs transfers the buffer to its worker and detaches it — lives at the call site in briefText.ts and cannot be reached from a pure function. It was verified against the runnin",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › does not treat a zero byte length as a healthy empty extraction",
-      "line": 161,
+      "line": 163,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2579,7 +2903,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › names an unnamed file readably",
-      "line": 172,
+      "line": 174,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2588,7 +2912,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › stays quiet about a short document that is also a small file",
-      "line": 167,
+      "line": 169,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2597,7 +2921,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › stays quiet when a real document came out",
-      "line": 132,
+      "line": 134,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2606,7 +2930,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › warns when a large file yielded almost no text",
-      "line": 145,
+      "line": 147,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2615,7 +2939,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "extractionWarning › warns when no text came out",
-      "line": 137,
+      "line": 139,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2804,7 +3128,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns an empty string for a document with no text",
-      "line": 113,
+      "line": 115,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2813,7 +3137,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns an empty string when asked for no lines",
-      "line": 119,
+      "line": 121,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2822,7 +3146,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns everything when asked for more lines than the document has",
-      "line": 108,
+      "line": 110,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2831,7 +3155,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › returns the first n lines",
-      "line": 95,
+      "line": 97,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2840,7 +3164,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "firstLines › skips blank lines instead of counting them",
-      "line": 101,
+      "line": 103,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -2849,7 +3173,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "formatCharCount › formats zero",
-      "line": 218,
+      "line": 220,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -2858,7 +3182,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "formatCharCount › groups thousands",
-      "line": 208,
+      "line": 210,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -2867,7 +3191,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "formatCharCount › leaves a short count alone",
-      "line": 213,
+      "line": 215,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -3481,6 +3805,123 @@
       "key": "isAnsweredCard › never treats a settled insight as your answer",
       "line": 100,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A mapped PUBLIC address is still public — the unwrapping must not turn into a blanket refusal of the mapped form.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › allows a mapped public address",
+      "line": 158,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Ordinary public IPv6 has to work.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › allows a public IPv6 address",
+      "line": 163,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point is that ordinary public addresses go through.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › allows ordinary public addresses",
+      "line": 122,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bypass that makes an IPv6-unaware check useless: every blocked v4 range can be written as a v6 address, and has to be judged as the v4 address it actually is.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks IPv4 addresses wearing an IPv6 mapping",
+      "line": 150,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "IPv6 loopback and unspecified, in both the compressed forms they arrive in.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks IPv6 loopback and unspecified",
+      "line": 129,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Unique-local and link-local are v6's private ranges.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks IPv6 unique-local and link-local",
+      "line": 135,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A zone id is a local routing detail, and anything carrying one is link-local anyway — parsing must not choke on the suffix and let it past.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks a link-local address carrying a zone id",
+      "line": 143,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Loopback reaches every other service bound on the same box — an admin panel, a database, the app's own unauthenticated internals.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks loopback across the whole /8, not just 127.0.0.1",
+      "line": 90,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The single most valuable address to an attacker: on every major cloud it serves the instance's own credentials to anything that asks.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks the cloud metadata endpoint",
+      "line": 84,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Carrier-grade NAT, benchmarking, multicast, the reserved top sixteenth, and the unspecified address — none of them is a page.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks the other non-public v4 ranges",
+      "line": 113,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The three private blocks are the rest of whatever network this server sits inside.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › blocks the private ranges",
+      "line": 97,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The edges of 172.16/12 specifically, because it is the one range whose boundaries are easy to get wrong by an octet.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › gets the edges of the 172.16/12 block right",
+      "line": 106,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything that is not a resolved address at all is a surprise, and a surprise here has to fail closed rather than open.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "isBlockedAddress › refuses anything that is not an address",
+      "line": 169,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -4163,7 +4604,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › collapses three or more newlines to a paragraph break",
-      "line": 29,
+      "line": 31,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4172,7 +4613,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › converts CRLF to LF",
-      "line": 18,
+      "line": 20,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4181,7 +4622,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › converts a bare CR to LF",
-      "line": 23,
+      "line": 25,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4190,7 +4631,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › keeps leading whitespace on a line",
-      "line": 47,
+      "line": 49,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4199,7 +4640,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › leaves a single blank line alone",
-      "line": 34,
+      "line": 36,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4208,7 +4649,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › reduces a whitespace-only document to an empty string",
-      "line": 58,
+      "line": 60,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4217,7 +4658,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › strips trailing spaces and tabs from every line",
-      "line": 40,
+      "line": 42,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4226,7 +4667,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "normalizeBriefText › trims the whole document",
-      "line": 52,
+      "line": 54,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -4345,6 +4786,87 @@
       "key": "parseBriefInput › rejects values that are not brief objects",
       "line": 57,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, and the reason the function returns a URL rather than a boolean: everything downstream works from the parsed form.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › accepts an ordinary https page",
+      "line": 20,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Plain http is still most of the web, and refusing it would reject working pages for a reason the person cannot act on.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › accepts plain http",
+      "line": 28,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty box is a thing to say, not a thing to crash on.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › asks for a link when given nothing",
+      "line": 63,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nobody types the scheme. Assuming https is the difference between a door that works and one that rejects the first thing everyone tries.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › assumes https when no scheme was typed",
+      "line": 34,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Credentials in a URL would send somebody else's password out of OUR server, and are also the classic way to disguise the real host from a person reading the address.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › refuses a URL carrying credentials",
+      "line": 56,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`file://` is the one that matters: it would read the server's own disk. The refusal names the scheme so the person knows what was wrong.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › refuses a file URL and says which scheme it refused",
+      "line": 40,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every other exotic scheme goes the same way, rather than being parsed and handed to fetch to find out.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › refuses non-web schemes generally",
+      "line": 48,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Not everything with a slash in it is an address.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › refuses something that is not a web address at all",
+      "line": 76,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Whitespace around a pasted address is normal and is not the person's mistake to fix.",
+      "file": "app/lib/briefUrl.test.ts",
+      "format": "vitest",
+      "key": "parseBriefUrl › trims surrounding whitespace",
+      "line": 69,
+      "registeredAt": "2026-09-02T21:44:23Z",
       "runner": "tests"
     },
     {
@@ -5023,6 +5545,69 @@
       "runner": "tests"
     },
     {
+      "description": "A warning is the whole reason a scanned PDF does not silently become an empty brief, so it has to survive the trip.",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › carries a warning through",
+      "line": 63,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The failure no route ever saw: a proxy answering with HTML. This is the exact shape that once put \"Failed to execute 'json' on 'Response'\" on screen, and the fallback plus the status is what a person can report.",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › falls back to a readable sentence when the body is not JSON",
+      "line": 95,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A 500 with nothing in it at all — no body to read a reason out of.",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › handles an empty body",
+      "line": 107,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "When a route failed the way it meant to, its own sentence is better than anything this function could compose — it knows what actually went wrong.",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › prefers the route’s own error sentence",
+      "line": 79,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A 200 whose body is missing the one field that makes a brief a brief. The status said fine; the payload is not usable, and saying otherwise would attach an empty brief that looks like a successful read.",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › rejects a success response with no text in it",
+      "line": 119,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary success, and the shape every caller downstream depends on.",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › returns the brief a route handed back",
+      "line": 25,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A route that saw nothing worth flagging simply omits the key. The readout wants the absence spelled out, so an omitted warning becomes null rather than travelling as undefined and reading as \"not decided yet\".",
+      "file": "app/lib/briefFetch.test.ts",
+      "format": "vitest",
+      "key": "readBriefResponse › spells an omitted warning as null",
+      "line": 48,
+      "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
       "description": "A failure no route ever saw, so no route could have made it JSON.",
       "file": "app/lib/readJson.test.ts",
       "format": "vitest",
@@ -5531,7 +6116,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "sectionLabel › handles a multi-digit section number",
-      "line": 191,
+      "line": 193,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -5540,7 +6125,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "sectionLabel › renders a section id as a section mark",
-      "line": 185,
+      "line": 187,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -5549,7 +6134,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "sectionLabel › strips only the leading prefix",
-      "line": 197,
+      "line": 199,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -5963,7 +6548,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "untouchedNoteText › asks the agent to act rather than only reporting the gap",
-      "line": 240,
+      "line": 242,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },
@@ -5972,7 +6557,7 @@
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
       "key": "untouchedNoteText › names the section by mark and heading",
-      "line": 229,
+      "line": 231,
       "registeredAt": "2026-09-01T15:57:26Z",
       "runner": "tests"
     },

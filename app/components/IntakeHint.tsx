@@ -14,7 +14,7 @@ export default function IntakeHint({ reading }: { reading: boolean }) {
     <p className="mt-3 text-center text-[12.5px] text-muted">
       {reading
         ? 'Reading it…'
-        : 'PDF, Word, Markdown or plain text — or drop one here'}
+        : 'PDF, Word, Markdown, plain text or a link — or drop one here'}
     </p>
   );
 }

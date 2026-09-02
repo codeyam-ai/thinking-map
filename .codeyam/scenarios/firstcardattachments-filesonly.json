@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachments - FilesOnly",
+  "id": "ed41e416-d70b-4f8d-987e-eb17be20ec25",
+  "url": "/isolated-components/FirstCardAttachments?s=FilesOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "description": "Browsed files and no page: the pre-existing state, unchanged by the link door. It is the contrast that makes the inverted link chip mean something - these are washes of the card's own yellow, because nothing reads them yet."
+}

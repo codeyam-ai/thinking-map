@@ -18,8 +18,10 @@ import Component from '../../components/BriefMenu';
 // scenario, where the menu is driven for real.
 const scenarios: Record<string, { busy: boolean; attachedName: string | null }> =
   {
-    // The resting state, and what almost every arrival sees: a `+` at the left
-    // of the prompt, which is the whole brief intake now.
+    // The resting state, and what almost every arrival sees: a labelled attach
+    // control at the left of the prompt, which is the whole brief intake now.
+    // The label is what the bare `+` could not do — say what the door takes,
+    // which is why drag-and-drop read as missing while it worked all along.
     Default: { busy: false, attachedName: null },
     // A document in hand. The button stops inviting one and names the one it
     // has, which is the state the dashed panel used to make obvious.
@@ -54,6 +56,7 @@ function Harness() {
             attachedName={props.attachedName}
             onChooseFile={() => {}}
             onPaste={() => {}}
+            onLink={() => {}}
           />
         </div>
       </div>

@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachments - LinkAttached",
+  "id": "7fb911fc-d5aa-4dd1-ae5e-3ae3e995eabd",
+  "url": "/isolated-components/FirstCardAttachments?s=LinkAttached",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "description": "A page attached to the landing card. The chip INVERTS - black on the card's yellow - because this is the one attachment actually carrying words the board can quote, as against a browsed file that travels as a name only. The page's own name truncates rather than widening the chip."
+}

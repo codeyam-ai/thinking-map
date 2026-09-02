@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachments - LongFilename",
+  "id": "ab56f8ff-bde7-48d9-af63-2e70477c46b6",
+  "url": "/isolated-components/FirstCardAttachments?s=LongFilename",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "description": "A filename far longer than its chip. This is the edge case that decides whether a chip can live in a 440px card at all - it truncates rather than pushing the card's own controls out of line."
+}

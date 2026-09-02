@@ -26,7 +26,9 @@ export default function IdeaForm({
   onSubmit,
   onChooseFile,
   onPaste,
+  onLink,
   onDropFile,
+  onDropLink,
 }: {
   value: string;
   busy: boolean;
@@ -36,7 +38,11 @@ export default function IdeaForm({
   onSubmit: (event: React.FormEvent) => void;
   onChooseFile: () => void;
   onPaste: () => void;
+  onLink: () => void;
   onDropFile: (file: File) => void;
+  /** A link dragged out of another tab. Separate from `onDropFile` because it
+   *  arrives as an address rather than bytes, and is fetched rather than read. */
+  onDropLink: (url: string) => void;
 }) {
   const [dragging, setDragging] = useState(false);
 
@@ -57,7 +63,29 @@ export default function IdeaForm({
         e.preventDefault();
         setDragging(false);
         const file = e.dataTransfer.files?.[0];
-        if (file) onDropFile(file);
+        if (file) {
+          onDropFile(file);
+          return;
+        }
+        // Dragging a tab, a bookmark or a link out of another window yields no
+        // file at all — it yields `text/uri-list`, which is why dropping a page
+        // on this form used to do nothing at all. `text/plain` is the fallback
+        // for the sources that only set that one, and it is accepted only when
+        // it actually parses as an address: dropping a sentence should still
+        // do nothing rather than attach a brief nobody asked for.
+        const list = e.dataTransfer.getData('text/uri-list');
+        const dropped =
+          list.split('\n').find((line) => line.trim() && !line.startsWith('#')) ??
+          e.dataTransfer.getData('text/plain');
+        if (!dropped) return;
+        try {
+          const { protocol } = new URL(dropped.trim());
+          if (protocol === 'http:' || protocol === 'https:') {
+            onDropLink(dropped.trim());
+          }
+        } catch {
+          // Not an address. Nothing to attach, and nothing to say about it.
+        }
       }}
       className="relative"
     >
@@ -74,7 +102,11 @@ export default function IdeaForm({
             ? 'What do you want out of it? (optional)'
             : 'I want to build an educational game for kids…'
         }
-        className={`h-[76px] w-full rounded-full border-[1.5px] bg-surface pl-16 pr-24 text-[16px] text-ink outline-none transition placeholder:text-muted focus:border-ink disabled:opacity-60 ${
+        // `pl-44` reserves the width of the attach control, which sits inside
+        // this frame at `left-3` rather than beside it. The two numbers move
+        // together: a labelled trigger is wider than the `+` it replaced, and
+        // leaving the old `pl-16` would run the placeholder underneath it.
+        className={`h-[76px] w-full rounded-full border-[1.5px] bg-surface pl-44 pr-24 text-[16px] text-ink outline-none transition placeholder:text-muted focus:border-ink disabled:opacity-60 ${
           dragging ? 'border-ink bg-paper' : 'border-ink'
         }`}
       />
@@ -83,6 +115,7 @@ export default function IdeaForm({
         attachedName={attachedName}
         onChooseFile={onChooseFile}
         onPaste={onPaste}
+        onLink={onLink}
       />
       <SendButton
         size="large"

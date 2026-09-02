@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardLinkBox - Filled",
+  "id": "cb35fef5-4f27-4dca-82a9-14e2abec5b0c",
+  "url": "/isolated-components/FirstCardLinkBox?s=Filled",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardLinkBox",
+  "scenarioType": "component",
+  "description": "A long address typed in, with Attach it live. The field scrolls rather than growing, because the card is 440px wide and the panel cannot widen to fit a deep link."
+}

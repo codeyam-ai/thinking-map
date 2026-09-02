@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachments - Both",
+  "id": "09f57bb7-638d-4c6e-aeee-9fca1c55aaac",
+  "url": "/isolated-components/FirstCardAttachments?s=Both",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "description": "A page and a browsed file at once, which is a real thing to arrive with. The two kinds sit side by side and have to read as different kinds of thing rather than as one list, because only one of them is carrying text."
+}

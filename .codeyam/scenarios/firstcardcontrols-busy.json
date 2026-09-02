@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardControls - Busy",
+  "id": "21c4ca86-f7a0-42e1-a001-802132270ff2",
+  "url": "/isolated-components/FirstCardControls?s=Busy",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardControls",
+  "scenarioType": "component",
+  "description": "Mid-submit: the row locks and the send spins, so a second click cannot start a second board from the same card."
+}

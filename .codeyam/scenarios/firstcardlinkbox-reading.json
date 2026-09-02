@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardLinkBox - Reading",
+  "id": "f1d3b4b2-72be-4824-b176-4c8eaf8d9ce4",
+  "url": "/isolated-components/FirstCardLinkBox?s=Reading",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardLinkBox",
+  "scenarioType": "component",
+  "description": "Mid-fetch. The field locks and the button says 'Reading it…' rather than staying an invitation - a second attempt at the same page while the first is in flight is how you lose the first."
+}

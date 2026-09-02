@@ -15,6 +15,7 @@ import 'server-only';
 // runtime, not edge.
 
 import { extractionWarning, normalizeBriefText } from './briefFormat';
+import { extractHtmlPage } from './briefHtml';
 
 export interface ExtractedBrief {
   text: string;
@@ -74,12 +75,19 @@ export async function extractBriefText(
     ext === 'docx'
   ) {
     raw = await extractDocx(bytes);
+  } else if (type === 'text/html' || ext === 'html' || ext === 'htm') {
+    // Checked BEFORE the `text/` branch below, which would otherwise claim
+    // `text/html` and hand the markup through as if the tags were prose. The
+    // same branch is what makes a dropped or picked `.html` file work, and it
+    // is the branch a fetched page goes through.
+    const page = await extractHtmlPage(new TextDecoder().decode(bytes));
+    raw = page.text;
   } else if (type.startsWith('text/') || ext === 'md' || ext === 'txt') {
     raw = new TextDecoder().decode(bytes);
   } else {
     return {
       text: '',
-      warning: `We can read .pdf, .docx, .md and .txt files. ${
+      warning: `We can read .pdf, .docx, .md, .txt and .html files. ${
         filename || 'That file'
       } is not one of those — paste the text instead.`,
     };
