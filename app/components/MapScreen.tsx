@@ -38,6 +38,11 @@ export default function MapScreen({
   return (
     <main className="flex h-screen flex-col gap-3 px-4 py-4 sm:px-6 lg:gap-6 lg:px-10 lg:py-8">
       <AppHeader phase={phase} status={<AgentStatus />} />
+      {/* Deliberately NOT wrapped in a sizing div. This main is a flex column
+          with a gap, and AgentHandoff hides itself by returning null — a
+          wrapper would stay in the DOM as a zero-height flex item and collect
+          a gap on either side, pushing the map down on every map an agent has
+          already worked. The band carries its own `shrink-0` instead. */}
       {mapId ? (
         <AgentHandoff
           mapId={mapId}

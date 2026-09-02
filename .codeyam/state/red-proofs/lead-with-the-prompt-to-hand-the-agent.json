@@ -1,0 +1,88 @@
+{
+  "provenAt": "2026-09-02T11:13:22Z",
+  "slug": "lead-with-the-prompt-to-hand-the-agent",
+  "paths": [
+    "app/components/AgentHandoff.tsx",
+    "app/components/CopyablePrompt.tsx",
+    "app/lib/handoffCopy.ts"
+  ],
+  "runScope": [
+    "app/components/AgentHandoff.tsx",
+    "app/components/CopyablePrompt.tsx",
+    "app/lib/handoffCopy.ts"
+  ],
+  "tests": {
+    "announces the copied state in a live region": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "gives the same instruction and steps for a brief-only map": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "leads with an instruction naming the agent handoff": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "neither throws nor claims success when the clipboard is refused": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "puts the instruction before the explanation in document order": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "renders the instruction and both steps": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "renders the steps as an ordered list": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "states copying before pasting": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "tells the person to paste the prompt into an agent chat window": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "tells the person to paste the prompt into an agent chat window",
+      "states copying before pasting",
+      "leads with an instruction naming the agent handoff",
+      "gives the same instruction and steps for a brief-only map"
+    ]
+  }
+}

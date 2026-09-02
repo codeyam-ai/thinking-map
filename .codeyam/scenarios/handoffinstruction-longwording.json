@@ -1,0 +1,12 @@
+{
+  "name": "HandoffInstruction - LongWording",
+  "id": "f181967a-d890-4bc3-ba71-ffa676be5023",
+  "url": "/isolated-components/HandoffInstruction?s=LongWording",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffInstruction",
+  "scenarioType": "component",
+  "description": "A wrapping headline and two-line steps. The wording lives in a module built to be edited, so the layout has to survive an edit - this is where a heading that wraps either still wins against the steps beneath it or stops being the headline."
+}

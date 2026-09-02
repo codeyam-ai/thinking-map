@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - JustArrived",
+  "id": "ad1fdc51-5883-4ad4-ac47-e2a16e413769",
+  "url": "/isolated-components/MapScreen?s=JustArrived",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "The moment this feature is for: someone typed an idea, pressed return, and arrived at a map nobody is working on. The handoff band leads the page with what to do about that, and the map they just made stays visible underneath it - which is the whole argument for a band rather than a takeover. The band keeps its natural height and the workspace takes the remainder, so a short viewport scrolls the map instead of crushing it."
+}

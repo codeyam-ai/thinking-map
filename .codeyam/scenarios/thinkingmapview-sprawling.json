@@ -1,16 +1,15 @@
 {
- "name": "ThinkingMapView - Sprawling",
- "id": "9994bf4e-63a5-4d4a-afa3-bb2a2b1e6c10",
- "url": "/isolated-components/ThinkingMapView?s=Sprawling",
- "dimensions": [
-  "Tablet"
- ],
- "mocks": {},
- "componentName": "ThinkingMapView",
- "demonstratesState": { "rounds": "many" },
- "scenarioType": "component",
- "description": "Seventeen nodes across four levels. The column keeps every card at a readable size and scrolls rather than shrinking anything, because a map you scroll beats one that fits and cannot be read.",
- "demonstratesState": {
-  "rounds": "many"
- }
+  "name": "ThinkingMapView - Sprawling",
+  "id": "ae1b6d72-eb7f-47fc-8ea3-0e1f8bd38a3b",
+  "url": "/isolated-components/ThinkingMapView?s=Sprawling",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingMapView",
+  "scenarioType": "component",
+  "description": "Thirteen answered and four still open across four levels - past the legibility floor, so the panel scrolls rather than shrinking the labels away. The overflow case the other four scenarios never reach: they each fit their frame, and a map that fits proves nothing about a map that does not.",
+  "demonstratesState": {
+    "rounds": "many"
+  }
 }

@@ -6,7 +6,7 @@
       "dimension": "copied",
       "value": "true",
       "rationale": "source-derived state copied=true",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "copied",

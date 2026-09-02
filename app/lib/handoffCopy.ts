@@ -15,6 +15,14 @@
 export interface HandoffCopy {
   /** The small label above the panel. */
   eyebrow: string;
+  /** What to do about it, at heading weight — the line the panel leads with. */
+  instruction: string;
+  /**
+   * The instruction broken into the two moves it actually takes. Stated as
+   * steps because "hand this to your agent" is only obvious to someone who
+   * already knows the answer; the person this panel is for does not.
+   */
+  steps: readonly string[];
   /** Why nothing is working on this map yet. */
   explanation: string;
   /** A prompt the person can copy straight into an agent, naming this map. */
@@ -46,6 +54,15 @@ export function handoffCopy({
 
   return {
     eyebrow: 'No one is on this yet',
+    // The one sentence the panel previously never said. Copy-and-paste is named
+    // as the path that WORKS, not as a fallback: await_new_map only helps an
+    // agent already connected and already parked in that call, so for the
+    // person reading this, pasting the prompt is the thing that starts the map.
+    instruction: 'Hand this to your agent',
+    steps: [
+      'Copy the prompt below.',
+      'Paste it into your agent’s chat window.',
+    ],
     // Deliberately does not say "an agent is on its way": nothing is attached,
     // and a map cannot call for one. Saying what IS true — the idea is saved,
     // and it waits — is the honest version, and it is also the useful one.

@@ -114,4 +114,42 @@ describe('AgentHandoff', () => {
     expect(screen.getByText(/No one is on this yet/i)).toBeTruthy();
     expect(container.textContent).not.toMatch(/“”/);
   });
+
+  // The instruction has to be ON the panel at all — it is the sentence the
+  // panel existed without, and the one someone arriving actually needs.
+  it('renders the instruction and both steps', () => {
+    render(<AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />);
+    expect(screen.getByText(/Hand this to your agent/i)).toBeTruthy();
+    expect(screen.getByText(/Copy the prompt below/i)).toBeTruthy();
+    expect(screen.getByText(/Paste it into your agent/i)).toBeTruthy();
+  });
+
+  // The ORDER is the change, so asserting only presence would let the old
+  // arrangement back in unnoticed — the panel used to open with the
+  // explanation and reach the prompt third, which is exactly the layout that
+  // still passes a presence-only check.
+  it('puts the instruction before the explanation in document order', () => {
+    const { container } = render(
+      <AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />,
+    );
+    const text = container.textContent ?? '';
+    const instruction = text.indexOf('Hand this to your agent');
+    const prompt = text.indexOf(MAP_ID);
+    const explanation = text.indexOf('Your idea is saved');
+
+    expect(instruction).toBeGreaterThanOrEqual(0);
+    expect(prompt).toBeGreaterThan(instruction);
+    expect(explanation).toBeGreaterThan(prompt);
+  });
+
+  // Steps are numbered because their order is the content. An unordered list
+  // renders the same words and loses the only thing making them instructions.
+  it('renders the steps as an ordered list', () => {
+    const { container } = render(
+      <AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />,
+    );
+    const list = container.querySelector('ol');
+    expect(list).toBeTruthy();
+    expect(list?.querySelectorAll('li')).toHaveLength(2);
+  });
 });

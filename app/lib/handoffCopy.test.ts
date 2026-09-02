@@ -70,12 +70,57 @@ describe('handoffCopy', () => {
     expect(copy.attachHint).toContain('await_new_map');
   });
 
+  // The sentence the panel never said. Someone who has just pressed return
+  // needs to be told the prompt goes into an agent's chat window — knowing
+  // that is not obvious to anyone who does not already know the answer, and it
+  // is the one instruction that turns a quoted block into a next step.
+  it('tells the person to paste the prompt into an agent chat window', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, seedIdea: 'A chore app', hasBrief: false });
+    const steps = copy.steps.join(' ');
+    expect(steps).toMatch(/paste/i);
+    expect(steps).toMatch(/agent/i);
+    expect(steps).toMatch(/chat/i);
+  });
+
+  // Copying is the first move and pasting the second, so the steps have to be
+  // in that order. A set of instructions that reads paste-then-copy is worse
+  // than no instructions.
+  it('states copying before pasting', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, seedIdea: 'A chore app', hasBrief: false });
+    expect(copy.steps).toHaveLength(2);
+    expect(copy.steps[0]).toMatch(/copy/i);
+    expect(copy.steps[1]).toMatch(/paste/i);
+  });
+
+  // The headline is the panel's first line at heading weight. It has to name
+  // the action — a label that only restates the eyebrow would put the panel
+  // back to explaining itself before it says what to do.
+  it('leads with an instruction naming the agent handoff', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, seedIdea: 'A chore app', hasBrief: false });
+    expect(copy.instruction).toMatch(/agent/i);
+    expect(copy.instruction).not.toBe(copy.eyebrow);
+  });
+
+  // Both cases render the same instruction block, so a brief-only map must not
+  // arrive with the steps missing.
+  it('gives the same instruction and steps for a brief-only map', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: true });
+    expect(copy.instruction.length).toBeGreaterThan(0);
+    expect(copy.steps).toHaveLength(2);
+  });
+
   // Every field renders directly; an empty one would be a blank row in the card.
+  // `steps` is an array, so check the strings inside it rather than only its
+  // length — two empty steps would pass a length check and render two blank
+  // list items.
   it('returns non-empty copy for every field in both cases', () => {
     for (const hasBrief of [true, false]) {
       const copy = handoffCopy({ mapId: MAP_ID, seedIdea: 'A chore app', hasBrief });
       for (const value of Object.values(copy)) {
         expect(value.length).toBeGreaterThan(0);
+      }
+      for (const step of copy.steps) {
+        expect(step.trim().length).toBeGreaterThan(0);
       }
     }
   });

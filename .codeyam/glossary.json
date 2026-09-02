@@ -27,7 +27,7 @@
     ]
   },
   {
-    "description": "The panel a person meets when they submit an idea and nothing picks it up. Before it existed the only sign of that was 'No agent attached' in the header, which states a fact about the page rather than telling the person what to do about it. A renderer only - every string comes from handoffCopy, where tests pin it. What it decides is whether to appear at all: it hides when an agent is listening, using the identical predicate NodeQuestionComposer uses so working counts as attached and the two surfaces cannot contradict each other, and it hides when the log already carries an agent-origin event, because a map an agent has already worked is not waiting for one.",
+    "description": "The band a person meets when they submit an idea and nothing picks it up. Before it existed the only sign of that was 'No agent attached' in the header, which states a fact about the page rather than telling the person what to do about it. It leads with the instruction and follows with the explanation, in that order, because someone who just pressed return wants to know what to DO - the panel used to open with the explanation and reach the prompt third, which read as a footnote about agent availability rather than as the next step. A renderer and a composer only: every string comes from handoffCopy where tests pin it, and the band itself is HandoffInstruction, CopyablePrompt, SeedIdeaQuote and HandoffFootnote in that order. What it decides is whether to appear at all - it hides when an agent is listening, using the identical predicate NodeQuestionComposer uses so working counts as attached and the two surfaces cannot contradict each other, and it hides when the log already carries an agent-origin event, because a map an agent has already worked is not waiting for one.",
     "filePath": "app/components/AgentHandoff.tsx",
     "name": "AgentHandoff",
     "scenarios": [
@@ -330,14 +330,16 @@
     ]
   },
   {
-    "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff panel with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath.",
+    "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original secondary appearance and promotes to a lime-filled primary for the handoff band, so promoting that one caller cannot restyle the others. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation.",
     "filePath": "app/components/CopyablePrompt.tsx",
     "name": "CopyablePrompt",
     "scenarios": [
       "copyableprompt-default",
       "copyableprompt-shortprompt",
-      "copyableprompt-defaultlabel"
-    ]
+      "copyableprompt-defaultlabel",
+      "copyableprompt-primary"
+    ],
+    "testFile": "app/components/CopyablePrompt.render.test.tsx"
   },
   {
     "description": "The strongest directions on the summary screen, lettered A onward so they can be referred to by name in conversation.",
@@ -402,6 +404,23 @@
       "exchangerow-agentaddedmany",
       "exchangerow-agentnote",
       "exchangerow-youranswer"
+    ]
+  },
+  {
+    "description": "The honest paragraph about why nobody is attached, and the two ways to fix that for good - kept, and kept small. Its own component because of the decision it owns: these two travel together and they travel BELOW the action. The panel used to lead with the explanation, which answered a question someone who just pressed return had not asked yet; deleting it would have been the other mistake, since it is the only thing on the page that says a map cannot summon a thinking partner. So it is demoted rather than dropped, and grouping it here is what makes demoted a structural fact instead of two loose paragraphs that could drift back up the page one edit at a time.",
+    "filePath": "app/components/HandoffFootnote.tsx",
+    "name": "HandoffFootnote",
+    "scenarios": [
+      "handofffootnote-default"
+    ]
+  },
+  {
+    "description": "What to do about a map nobody has picked up, said before anything explains why nobody has. Its own component because of the decision it owns: the steps are an ORDERED list, not a styled pair of lines. Their order is the content - copy, then paste - and someone skimming a band on arrival reads the numbers before they read the words, so rendering them unordered or as prose would lose the only thing that makes two short sentences into instructions. It is also the block whose POSITION is the point: the panel used to open with the explanation and reach the prompt third, and keeping this separable is what lets a test assert that ordering rather than merely assert both texts exist somewhere.",
+    "filePath": "app/components/HandoffInstruction.tsx",
+    "name": "HandoffInstruction",
+    "scenarios": [
+      "handoffinstruction-default",
+      "handoffinstruction-longwording"
     ]
   },
   {
@@ -566,9 +585,10 @@
     "filePath": "app/components/MapScreen.tsx",
     "name": "MapScreen",
     "scenarios": [
-      "mapscreen-working",
       "mapscreen-noagent",
-      "mapscreen-summary"
+      "mapscreen-working",
+      "mapscreen-summary",
+      "mapscreen-justarrived"
     ]
   },
   {
@@ -849,7 +869,10 @@
     "scenarios": [
       "thinkingmapview-default",
       "thinkingmapview-empty",
-      "thinkingmapview-seeded"
+      "thinkingmapview-nocaption",
+      "thinkingmapview-seeded",
+      "thinkingmapview-withoptions",
+      "thinkingmapview-sprawling"
     ]
   },
   {
@@ -1240,7 +1263,7 @@
     }
   },
   {
-    "description": "The wording a map with nobody attached to it says for itself. WebMCP is pull-only, so submitting an idea writes a map but does not summon anyone to think about it - and a spinner would be a lie about work that will never begin on its own. Returns the eyebrow, the explanation, a copyable start prompt naming the map id, and the two ways to attach. hasBrief is an argument rather than a branch in the component because a brief-started map has no sentence to quote and its agent should read the brief, not the emptier map. Pure and pinned by tests, following askPresence, because the wording IS the interface here.",
+    "description": "What a map with nobody working on it says for itself, in words. WebMCP is pull-only, so submitting an idea writes a map but does not summon anyone to think about it, and the tempting thing to show - a spinner, 'getting started' - would be a lie about work that will never begin on its own. The wording lives here rather than as strings inside a component because the wording IS the interface and a regression here is a person being told something is happening when nothing is. It carries the instruction the panel leads with and the two steps it breaks down into - copy the prompt, paste it into your agent's chat window - alongside the eyebrow, the honest explanation, the attach hint, and the start prompt itself. hasBrief is an argument rather than a branch in the component because a brief-only map has no sentence to quote and pointing that agent at read_map would send it to the emptier of the two things it could read.",
     "filePath": "app/lib/handoffCopy.ts",
     "name": "handoffCopy",
     "testFile": "app/lib/handoffCopy.test.ts"

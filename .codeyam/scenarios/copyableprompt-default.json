@@ -1,12 +1,15 @@
 {
- "name": "CopyablePrompt - Default",
- "id": "2df6d5e3-2ef4-4791-ae18-4e5a40bd0f8d",
- "url": "/isolated-components/CopyablePrompt?s=Default",
- "dimensions": [
-  "Tablet"
- ],
- "mocks": {},
- "componentName": "CopyablePrompt",
- "scenarioType": "component",
- "description": "The resting state, which is what a person actually arrives to - the button offers to copy rather than claiming it already did. The prompt itself is the handoff panel's, naming a real map id and read_map."
+  "name": "CopyablePrompt - Default",
+  "id": "2df6d5e3-2ef4-4791-ae18-4e5a40bd0f8d",
+  "url": "/isolated-components/CopyablePrompt?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CopyablePrompt",
+  "scenarioType": "component",
+  "description": "The resting state, which is what a person actually arrives to - the button offers to copy rather than claiming it already did. The prompt itself is the handoff panel's, naming a real map id and read_map.",
+  "demonstratesState": {
+    "copied": "false"
+  }
 }

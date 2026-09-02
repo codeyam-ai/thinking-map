@@ -1,6 +1,8 @@
 'use client';
 
 import CopyablePrompt from './CopyablePrompt';
+import HandoffFootnote from './HandoffFootnote';
+import HandoffInstruction from './HandoffInstruction';
 import SeedIdeaQuote from './SeedIdeaQuote';
 import { handoffCopy } from '../lib/handoffCopy';
 import { useOptionalWebMcpBridge } from './WebMcpBridge';
@@ -12,6 +14,11 @@ import { useOptionalWebMcpBridge } from './WebMcpBridge';
  * that nobody is attached to simply sits there. Before this panel existed the
  * only sign of that was "No agent attached" in the header, which states a fact
  * about the page rather than telling the person what to do about it.
+ *
+ * It leads with the instruction and follows with the explanation, in that
+ * order, because someone who just pressed return wants to know what to DO. The
+ * honest paragraph about why nobody is attached is still here — it has simply
+ * stopped being the first thing they read on the way to the prompt.
  *
  * A renderer only — every string it shows comes from `handoffCopy`, where the
  * tests can pin the wording. What it decides is *whether to appear at all*.
@@ -43,14 +50,30 @@ export default function AgentHandoff({
   const copy = handoffCopy({ mapId, seedIdea, hasBrief });
 
   return (
-    <section className="rounded-[20px] border border-line bg-surface p-6">
-      <h2 className="eyebrow mb-3">{copy.eyebrow}</h2>
-      <p className="text-[14px] leading-[1.55]">{copy.explanation}</p>
+    // Lime, and a heavier border than the surrounding cards: on this screen it
+    // is the one thing asking to be acted on, and it has to win that comparison
+    // against a whole map underneath it.
+    //
+    // `shrink-0` lives here rather than on a wrapper in MapScreen: that main is
+    // an `h-screen` flex column, so without it the band would be squeezed on a
+    // short viewport — and a wrapper div would remain a zero-height flex item
+    // collecting gaps on the maps where this returns null.
+    <section className="shrink-0 rounded-[20px] border-2 border-lime-deep bg-surface p-6">
+      <HandoffInstruction
+        eyebrow={copy.eyebrow}
+        instruction={copy.instruction}
+        steps={copy.steps}
+      />
+      <CopyablePrompt
+        text={copy.startPrompt}
+        label="Copy start prompt"
+        tone="primary"
+      />
       <SeedIdeaQuote seedIdea={seedIdea} />
-      <CopyablePrompt text={copy.startPrompt} label="Copy start prompt" />
-      <p className="mt-4 text-[12px] leading-[1.6] text-muted">
-        {copy.attachHint}
-      </p>
+      <HandoffFootnote
+        explanation={copy.explanation}
+        attachHint={copy.attachHint}
+      />
     </section>
   );
 }

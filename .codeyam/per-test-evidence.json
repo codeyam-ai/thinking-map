@@ -1,10 +1,73 @@
 {
-  "AgentHandoff › renders nothing when an agent is connected": {
+  "AgentHandoff › puts the instruction before the explanation in document order": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "AgentHandoff › renders nothing when an agent is connected": {
+    "file": "app/components/AgentHandoff.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -23,46 +86,46 @@
       {
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "AgentHandoff › renders nothing when an agent is mid-tool-call": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -81,46 +144,46 @@
       {
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "AgentHandoff › renders nothing when the log already carries an agent-origin event": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -140,34 +203,70 @@
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "AgentHandoff › renders the instruction and both steps": {
+    "file": "app/components/AgentHandoff.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
+        "at": "2026-09-02T11:34:28.381669335+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
+        "at": "2026-09-02T11:24:27.862819981+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
+        "at": "2026-09-02T11:14:53.143061466+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
+        "at": "2026-09-02T11:14:46.512296335+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "AgentHandoff › renders the steps as an ordered list": {
+    "file": "app/components/AgentHandoff.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -175,10 +274,40 @@
   },
   "AgentHandoff › renders when nothing is attached and no agent has worked the map": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -197,46 +326,46 @@
       {
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "AgentHandoff › renders without a bridge provider at all": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -255,46 +384,46 @@
       {
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "AgentHandoff › shows a start prompt naming this map": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -313,46 +442,46 @@
       {
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "AgentHandoff › shows no quoted idea for a map started from a brief": {
     "file": "app/components/AgentHandoff.render.test.tsx",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -371,36 +500,6 @@
       {
         "at": "2026-09-01T22:09:54.992302604+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T22:04:04.329379791+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:51:18.053769883+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:40.316636753+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:27.794169954+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:14.848220801+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T21:33:10.066155370+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
@@ -832,6 +931,204 @@
       },
       {
         "at": "2026-09-01T18:39:31.661589783+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "CopyablePrompt › announces the copied state in a live region": {
+    "file": "app/components/CopyablePrompt.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "CopyablePrompt › flips the label once the copy succeeds": {
+    "file": "app/components/CopyablePrompt.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "CopyablePrompt › neither throws nor claims success when the clipboard is refused": {
+    "file": "app/components/CopyablePrompt.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "CopyablePrompt › renders the default tone when none is given": {
+    "file": "app/components/CopyablePrompt.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "CopyablePrompt › renders the prompt text": {
+    "file": "app/components/CopyablePrompt.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "CopyablePrompt › writes exactly the displayed text to the clipboard": {
+    "file": "app/components/CopyablePrompt.render.test.tsx",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
         "kind": "changed",
         "status": "pass"
       }
@@ -12631,12 +12928,108 @@
       }
     ]
   },
-  "handoffCopy › leaves no empty quotes in the prompt when there is no seed idea": {
+  "handoffCopy › gives the same instruction and steps for a brief-only map": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "handoffCopy › leads with an instruction naming the agent handoff": {
+    "file": "app/lib/handoffCopy.test.ts",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "handoffCopy › leaves no empty quotes in the prompt when there is no seed idea": {
+    "file": "app/lib/handoffCopy.test.ts",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -12655,46 +13048,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › names await_new_map as the way to stop copying prompts by hand": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -12713,46 +13106,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › names the map id in the start prompt": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -12771,46 +13164,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › never claims work is underway or an agent is coming": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -12829,46 +13222,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › points at read_brief when the map was started from a brief": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -12887,46 +13280,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › points at read_map for a map started from a sentence": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -12945,46 +13338,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › quotes the seed idea in the prompt when there is one": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -13003,46 +13396,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › returns non-empty copy for every field in both cases": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -13061,46 +13454,46 @@
       {
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
-        "kind": "changed",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
-        "status": "pass"
-      },
-      {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
-        "kind": "changed",
         "status": "pass"
       }
     ]
   },
   "handoffCopy › says the idea is saved": {
     "file": "app/lib/handoffCopy.test.ts",
-    "lastRunAt": "2026-09-01T23:33:36.721877789+00:00",
-    "lastRunKind": "full",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
     "lastStatus": "pass",
     "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:07:15.182507681+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
       {
         "at": "2026-09-01T23:33:36.721877789+00:00",
         "kind": "full",
@@ -13120,34 +13513,70 @@
         "at": "2026-09-01T20:37:40.883557680+00:00",
         "kind": "full",
         "status": "pass"
-      },
+      }
+    ]
+  },
+  "handoffCopy › states copying before pasting": {
+    "file": "app/lib/handoffCopy.test.ts",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
       {
-        "at": "2026-09-01T19:59:54.895748472+00:00",
+        "at": "2026-09-02T11:34:28.381669335+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T19:57:08.994395013+00:00",
+        "at": "2026-09-02T11:24:27.862819981+00:00",
         "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T18:42:40.898437571+00:00",
-        "kind": "full",
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T18:25:56.897858103+00:00",
-        "kind": "full",
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T18:20:33.198054269+00:00",
-        "kind": "full",
+        "at": "2026-09-02T11:14:41.643565715+00:00",
+        "kind": "changed",
+        "status": "pass"
+      }
+    ]
+  },
+  "handoffCopy › tells the person to paste the prompt into an agent chat window": {
+    "file": "app/lib/handoffCopy.test.ts",
+    "lastRunAt": "2026-09-02T11:34:28.381669335+00:00",
+    "lastRunKind": "changed",
+    "lastStatus": "pass",
+    "recentStatuses": [
+      {
+        "at": "2026-09-02T11:34:28.381669335+00:00",
+        "kind": "changed",
         "status": "pass"
       },
       {
-        "at": "2026-09-01T17:38:43.406046075+00:00",
+        "at": "2026-09-02T11:24:27.862819981+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:53.143061466+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:46.512296335+00:00",
+        "kind": "changed",
+        "status": "pass"
+      },
+      {
+        "at": "2026-09-02T11:14:41.643565715+00:00",
         "kind": "changed",
         "status": "pass"
       }

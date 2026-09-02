@@ -28,6 +28,17 @@ const scenarios: Record<string, Props> = {
   DefaultLabel: {
     text: "npm run mcp",
   },
+  // The promoted tone, which is what the handoff band actually renders now.
+  // Worth its own capture beside Default because the whole point of the tone
+  // prop is that these two look different — a lime-filled button that reads as
+  // the one thing to do on the screen, against a bordered pill that does not.
+  // If they ever captured alike, the promotion would have silently come undone.
+  Primary: {
+    text:
+      'Work on thinking map cmtixt5tg000wymek3vbmllaj — "A weekend app for splitting chores fairly". Start with read_map, then deconstruct the idea.',
+    label: "Copy start prompt",
+    tone: "primary",
+  },
 };
 
 export default async function Page({

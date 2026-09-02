@@ -1,0 +1,12 @@
+{
+  "name": "HandoffFootnote - Default",
+  "id": "63ea179e-f035-4198-a57b-ba276a32524a",
+  "url": "/isolated-components/HandoffFootnote?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffFootnote",
+  "scenarioType": "component",
+  "description": "The honest explanation and the attach hint at their real length, in the small grey type they were demoted to. These two used to open the panel; demoted is a visual claim, and this capture is where it is either true or quietly undone."
+}

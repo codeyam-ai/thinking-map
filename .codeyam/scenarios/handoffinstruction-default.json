@@ -1,0 +1,12 @@
+{
+  "name": "HandoffInstruction - Default",
+  "id": "b75edf3e-2404-482e-ba23-6033bee7bb01",
+  "url": "/isolated-components/HandoffInstruction?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffInstruction",
+  "scenarioType": "component",
+  "description": "The block that now opens the handoff band, in the wording every unattached map actually shows. The instruction carries heading weight and the two moves read as numbered steps, because their order is the content - copy, then paste - and a person who just pressed return reads the numbers before the words."
+}

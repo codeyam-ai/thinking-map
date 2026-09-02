@@ -1,0 +1,12 @@
+{
+  "name": "CopyablePrompt - Primary",
+  "id": "68fed929-0da8-4319-adfa-1b5f6967f003",
+  "url": "/isolated-components/CopyablePrompt?s=Primary",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CopyablePrompt",
+  "scenarioType": "component",
+  "description": "The promoted tone the handoff band actually renders: a lime-filled button that reads as the one thing to do on the screen. Worth seeing beside Default, because the whole point of the tone prop is that these two look different - if they ever captured alike the promotion would have silently come undone."
+}

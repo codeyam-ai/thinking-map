@@ -89,6 +89,10 @@ const scenarios: Record<
     status: "unavailable" | "connected" | "working";
     tools: string[];
     revision: number;
+    /** Passing one mounts the handoff band; the working scenarios below leave
+     *  it off because an agent has already been on those maps. */
+    mapId?: string;
+    seedIdea?: string;
   }
 > = {
   // The working surface with an agent attached and two questions waiting.
@@ -109,6 +113,20 @@ const scenarios: Record<
     status: "unavailable",
     tools: [],
     revision: 14,
+  },
+  // The moment this feature is for: someone typed an idea, pressed return, and
+  // arrived at a map nobody is working on. The band leads the page with what to
+  // do about that, and the map they just made stays visible underneath it —
+  // which is the whole argument for a band over a takeover.
+  JustArrived: {
+    phase: "idea",
+    nodes: [READING_MAP[0]] as FlatNode[] & SummaryNode[],
+    events: [],
+    status: "unavailable",
+    tools: [],
+    revision: 1,
+    mapId: "cmtixt5tg000wymek3vbmllaj",
+    seedIdea: "A tool for tracking what I read",
   },
   // The end of the loop: the plan, with somewhere to keep going underneath it.
   Summary: {
@@ -140,7 +158,12 @@ export default async function Page({
         events={fixture.events}
         revision={fixture.revision}
       >
-        <Component phase={fixture.phase} nodes={fixture.nodes} />
+        <Component
+          phase={fixture.phase}
+          nodes={fixture.nodes}
+          mapId={fixture.mapId}
+          seedIdea={fixture.seedIdea}
+        />
       </BridgeFixture>
     </div>
   );
