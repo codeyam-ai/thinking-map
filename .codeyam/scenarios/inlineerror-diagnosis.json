@@ -1,0 +1,12 @@
+{
+  "name": "InlineError - Diagnosis",
+  "id": "4723e993-7d62-475c-b436-f0cdba44a2bc",
+  "url": "/isolated-components/InlineError?s=Diagnosis",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InlineError",
+  "scenarioType": "component",
+  "description": "A route that classified what went wrong gets to say it, and in development to offer the one command that fixes it. The command sits in a monospace pill rather than in the sentence, because the point of a command is that you copy and run it."
+}

@@ -1,0 +1,24 @@
+{
+  "name": "IdeaPrompt - Schema Drift In Production",
+  "id": "dc1c0aeb-4692-4b42-86a0-c64eb84376e9",
+  "url": "/isolated-components/IdeaPrompt?s=SchemaDriftProduction",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "IdeaPrompt",
+  "scenarioType": "component",
+  "description": "The identical failure as a deployed user meets it. Compare with Schema Drift beside it: same sentence, and the command pill is gone, along with the Prisma code and the column name. This is the half no development capture can show, and the difference between a diagnosis and a leak.",
+  "interactions": [
+    {
+      "action": "fill",
+      "selector": "#idea",
+      "value": "a subscription box for hot sauce"
+    },
+    {
+      "action": "press",
+      "selector": "#idea",
+      "value": "Enter"
+    }
+  ]
+}

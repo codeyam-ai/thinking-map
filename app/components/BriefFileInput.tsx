@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
+import InlineError from './InlineError';
 
 /** What the picker will offer, and what the extractor can actually read.
  *  Kept together so the two never drift apart. */
@@ -33,11 +34,7 @@ const BriefFileInput = forwardRef<
           e.target.value = '';
         }}
       />
-      {error ? (
-        <p role="alert" className="mt-3 text-center text-[13px] text-risk">
-          {error}
-        </p>
-      ) : null}
+      <InlineError message={error} />
     </>
   );
 });

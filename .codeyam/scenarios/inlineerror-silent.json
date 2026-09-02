@@ -1,0 +1,13 @@
+{
+  "name": "InlineError - Silent",
+  "id": "3dec0d63-e491-48a8-97c8-b57e5e13bb19",
+  "url": "/isolated-components/InlineError?s=Silent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InlineError",
+  "scenarioType": "component",
+  "description": "Nothing wrong, nothing rendered - deliberately a blank frame. This is the state both call sites are in almost all of the time, and the guarantee is negative: no empty paragraph, no reserved margin, no gap in the intake column where an error is not.",
+  "allowMinimalRender": true
+}

@@ -25,6 +25,7 @@ import {
   webMcpUnavailableReason,
 } from '@/app/lib/webmcp';
 import { toolSummaries } from '@/app/lib/toolInvocation';
+import { readJson } from '@/app/lib/readJson';
 import { useAskUser, type PendingQuestion } from '@/app/hooks/useAskUser';
 import { useExchangeLog } from '@/app/hooks/useExchangeLog';
 import type { ToolClient } from '@/app/lib/toolCatalog';
@@ -132,13 +133,14 @@ export function WebMcpBridge({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ kind, payload }),
       });
-      if (!res.ok) {
-        throw new Error(`Could not record ${kind} (HTTP ${res.status}).`);
-      }
-      const body = (await res.json()) as {
+      // `res.ok` was already checked here; what this adds is surviving a 200
+      // whose body is truncated, which would otherwise throw a raw parse error
+      // into a callback with no boundary around it.
+      const { data: body, error } = await readJson<{
         revision?: number;
         events?: ExchangeEvent[];
-      };
+      }>(res, `Could not record ${kind}.`);
+      if (!body) throw new Error(error ?? `Could not record ${kind}.`);
       if (typeof body.revision === 'number') observeRevision(body.revision);
       // The write's own events come straight back, so the rail shows the
       // contribution without waiting for the next poll.

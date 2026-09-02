@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { extractBriefText } from '@/app/lib/briefText';
+import { withFailure } from '@/app/lib/apiFailure';
 
 // Node, not edge: the PDF and .docx extractors are Node libraries and will not
 // run on the edge runtime.
@@ -17,8 +18,12 @@ const MAX_BYTES = 10 * 1024 * 1024;
  * submits it with the rest of the form, which keeps map creation a single
  * transaction and means an upload the person abandons leaves nothing behind —
  * no row, no orphaned file, nothing to clean up.
+ *
+ * The extractor's own failures are handled below. `withFailure` covers what is
+ * left — a throw from `formData()` bookkeeping, or anything else unanticipated
+ * — which would otherwise reach the upload readout as a parse error.
  */
-export async function POST(request: Request) {
+export const POST = withFailure(async (request: Request) => {
   let form: FormData;
   try {
     form = await request.formData();
@@ -72,4 +77,4 @@ export async function POST(request: Request) {
       { status: 422 },
     );
   }
-}
+});

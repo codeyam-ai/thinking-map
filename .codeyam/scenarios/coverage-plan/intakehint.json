@@ -1,0 +1,18 @@
+{
+  "surface": "IntakeHint",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "reading",
+      "value": "true",
+      "rationale": "source-derived state reading=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "reading",
+      "value": "false",
+      "rationale": "source-derived state reading=false",
+      "status": "planned"
+    }
+  ]
+}

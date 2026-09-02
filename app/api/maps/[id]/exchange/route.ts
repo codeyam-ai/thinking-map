@@ -15,6 +15,7 @@ import {
 } from '@/app/lib/exchange';
 import { contributionEvents } from '@/app/lib/contributions';
 import { prisma } from '@/app/lib/prisma';
+import { withFailure } from '@/app/lib/apiFailure';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,26 +52,25 @@ async function nodeOnMap(
  * Omit `since` for the whole log. The current revision comes back either way,
  * so a caller with an empty delta still leaves holding a usable cursor.
  */
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  if (!(await mapExists(id))) {
-    return NextResponse.json({ error: 'No such map' }, { status: 404 });
-  }
+export const GET = withFailure(
+  async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
+    if (!(await mapExists(id))) {
+      return NextResponse.json({ error: 'No such map' }, { status: 404 });
+    }
 
-  const raw = new URL(request.url).searchParams.get('since');
-  const since = raw === null ? null : Number(raw);
-  if (since !== null && !Number.isInteger(since)) {
-    return NextResponse.json(
-      { error: '`since` must be a whole number.' },
-      { status: 400 },
-    );
-  }
+    const raw = new URL(request.url).searchParams.get('since');
+    const since = raw === null ? null : Number(raw);
+    if (since !== null && !Number.isInteger(since)) {
+      return NextResponse.json(
+        { error: '`since` must be a whole number.' },
+        { status: 400 },
+      );
+    }
 
-  return NextResponse.json(await readSince(id, since));
-}
+    return NextResponse.json(await readSince(id, since));
+  },
+);
 
 /**
  * POST /api/maps/:id/exchange
@@ -79,73 +79,78 @@ export async function GET(
  * agent's own kinds are minted by the tools, and taking one from the browser
  * would let the page forge the other side of the conversation.
  */
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  if (!(await mapExists(id))) {
-    return NextResponse.json({ error: 'No such map' }, { status: 404 });
-  }
+export const POST = withFailure(
+  async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
+    if (!(await mapExists(id))) {
+      return NextResponse.json({ error: 'No such map' }, { status: 404 });
+    }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Expected a JSON body.' }, { status: 400 });
-  }
-
-  const { kind, payload, requestId } = (body ?? {}) as {
-    kind?: unknown;
-    payload?: unknown;
-    requestId?: unknown;
-  };
-
-  if (typeof kind !== 'string' || !isUserEventKind(kind)) {
-    return NextResponse.json(
-      {
-        error: `\`kind\` must be one of: ${USER_EVENT_KINDS.join(', ')}.`,
-      },
-      { status: 400 },
-    );
-  }
-
-  // A question is about one specific node, and that is the whole point of the
-  // kind — so a `nodeId` that names nothing on this map is a bad request, not a
-  // question to log and puzzle over later. Resolving it here also picks up the
-  // label the rail needs, which is why the payload goes on enriched.
-  let contributed = payload;
-  if (kind === 'user.question') {
-    const nodeId = (payload as { nodeId?: unknown } | null)?.nodeId;
-    if (typeof nodeId !== 'string' || nodeId.length === 0) {
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { error: '`payload.nodeId` is required for a user.question.' },
+        { error: 'Expected a JSON body.' },
         { status: 400 },
       );
     }
-    const node = await nodeOnMap(id, nodeId);
-    if (!node) {
+
+    const { kind, payload, requestId } = (body ?? {}) as {
+      kind?: unknown;
+      payload?: unknown;
+      requestId?: unknown;
+    };
+
+    if (typeof kind !== 'string' || !isUserEventKind(kind)) {
       return NextResponse.json(
-        { error: 'No such node on this map.' },
+        {
+          error: `\`kind\` must be one of: ${USER_EVENT_KINDS.join(', ')}.`,
+        },
         { status: 400 },
       );
     }
-    contributed = { ...(payload as Record<string, unknown>), label: node.label };
-  }
 
-  // A contribution is an event, but the interesting ones are also a change to
-  // the map — a node that has to appear, a question that has to stop being
-  // open. Those writes happen first, and everything they produce is recorded in
-  // one batch so the act and its consequences share one run of revisions.
-  const events = await contributionEvents(id, kind, contributed);
+    // A question is about one specific node, and that is the whole point of the
+    // kind — so a `nodeId` that names nothing on this map is a bad request, not a
+    // question to log and puzzle over later. Resolving it here also picks up the
+    // label the rail needs, which is why the payload goes on enriched.
+    let contributed = payload;
+    if (kind === 'user.question') {
+      const nodeId = (payload as { nodeId?: unknown } | null)?.nodeId;
+      if (typeof nodeId !== 'string' || nodeId.length === 0) {
+        return NextResponse.json(
+          { error: '`payload.nodeId` is required for a user.question.' },
+          { status: 400 },
+        );
+      }
+      const node = await nodeOnMap(id, nodeId);
+      if (!node) {
+        return NextResponse.json(
+          { error: 'No such node on this map.' },
+          { status: 400 },
+        );
+      }
+      contributed = {
+        ...(payload as Record<string, unknown>),
+        label: node.label,
+      };
+    }
 
-  const result = await recordEvents(id, events, {
-    requestId: typeof requestId === 'string' ? requestId : null,
-  });
+    // A contribution is an event, but the interesting ones are also a change to
+    // the map — a node that has to appear, a question that has to stop being
+    // open. Those writes happen first, and everything they produce is recorded in
+    // one batch so the act and its consequences share one run of revisions.
+    const events = await contributionEvents(id, kind, contributed);
 
-  return NextResponse.json({
-    revision: result.revision,
-    events: result.events,
-    deduped: result.deduped,
-  });
-}
+    const result = await recordEvents(id, events, {
+      requestId: typeof requestId === 'string' ? requestId : null,
+    });
+
+    return NextResponse.json({
+      revision: result.revision,
+      events: result.events,
+      deduped: result.deduped,
+    });
+  },
+);

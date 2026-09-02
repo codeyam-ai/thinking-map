@@ -379,6 +379,60 @@
       "runner": "tests"
     },
     {
+      "description": "Development offers the one command that fixes it. The pill is the whole reason the route's extra fields are carried back rather than dropped.",
+      "file": "app/components/IdeaPrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "IdeaPrompt › offers the fix a failing route named",
+      "line": 90,
+      "registeredAt": "2026-09-02T14:20:07.526030765+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A failure no route ever saw, so nothing upstream could have made it JSON.",
+      "file": "app/components/IdeaPrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "IdeaPrompt › reads a proxy failure carrying HTML as a sentence",
+      "line": 136,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The happy path still has to work — an error-handling change that broke creation would pass every assertion above.",
+      "file": "app/components/IdeaPrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "IdeaPrompt › routes to the new map when creation succeeds",
+      "line": 157,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE PRODUCTION HALF, and the one no development capture can show: the same failure, with the classifier having withheld the command, must render the sentence and no pill at all.",
+      "file": "app/components/IdeaPrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "IdeaPrompt › shows no fix when the route withheld one",
+      "line": 115,
+      "registeredAt": "2026-09-02T14:20:07.526030765+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A route that classified the failure gets to say what it found; the component must show that rather than its own fallback.",
+      "file": "app/components/IdeaPrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "IdeaPrompt › shows the sentence a failing route stated itself",
+      "line": 68,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE REPRODUCTION. A 500 with an empty body is what the drifted database produced, and it is the shape that has no JSON to read.",
+      "file": "app/components/IdeaPrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "IdeaPrompt › surfaces a server failure without leaking a parse error",
+      "line": 51,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
       "description": "The kind has to be in the accepted set at all — this is what makes it wake an agent parked on await_user_activity rather than sitting inert.",
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
@@ -626,7 +680,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › renders every catalog tool rather than an empty list",
-      "line": 92,
+      "line": 95,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -635,7 +689,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › reports that no agent is attached, with a reason",
-      "line": 80,
+      "line": 83,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -644,7 +698,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › shows nothing awaiting an answer",
-      "line": 102,
+      "line": 105,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -653,7 +707,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › clears the questions and records the answer once the person replies",
-      "line": 162,
+      "line": 165,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -662,7 +716,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders a single outstanding question",
-      "line": 113,
+      "line": 116,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -671,7 +725,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders both questions and marks the agent as working",
-      "line": 126,
+      "line": 129,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -680,7 +734,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders every question when an agent asks several at once",
-      "line": 143,
+      "line": 146,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -3215,7 +3269,7 @@
     },
     {
       "description": "A drag could settle several nodes at once, so a batch is the shape of the request.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › accepts a batch of nudges",
       "line": 12,
@@ -3224,7 +3278,7 @@
     },
     {
       "description": "A lone object is accepted as a batch of one, so the common case does not have to wrap itself in an array.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › accepts a single nudge without an array wrapper",
       "line": 25,
@@ -3233,7 +3287,7 @@
     },
     {
       "description": "Without a node id there is nothing to move.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › rejects a missing or empty node id",
       "line": 37,
@@ -3242,7 +3296,7 @@
     },
     {
       "description": "A null or non-object entry must be reported, not thrown on.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › rejects a null entry without throwing",
       "line": 67,
@@ -3251,7 +3305,7 @@
     },
     {
       "description": "An empty batch asks for nothing and is more likely a bug than an intent.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › rejects an empty batch",
       "line": 32,
@@ -3260,7 +3314,7 @@
     },
     {
       "description": "Finite, not merely numeric: NaN and Infinity are both `typeof number`, and either one written to the column would put a node nowhere.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › rejects offsets that are not finite numbers",
       "line": 48,
@@ -3269,7 +3323,7 @@
     },
     {
       "description": "One bad entry rejects the whole batch rather than silently moving the rest — a partial arrangement is harder to explain than a refused one.",
-      "file": "app/api/maps/[id]/positions/route.test.ts",
+      "file": "app/lib/nudges.test.ts",
       "format": "vitest",
       "key": "parseNudges › rejects the whole batch when one entry is malformed",
       "line": 57,
@@ -3760,6 +3814,96 @@
       "key": "railEntries › renders a full exchange as one line per act",
       "line": 305,
       "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A failure no route ever saw, so no route could have made it JSON.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › describes an HTML error page from a proxy",
+      "line": 56,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE REPORTED CASE. An unhandled throw used to reach the browser as a 500 with nothing in it, and reading that as JSON is what put `Unexpected end of JSON input` on screen.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › describes an empty error body without a parse error",
+      "line": 47,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A failing response that IS JSON but carries no `error` field — well-formed and still says nothing, so the fallback has to cover it.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › falls back when a failing body states no error",
+      "line": 81,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A route that named the fix as well as the fault: the sentence is the headline, and everything else it said comes back beside it rather than being dropped on the floor of the network tab.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › hands back the rest of a failing body alongside the message",
+      "line": 93,
+      "registeredAt": "2026-09-02T14:20:07.526030765+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing parsed means nothing to offer, and inventing a shape here would put an undefined command in front of a caller that trusts the field.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › offers no failure body when there was nothing to parse",
+      "line": 126,
+      "registeredAt": "2026-09-02T14:20:07.526030765+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A route that failed the way it meant to. Its own sentence is better than anything composed here, so it wins over the fallback.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › prefers the error a failing route stated itself",
+      "line": 30,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Production withholds the fix, so there is nothing to hand back — and the absence has to read as absence rather than as an empty pill.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › reports no extra fields when the route withheld them",
+      "line": 113,
+      "registeredAt": "2026-09-02T14:20:07.526030765+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: a route answered, and the caller gets the payload.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › returns the parsed body of a successful response",
+      "line": 17,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A 200 is not on its own a reason to trust the body: a truncated one still has to fail as a sentence rather than as a thrown SyntaxError.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › treats a truncated body as a failure even on a 200",
+      "line": 68,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The fallback is used verbatim, so each call site's wording reaches the person who was doing that particular thing.",
+      "file": "app/lib/readJson.test.ts",
+      "format": "vitest",
+      "key": "readJson › uses the caller wording rather than a generic one",
+      "line": 134,
+      "registeredAt": "2026-09-02T14:01:35Z",
       "runner": "tests"
     },
     {
@@ -5065,6 +5209,69 @@
       "key": "webMcpUnavailableReason › reports the security problem first when several apply",
       "line": 105,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Route handlers on dynamic segments take a second context argument, and the wrapper has to hand both through unchanged.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › forwards every argument to the handler",
+      "line": 133,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Development gets the one command that fixes it, and the column that named the problem. This is what the scenarios show.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › includes the fix and the diagnosis in development",
+      "line": 88,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unrecognised failure is by definition one nobody anticipated, so the wrapper says nothing it has not been taught to say.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › leaks nothing internal for an ordinary error",
+      "line": 103,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A route's own 400 must survive: the wrapper covers the unanticipated throw, not the faults a handler already decided how to report.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › leaves a handler-authored failure alone",
+      "line": 56,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A handler that answers is not the wrapper's business — status and body come back exactly as written, including a deliberate non-2xx.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › passes a successful response through untouched",
+      "line": 43,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The terminal keeps the whole thing. Swallowing the original would trade one unreadable failure for an invisible one.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › still writes the original error to the terminal",
+      "line": 118,
+      "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported case, from the route's side: a throw becomes a 500 that is still JSON, so the browser has something it can read.",
+      "file": "app/lib/apiFailure.test.ts",
+      "format": "vitest",
+      "key": "withFailure › turns a thrown database drift into a readable JSON 500",
+      "line": 71,
+      "registeredAt": "2026-09-02T14:01:35Z",
       "runner": "tests"
     }
   ],

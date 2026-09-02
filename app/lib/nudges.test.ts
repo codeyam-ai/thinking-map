@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseNudges } from './route';
+import { parseNudges } from './nudges';
 
 // The arrangement endpoint is vestigial — the map is a scrolling column of card
 // rows now, so nothing produces a nudge any more. Its validation is still worth

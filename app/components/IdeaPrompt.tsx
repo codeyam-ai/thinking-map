@@ -2,9 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { readJson } from '@/app/lib/readJson';
 import BriefDrop, { type AttachedBrief } from './BriefDrop';
 import BriefFileInput from './BriefFileInput';
 import IdeaForm from './IdeaForm';
+import InlineError from './InlineError';
+import IntakeHint from './IntakeHint';
 import SuggestionChips from './SuggestionChips';
 
 /**
@@ -24,6 +27,9 @@ export default function IdeaPrompt() {
   const [brief, setBrief] = useState<AttachedBrief | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** The command a failing route offered, when it offered one. Development
+   *  only, because that is where the classifier fills the field at all. */
+  const [fix, setFix] = useState<string | null>(null);
 
   const [pasting, setPasting] = useState(false);
   const [reading, setReading] = useState(false);
@@ -40,13 +46,23 @@ export default function IdeaPrompt() {
         method: 'POST',
         body: form,
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? 'Could not read that file.');
+      // Status first, body second. Reading the body of a failed response as
+      // JSON is what put the browser's parser error on screen instead of a
+      // sentence about the upload.
+      const { data, error } = await readJson<{
+        text: string;
+        sourceName: string;
+        mediaType: string;
+        warning?: string | null;
+      }>(response, 'Could not read that file.');
+      if (!data) throw new Error(error ?? 'Could not read that file.');
       setBrief({
         text: data.text,
         sourceName: data.sourceName,
         mediaType: data.mediaType,
-        warning: data.warning,
+        // Extraction reports a warning or says nothing at all; the readout
+        // wants the absence spelled out rather than left undefined.
+        warning: data.warning ?? null,
       });
       setPasting(false);
     } catch (err) {
@@ -66,6 +82,7 @@ export default function IdeaPrompt() {
 
     setBusy(true);
     setError(null);
+    setFix(null);
     try {
       const response = await fetch('/api/maps', {
         method: 'POST',
@@ -83,8 +100,17 @@ export default function IdeaPrompt() {
             : {}),
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? 'Could not start a map.');
+      const { data, error, failure } = await readJson<{ id: string }>(
+        response,
+        'Could not start a map.',
+      );
+      if (!data) {
+        // A route that named the fix gets to offer it. The classifier already
+        // withholds this outside development, so there is no second check here
+        // — in production the field is simply absent.
+        setFix(typeof failure?.command === 'string' ? failure.command : null);
+        throw new Error(error ?? 'Could not start a map.');
+      }
       router.push(`/map/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start a map.');
@@ -108,13 +134,7 @@ export default function IdeaPrompt() {
 
       {/* The file types still have to be stated somewhere, and one muted line
           under the input costs a fraction of the panel that used to say it. */}
-      {brief || pasting ? null : (
-        <p className="mt-3 text-center text-[12.5px] text-muted">
-          {reading
-            ? 'Reading it…'
-            : 'PDF, Word, Markdown or plain text — or drop one here'}
-        </p>
-      )}
+      {brief || pasting ? null : <IntakeHint reading={reading} />}
 
       <BriefFileInput
         ref={fileInput}
@@ -122,11 +142,7 @@ export default function IdeaPrompt() {
         onFile={(file) => void upload(file)}
       />
 
-      {error ? (
-        <p role="alert" className="mt-4 text-center text-[13px] text-risk">
-          {error}
-        </p>
-      ) : null}
+      <InlineError message={error} command={fix} className="mt-4" />
 
       <BriefDrop
         brief={brief}

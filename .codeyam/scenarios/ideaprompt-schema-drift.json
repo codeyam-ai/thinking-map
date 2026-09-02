@@ -1,0 +1,24 @@
+{
+  "name": "IdeaPrompt - Schema Drift",
+  "id": "e8ff3cfb-0b4d-4e62-a867-fdab7fe418d6",
+  "url": "/isolated-components/IdeaPrompt?s=SchemaDrift",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "IdeaPrompt",
+  "scenarioType": "component",
+  "description": "The same submit against a database that is behind the schema, in development. The route classified the throw instead of letting it escape, so the page says what is actually wrong AND offers the one command that fixes it, in a monospace pill because the point of a command is that you copy and run it.",
+  "interactions": [
+    {
+      "action": "fill",
+      "selector": "#idea",
+      "value": "a subscription box for hot sauce"
+    },
+    {
+      "action": "press",
+      "selector": "#idea",
+      "value": "Enter"
+    }
+  ]
+}

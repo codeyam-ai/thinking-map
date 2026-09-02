@@ -1,0 +1,18 @@
+{
+  "surface": "InlineError",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "command",
+      "value": "true",
+      "rationale": "source-derived state command=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "command",
+      "value": "false",
+      "rationale": "source-derived state command=false",
+      "status": "covered"
+    }
+  ]
+}

@@ -431,6 +431,15 @@
     ]
   },
   {
+    "description": "Supplies a failed API response to an isolated capture. The states this feature exists to handle - a 500 with an empty body, a proxy 502 carrying HTML - are exactly the ones a healthy dev server will not produce on request, so a capture reaches them by being given the response rather than by driving the app harder. Intercepts only /api/ requests, leaving framework traffic on the real fetch. Lives beside the isolation routes for the same reason as BridgeFixture: the production path should not carry a capture-only seam.",
+    "filePath": "app/isolated-components/FetchFailureFixture.tsx",
+    "name": "FetchFailureFixture",
+    "untestabilityReason": {
+      "justification": "A capture-only seam, like BridgeFixture and ErrorBoundaryFixture beside it. It exists so the isolation routes can show a failed request at all, and nothing in the app imports it. What it enables is asserted directly in readJson.test.ts and IdeaPrompt.render.test.tsx.",
+      "kind": "test-fixture"
+    }
+  },
+  {
     "description": "The last resort: a failure in the root layout itself, where app/error.tsx has no layout left to render into. Supplies its own html and body, and deliberately does NOT use ErrorScreen - it cannot lean on anything that assumes the app chrome mounted. Imports globals.css directly for tokens and nothing else.",
     "filePath": "app/global-error.tsx",
     "name": "GlobalError",
@@ -498,6 +507,27 @@
     "name": "IdeaPrompt",
     "scenarios": [
       "ideaprompt-default"
+    ]
+  },
+  {
+    "description": "One line of failure, under the thing that failed, with the fix beside it when the route named one. Renders nothing at all when there is no message, so a caller can hand it state directly rather than guarding at every use. The command goes in a monospace pill rather than the sentence, matching ErrorScreen: the point of a command is that you copy and run it. Extracted from two call sites that had drifted into near-identical markup; the value is not the lines saved but that role=alert now travels with the styling, so an error line added later is announced to a screen reader whether or not its author thought about it.",
+    "filePath": "app/components/InlineError.tsx",
+    "name": "InlineError",
+    "scenarios": [
+      "inlineerror-default",
+      "inlineerror-diagnosis",
+      "inlineerror-diagnosis-in-production",
+      "inlineerror-upload",
+      "inlineerror-silent"
+    ]
+  },
+  {
+    "description": "The muted line under the idea input saying what can be dropped on it, doubling as the reading indicator while a document is extracted - the person's attention is already there, and a second spinner elsewhere would only split it. Whether the line belongs on screen at all is the caller's decision, since that is a fact about the intake state rather than about this line.",
+    "filePath": "app/components/IntakeHint.tsx",
+    "name": "IntakeHint",
+    "scenarios": [
+      "intakehint-default",
+      "intakehint-reading"
     ]
   },
   {
@@ -689,7 +719,7 @@
   },
   {
     "description": "One node's arrangement as a client would ask for it. Vestigial: the map is a scrolling column of card rows with no plane to drag a node around on, so nothing produces one any more.",
-    "filePath": "app/api/maps/[id]/positions/route.ts",
+    "filePath": "app/lib/nudges.ts",
     "name": "Nudge",
     "untestabilityReason": {
       "justification": "A TypeScript interface describing one node's arrangement as a client would request it. It declares a shape and emits no runtime code; parseNudges, which produces it, is covered by route.test.ts.",
@@ -1506,9 +1536,9 @@
   },
   {
     "description": "Reads a nudge batch off a request body, returning the parsed batch or the message to send back — the caller picks the status code, this decides what is acceptable. Offsets must be FINITE, not merely numeric: NaN and Infinity are both typeof number and either would put a node nowhere. One bad entry rejects the whole batch, since a partial arrangement is harder to explain than a refused one. Vestigial along with its route: nothing produces a nudge now that the map is a scrolling column of cards.",
-    "filePath": "app/api/maps/[id]/positions/route.ts",
+    "filePath": "app/lib/nudges.ts",
     "name": "parseNudges",
-    "testFile": "app/api/maps/[id]/positions/route.test.ts"
+    "testFile": "app/lib/nudges.test.ts"
   },
   {
     "description": "Reads a question's suggested answers out of the JSON array the column stores — SQLite has no array type. A missing, malformed, or wrongly-shaped value yields no chips at all, because a question with no shortlist is the ordinary case rather than a degraded one; blank and non-string entries are dropped so no unlabelled chip is ever rendered.",
@@ -1584,6 +1614,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "railEntries",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Reads a fetch response whose body might not be JSON, and never lets JSON.parse throw at a person. Consumes the body as text once, then returns the data on success, the route's own stated error on a failing JSON body, and '<fallback> (HTTP <status>)' for an empty, truncated, or HTML body. Reports ok only when the caller actually got usable data, so a 200 carrying a truncated body reads as the failure it is. Pure over a Response, so it is testable with a constructed one and no network.",
+    "filePath": "app/lib/readJson.ts",
+    "name": "readJson",
+    "testFile": "app/lib/readJson.test.ts"
   },
   {
     "description": "Everything that happened after a cursor. An omitted cursor means the whole log, which is what a fresh agent wants; a cursor means just the delta, which is what a returning one wants. Both return the map's current revision, so a caller always leaves holding a cursor it can resume from even when the delta is empty.",
@@ -1835,5 +1871,11 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "who",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Wraps a Next route handler so an unanticipated throw becomes a JSON 500 rather than an unparseable body. Logs the original error to the terminal, runs it through classifyLoadError, and answers { error, command?, hint?, detail? } with the fix and the internals present only in development. A handler's own response passes through untouched, so a deliberate 400 or 404 keeps its status and body. Variadic so it composes with both (request) and (request, { params }) handlers without casting.",
+    "filePath": "app/lib/apiFailure.ts",
+    "name": "withFailure",
+    "testFile": "app/lib/apiFailure.test.ts"
   }
 ]
