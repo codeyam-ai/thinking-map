@@ -1,0 +1,29 @@
+{
+  "claimStartedAt": "2026-09-02T21:16:16Z",
+  "completedAt": "2026-09-02T21:58:11Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "backend-step15",
+    "machine": "codeyam-editor-codeyam-editor-13",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "a-retry-must-not-draw-the-card-twice",
+    "sessionId": "9ede0fd7-74f2-41ab-bcf0-29683110f94a",
+    "startedAt": "2026-09-02T21:16:16Z"
+  },
+  "createdAt": "2026-09-02T20:01:11Z",
+  "deliverables": [
+    "app/lib/exchange.integration.test.ts",
+    "app/lib/exchange.ts",
+    "app/lib/mapStore.test.ts",
+    "app/lib/mapStore.ts",
+    "package-lock.json",
+    "prisma/schema.prisma"
+  ],
+  "journalTimestamp": "2026-09-02T21:58:11Z",
+  "mode": "backend",
+  "planFile": "completed/a-retry-must-not-draw-the-card-twice.md",
+  "slug": "a-retry-must-not-draw-the-card-twice",
+  "title": "A Retry Must Not Draw the Card Twice"
+}

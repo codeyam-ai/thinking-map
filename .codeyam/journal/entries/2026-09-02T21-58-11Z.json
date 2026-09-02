@@ -1,0 +1,999 @@
+{
+  "timestamp": "2026-09-02T21:58:11Z",
+  "title": "A Retry Must Not Draw the Card Twice",
+  "type": "fix",
+  "userRequest": "## Summary\n\nTwo identical open-question cards appear side by side on the board — same\nlabel, same three options, same everything. The map's own log says only one was\nadded, and the agent that added it was told the second call was a no-op. The\nnode writes and the idempotency check are on opposite sides of the same\nfunction: `applyToolCalls` creates every theme and node row FIRST and only then\ncalls `recordEvents`, which is the only place the `requestId` dedupe lives. A\nretried tool call therefore inserts the rows a second time and is then told\n\"already applied\". Move the check in front of the writes, and put both inside\none transaction.\n\n![Two identical open-question cards on the board](assets/a-retry-must-not-draw-the-card-twice/duplicate-questions.png)\n\n## Root cause\n\n`app/lib/mapStore.ts` — `applyToolCalls` runs, in order:\n\n1. `prisma.theme.create(...)` per new theme,\n2. `prisma.mapNode.create(...)` per insert,\n3. `prisma.mapNode.updateMany(...)` per update,\n4. `prisma.thinkingMap.update(...)` for the phase,\n5. and only at the end, `return recordEvents(mapId, events, { requestId })`.\n\n`recordEvents` in `app/lib/exchange.ts` opens its transaction and looks for a\nprior row with this `requestId`. On a retry it finds one, returns\n`{ deduped: true }` with the original revision, and writes no events — but\nsteps 1–4 have already run a second time. The board gains a duplicate node\nwhile the event log, the revision counter, and `app/lib/toolRuntime.ts`'s\n\"Already applied (requestId …)\" reply all agree that nothing happened. Nobody\non either side of the exchange can see the duplicate, which is why it reaches\nthe screen.\n\nThe gap is named in the codebase already. The doc comment on `recordEvents` in\n`app/lib/exchange.ts` reads: *\"`requestId` makes a retry a no-op. An agent that\ntimes out mid-call and retries gets the original revision back rather than a\nduplicate node — the failure mode `applyToolCalls` has today.\"* The dedupe was\nbuilt at the event layer and the node writes were never moved behind it.\n\nThe existing coverage explains why it survived. `app/lib/exchange.integration.test.ts`\nhas \"treats a repeated requestId as a no-op and returns the original revision\",\nwhich passes — it calls `recordEvents` directly and asserts on\n`prisma.mapEvent.count`. It never calls `applyToolCalls` and never counts\n`prisma.mapNode`. The tested path is not the path the agents take.\n\n**Second defect, same shape.** Steps 1–4 run outside any transaction at all. A\nthrow partway through the insert loop leaves nodes on the map with no events\nand no revision bump — a state no agent reading the log can reconcile, and one\nthat also renders as an unexplained card. The fix below closes both, because\nthey are one missing transaction boundary.\n\n## Key Decisions\n\n- **Check the key before writing, not after.** The minimal patch — a\n  `findFirst` on `requestId` at the top of `applyToolCalls` with an early\n  return — fixes the reported symptom, and is rejected: it leaves two dedupe\n  checks racing outside a shared transaction, so two concurrent retries can\n  both miss and both insert. The check has to be inside the transaction that\n  does the writing.\n\n- **One transaction spanning the whole call.** `applyToolCalls` opens the\n  `prisma.$transaction`, does the dedupe lookup as its first statement, and\n  performs the theme/node/update/phase writes and the event append on that same\n  `tx`. This is what makes \"a retry changed nothing\" true of the map and not\n  only of the log, and it closes the partial-write hole in the same stroke.\n\n- **`recordEvents` keeps its own check and gains an optional transaction\n  client.** It is still called directly — by\n  `app/api/maps/[id]/exchange/route.ts` among others — so it cannot lose its\n  guard. It takes an optional `tx` and uses it when given, so `applyToolCalls`\n  does not open a transaction inside a transaction (SQLite will not nest them).\n  The dedupe lookup itself moves into a small shared helper in\n  `app/lib/exchange.ts` so there is exactly one definition of \"have we seen\n  this key\".\n\n- **The event emit stays outside the transaction.** `mapEvents.emit` currently\n  fires after the transaction resolves and must continue to: emitting inside\n  would wake waiters on a revision that can still roll back.\n\n- **No schema change, and no content-level dedupe.** Two genuinely different\n  calls that happen to add the same question are not this bug and must keep\n  working — an agent may legitimately ask a similar question twice. The key is\n  the contract; only the key is honoured.\n\n## Reproduction Test\n\nPins the failure directly: a retried `applyToolCalls` leaves a second copy of\nthe node on the map even though it reports itself deduplicated.\n\n**Target**: `app/lib/exchange.integration.test.ts` — run with\n`codeyam-editor editor refresh-tests --test applyToolCalls`.\n\nThe file already has the real-SQLite harness (`beforeAll` pushes the schema to\na temp database), already imports `mapStore`, and already holds the\n`recordEvents` dedupe test this one is the missing sibling of. Place the new\ntest in a `describe('applyToolCalls')` block directly after that one, so the\npassing event-level test and the failing node-level test read together.\n\n```ts\n// A retry deduplicates the LOG but not the MAP: applyToolCalls creates the\n// node rows before it ever reaches the requestId check inside recordEvents,\n// so the second call inserts a second identical card and is then told\n// nothing happened.\nit('does not duplicate nodes when a call is retried with the same requestId', async () => {\n  const id = await freshMap();\n  const call = [\n    {\n      name: 'add_nodes',\n      input: {\n        nodes: [\n          {\n            ref: 'q1',\n            kind: 'open-question',\n            label: 'Can folders seed metadata?',\n            status: 'open',\n            options: ['Yes, automatically', 'Review before import', 'No, enter manually'],\n          },\n        ],\n      },\n    },\n  ];\n\n  const first = await mapStore.applyToolCalls(id, call, { requestId: 'retry-me' });\n  const second = await mapStore.applyToolCalls(id, call, { requestId: 'retry-me' });\n\n  expect(second.deduped).toBe(true);\n  expect(second.revision).toBe(first.revision);\n  expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(1);\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: the first two\nassertions PASS (the log really is deduplicated) and\n`expect(await prisma.mapNode.count(...)).toBe(1)` fails with `2`. That split is\nthe diagnosis restated as a test — the log and the board disagree.\n\nConfirm the `options` field name and the exact `ToolInvocation` shape against\n`app/lib/nodePlan.ts` when materializing; `open-question` and `open` are\nverified against `NODE_KINDS` and `NODE_STATUSES` in `app/lib/mapKinds.ts`.\n\n## Implementation\n\n### 1. Give the dedupe lookup one home\n\n**File**: `app/lib/exchange.ts`\n\nLift the \"is there a prior batch for this key\" query out of `recordEvents` into\na helper that takes a transaction client, a `mapId` and a `requestId`, and\nreturns the original batch or null. `recordEvents` calls it as its first\nstatement, exactly as today.\n\nAdd an optional transaction client to `recordEvents`' options so a caller\nalready inside a transaction passes its own `tx` instead of opening a second.\nWhen one is supplied, `recordEvents` skips `prisma.$transaction` and runs its\nbody on the given client. Keep `mapEvents.emit` where it is — after the\ntransaction, on a non-deduped result with events.\n\n### 2. Move every write behind the check\n\n**File**: `app/lib/mapStore.ts`\n\nWrap `applyToolCalls`' body in a single `prisma.$transaction`. As its first\nstatement, call the new helper; on a hit, return the original batch's\n`{ revision, events, deduped: true }` immediately, having written nothing.\nOtherwise run the existing theme, insert, update and phase writes on the\ntransaction's client rather than on the module-level `prisma`, then hand the\nsame client to `recordEvents`.\n\nThe `refToId` / `themeRefToId` resolution, the dangling-ref write-through, the\nhue counting, and the event payload construction are all unchanged — this is a\nboundary change, not a rewrite of what the function does.\n\nNote for execution: the SQLite transaction now spans the whole call, so give\n`$transaction` a timeout generous enough for a large batch, and keep the\n`prisma.theme.count` inside it so the hue index cannot be computed against a\ncount another writer has since changed.\n\n### 3. Say so where the contract is described\n\n**File**: `prisma/schema.prisma`\n\nThe `MapEvent.requestId` comment promises \"a retried tool call with the same\nrequestId is a no-op\". That is about to become true of the map and not just the\nlog; update it to say the guarantee covers the rows the call wrote. The\n`recordEvents` comment in `app/lib/exchange.ts` that names this as \"the failure\nmode `applyToolCalls` has today\" must be corrected in the same change — leaving\nit would document a bug that no longer exists.\n\n## Reused existing code\n\n- `recordEvents` from `app/lib/exchange.ts` — the dedupe this plan moves in\n  front of the writes rather than reimplementing.\n- `applyToolCalls` from `app/lib/mapStore.ts` — the function being fixed.\n- `planMapMutations` and `ToolInvocation` from `app/lib/nodePlan.ts` — the\n  call-planning stage, untouched.\n- `app/lib/exchange.integration.test.ts` — its temp-SQLite `beforeAll`,\n  `freshMap` helper, and `mapStore` import are all reused verbatim by the\n  reproduction test.\n- `NODE_KINDS` / `NODE_STATUSES` from `app/lib/mapKinds.ts` — the vocabulary the\n  fixture uses.\n- `add_nodes` in `app/lib/toolRuntime.ts` and its `requestId` passthrough —\n  unchanged; its \"Already applied\" reply simply becomes true.\n\n**Existing-implementation survey.** There is exactly one idempotency mechanism\nin the tree — the `requestId` check inside `recordEvents` — and no\ncontent-hash, unique constraint, or second dedupe anywhere. This plan adds no\nnew mechanism; it relocates the one that exists so the writes happen behind it.\n\n## Scenarios to Demonstrate\n\n- The board after a retried `add_nodes` — one card where there are currently\n  two. This is the reported screenshot's state, fixed.\n- The board after two genuinely distinct calls that add similar questions —\n  both cards still present, proving the fix keys on the requestId and not on\n  the content.\n- A retried call that spans several nodes and a theme — one theme, one set of\n  nodes, the revision unchanged.\n- A call with no `requestId` at all — still writes, since idempotency is\n  opt-in and the tool description asks agents to supply a key.\n- The exchange rail after a retry: no phantom second round.",
+  "description": "SCOPE VERDICT: this cycle delivered no new project deliverable and deferred none. All 10 deliverables were already resolved before it began (9 delivered, 1 deferred), and the deliverable list is unchanged by this work. It is a defect fix inside the exchange spine that already backs the live-map and MCP deliverables, so it hardens delivered scope rather than extending it. Worth surfacing honestly: all 9 delivered rows carry decidedBy=agent, meaning the agent judged them delivered rather than the user confirming it — those judgements were made in earlier cycles and this cycle did not re-examine them. The single deferred row (assist-track registration) carries decidedBy=user.\n\nTHE BUG: two identical open-question cards appeared side by side on the board while the map's own log said only one had been added, and the agent that added it was told its second call was a no-op. applyToolCalls created every theme and node row FIRST and only then called recordEvents, which held the sole requestId dedupe. A retried tool call therefore inserted the rows a second time and was then handed back deduped:true with the original revision — so the board, the event log, the revision counter and the tool's own 'Already applied' reply all disagreed, and nobody on either side of the exchange could see the duplicate. That is why it reached the screen. The gap was already named in the codebase: the doc comment on recordEvents described this as 'the failure mode applyToolCalls has today'. The dedupe was built at the event layer and the node writes were never moved behind it. Existing coverage explained the survival — exchange.integration.test.ts asserted on mapEvent.count via a direct recordEvents call and never counted mapNode, so the tested path was not the path the agents take.\n\nTHE FIX: applyToolCalls now opens one prisma.$transaction whose FIRST statement is the dedupe lookup, returning the original batch having written nothing. Three decisions carried the design. The check runs before the writes because that ordering was the bug. It runs INSIDE the transaction rather than as a bare early return, because two checks racing outside a shared transaction can both miss and both write — the minimal patch would have fixed the reported symptom and left that race open. And the writes share that transaction with the event append, which closes a second defect in the same stroke: steps 1-4 previously ran outside any transaction at all, so a throw partway through the insert loop left nodes on the map with no events and no revision bump, a state no agent reading the log can reconcile and one that also renders as an unexplained card. recordEvents keeps its own guard because the HTTP route and toolRuntime still call it directly, and gained an optional tx so it does not open a nested transaction (SQLite will not nest them). The emit stays outside the transaction, and is deferred to the caller when a tx is borrowed: waking a waiter on a revision that can still roll back would show a map that never existed. No schema change and no content-level dedupe — two genuinely different calls that add the same question must keep working, since an agent may legitimately ask a similar question twice. Only the key is honoured.\n\nEXTRACTIONS: findPriorBatch (app/lib/exchange.ts) is now the one definition of 'have we seen this key', taking a transaction client rather than the singleton so the in-transaction requirement is enforceable at the call site. resolveRef replaced four identical inline copies of the two-source ref lookup; its load-bearing behaviour is that an unresolvable value passes through unchanged rather than becoming null, because a dangling link is reported on screen and dropping it silently would hide that the node claimed a relationship at all. nodeAddedPayload lifted the row-to-log translation out of the insert loop — options come back as the array the tools take rather than the JSON string SQLite forces, and optional fields are omitted rather than nulled so presence carries meaning. Inline it could only be reached through a live insert; extracted it is unit-testable with no database. createThemes owns the positional hue assignment.\n\nEVIDENCE: 12 new tests, 81/81 green. Three were MEASURED red against the pre-fix code by prove-red and green after — the duplicate-node repro, the partial-write rollback, and the multi-write retry. Two more could not be proven by revert, because resolveRef and nodeAddedPayload are new exported symbols the pre-change world cannot compile a test against; their redness was established by fault injection (resolveRef's fallback changed to null; nodeAddedPayload's conditional options spread made unconditional), observed as 5 failed / 76 passed, restored to 81/81, and recorded as AGENT-ATTESTED claims rather than tool measurements. That distinction is deliberate and should not be read as proof.\n\nONE ENVIRONMENT DEFECT FIXED IN PASSING: the screenshot recapture failed 12 scenarios with one shared signature, 'Module did not self-register: better_sqlite3.node'. It was not scenario drift and not this change — the native addon loaded fine in a fresh Node process, so it was the classic double-load inside a long-lived Next dev server, triggered by hot-reloading the two edited modules (both import ./prisma). Confirmed live via /api/maps returning 500 with that exact error, cleared by restart-dev-server, verified by the same route returning 200. Audit then passed with 0 findings across all 113 screenshots.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/a-retry-must-not-draw-the-card-twice.md\t.codeyam/plans/completed/a-retry-must-not-draw-the-card-twice.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/a-retry-must-not-draw-the-card-twice/duplicate-questions.png\t.codeyam/plans/completed/assets/a-retry-must-not-draw-the-card-twice/duplicate-questions.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-bigturn--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentadded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentaddedmany--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentnote--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-youranswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-nothingtodraw--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-parenttworoundsback--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-singlethread--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-someunattached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-wrappedrow--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/683c6ab7324100956cf1f05ac7fe8d44d4dad3ad2a231274ad505880db5d6292.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/71efea0751e3bfa9a3bee1ec0272a9474f41abde8a0ceeb676bed9c2e0adc92f.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchange.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchange.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/a-retry-must-not-draw-the-card-twice.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6fa44500e4ef6ff160315696f20633657e4fe4fda6173a4527ff42ca439aba08.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7e01ca9b6dcd35ad885124085d9dbc5f3adb7d699ffe5bc68760d2e38386f4f8.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a2b338e5ce52c9eb9eda0bd1e48256f79a86d28d4e39599748142bd50f95600b.json",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/mapStore.test.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly",
+      "screenshotPath": "boardchat-boardvisibleonly--tablet.png"
+    },
+    {
+      "name": "BoardChat - Default",
+      "screenshotPath": "boardchat-default--tablet.png"
+    },
+    {
+      "name": "BoardChat - Empty",
+      "screenshotPath": "boardchat-empty--tablet.png"
+    },
+    {
+      "name": "BoardChat - JustOpened",
+      "screenshotPath": "boardchat-justopened--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - BigTurn",
+      "screenshotPath": "exchangerail-bigturn--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Default",
+      "screenshotPath": "exchangerail-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Empty",
+      "screenshotPath": "exchangerail-empty--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered",
+      "screenshotPath": "exchangerail-justanswered--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded",
+      "screenshotPath": "exchangerow-agentadded--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany",
+      "screenshotPath": "exchangerow-agentaddedmany--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentNote",
+      "screenshotPath": "exchangerow-agentnote--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer",
+      "screenshotPath": "exchangerow-youranswer--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "MapCard - Answered",
+      "screenshotPath": "mapcard-answered--tablet.png"
+    },
+    {
+      "name": "MapCard - Default",
+      "screenshotPath": "mapcard-default--tablet.png"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer",
+      "screenshotPath": "mapcard-editingananswer--tablet.png"
+    },
+    {
+      "name": "MapCard - Finding",
+      "screenshotPath": "mapcard-finding--tablet.png"
+    },
+    {
+      "name": "MapCard - LongLabel",
+      "screenshotPath": "mapcard-longlabel--tablet.png"
+    },
+    {
+      "name": "MapCard - NoOptions",
+      "screenshotPath": "mapcard-nooptions--tablet.png"
+    },
+    {
+      "name": "MapCard - RootIdea",
+      "screenshotPath": "mapcard-rootidea--tablet.png"
+    },
+    {
+      "name": "MapCard - Yours",
+      "screenshotPath": "mapcard-yours--tablet.png"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold",
+      "screenshotPath": "maprow-belowresearchthreshold--tablet.png"
+    },
+    {
+      "name": "MapRow - Default",
+      "screenshotPath": "maprow-default--tablet.png"
+    },
+    {
+      "name": "MapRow - NamedByPhase",
+      "screenshotPath": "maprow-namedbyphase--tablet.png"
+    },
+    {
+      "name": "MapRow - PartlyAnswered",
+      "screenshotPath": "maprow-partlyanswered--tablet.png"
+    },
+    {
+      "name": "MapRow - Receded",
+      "screenshotPath": "maprow-receded--tablet.png"
+    },
+    {
+      "name": "MapRow - ResearchBand",
+      "screenshotPath": "maprow-researchband--tablet.png"
+    },
+    {
+      "name": "MapRow - TheIdea",
+      "screenshotPath": "maprow-theidea--tablet.png"
+    },
+    {
+      "name": "MapRow - Wrapping",
+      "screenshotPath": "maprow-wrapping--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "RowThreads - Default",
+      "screenshotPath": "rowthreads-default--tablet.png"
+    },
+    {
+      "name": "RowThreads - NothingToDraw",
+      "screenshotPath": "rowthreads-nothingtodraw--tablet.png"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack",
+      "screenshotPath": "rowthreads-parenttworoundsback--tablet.png"
+    },
+    {
+      "name": "RowThreads - SingleThread",
+      "screenshotPath": "rowthreads-singlethread--tablet.png"
+    },
+    {
+      "name": "RowThreads - SomeUnattached",
+      "screenshotPath": "rowthreads-someunattached--tablet.png"
+    },
+    {
+      "name": "RowThreads - WrappedRow",
+      "screenshotPath": "rowthreads-wrappedrow--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 81,
+    "passed": 81,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 81,
+        "passed": 81
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "provenAt": "2026-09-02T21:34:01Z",
+  "slug": "a-retry-must-not-draw-the-card-twice",
+  "paths": [
+    "app/lib/mapStore.ts",
+    "app/lib/exchange.ts"
+  ],
+  "runScope": [
+    "app/lib/mapStore.ts",
+    "app/lib/exchange.ts"
+  ],
+  "tests": {
+    "does not duplicate nodes when a call is retried with the same requestId": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "leaves nothing behind when a write fails partway through the batch": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "leaves one theme and one set of nodes when a multi-write call is retried": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "nodeAddedPayload omits the optional fields entirely when they are absent": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "Fault injection, not revert: nodeAddedPayload is a new exported symbol, so the pre-change world cannot compile a test that imports it. Replaced the conditional options spread with an unconditional 'options: created.options' (raw JSON string, present even when null) and re-ran refresh-tests --file app/lib/mapStore.test.ts, then restored it.",
+        "evidence": "2 of the 4 nodeAddedPayload tests went red under the injected fault: 'omits the optional fields entirely when they are absent' and 'returns options as an array, not the JSON string the column holds'. The other two ('carries the identity a reader needs', 'includes provenance and the settled assumption when present') correctly stayed green, since the fault only affects the options key. Run d499dd06-3ee6-4d59-802f-c0efe9f4f70b reported 5 failed / 76 passed; suite returned to 81/81 green after restoring."
+      }
+    },
+    "resolveRef keeps an unresolvable ref rather than dropping it": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "Fault injection, not revert: resolveRef is a new exported symbol, so the pre-change world cannot compile a test that imports it. Changed the fallback from 'return refs.get(ref) ?? ref' to '?? null' and re-ran refresh-tests --file app/lib/mapStore.test.ts, then restored it.",
+        "evidence": "2 of the 3 resolveRef tests went red under the injected fault: 'passes through a value the plan does not name' and 'keeps an unresolvable ref rather than dropping it'. The third ('resolves a ref minted earlier in the same plan') correctly stayed green, since the fault only affects the miss path. Run d499dd06-3ee6-4d59-802f-c0efe9f4f70b reported 5 failed / 76 passed; suite returned to 81/81 green after restoring."
+      }
+    }
+  },
+  "proof": {
+    "verdict": "provenByHand",
+    "attested": [
+      "nodeAddedPayload omits the optional fields entirely when they are absent"
+    ],
+    "method": "Fault injection, not revert: nodeAddedPayload is a new exported symbol, so the pre-change world cannot compile a test that imports it. Replaced the conditional options spread with an unconditional 'options: created.options' (raw JSON string, present even when null) and re-ran refresh-tests --file app/lib/mapStore.test.ts, then restored it.",
+    "evidence": "2 of the 4 nodeAddedPayload tests went red under the injected fault: 'omits the optional fields entirely when they are absent' and 'returns options as an array, not the JSON string the column holds'. The other two ('carries the identity a reader needs', 'includes provenance and the settled assumption when present') correctly stayed green, since the fault only affects the options key. Run d499dd06-3ee6-4d59-802f-c0efe9f4f70b reported 5 failed / 76 passed; suite returned to 81/81 green after restoring."
+  }
+}

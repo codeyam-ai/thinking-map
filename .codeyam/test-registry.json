@@ -1324,6 +1324,51 @@
       "runner": "tests"
     },
     {
+      "description": "The reported bug, as a test: two identical cards on the board where the agent made one call and a retry.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "applyToolCalls › does not duplicate nodes when a call is retried with the same requestId",
+      "line": 177,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The other half of the contract, and the reason the fix keys on the request rather than the content: an agent may legitimately ask a similar question twice, and two genuine calls must both land.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "applyToolCalls › keys on the requestId rather than the content",
+      "line": 196,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The second defect the fix closes. The writes used to run outside any transaction, so a throw partway through the insert loop left nodes on the map with no events and no revision bump — a state no agent reading the log can reconcile, and one that also renders as an unexplained card.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "applyToolCalls › leaves nothing behind when a write fails partway through the batch",
+      "line": 258,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A retry of a call that created a theme and several nodes must leave exactly one of each — the dedupe covers everything the call wrote, not just the first table it touched.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "applyToolCalls › leaves one theme and one set of nodes when a multi-write call is retried",
+      "line": 221,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Idempotency is opt-in. A call that supplies no key is not a retry and must write, or every caller that never adopted the convention silently stops working.",
+      "file": "app/lib/exchange.integration.test.ts",
+      "format": "vitest",
+      "key": "applyToolCalls › writes on every call when no requestId is given",
+      "line": 209,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
       "description": "Nothing is genuinely nothing.",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
@@ -2120,7 +2165,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "currentRevision › reports the map’s revision without reading the log",
-      "line": 199,
+      "line": 342,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -2129,7 +2174,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "currentRevision › throws for a map that does not exist",
-      "line": 210,
+      "line": 353,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3916,6 +3961,42 @@
       "runner": "tests"
     },
     {
+      "description": "The floor: the fields every reader of the log depends on.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "nodeAddedPayload › carries the identity a reader needs",
+      "line": 46,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Provenance and the assumption a slice claims to settle both belong in the log, not only in the database where the log's readers cannot see them.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "nodeAddedPayload › includes provenance and the settled assumption when present",
+      "line": 81,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Absence is expressed by omission, not by null, so a reader can treat the presence of a key as meaning something — and an ordinary node's event stays byte-for-byte what it has always been.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "nodeAddedPayload › omits the optional fields entirely when they are absent",
+      "line": 72,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The log speaks the contract's language, not the column's: options are stored as a JSON string because SQLite has no array type, and a reader should get the array the tools take.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "nodeAddedPayload › returns options as an array, not the JSON string the column holds",
+      "line": 60,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
       "description": "Gaps are the most valuable finding on the map, not a warning — an earlier build wrongly reddened them. They read as questions, which is what a gap is: something nobody has answered.",
       "file": "app/lib/nodeAppearance.test.ts",
       "format": "vitest",
@@ -4964,7 +5045,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › decodes stored payloads back into objects",
-      "line": 186,
+      "line": 329,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -4973,7 +5054,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › reports the current revision even when the delta is empty",
-      "line": 174,
+      "line": 317,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -4982,7 +5063,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › returns only what happened after the cursor",
-      "line": 161,
+      "line": 304,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -4991,7 +5072,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › returns the whole log when given no cursor",
-      "line": 148,
+      "line": 291,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -5110,6 +5191,33 @@
       "key": "renderEvents › still renders an event whose payload is null or empty",
       "line": 65,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The load-bearing half. An unresolvable value must survive rather than become null: a dangling link is reported on screen, whereas dropping it would hide that the node claimed the relationship at all.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "resolveRef › keeps an unresolvable ref rather than dropping it",
+      "line": 28,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A ref that is not in the plan is usually the real id of something already on the board, so it passes through untouched.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "resolveRef › passes through a value the plan does not name",
+      "line": 19,
+      "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: a node names something created moments earlier in the same call, and the ref has to become the id the database just handed back.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "resolveRef › resolves a ref minted earlier in the same plan",
+      "line": 12,
+      "registeredAt": "2026-09-02T21:34:40Z",
       "runner": "tests"
     },
     {
@@ -6305,7 +6413,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › does not re-deliver a map through the cursor it handed back",
-      "line": 340,
+      "line": 483,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -6314,7 +6422,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › releases when a map is created during the wait",
-      "line": 307,
+      "line": 450,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -6323,7 +6431,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › reports whether each map was started from a brief",
-      "line": 383,
+      "line": 526,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -6332,7 +6440,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › returns immediately when a map already exists after the cursor",
-      "line": 294,
+      "line": 437,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -6341,7 +6449,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › returns several maps in creation order when they arrive together",
-      "line": 362,
+      "line": 505,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -6350,7 +6458,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › times out cleanly with a usable cursor when nobody starts anything",
-      "line": 324,
+      "line": 467,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -6359,7 +6467,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › does not wake on the agent’s own writes",
-      "line": 231,
+      "line": 374,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -6368,7 +6476,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › returns immediately when the person already acted",
-      "line": 219,
+      "line": 362,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -6377,7 +6485,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › times out cleanly with a resume cursor when nobody acts",
-      "line": 263,
+      "line": 406,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -6386,7 +6494,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › wakes and returns the user’s events when they act during the wait",
-      "line": 246,
+      "line": 389,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },

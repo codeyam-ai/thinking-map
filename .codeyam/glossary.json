@@ -1252,7 +1252,7 @@
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
-    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. A slice's testsRef goes through the same resolution as parentRef, since a slice usually names an assumption created moments earlier in the same call; an unresolvable value is written through rather than dropped, because a dangling link is reported on screen and losing it silently would hide that the slice claimed to settle anything. All the rules live in planMapMutations, which is pure and tested. It has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
+    "description": "Thin executor for a validated map-mutation plan, run as ONE transaction whose first statement is the requestId check. Both facts are load-bearing. The check runs before the writes because it used to run after them: applyToolCalls created every theme and node row and only then reached the dedupe inside recordEvents, so a retried tool call inserted a second identical card and was then told nothing had happened - the log, the revision counter and the tool's own \"already applied\" reply all agreeing about a duplicate none of them could see. The check runs INSIDE the transaction because a bare early return would fix that symptom and leave two checks racing outside a shared transaction, where both can miss and both write. And the writes share the transaction with the event append because a throw partway through the insert loop used to leave nodes on the map with no events and no revision bump, a state no agent reading the log can reconcile. Otherwise unchanged: it walks the inserts in order, resolving each temporary ref through resolveRef to the id the database just returned so one call can create a parent and its children together, delegates the theme writes to createThemes and the event payload to nodeAddedPayload, then applies updates and any phase change. Only changes that actually landed are logged. The emitter fires after the transaction commits, never inside it.",
     "filePath": "app/lib/mapStore.ts",
     "name": "applyToolCalls",
     "scenarios": [
@@ -1364,6 +1364,12 @@
     "scenarios": [
       "day-one-nothing-yet"
     ]
+  },
+  {
+    "description": "Writes a plan's new themes on the caller's transaction and reports what they became - the ref-to-id map the node inserts need, plus one theme.added event each. Its own concern because the hue is positional: a theme's colour comes from how many themes the map already had, so the count is taken ONCE up front rather than re-read per theme, and it is taken inside the caller's transaction so the index cannot be computed against a count another writer has since changed. Returns empty for an empty plan without touching the database.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "createThemes",
+    "testFile": "app/lib/exchange.integration.test.ts"
   },
   {
     "description": "The map's current revision for a caller that needs only the cursor and not the events - used by the waiting tools to report where to resume from, and by the conflict check before it decides whether reading the log is warranted at all.",
@@ -1511,6 +1517,12 @@
     "filePath": "app/lib/conflict.ts",
     "name": "findConflictingChanges",
     "testFile": "app/lib/conflict.test.ts"
+  },
+  {
+    "description": "The one definition of \"have we already recorded a batch under this requestId\". Returns the original batch as a deduped RecordResult so a retry sees exactly what the first attempt produced, or null when the key is new or absent - an absent key is not an error, since idempotency is opt-in and a call without one is meant to write. Takes a transaction client rather than reaching for the singleton, and that is the point: the check has to run inside the transaction that does the writing, because two checks racing outside a shared transaction can both miss and both write. Extracted so applyToolCalls and recordEvents cannot drift into two different notions of \"seen this key\".",
+    "filePath": "app/lib/exchange.ts",
+    "name": "findPriorBatch",
+    "testFile": "app/lib/exchange.integration.test.ts"
   },
   {
     "description": "Resolves a tool by name from the shared catalog. Every front door goes through it, and an unknown name comes back undefined so the caller can answer the agent rather than throw.",
@@ -1781,6 +1793,12 @@
     "testFile": "app/lib/conflict.test.ts"
   },
   {
+    "description": "Shapes the node.added event payload from the row that was just inserted. A translation, not a write: the database's vocabulary in, the exchange contract's vocabulary out. options is stored as a JSON string because SQLite has no array type, and the log speaks the contract's language rather than the column's, so it comes back out as the array the tools take. The optional fields - testsNodeId, sourceRef, options - are OMITTED entirely when absent rather than sent as null, so a reader can treat presence as meaning and an ordinary node's event stays byte-for-byte what it has always been. Pure, so it is unit-testable without a database; inline it could only be reached through a live insert.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "nodeAddedPayload",
+    "testFile": "app/lib/mapStore.test.ts"
+  },
+  {
     "description": "The node a question is about, if it is genuinely on this map. The same ownership check mapExists makes, pushed down to the payload so a caller cannot ask about a node belonging to someone else's map; returns the label too, because the rail names the node.",
     "filePath": "app/api/maps/[id]/exchange/route.ts",
     "name": "nodeOnMap",
@@ -1937,7 +1955,7 @@
     "testFile": "app/lib/exchange.integration.test.ts"
   },
   {
-    "description": "The only place a map revision is minted. Appends events to the map's log and bumps ThinkingMap.revision once per event inside a single transaction, so a revision can never exist without its event or vice versa - either would hand a reader a cursor it cannot resume from. Every row of a batch carries the requestId, so a retry returns the whole original batch and its LAST revision; keying only the first row loses the batch's extent and hands a retrying agent a stale cursor, which makes it re-read its own writes as new. Fires the in-process emitter that waiting callers race against.",
+    "description": "The only place a map revision is minted. Appends events to the map's log and bumps ThinkingMap.revision once per event inside a single transaction, so a revision can never exist without its event or vice versa - either would hand a reader a cursor it cannot resume from. Every row of a batch carries the requestId, so a retry returns the whole original batch and its LAST revision; keying only the first row loses the batch's extent and hands a retrying agent a stale cursor, which makes it re-read its own writes as new. The dedupe lookup itself lives in findPriorBatch, shared with applyToolCalls so there is one notion of \"seen this key\". Takes an optional transaction client: a caller already inside a transaction hands over its own, because SQLite will not nest transactions and opening a second would deadlock against the write lock the outer one holds. Fires the in-process emitter that waiting callers race against - but NOT when a transaction was borrowed, since the outer transaction has not committed yet and waking a waiter on a revision that can still roll back would show a map that never existed.",
     "filePath": "app/lib/exchange.ts",
     "name": "recordEvents",
     "testFile": "app/lib/exchange.integration.test.ts"
@@ -1953,6 +1971,12 @@
     "filePath": "app/lib/contributions.ts",
     "name": "resolveAnswered",
     "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
+    "description": "Turns a ref into the id it names. A ref is one of two things and the caller cannot tell which: a temporary name minted earlier in this same plan, or the real id of something already on the board - so resolution tries the plan first and falls through to the value itself. The load-bearing half is that an unresolvable value is returned UNCHANGED rather than dropped: a dangling link is reported on screen, whereas silently discarding it would hide that the node claimed a relationship at all. Hoisted out of four identical inline sites in applyToolCalls (parentRef, testsRef, themeRef, and the update id).",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "resolveRef",
+    "testFile": "app/lib/mapStore.test.ts"
   },
   {
     "description": "The readable part of an MCP tool response — the first text block, which is what an agent would actually read. Falls back to raw JSON rather than rendering nothing, because a silently empty panel is worse than an ugly one.",

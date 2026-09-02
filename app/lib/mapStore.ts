@@ -11,12 +11,127 @@ import { hueForIndex } from './themeHue';
 import { planMapMutations, type ToolInvocation } from './nodePlan';
 import {
   MAP_CREATED,
+  findPriorBatch,
   mapEvents,
   recordEvents,
   type EventInput,
+  type ExchangeClient,
   type NewMapSummary,
   type Origin,
 } from './exchange';
+
+/**
+ * How long `applyToolCalls`' transaction may run before Prisma gives up.
+ *
+ * Prisma's 5s default was sized for a transaction holding one or two
+ * statements; this one now holds every theme, node and update of a batch plus
+ * the event append, and a large add_nodes call would trip that default. Long
+ * enough for a whole board, short enough that a genuinely stuck write still
+ * releases SQLite's single write lock rather than parking every other writer
+ * behind it.
+ */
+const APPLY_TOOL_CALLS_TIMEOUT_MS = 30_000;
+
+/**
+ * Turn a ref into the id it names.
+ *
+ * A ref is one of two things and the caller cannot tell which: a temporary name
+ * minted earlier in this same plan, or the real id of something already on the
+ * board. Resolution tries the plan first and falls through to the value itself.
+ *
+ * An unresolvable value is returned UNCHANGED rather than dropped. That is the
+ * load-bearing half: a dangling link is reported on screen, whereas silently
+ * discarding it would hide the fact that the node claimed a relationship at all.
+ */
+export function resolveRef(refs: Map<string, string>, ref: string): string {
+  return refs.get(ref) ?? ref;
+}
+
+/**
+ * The `node.added` payload, as the log should carry it.
+ *
+ * Separate from the insert that produced the row because it is a translation,
+ * not a write: the database's vocabulary in, the exchange contract's vocabulary
+ * out. `options` is stored as a JSON string because SQLite has no array type,
+ * and the log speaks the contract's language rather than the column's.
+ *
+ * The optional fields are OMITTED entirely when absent rather than sent as
+ * null, so an ordinary node's event is byte-for-byte what it has always been
+ * and a reader can treat presence as meaning.
+ */
+export function nodeAddedPayload(
+  created: {
+    id: string;
+    kind: string;
+    label: string;
+    status: string;
+    themeId: string | null;
+    sourceRef: string | null;
+    options: string | null;
+  },
+  parentId: string | null,
+  testsNodeId: string | null,
+): Record<string, unknown> {
+  return {
+    id: created.id,
+    parentId,
+    kind: created.kind,
+    label: created.label,
+    status: created.status,
+    themeId: created.themeId,
+    // Carried so an agent reading the log after the fact can see which
+    // assumption a slice claimed to settle, not just that a slice appeared.
+    ...(testsNodeId ? { testsNodeId } : {}),
+    // Carried so a second front door reading the log learns where a claim came
+    // from, rather than that provenance existing only in the database where the
+    // log's readers cannot see it.
+    ...(created.sourceRef ? { sourceRef: created.sourceRef } : {}),
+    // Carried for the same reason `sourceRef` is: a reader should learn what
+    // was offered alongside a question, not just that a question appeared.
+    ...(created.options
+      ? { options: JSON.parse(created.options) as string[] }
+      : {}),
+  };
+}
+
+/**
+ * Write a plan's new themes and report what they became.
+ *
+ * Its own concern because the hue is positional: a theme's colour comes from
+ * how many themes the map already had, so the count is taken ONCE up front
+ * rather than re-read per theme, and it is taken inside the caller's
+ * transaction so the index cannot be computed against a count another writer
+ * has since changed.
+ */
+async function createThemes(
+  tx: ExchangeClient,
+  mapId: string,
+  themes: { ref: string; label: string }[],
+  origin: Origin,
+): Promise<{ themeRefToId: Map<string, string>; events: EventInput[] }> {
+  const themeRefToId = new Map<string, string>();
+  const events: EventInput[] = [];
+  if (themes.length === 0) return { themeRefToId, events };
+
+  const existing = await tx.theme.count({ where: { mapId } });
+  for (const [i, theme] of themes.entries()) {
+    const created = await tx.theme.create({
+      data: {
+        mapId,
+        label: theme.label,
+        hue: hueForIndex(existing + i),
+        order: existing + i,
+      },
+    });
+    themeRefToId.set(theme.ref, created.id);
+    events.push({
+      kind: 'theme.added',
+      origin,
+      payload: { id: created.id, label: created.label, hue: created.hue },
+    });
+  }
+  return { themeRefToId, events };
+}
 
 export async function listMaps() {
   return prisma.thinkingMap.findMany({
@@ -241,6 +356,21 @@ export function summarizeMap(
  * map's log, tagged with the side that made it. That is what lets a person and
  * an agent work the same map without either one having to be told what the
  * other did.
+ *
+ * The whole call is ONE transaction, and the `requestId` check is its first
+ * statement. Both facts are load-bearing:
+ *
+ *   • The check has to run before the writes, or a retry inserts a second copy
+ *     of every node and is then told by `recordEvents` that nothing happened —
+ *     a duplicate card on the board that the event log, the revision counter
+ *     and the tool's own reply all agree does not exist.
+ *   • The check has to run INSIDE the transaction, or two concurrent retries
+ *     can both miss it and both write. A bare early return at the top of this
+ *     function would fix the reported symptom and leave that race open.
+ *   • The writes have to share the transaction with the event append, or a
+ *     throw partway through the insert loop leaves nodes on the map with no
+ *     events and no revision bump — a state no agent reading the log can
+ *     reconcile, and one that also renders as an unexplained card.
  */
 export async function applyToolCalls(
   mapId: string,
@@ -248,132 +378,107 @@ export async function applyToolCalls(
   options: { origin?: Origin; requestId?: string | null } = {},
 ) {
   const origin: Origin = options.origin ?? 'agent';
+  const requestId = options.requestId ?? null;
   const { themes, inserts, updates, phase } = planMapMutations(calls);
-  const refToId = new Map<string, string>();
-  const themeRefToId = new Map<string, string>();
-  const events: EventInput[] = [];
 
-  // Themes are written before nodes because a node names its theme, and the
-  // hue depends on how many themes the map already has — so this counts once,
-  // up front, rather than re-reading per theme.
-  if (themes.length > 0) {
-    const existing = await prisma.theme.count({ where: { mapId } });
-    for (const [i, theme] of themes.entries()) {
-      const created = await prisma.theme.create({
-        data: {
-          mapId,
-          label: theme.label,
-          hue: hueForIndex(existing + i),
-          order: existing + i,
-        },
-      });
-      themeRefToId.set(theme.ref, created.id);
-      events.push({
-        kind: 'theme.added',
-        origin,
-        payload: { id: created.id, label: created.label, hue: created.hue },
-      });
-    }
+  const result = await prisma.$transaction(
+    async (tx) => {
+      // First statement, before anything is written: a retry leaves the map
+      // exactly as the original call left it, and gets that call's revision
+      // and events back.
+      const prior = await findPriorBatch(tx, mapId, requestId);
+      if (prior) return prior;
+
+      const refToId = new Map<string, string>();
+
+      const themeWrites = await createThemes(tx, mapId, themes, origin);
+      const themeRefToId = themeWrites.themeRefToId;
+      const events: EventInput[] = [...themeWrites.events];
+
+      for (const node of inserts) {
+        // A parentRef is either a ref from earlier in this same plan or the real
+        // id of a node already on the map.
+        const parentId = node.parentRef
+          ? resolveRef(refToId, node.parentRef)
+          : null;
+
+        // The same resolution, for the same reason: a slice usually names an
+        // assumption created earlier in this very call, so the ref has to become
+        // a real id before it is stored.
+        const testsNodeId = node.testsRef
+          ? resolveRef(refToId, node.testsRef)
+          : null;
+
+        const created = await tx.mapNode.create({
+          data: {
+            mapId,
+            parentId,
+            kind: node.kind,
+            label: node.label,
+            detail: node.detail,
+            status: node.status,
+            sourceUrl: node.sourceUrl,
+            choices: node.choices ? JSON.stringify(node.choices) : null,
+            diagram: node.diagram ? JSON.stringify(node.diagram) : null,
+            imageUrl: node.imageUrl,
+            imageAlt: node.imageAlt,
+            testsNodeId,
+            sourceRef: node.sourceRef,
+            options: node.options,
+            order: node.order,
+            // Same two-source resolution as parentRef: a ref from this call, or
+            // an id of a theme already on the board.
+            themeId: node.themeRef
+              ? resolveRef(themeRefToId, node.themeRef)
+              : null,
+            origin,
+          },
+        });
+        if (node.ref) refToId.set(node.ref, created.id);
+        events.push({
+          kind: 'node.added',
+          origin,
+          payload: nodeAddedPayload(created, parentId, testsNodeId),
+        });
+      }
+
+      for (const update of updates) {
+        const resolved = resolveRef(refToId, update.id);
+        // A model can name a node that has since been deleted; updateMany skips
+        // a miss rather than failing the whole turn.
+        const { count } = await tx.mapNode.updateMany({
+          where: { id: resolved, mapId },
+          data: { ...update.data, origin },
+        });
+        // Only log what actually changed. An event for a node that was not there
+        // would be a revision no agent could reconcile against the map it can read.
+        if (count > 0) {
+          events.push({
+            kind: 'node.updated',
+            origin,
+            payload: { id: resolved, ...update.data },
+          });
+        }
+      }
+
+      if (phase) {
+        await tx.thinkingMap.update({ where: { id: mapId }, data: { phase } });
+        events.push({ kind: 'phase.set', origin, payload: { phase } });
+      }
+
+      // The same client, so the events land or roll back with the rows they
+      // describe. `recordEvents` leaves the emit to us for that reason.
+      return recordEvents(mapId, events, { requestId, tx });
+    },
+    // A single add_nodes call can carry a whole board's worth of inserts, and
+    // the boundary now spans all of them rather than one statement at a time.
+    { timeout: APPLY_TOOL_CALLS_TIMEOUT_MS },
+  );
+
+  // Outside the transaction, deliberately: a waiter woken on a revision that
+  // then rolled back would read a map that never existed.
+  if (!result.deduped && result.events.length > 0) {
+    mapEvents.emit(mapId, result);
   }
-
-  for (const node of inserts) {
-    // A parentRef is either a ref from earlier in this same plan or the real
-    // id of a node already on the map.
-    const parentId = node.parentRef
-      ? (refToId.get(node.parentRef) ?? node.parentRef)
-      : null;
-
-    // The same resolution, for the same reason: a slice usually names an
-    // assumption created earlier in this very call, so the ref has to become a
-    // real id before it is stored. Unresolvable values are written through
-    // rather than dropped — a dangling link is reported on screen, and losing
-    // it silently would hide the fact that the slice claimed to settle
-    // something at all.
-    const testsNodeId = node.testsRef
-      ? (refToId.get(node.testsRef) ?? node.testsRef)
-      : null;
-
-    const created = await prisma.mapNode.create({
-      data: {
-        mapId,
-        parentId,
-        kind: node.kind,
-        label: node.label,
-        detail: node.detail,
-        status: node.status,
-        sourceUrl: node.sourceUrl,
-        choices: node.choices ? JSON.stringify(node.choices) : null,
-        diagram: node.diagram ? JSON.stringify(node.diagram) : null,
-        imageUrl: node.imageUrl,
-        imageAlt: node.imageAlt,
-        testsNodeId,
-        sourceRef: node.sourceRef,
-        options: node.options,
-        order: node.order,
-        // Same two-source resolution as parentRef: a ref from this call, or an
-        // id of a theme already on the board.
-        themeId: node.themeRef
-          ? (themeRefToId.get(node.themeRef) ?? node.themeRef)
-          : null,
-        origin,
-      },
-    });
-    if (node.ref) refToId.set(node.ref, created.id);
-    events.push({
-      kind: 'node.added',
-      origin,
-      payload: {
-        id: created.id,
-        parentId,
-        kind: created.kind,
-        label: created.label,
-        status: created.status,
-        themeId: created.themeId,
-        // Carried on the event so an agent reading the log after the fact can
-        // see which assumption a slice claimed to settle, not just that a
-        // slice appeared.
-        ...(testsNodeId ? { testsNodeId } : {}),
-        // Carried in the payload so a second front door reading the log learns
-        // where a claim came from, rather than that provenance existing only in
-        // the database where the log's readers cannot see it. Omitted entirely
-        // when absent, so an unreferenced node's event is unchanged.
-        ...(created.sourceRef ? { sourceRef: created.sourceRef } : {}),
-        // Carried for the same reason `sourceRef` is: a second front door
-        // reading the log should learn what was offered alongside a question,
-        // not just that a question appeared. Sent as the array the tools take
-        // rather than the JSON string the column holds — the log speaks the
-        // contract's language, not the database's. Omitted when absent, so an
-        // ordinary question's event is byte-for-byte what it always was.
-        ...(created.options
-          ? { options: JSON.parse(created.options) as string[] }
-          : {}),
-      },
-    });
-  }
-
-  for (const update of updates) {
-    const resolved = refToId.get(update.id) ?? update.id;
-    // A model can name a node that has since been deleted; updateMany skips
-    // a miss rather than failing the whole turn.
-    const { count } = await prisma.mapNode.updateMany({
-      where: { id: resolved, mapId },
-      data: { ...update.data, origin },
-    });
-    // Only log what actually changed. An event for a node that was not there
-    // would be a revision no agent could reconcile against the map it can read.
-    if (count > 0) {
-      events.push({
-        kind: 'node.updated',
-        origin,
-        payload: { id: resolved, ...update.data },
-      });
-    }
-  }
-
-  if (phase) {
-    await prisma.thinkingMap.update({ where: { id: mapId }, data: { phase } });
-    events.push({ kind: 'phase.set', origin, payload: { phase } });
-  }
-
-  return recordEvents(mapId, events, { requestId: options.requestId });
+  return result;
 }

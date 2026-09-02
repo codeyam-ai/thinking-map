@@ -12,7 +12,19 @@
 // matter which front door asked.
 
 import { EventEmitter } from 'events';
+import { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
+
+/**
+ * A Prisma client that may be the module-level singleton or a transaction's own
+ * client.
+ *
+ * Named here rather than inlined because it is the seam that lets a caller
+ * already inside a transaction — `applyToolCalls` — do its node writes and its
+ * event append against the SAME transaction. That is what makes "a retry
+ * changed nothing" true of the map and not only of the log.
+ */
+export type ExchangeClient = Prisma.TransactionClient;
 
 /** Which side of the exchange produced a write. */
 export type Origin = 'user' | 'agent';
@@ -152,6 +164,41 @@ export function decodeEvent(row: {
 }
 
 /**
+ * The one definition of "have we already recorded a batch under this key?".
+ *
+ * Every caller that writes under a `requestId` asks this question, and it has to
+ * be asked INSIDE the transaction that does the writing — two checks racing
+ * outside a shared transaction can both miss and both write, which is the
+ * duplicate the key exists to prevent. Taking a client rather than reaching for
+ * the singleton is what makes that enforceable at the call site.
+ *
+ * Returns the original batch as a deduped `RecordResult`, or null when the key
+ * is new or absent. An absent key is not an error: idempotency is opt-in, and a
+ * call without one is meant to write.
+ */
+export async function findPriorBatch(
+  tx: ExchangeClient,
+  mapId: string,
+  requestId: string | null | undefined,
+): Promise<RecordResult | null> {
+  if (!requestId) return null;
+
+  // Every event that original call wrote, not just the first — a retry should
+  // see exactly what the first attempt produced.
+  const siblings = await tx.mapEvent.findMany({
+    where: { mapId, requestId },
+    orderBy: { revision: 'asc' },
+  });
+  if (siblings.length === 0) return null;
+
+  return {
+    revision: siblings[siblings.length - 1]!.revision,
+    events: siblings.map(decodeEvent),
+    deduped: true,
+  };
+}
+
+/**
  * Append events to a map's log, bumping the map's revision once per event.
  *
  * The bump and the insert share a transaction because they are one fact: a
@@ -159,36 +206,25 @@ export function decodeEvent(row: {
  * has not reached, would both hand a reader a cursor it cannot resume from.
  *
  * `requestId` makes a retry a no-op. An agent that times out mid-call and
- * retries gets the original revision back rather than a duplicate node — the
- * failure mode `applyToolCalls` has today.
+ * retries gets the original revision back rather than a duplicate node.
+ *
+ * `options.tx` is how a caller that is ALREADY inside a transaction — today
+ * only `applyToolCalls` — gets its own writes and this event append covered by
+ * one boundary. SQLite will not nest transactions, so opening a second one here
+ * would deadlock against the write lock the outer one already holds. When a
+ * `tx` is supplied the emit becomes the caller's to make, for the reason given
+ * at the emit itself.
  */
 export async function recordEvents(
   mapId: string,
   events: EventInput[],
-  options: { requestId?: string | null } = {},
+  options: { requestId?: string | null; tx?: ExchangeClient } = {},
 ): Promise<RecordResult> {
   const requestId = options.requestId ?? null;
 
-  const result = await prisma.$transaction(async (tx) => {
-    if (requestId) {
-      const prior = await tx.mapEvent.findFirst({
-        where: { mapId, requestId },
-        orderBy: { revision: 'asc' },
-      });
-      if (prior) {
-        // Return every event that original call wrote, not just the first —
-        // a retry should see exactly what the first attempt produced.
-        const siblings = await tx.mapEvent.findMany({
-          where: { mapId, requestId },
-          orderBy: { revision: 'asc' },
-        });
-        return {
-          revision: siblings[siblings.length - 1]!.revision,
-          events: siblings.map(decodeEvent),
-          deduped: true,
-        };
-      }
-    }
+  const write = async (tx: ExchangeClient): Promise<RecordResult> => {
+    const prior = await findPriorBatch(tx, mapId, requestId);
+    if (prior) return prior;
 
     const map = await tx.thinkingMap.findUnique({
       where: { id: mapId },
@@ -224,9 +260,16 @@ export async function recordEvents(
 
     await tx.thinkingMap.update({ where: { id: mapId }, data: { revision } });
     return { revision, events: written, deduped: false };
-  });
+  };
 
-  if (!result.deduped && result.events.length > 0) {
+  const result = options.tx
+    ? await write(options.tx)
+    : await prisma.$transaction(write);
+
+  // Emitting inside a transaction would wake waiters on a revision that can
+  // still roll back. A borrowed `tx` means the transaction has NOT committed
+  // when this returns, so the emit belongs to the caller that owns it.
+  if (!options.tx && !result.deduped && result.events.length > 0) {
     mapEvents.emit(mapId, result);
   }
   return result;

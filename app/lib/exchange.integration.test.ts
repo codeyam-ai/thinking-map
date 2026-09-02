@@ -143,6 +143,149 @@ describe('recordEvents', () => {
   });
 });
 
+// The sibling of the recordEvents dedupe test directly above, and the reason
+// this block exists: that one passes by asking the LOG whether a retry wrote
+// twice, which it never did. Nobody was asking the BOARD. `applyToolCalls`
+// created the node rows before it ever reached the requestId check inside
+// `recordEvents`, so a retry inserted a second identical card and was then told
+// nothing had happened — the log, the revision counter and the tool's own
+// "already applied" reply all agreeing about a duplicate none of them could see.
+describe('applyToolCalls', () => {
+  const question = (label: string) => [
+    {
+      name: 'add_nodes',
+      input: {
+        nodes: [
+          {
+            ref: 'q1',
+            kind: 'open-question',
+            label,
+            status: 'open',
+            options: [
+              'Yes, automatically',
+              'Review before import',
+              'No, enter manually',
+            ],
+          },
+        ],
+      },
+    },
+  ];
+
+  // The reported bug, as a test: two identical cards on the board where the
+  // agent made one call and a retry.
+  it('does not duplicate nodes when a call is retried with the same requestId', async () => {
+    const id = await freshMap();
+    const call = question('Can folders seed metadata?');
+
+    const first = await mapStore.applyToolCalls(id, call, {
+      requestId: 'retry-me',
+    });
+    const second = await mapStore.applyToolCalls(id, call, {
+      requestId: 'retry-me',
+    });
+
+    expect(second.deduped).toBe(true);
+    expect(second.revision).toBe(first.revision);
+    expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(1);
+  });
+
+  // The other half of the contract, and the reason the fix keys on the request
+  // rather than the content: an agent may legitimately ask a similar question
+  // twice, and two genuine calls must both land.
+  it('keys on the requestId rather than the content', async () => {
+    const id = await freshMap();
+    const label = 'Can folders seed metadata?';
+
+    await mapStore.applyToolCalls(id, question(label), { requestId: 'first' });
+    await mapStore.applyToolCalls(id, question(label), { requestId: 'second' });
+
+    expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(2);
+  });
+
+  // Idempotency is opt-in. A call that supplies no key is not a retry and must
+  // write, or every caller that never adopted the convention silently stops
+  // working.
+  it('writes on every call when no requestId is given', async () => {
+    const id = await freshMap();
+
+    await mapStore.applyToolCalls(id, question('Which import path?'));
+    await mapStore.applyToolCalls(id, question('Which import path?'));
+
+    expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(2);
+  });
+
+  // A retry of a call that created a theme and several nodes must leave exactly
+  // one of each — the dedupe covers everything the call wrote, not just the
+  // first table it touched.
+  it('leaves one theme and one set of nodes when a multi-write call is retried', async () => {
+    const id = await freshMap();
+    const call = [
+      {
+        name: 'create_themes',
+        input: { themes: [{ ref: 't1', label: 'Import' }] },
+      },
+      {
+        name: 'add_nodes',
+        input: {
+          nodes: [
+            { ref: 'a', kind: 'goal', label: 'Seed metadata', themeRef: 't1' },
+            {
+              ref: 'b',
+              kind: 'open-question',
+              label: 'From folders?',
+              parentRef: 'a',
+              themeRef: 't1',
+            },
+          ],
+        },
+      },
+    ];
+
+    const first = await mapStore.applyToolCalls(id, call, { requestId: 'big' });
+    const second = await mapStore.applyToolCalls(id, call, { requestId: 'big' });
+
+    expect(second.deduped).toBe(true);
+    expect(second.revision).toBe(first.revision);
+    expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(2);
+    expect(await prisma.theme.count({ where: { mapId: id } })).toBe(1);
+  });
+
+  // The second defect the fix closes. The writes used to run outside any
+  // transaction, so a throw partway through the insert loop left nodes on the
+  // map with no events and no revision bump — a state no agent reading the log
+  // can reconcile, and one that also renders as an unexplained card.
+  it('leaves nothing behind when a write fails partway through the batch', async () => {
+    const id = await freshMap();
+
+    await expect(
+      mapStore.applyToolCalls(id, [
+        {
+          name: 'add_nodes',
+          input: {
+            nodes: [
+              { ref: 'ok', kind: 'goal', label: 'This one is fine' },
+              // An unresolvable theme ref is written through rather than
+              // dropped, so this reaches the database as a themeId naming no
+              // theme and the insert fails.
+              {
+                ref: 'bad',
+                kind: 'goal',
+                label: 'This one cannot be stored',
+                themeRef: 'no-such-theme',
+              },
+            ],
+          },
+        },
+      ]),
+    ).rejects.toThrow();
+
+    expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(0);
+    expect(await prisma.mapEvent.count({ where: { mapId: id } })).toBe(0);
+    expect(await exchange.currentRevision(id)).toBe(0);
+  });
+});
+
 describe('readSince', () => {
   // No cursor means "give me everything", which is what a fresh agent needs.
   it('returns the whole log when given no cursor', async () => {

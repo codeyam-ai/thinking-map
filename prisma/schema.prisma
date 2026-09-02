@@ -270,12 +270,17 @@ model MapEvent {
   /// call with the same requestId is a no-op that returns the original batch
   /// and its last revision, rather than a duplicate write.
   ///
+  /// The guarantee covers the ROWS THE CALL WROTE, not only this log. The key
+  /// is checked as the first statement of the same transaction that creates
+  /// the themes and nodes, so a retry adds no second copy of a card either —
+  /// see `applyToolCalls` in app/lib/mapStore.ts.
+  ///
   /// Keyed per row rather than per batch because the retry needs the batch's
   /// extent: with only the first row keyed, a retry hands back the first
   /// revision as the resume cursor and the agent re-reads the rest of its own
   /// batch as new information. Uniqueness therefore includes `revision` — the
   /// duplicate a retry could create is caught by the in-transaction lookup in
-  /// `recordEvents`, which runs inside SQLite's serialized write lock.
+  /// `findPriorBatch`, which runs inside SQLite's serialized write lock.
   requestId String?
 
   createdAt DateTime @default(now())
