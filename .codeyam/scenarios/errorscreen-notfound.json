@@ -1,0 +1,12 @@
+{
+  "name": "ErrorScreen - NotFound",
+  "id": "6e570bd9-bc5d-4413-aa4c-a9bb2cf2542e",
+  "url": "/isolated-components/ErrorScreen?s=NotFound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ErrorScreen",
+  "scenarioType": "component",
+  "description": "An unknown map id, and the only state with a way out. Every other failure here is a setup problem the reader cannot fix from the page, so this is the one that earns a button."
+}

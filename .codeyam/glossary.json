@@ -105,6 +105,15 @@
     }
   },
   {
+    "description": "The client error boundary under everything below app/ that the server-side catches do not cover. Deliberately generic: React replaces error.message with an opaque digest in production, so a boundary structurally cannot diagnose a database failure - which is why the two DB-backed pages catch their own load failure on the server instead of leaving it to here. What this owns is the way back, via the reset prop.",
+    "filePath": "app/error.tsx",
+    "name": "AppErrorBoundary",
+    "scenarios": [
+      "apperrorboundary-withdigest",
+      "apperrorboundary-nodigest"
+    ]
+  },
+  {
     "description": "Wordmark left, phase track right. Shared by the landing screen and the map workspace so the two never drift.",
     "filePath": "app/components/AppHeader.tsx",
     "name": "AppHeader",
@@ -368,6 +377,21 @@
     ]
   },
   {
+    "description": "Mounts an error boundary in an isolated capture by building its props on the client. A boundary receives error and reset from React, and reset is a function, so a server-component isolation route cannot construct these props. Lives beside the isolation routes rather than in components/, for the same reason as BridgeFixture: the production boundary should not carry a capture-only seam.",
+    "filePath": "app/isolated-components/ErrorBoundaryFixture.tsx",
+    "name": "ErrorBoundaryFixture",
+    "untestabilityReason": {
+      "justification": "A capture-only seam, like BridgeFixture beside it. It exists so the isolation routes can mount an error boundary at all - a boundary prop is a function, and a server component cannot pass one to a client component. It ships no behaviour of its own and nothing in the app imports it.",
+      "kind": "test-fixture"
+    }
+  },
+  {
+    "description": "The one card every failure renders through - the map page, the landing page, the client error boundary and not-found - so four failure paths cannot drift into four different apologies. Presentational and server-renderable: the boundary that needs a button passes it in through the action slot. A runnable command renders as a monospace pill because you copy it; prose guidance renders as an ordinary line, since a sentence in that pill spans the card and reads as code you are meant to type.",
+    "filePath": "app/components/ErrorScreen.tsx",
+    "name": "ErrorScreen",
+    "testFile": "app/components/ErrorScreen.render.test.tsx"
+  },
+  {
     "description": "Free text a side actually wrote, inside an activity row. A question keeps its weight here for the reason it did in the conversation panel this replaces: the questions are the product, and one buried in an agent's note is the line the person is meant to act on.",
     "filePath": "app/components/ExchangeNote.tsx",
     "name": "ExchangeNote",
@@ -404,6 +428,14 @@
       "exchangerow-agentaddedmany",
       "exchangerow-agentnote",
       "exchangerow-youranswer"
+    ]
+  },
+  {
+    "description": "The last resort: a failure in the root layout itself, where app/error.tsx has no layout left to render into. Supplies its own html and body, and deliberately does NOT use ErrorScreen - it cannot lean on anything that assumes the app chrome mounted. Imports globals.css directly for tokens and nothing else.",
+    "filePath": "app/global-error.tsx",
+    "name": "GlobalError",
+    "scenarios": [
+      "globalerror-default"
     ]
   },
   {
@@ -635,6 +667,14 @@
     "scenarios": [
       "nodequestionheader-default",
       "nodequestionheader-longlabel"
+    ]
+  },
+  {
+    "description": "Where notFound() from the map route lands, and where a stale bookmark to a deleted map lands too. Renders ErrorScreen with a way back, because per the design system an empty state describes the next action rather than reporting the absence. Uses a plain anchor with suppressHydrationWarning, matching Wordmark and SavedMapRow - the preview proxy serves the app under a path prefix and rewrites href in the server HTML, so a next/link here hydrates against a different href and warns on every capture.",
+    "filePath": "app/not-found.tsx",
+    "name": "NotFound",
+    "scenarios": [
+      "notfound-default"
     ]
   },
   {
@@ -1017,6 +1057,12 @@
     "testFile": "app/lib/cardThreads.test.ts"
   },
   {
+    "description": "Turns a thrown database failure into what a person should be told: a title, a message, and in development the command that fixes it plus the column or table Prisma named. Recognises a Prisma error structurally (a string code beside a clientVersion) rather than by instanceof, because the thrown value has usually crossed a server component boundary by the time it arrives. P2022/P2021 become the schema-drift diagnosis with npm run db:push; P1001/P1003 point at DATABASE_URL; everything else falls through to a generic message that leaks nothing. The dev flag is a parameter rather than a read of NODE_ENV so the production behaviour - the half that withholds - is testable.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "classifyLoadError",
+    "testFile": "app/lib/loadError.test.ts"
+  },
+  {
     "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
     "filePath": "app/lib/briefCoverage.ts",
     "name": "computeBriefCoverage",
@@ -1077,6 +1123,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "describeRun",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Takes the LAST non-empty line of a Prisma message, which is the diagnosis - The column X does not exist in the current database. Deliberately not the first line: a Prisma message opens with its own framing (Invalid prisma.thinkingMap.findUnique() invocation:), so taking the first puts the call site on screen and leaves out the column, which is exactly backwards for someone working out what to fix.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "diagnosisLine",
+    "testFile": "app/lib/loadError.test.ts"
   },
   {
     "description": "Marks a response as a genuine fault. Deliberately narrow: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
@@ -1359,6 +1411,12 @@
     }
   },
   {
+    "description": "Gets a message string out of an unknown thrown value: an Error, an object carrying a string message, or the value stringified. Exists because what reaches the classifier is genuinely unknown - a throw is not obliged to throw an Error - and the screen must render something rather than crash on the way to explaining a crash.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "messageOf",
+    "testFile": "app/lib/loadError.test.ts"
+  },
+  {
     "description": "Reads navigator.modelContext, or null where there is none. The single place the WebMCP global is touched, so the draft spec moving again is one edit rather than a sweep.",
     "filePath": "app/lib/webmcp.ts",
     "name": "modelContext",
@@ -1366,6 +1424,12 @@
       "justification": "A guarded read of a browser global that exists only in Chrome 146+. The availability decisions built on it - isWebMcpAvailable and webMcpUnavailableReason - are covered by app/lib/webmcp.test.ts, which stubs this same global.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Digs the column the driver actually named out of meta.driverAdapterError.cause.column, or returns null. Preferred over parsing the message because it is a field rather than prose and does not move when Prisma rewords itself; the message stays as the fallback, since this nesting is adapter-specific and an unfamiliar adapter may not fill it.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "namedColumn",
+    "testFile": "app/lib/loadError.test.ts"
   },
   {
     "description": "Whether a guarded write warrants reading the log at all. An unguarded write is the agent saying it does not care, and a map that has not moved cannot have a conflict, so neither case costs a read.",
@@ -1468,6 +1532,12 @@
       "justification": "A single POST with no branching. The event kinds it may carry are enforced server-side by isUserEventKind, covered by app/lib/exchange.test.ts, and the answered path it serves is covered by answeredResponse in app/lib/toolInvocation.test.ts.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Recognises a Prisma known-request error structurally - a string code beside a string clientVersion - and returns the code, or null. Deliberately not instanceof: the thrown value has usually crossed a server component boundary by the time it is classified, and may come from a different copy of the client than this module imports, so class identity is not something to bet the error screen on. Requiring clientVersion as well as code is what stops a Node system error (ENOENT, which also has a code) being dressed up as a Prisma diagnosis.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "prismaCode",
+    "testFile": "app/lib/loadError.test.ts"
   },
   {
     "description": "Publishes a headless driver on window over the same bound catalog. Not a debug convenience: WebMCP is top-level-secure-context only and codeyam renders the app inside a capture iframe, so navigator.modelContext is genuinely absent in every preview and captured scenario, and this driver is what makes the tools exercisable there at all. It calls the exact catalog entries a real agent would.",

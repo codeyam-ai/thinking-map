@@ -1,0 +1,12 @@
+{
+  "name": "AppErrorBoundary - NoDigest",
+  "id": "22535b9f-b675-4952-b64a-729ea9196564",
+  "url": "/isolated-components/AppErrorBoundary?s=NoDigest",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AppErrorBoundary",
+  "scenarioType": "component",
+  "description": "The same failure with no digest assigned. The reference line is absent entirely rather than rendering an empty slot - the distinction a screenshot of the other state cannot make."
+}

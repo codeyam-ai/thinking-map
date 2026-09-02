@@ -1,0 +1,12 @@
+{
+  "name": "AppErrorBoundary - WithDigest",
+  "id": "2f240925-823f-43f4-8f93-5be95638d386",
+  "url": "/isolated-components/AppErrorBoundary?s=WithDigest",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AppErrorBoundary",
+  "scenarioType": "component",
+  "description": "A render failure as it arrives in production: React has replaced the message with an opaque digest, which is exactly why this boundary offers a way back rather than a diagnosis. The digest is shown because it is the one thing quotable into a bug report."
+}

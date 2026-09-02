@@ -1,9 +1,12 @@
 import { notFound } from 'next/navigation';
 import AgentSimulator from '@/app/components/AgentSimulator';
+import AppHeader from '@/app/components/AppHeader';
+import ErrorScreen from '@/app/components/ErrorScreen';
 import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
 import { getBriefCoverage, getMap } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
+import { classifyLoadError } from '@/app/lib/loadError';
 import { normalizePhase, type Phase } from '@/app/lib/mapKinds';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +29,16 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const map = await getMap(id);
+
+  // A failed read takes the same branch as no map at all. Metadata runs a frame
+  // before the body, so a throw here 500s the route before the page has a
+  // chance to say what went wrong — the title is not worth that.
+  let map: Awaited<ReturnType<typeof getMap>>;
+  try {
+    map = await getMap(id);
+  } catch {
+    return { title: 'Thinking Map' };
+  }
   if (!map) return { title: 'Thinking Map' };
 
   const open = map.nodes.filter((node) => node.status === 'open').length;
@@ -39,7 +51,26 @@ export default async function MapPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const map = await getMap(id);
+
+  // The load is caught HERE rather than left to `app/error.tsx`. A Next error
+  // boundary is a client component, and in production React replaces
+  // `error.message` with a digest — so a boundary structurally cannot say "the
+  // database is behind the schema". Catching on the server is what makes the
+  // diagnosis possible at all; the boundary stays as the net for everything
+  // else.
+  let map: Awaited<ReturnType<typeof getMap>>;
+  try {
+    map = await getMap(id);
+  } catch (error) {
+    // The terminal keeps the full Prisma output the screen deliberately hides.
+    console.error(`Failed to load map ${id}:`, error);
+    return (
+      <main className="flex min-h-screen flex-col px-4 py-4 sm:px-6 lg:px-10 lg:py-8">
+        <AppHeader phase="idea" />
+        <ErrorScreen {...classifyLoadError(error)} />
+      </main>
+    );
+  }
   if (!map) notFound();
 
   // `map` is the fallback as well as the alias target: an unreadable phase on a

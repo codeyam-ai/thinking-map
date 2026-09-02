@@ -262,6 +262,51 @@
       "runner": "tests"
     },
     {
+      "description": "A prose hint renders without the monospace pill styling, so a sentence never reads as a command you are meant to type.",
+      "file": "app/components/ErrorScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "ErrorScreen › keeps a prose hint out of the command pill",
+      "line": 60,
+      "registeredAt": "2026-09-02T13:25:51.550327669+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The title renders as the heading element, so the diagnosis is what a screen reader and the page outline lead with.",
+      "file": "app/components/ErrorScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "ErrorScreen › leads with the title as the heading",
+      "line": 21,
+      "registeredAt": "2026-09-02T13:25:51.486783465+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The action slot renders only when given one, so states with no next move offer no affordance leading nowhere.",
+      "file": "app/components/ErrorScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "ErrorScreen › renders an action only when one is passed",
+      "line": 79,
+      "registeredAt": "2026-09-02T13:25:51.571062721+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Neither renders when omitted, which is the production case and the one a screenshot cannot distinguish from a failed render.",
+      "file": "app/components/ErrorScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "ErrorScreen › renders neither when they are omitted",
+      "line": 48,
+      "registeredAt": "2026-09-02T13:25:51.529237432+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Both the command pill and the Prisma detail line appear when supplied.",
+      "file": "app/components/ErrorScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "ErrorScreen › renders the command and detail when given them",
+      "line": 31,
+      "registeredAt": "2026-09-02T13:25:51.508924834+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "The kind has to be in the accepted set at all — this is what makes it wake an agent parked on await_user_activity rather than sitting inert.",
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
@@ -1123,6 +1168,78 @@
       "key": "cardThreads › threads a card to its parent in the round directly above",
       "line": 32,
       "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "With no driver meta, the detail comes from the LAST line of the Prisma message (the diagnosis) rather than the first (the invocation header).",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › a database behind the schema — P2022 › falls back to the message when the driver names no column",
+      "line": 73,
+      "registeredAt": "2026-09-02T13:25:51.350040269+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A P2022 drift error in development yields the db:push command and the exact missing column, so the screen names the fix rather than the call site.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › a database behind the schema — P2022 › names the fix and the column that is missing",
+      "line": 47,
+      "registeredAt": "2026-09-02T13:25:51.287240893+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "P2021 gets the same schema-drift diagnosis and the same one-command answer as P2022, since to a person they are the same situation.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › a database behind the schema — P2022 › treats a missing table the same as a missing column",
+      "line": 86,
+      "registeredAt": "2026-09-02T13:25:51.376403395+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The same drift error with dev:false keeps the diagnosis but drops the command and the column name, which is the production guarantee no screenshot can show.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › a database behind the schema — P2022 › withholds both once deployed",
+      "line": 59,
+      "registeredAt": "2026-09-02T13:25:51.317757186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An unreachable database yields prose pointing at DATABASE_URL and no command, keeping non-runnable guidance out of the copy-and-run pill.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › a database that cannot be reached — P1001 › points at the setting rather than offering a command",
+      "line": 103,
+      "registeredAt": "2026-09-02T13:25:51.399699155+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An object with a code but no clientVersion falls through to generic, so a Node system error like ENOENT cannot be dressed up as a Prisma diagnosis telling someone to run db:push.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › anything else › is not fooled by an object that merely has a code",
+      "line": 136,
+      "registeredAt": "2026-09-02T13:25:51.443695952+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An unrecognised error in production yields the generic message with no command, hint or detail, so an unanticipated failure cannot leak internals.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › anything else › leaks nothing it was not taught to say",
+      "line": 121,
+      "registeredAt": "2026-09-02T13:25:51.423265049+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A thrown string or undefined still classifies, since the classifier must not crash on the way to explaining a crash.",
+      "file": "app/lib/loadError.test.ts",
+      "format": "vitest",
+      "key": "classifyLoadError › anything else › survives a thrown value that is not an error at all",
+      "line": 149,
+      "registeredAt": "2026-09-02T13:25:51.465422558+00:00",
       "runner": "tests"
     },
     {

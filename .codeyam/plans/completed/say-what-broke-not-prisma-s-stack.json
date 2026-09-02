@@ -1,0 +1,39 @@
+{
+  "claimStartedAt": "2026-09-02T12:20:57Z",
+  "completedAt": "2026-09-02T13:21:45Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "ui-step22",
+    "machine": "codeyam-editor-codeyam-editor-12",
+    "originId": "955b5426-a400-4480-b26d-423a56ca66fa",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "say-what-broke-not-prisma-s-stack",
+    "sessionId": "7fc6d1b8-f71f-4296-8a52-09092977dd14",
+    "startedAt": "2026-09-02T12:20:57Z"
+  },
+  "createdAt": "2026-09-02T12:03:10Z",
+  "deliverables": [
+    "app/api/codeyam-revalidate/route.ts",
+    "app/components/ErrorScreen.render.test.tsx",
+    "app/components/ErrorScreen.tsx",
+    "app/error.tsx",
+    "app/global-error.tsx",
+    "app/isolated-components/AppErrorBoundary/page.tsx",
+    "app/isolated-components/ErrorBoundaryFixture.tsx",
+    "app/isolated-components/ErrorScreen/page.tsx",
+    "app/isolated-components/GlobalError/page.tsx",
+    "app/isolated-components/NotFound/page.tsx",
+    "app/lib/loadError.test.ts",
+    "app/lib/loadError.ts",
+    "app/map/[id]/page.tsx",
+    "app/not-found.tsx",
+    "app/page.tsx"
+  ],
+  "journalTimestamp": "2026-09-02T13:21:45Z",
+  "mode": "ui",
+  "planFile": "completed/say-what-broke-not-prisma-s-stack.md",
+  "slug": "say-what-broke-not-prisma-s-stack",
+  "title": "Say What Broke, Not Prisma's Stack"
+}

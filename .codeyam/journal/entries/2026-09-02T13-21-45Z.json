@@ -1,0 +1,431 @@
+{
+  "timestamp": "2026-09-02T13:21:45Z",
+  "title": "Say What Broke, Not Prisma's Stack",
+  "type": "feature",
+  "userRequest": "## Summary\n\nLoading a map against a database that is behind `prisma/schema.prisma` throws a raw `PrismaClientKnownRequestError` (P2022, `MapNode.testsNodeId does not exist`) out of `getMap`, and nothing in the app catches it: there is no `error.tsx`, `global-error.tsx` or `not-found.tsx` anywhere under `app/`, so the person gets a 500 and a Prisma stack trace in the browser. `generateMetadata` throws on the same call one frame earlier, so the page fails before the body is even attempted. This plan gives the app a real error surface — an in-voice screen that says what happened, and in development names the one command that fixes it — plus a proper 404 for an unknown map id. (Confirmed drift: `dev.db`'s `MapNode` table has 14 columns and is missing `testsNodeId`, `sourceRef` and `options`; `npm run db:push` is the remediation, and this plan makes the app *say* that instead of the person having to read a stack trace.)\n\n## Key Decisions\n\n- **Catch on the server, not only in the client boundary.** A Next `error.tsx` is a client component, and in production React strips `error.message` down to a digest — so a boundary alone can never render \"the database is behind the schema\". The two DB-backed pages therefore catch their own load failure and render a diagnosis directly. The client boundary stays as the safety net for everything else.\n- **One pure classifier, `classifyLoadError`.** Turning an unknown thrown value into `{ title, message, hint }` is pure logic over a Prisma error code, so it lives in `app/lib/` and is unit-tested, rather than being inlined into two page components. P2022/P2021 (column/table missing) and P1001/P1003 (database unreachable/absent) get named diagnoses; everything else falls through to a generic one.\n- **Development names the fix; production stays quiet.** The `npm run db:push` hint and the Prisma code/column are gated on `process.env.NODE_ENV !== 'production'`. A deployed app shows the in-voice message and the digest only — schema internals are not leaked to a visitor.\n- **`generateMetadata` never throws.** It already has a \"no map\" branch returning `{ title: 'Thinking Map' }`; a failed read takes the same branch rather than 500-ing the route from metadata.\n- **One `ErrorScreen` component, four callers.** The map page, the home page, `app/error.tsx` and `app/not-found.tsx` all render the same thing, so the treatment cannot drift. Copy follows the design system's Voice section — it names what went wrong and what to do next, and does not apologise.\n- **No schema/DB changes here.** The drift itself is fixed by running `npm run db:push`; this plan is about the app behaving well when it happens, not about this one database file.\n\n## Implementation\n\n### 1. Classify a load failure\n\n**New file**: `app/lib/loadError.ts`\n\n`classifyLoadError(error: unknown, opts?: { dev?: boolean }): LoadErrorInfo` returning `{ title, message, hint?, detail? }`.\n\n- Detect a Prisma known-request error structurally (an object with a string `code` and a `clientVersion`) rather than by `instanceof` — the thrown value crosses a server/client boundary and the class is not reliable.\n- `P2022` (column not found) and `P2021` (table not found) → title \"The database is behind the app\", message that the schema has moved on since this database file was created; `hint` (dev only) `Run npm run db:push to bring it up to date.`; `detail` (dev only) the `code` plus the message's column/table text.\n- `P1001` / `P1003` → \"Can't reach the database\", hint pointing at `DATABASE_URL` and `DATABASE.md`.\n- Anything else → generic \"Something went wrong loading this map\" with no internals.\n- `dev` defaults to `process.env.NODE_ENV !== 'production'`; taking it as a parameter is what makes the production behaviour testable.\n\n### 2. The shared error surface\n\n**New file**: `app/components/ErrorScreen.tsx`\n\nA server-renderable presentational component taking `{ title, message, hint?, detail?, action? }`. Uses the existing tokens from `app/globals.css` — `--surface` card on `--paper`, `--ink` title, `--ink-soft` body, `--muted` for `detail`, pill shapes throughout — matching `MapEmptyState`'s restraint. `hint` renders as a monospaced pill so the command is copyable-looking; `detail` renders small and muted beneath. `action` is an optional slot for a button/link (used by the client boundary's \"Try again\" and not-found's \"Start a new map\").\n\n### 3. The map page stops throwing\n\n**File**: `app/map/[id]/page.tsx`\n\n- Wrap the `getMap(id)` call in `MapPage` so a thrown error becomes `<ErrorScreen {...classifyLoadError(error)} />` rendered inside the same `<main>`/`AppHeader` chrome the workspace uses, instead of propagating. `notFound()` still fires for a genuinely missing map.\n- Wrap the `getMap(id)` call in `generateMetadata` so a failure returns `{ title: 'Thinking Map' }` — the existing no-map branch — rather than throwing.\n- Log the original error server-side (`console.error`) in both places, so the terminal keeps the full Prisma output the classifier deliberately hides from the page.\n\n### 4. The home page gets the same treatment\n\n**File**: `app/page.tsx`\n\n`listMaps()` hits the same database and fails the same way. Catch it and render `<ErrorScreen>` beneath the existing `AppHeader` instead of `LandingScreen`.\n\n### 5. The client safety net\n\n**New file**: `app/error.tsx`\n\nClient boundary for everything under `app/` that the server-side catches do not cover (render-time failures in `MapScreen`, `WebMcpBridge`, etc.). Renders `ErrorScreen` with a generic message plus the `digest` when present, and a \"Try again\" button wired to the `reset` prop.\n\n**New file**: `app/global-error.tsx`\n\nThe last resort for a failure in the root layout itself. Must render its own `<html>`/`<body>`; keeps the copy minimal and does not import the token-dependent screen chrome beyond what `globals.css` provides.\n\n### 6. A real 404 for an unknown map\n\n**New file**: `app/not-found.tsx`\n\n`MapPage` already calls `notFound()` for an id with no map; today that renders Next's default page. Render `ErrorScreen` instead — \"No map with that link\", with a link back to `/` to start one. This is also the page a person lands on after deleting a map and using a stale bookmark.\n\n### 7. Tests\n\n**New file**: `app/lib/loadError.test.ts`\n\nUnit tests over `classifyLoadError`: the P2022 shape from this report yields the drift diagnosis and the `db:push` hint; the same input with `dev: false` yields the message with no `hint` and no `detail`; P1001 yields the connection diagnosis; an ordinary `Error` yields the generic one with nothing leaked.\n\n**New file**: `app/components/ErrorScreen.render.test.tsx`\n\nFollowing the existing `*.render.test.tsx` convention (see `app/components/AgentHandoff.render.test.tsx`): the hint and detail render when passed and are absent when omitted, and the title is the heading.\n\n## Reused existing code\n\n- `getMap` from `app/lib/mapStore.ts` (glossary entry: `getMap`) — the failing call; unchanged, only its call sites gain handling.\n- `listMaps` from `app/lib/mapStore.ts` (glossary entry: `listMaps`) — same treatment on the home page.\n- `AppHeader` from `app/components/AppHeader.tsx` (glossary entry: `AppHeader`) — the error screen renders inside the same chrome, so a failed load still looks like the app.\n- `MapEmptyState` from `app/components/MapEmptyState.tsx` (glossary entry: `MapEmptyState`) — the tone and type scale `ErrorScreen` matches; not reused directly, since an error is a card and not a one-line hint.\n- Design tokens in `app/globals.css` (`--paper`, `--surface`, `--ink`, `--ink-soft`, `--muted`, `--line`) and the Voice rules in `.codeyam/design/design_system.md` §7.\n- **Existing-implementation survey**: there is no error boundary, error component, or error-classification helper anywhere in the repo today — `find app -name 'error.tsx' -o -name 'not-found.tsx' -o -name 'global-error.tsx'` returns nothing, and no component name matches `*Error*`. Every file in this plan marked `(new)` is genuinely new; the only shared prior art is the `NextResponse.json({ error })` shape in `app/api/maps/route.ts`, which is API-layer and deliberately untouched. `errorResponse` in `app/lib/toolInvocation.ts` is the nearest-named existing helper and is deliberately NOT reused: it marks an MCP tool response as a fault for an agent to reason about, a different audience and a different payload from a rendered page.\n\n## Scenarios to Demonstrate\n\n- **Schema drift, development** — map page against a database missing `MapNode.testsNodeId`: the drift screen with the `npm run db:push` hint and the P2022 detail line.\n- **Schema drift, production** — the same failure with `dev: false`: in-voice message, no command, no column name.\n- **Database unreachable** — P1001: the connection diagnosis pointing at `DATABASE_URL`.\n- **Unknown map id** — `/map/does-not-exist`: the not-found screen with a link back to start a new map.\n- **Client render failure** — the `app/error.tsx` boundary with its \"Try again\" button.\n- **Home page load failure** — `listMaps` failing: the same screen under the header, landing screen absent.\n- **Happy path unchanged** — a healthy map still renders the workspace, with the `(2) …` open-count title intact.",
+  "description": "Loading a map against a database behind prisma/schema.prisma threw a raw PrismaClientKnownRequestError out of getMap with nothing to catch it — no error.tsx, no not-found.tsx anywhere under app/ — so a person got a 500 and a Prisma stack trace in the browser. generateMetadata threw on the same call a frame earlier, so the route died before the body was attempted. The app now has a real error surface: classifyLoadError turns a thrown value into a title, a message, and in development the command that fixes it plus the column Prisma named; ErrorScreen renders that as one card used by four callers, so the treatment cannot drift into four different apologies.\n\nThe load is caught on the SERVER in the two DB-backed pages rather than left to a client boundary. A Next error boundary is a client component and React replaces error.message with an opaque digest in production, so a boundary structurally cannot say 'the database is behind the schema' — catching on the server is what makes the diagnosis possible at all. app/error.tsx, app/global-error.tsx and app/not-found.tsx are the net under everything else. The db:push hint and the Prisma code are gated on NODE_ENV, taken as a parameter rather than read directly so the production half — the half that WITHHOLDS — is the part under test.\n\nTwo deviations from the plan, both found by looking at a capture. The plan carried one `hint` field for 'the command or setting'; a full sentence set in a monospace pill spans the card and reads as code you are meant to type, so it split into `command` (the pill, commands only) and `hint` (prose). And ErrorBoundaryFixture is new: an isolation route is a server component and cannot pass `reset` (a function) to a client boundary, so the boundary captures 500'd without it. It mirrors BridgeFixture beside it. Separately, the plan's `detail` spec read as the message's first line, which renders the call site rather than the missing column — it now prefers the driver's `meta.column` and falls back to the message's LAST line, which is where Prisma puts the diagnosis.\n\nSCOPE VERDICT: this cycle delivered its whole plan and deferred nothing. It is a bug fix and no project deliverable was in its scope; all 10 were already resolved before it began (9 delivered, 1 deferred BY THE USER — the assist-track item covering MCP-server registration in a client, which is not this build flow). No deferral was recorded by the agent in this cycle.\n\nWORKFLOW NOTE worth keeping: after the demo was approved at step 10, the workflow jumped straight to step 21, skipping Deconstruct, Extract TDD, glossary registration and scenario capture — slugVisits confirms those slugs were never entered, and ~28 minutes elapsed inside that single advance. Neither test file the plan promised existed on arrival at the final gate. The build loop was reopened and the skipped work done: 13 tests across two files, 9 registered scenarios, 10 glossary entries. Cause unknown.\n\nVerification: 537 tests pass across 49 files (13 new). Audit passes with zero failures over 229 glossary entries. Scenario review is clean on all four new targets. All 24 previously-stale screenshots recaptured pixel-identical, so nothing that already existed changed. The drift screen was confirmed against a database the column was actually dropped from, not a mock; the schema was restored afterwards.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/say-what-broke-not-prisma-s-stack.md",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/completed/say-what-broke-not-prisma-s-stack.md",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/apperrorboundary-nodigest.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/apperrorboundary-withdigest.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/errorscreen-notfound.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/errorscreen-schemadrift.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/errorscreen-schemadriftproduction.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/errorscreen-unreachable.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/errorscreen-unrecognised.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/globalerror-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/notfound-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-nodigest--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-nodigest--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-withdigest--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-withdigest--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-notfound--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-notfound--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-schemadrift--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-schemadrift--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-schemadriftproduction--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-schemadriftproduction--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-unreachable--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-unreachable--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-unrecognised--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/errorscreen-unrecognised--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/globalerror-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/globalerror-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/notfound-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/notfound-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2e0a5a9ce59f954c0f5a61c1e3ebc754dc691b33f28c1f35abe0f854fe127076.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/ErrorScreen.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/ErrorScreen.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/error.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/global-error.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AppErrorBoundary/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/ErrorBoundaryFixture.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/ErrorScreen/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/GlobalError/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/NotFound/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/loadError.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/loadError.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/not-found.tsx",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AppErrorBoundary - NoDigest",
+      "screenshotPath": "apperrorboundary-nodigest--tablet.png"
+    },
+    {
+      "name": "AppErrorBoundary - WithDigest",
+      "screenshotPath": "apperrorboundary-withdigest--tablet.png"
+    },
+    {
+      "name": "ErrorScreen - NotFound",
+      "screenshotPath": "errorscreen-notfound--tablet.png"
+    },
+    {
+      "name": "ErrorScreen - SchemaDrift",
+      "screenshotPath": "errorscreen-schemadrift--tablet.png"
+    },
+    {
+      "name": "ErrorScreen - SchemaDriftProduction",
+      "screenshotPath": "errorscreen-schemadriftproduction--tablet.png"
+    },
+    {
+      "name": "ErrorScreen - Unreachable",
+      "screenshotPath": "errorscreen-unreachable--tablet.png"
+    },
+    {
+      "name": "ErrorScreen - Unrecognised",
+      "screenshotPath": "errorscreen-unrecognised--tablet.png"
+    },
+    {
+      "name": "GlobalError - Default",
+      "screenshotPath": "globalerror-default--tablet.png"
+    },
+    {
+      "name": "NotFound - Default",
+      "screenshotPath": "notfound-default--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 524,
+    "passed": 524,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 524,
+        "passed": 524
+      }
+    ]
+  }
+}

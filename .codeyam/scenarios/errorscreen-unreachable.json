@@ -1,0 +1,12 @@
+{
+  "name": "ErrorScreen - Unreachable",
+  "id": "21731f26-2bc1-4dd7-aef4-fb8f7997376c",
+  "url": "/isolated-components/ErrorScreen?s=Unreachable",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ErrorScreen",
+  "scenarioType": "component",
+  "description": "Nothing answered at the database. The guidance is prose rather than a command pill - there is nothing to type, only a setting to check, and a sentence in the pill reads as code you are meant to run."
+}

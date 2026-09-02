@@ -1,0 +1,12 @@
+{
+  "name": "ErrorScreen - SchemaDrift",
+  "id": "f67de1e4-7d5f-48e6-8737-d22333b24cf7",
+  "url": "/isolated-components/ErrorScreen?s=SchemaDrift",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ErrorScreen",
+  "scenarioType": "component",
+  "description": "The reported bug, rendered: a database behind the schema, in development. It names what broke, offers the one command that fixes it, and says which column is missing - the three things the Prisma stack trace made someone dig for."
+}

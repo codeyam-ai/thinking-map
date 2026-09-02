@@ -1,0 +1,12 @@
+{
+  "name": "GlobalError - Default",
+  "id": "cd3b3774-b157-4b0d-a8a9-9eb41096ff74",
+  "url": "/isolated-components/GlobalError?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GlobalError",
+  "scenarioType": "component",
+  "description": "The last resort, when the root layout itself failed and there is no chrome left to render into. Deliberately does not reuse ErrorScreen and supplies its own html and body, so it cannot be brought down by whatever brought the layout down."
+}

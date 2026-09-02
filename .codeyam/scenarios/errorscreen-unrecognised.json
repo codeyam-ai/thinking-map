@@ -1,0 +1,12 @@
+{
+  "name": "ErrorScreen - Unrecognised",
+  "id": "cb284acd-5ab5-4b2e-95c0-78069df01b8d",
+  "url": "/isolated-components/ErrorScreen?s=Unrecognised",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ErrorScreen",
+  "scenarioType": "component",
+  "description": "A failure the classifier does not recognise. It says the map is still there and stops - an error we did not anticipate is exactly the one where we cannot know what is safe to show."
+}
