@@ -83,3 +83,56 @@ body {
     animation: none;
   }
 }
+
+/* The dust that orbits each galaxy hub — see app/components/ThemeParticles.tsx.
+   A full turn of a wrapper element, so the compositor animates it and the board
+   can carry hundreds of particles without React re-rendering anything. */
+@keyframes cy-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* A card arriving on the board.
+   Played on mount only: React keys cards by node id, so a card that was
+   already there does not remount and does not replay this, while a card the
+   partner has just written animates itself in without anything having to
+   track which ones are new. */
+@keyframes cy-emerge {
+  from { opacity: 0; transform: translateY(18px) scale(0.94); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* The hub a new galaxy opens with. Overshoots slightly, so a theme appearing
+   reads as something arriving rather than something fading up. */
+@keyframes cy-hub-in {
+  0%   { opacity: 0; transform: scale(0.3); }
+  70%  { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* The partner thinking: a pulse that travels outward along the axis the
+   branches will appear on, so the wait happens where the answer will. */
+@keyframes cy-think {
+  0%, 100% { opacity: 0.15; transform: scale(0.75); }
+  50%      { opacity: 1;    transform: scale(1); }
+}
+
+/* A branch drawing itself. The dash length is set inline per path, because it
+   has to match that path's own length for the line to appear to be drawn
+   rather than to slide. */
+@keyframes cy-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* The Idea badge orbiting the core.
+   Two counter-rotations: the arm carries the badge around the rim, and the
+   badge itself turns back by the same amount so its label stays upright.
+   Without the second the word would tumble. */
+@keyframes cy-orbit-arm {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes cy-orbit-upright {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}

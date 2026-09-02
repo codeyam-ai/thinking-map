@@ -17,6 +17,7 @@ describe('the shared tool catalog', () => {
   it('exposes exactly the tools every front door shares', () => {
     expect(TOOL_CATALOG.map((t) => t.name)).toEqual([
       'read_map',
+      'create_themes',
       'add_nodes',
       'update_node',
       'set_phase',

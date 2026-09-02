@@ -25,6 +25,7 @@ export type Origin = 'user' | 'agent';
  * its own, and the activity feed renders both.
  */
 export const EVENT_KINDS = [
+  'theme.added',
   'node.added',
   'node.updated',
   'phase.set',

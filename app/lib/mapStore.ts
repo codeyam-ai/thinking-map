@@ -4,6 +4,7 @@
 
 import { prisma } from './prisma';
 import { KIND_EYEBROW } from './mapKinds';
+import { hueForIndex } from './themeHue';
 import { planMapMutations, type ToolInvocation } from './nodePlan';
 import { recordEvents, type EventInput, type Origin } from './exchange';
 
@@ -27,6 +28,7 @@ export async function getMap(id: string) {
     include: {
       messages: { orderBy: { createdAt: 'asc' } },
       nodes: { orderBy: [{ createdAt: 'asc' }, { order: 'asc' }] },
+      themes: { orderBy: { order: 'asc' } },
     },
   });
 }
@@ -123,9 +125,33 @@ export async function applyToolCalls(
   options: { origin?: Origin; requestId?: string | null } = {},
 ) {
   const origin: Origin = options.origin ?? 'agent';
-  const { inserts, updates, phase } = planMapMutations(calls);
+  const { themes, inserts, updates, phase } = planMapMutations(calls);
   const refToId = new Map<string, string>();
+  const themeRefToId = new Map<string, string>();
   const events: EventInput[] = [];
+
+  // Themes are written before nodes because a node names its theme, and the
+  // hue depends on how many themes the map already has — so this counts once,
+  // up front, rather than re-reading per theme.
+  if (themes.length > 0) {
+    const existing = await prisma.theme.count({ where: { mapId } });
+    for (const [i, theme] of themes.entries()) {
+      const created = await prisma.theme.create({
+        data: {
+          mapId,
+          label: theme.label,
+          hue: hueForIndex(existing + i),
+          order: existing + i,
+        },
+      });
+      themeRefToId.set(theme.ref, created.id);
+      events.push({
+        kind: 'theme.added',
+        origin,
+        payload: { id: created.id, label: created.label, hue: created.hue },
+      });
+    }
+  }
 
   for (const node of inserts) {
     // A parentRef is either a ref from earlier in this same plan or the real
@@ -143,7 +169,13 @@ export async function applyToolCalls(
         detail: node.detail,
         status: node.status,
         sourceUrl: node.sourceUrl,
+        choices: node.choices ? JSON.stringify(node.choices) : null,
         order: node.order,
+        // Same two-source resolution as parentRef: a ref from this call, or an
+        // id of a theme already on the board.
+        themeId: node.themeRef
+          ? (themeRefToId.get(node.themeRef) ?? node.themeRef)
+          : null,
         origin,
       },
     });
@@ -157,6 +189,7 @@ export async function applyToolCalls(
         kind: created.kind,
         label: created.label,
         status: created.status,
+        themeId: created.themeId,
       },
     });
   }

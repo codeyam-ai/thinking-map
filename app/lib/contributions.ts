@@ -49,18 +49,42 @@ async function resolveAnswered(
   if (answers.length === 0) return [];
 
   const events: EventInput[] = [];
-  for (const { id } of answers) {
-    const { count } = await prisma.mapNode.updateMany({
-      where: { id, mapId, status: 'open' },
-      data: { status: 'answered' },
+  for (const { id, answer } of answers) {
+    // The answer is written ONTO the node, not only into the log.
+    //
+    // Two things follow from that. The card can show what was said without
+    // replaying the event stream to find it — an answered question that still
+    // rendered as a bare question would lose the half of the exchange the
+    // person contributed. And an agent doing `read_map` sees the answer in the
+    // map it is reasoning about, rather than having to reconcile the map
+    // against a separate log to know what is already known.
+    //
+    // Matched on id alone rather than on `status: 'open'`, so answering a
+    // question a second time REPLACES the answer. Editing is the same act as
+    // answering; a first answer that could never be corrected would make the
+    // board a form rather than a place to think.
+    //
+    // But the node is read first and written only if something actually moved.
+    // Re-submitting an identical answer is a real thing people do — a stray
+    // second enter, a retry after a dropped response — and it is not a change
+    // to the map. Logging one anyway would put a revision on the wire that an
+    // agent has to diff against its own copy to discover means nothing.
+    const current = await prisma.mapNode.findFirst({
+      where: { id, mapId },
+      select: { status: true, detail: true },
     });
-    if (count > 0) {
-      events.push({
-        kind: 'node.updated',
-        origin: 'user',
-        payload: { id, status: 'answered' },
-      });
-    }
+    if (!current) continue;
+    if (current.status === 'answered' && current.detail === answer) continue;
+
+    await prisma.mapNode.update({
+      where: { id },
+      data: { status: 'answered', detail: answer },
+    });
+    events.push({
+      kind: 'node.updated',
+      origin: 'user',
+      payload: { id, status: 'answered', detail: answer },
+    });
   }
   return events;
 }

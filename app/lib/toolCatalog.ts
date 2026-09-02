@@ -81,6 +81,29 @@ const nodeShape = z.object({
   detail: z.string().optional(),
   status: z.enum(NODE_STATUSES).optional(),
   sourceUrl: z.string().optional(),
+  choices: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Offer two to four concrete options instead of a blank field. Use them when the useful answers are enumerable — experience level, who it is for, build-or-buy. The person can always type something else instead, so a list never traps them.',
+    ),
+  themeRef: z
+    .string()
+    .optional()
+    .describe(
+      'Which theme this node belongs to: the ref of a theme created earlier in this same call, or the real id of an existing one. Omit for the root idea, which belongs to no theme.',
+    ),
+});
+
+/** A theme carries a label and nothing else. The colour is the app's to assign
+ *  — see app/lib/themeHue.ts for why that split exists. */
+const themeShape = z.object({
+  ref: z
+    .string()
+    .describe('A temporary id so nodes in this same call can name this theme.'),
+  label: z
+    .string()
+    .describe('What this group of questions is about. Two or three words: "Context", "Who it is for".'),
 });
 
 export interface ToolSpec {
@@ -112,6 +135,19 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
         .describe('Return only changes after this revision. Omit for the full map.'),
     }),
     annotations: { readOnlyHint: true },
+  },
+  {
+    name: 'create_themes',
+    title: 'Open new themes on the board',
+    description:
+      'Group the questions you are about to ask into themes. A theme is one cluster on the board — name it for what it is about, not for a step in a process. Create the themes first, then pass each node a themeRef. You choose the names; the board chooses the colours.',
+    inputSchema: z.object({
+      themes: z.array(themeShape),
+      requestId: z
+        .string()
+        .optional()
+        .describe('Idempotency key. Retrying with the same value is a no-op.'),
+    }),
   },
   {
     name: 'add_nodes',

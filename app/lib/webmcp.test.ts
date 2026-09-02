@@ -120,7 +120,7 @@ describe('bindTools', () => {
     bindTools({ mapId: 'm' });
     expect(registered).toContain('read_map');
     expect(registered).toContain('await_user_activity');
-    expect(registered).toHaveLength(7);
+    expect(registered).toHaveLength(8);
   });
 
   // Disposal must remove exactly what was registered, or re-binding the same
@@ -134,7 +134,7 @@ describe('bindTools', () => {
       },
     });
     bindTools({ mapId: 'm' })();
-    expect(removed).toHaveLength(7);
+    expect(removed).toHaveLength(8);
     expect(removed).toContain('post_note');
   });
 
@@ -152,7 +152,7 @@ describe('bindTools', () => {
       },
     });
     expect(() => bindTools({ mapId: 'm' })).not.toThrow();
-    expect(calls).toBe(7);
+    expect(calls).toBe(8);
   });
 
   // The pre-March-2026 convention the @mcp-b/global polyfill still ships:
@@ -166,7 +166,7 @@ describe('bindTools', () => {
     });
     const dispose = bindTools({ mapId: 'm' });
     dispose();
-    expect(sets).toEqual([7, 0]);
+    expect(sets).toEqual([8, 0]);
   });
 
   // No agent at all — the common case, including every codeyam capture. It must
@@ -190,7 +190,7 @@ describe('publishAgentDriver', () => {
     };
     expect(driver.mapId).toBe('map-1');
     expect(driver.listTools().map((t) => t.name)).toContain('read_map');
-    expect(driver.listTools()).toHaveLength(7);
+    expect(driver.listTools()).toHaveLength(8);
   });
 
   // Disposal removes the driver so a stale one cannot answer for a map the

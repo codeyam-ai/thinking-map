@@ -160,6 +160,7 @@ describe('toolSummaries', () => {
     const summaries = toolSummaries();
     expect(summaries.map((t) => t.name)).toEqual([
       'read_map',
+      'create_themes',
       'add_nodes',
       'update_node',
       'set_phase',

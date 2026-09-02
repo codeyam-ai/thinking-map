@@ -80,6 +80,19 @@ const HISTORY: ExchangeEvent[] = [
 // different moments — the working tree while the thinking is live, the plan
 // once it has run out — which is why choosing between them lives here rather
 // than in the route.
+/** The idea the board orbits in every scenario. Fixed so a capture is
+ *  reproducible and two scenarios differ only in what they mean to show. */
+const SEED_IDEA = "I want help building an app to help me plan my trip.";
+
+/** Hues are the ones hueForIndex hands out for themes 0, 1 and 2, written as
+ *  literals so a capture pins the palette the layout actually produces rather
+ *  than re-deriving it and passing whatever the function returns today. */
+const THEMES = [
+  { id: "t-context", label: "Context", hue: 318, order: 0 },
+  { id: "t-who", label: "Who it is for", hue: 96, order: 1 },
+  { id: "t-shape", label: "Shape of the trip", hue: 233, order: 2 },
+];
+
 const scenarios: Record<
   string,
   {
@@ -140,7 +153,12 @@ export default async function Page({
         events={fixture.events}
         revision={fixture.revision}
       >
-        <Component phase={fixture.phase} nodes={fixture.nodes} />
+        <Component
+          phase={fixture.phase}
+          seedIdea={SEED_IDEA}
+          themes={THEMES}
+          nodes={fixture.nodes}
+        />
       </BridgeFixture>
     </div>
   );

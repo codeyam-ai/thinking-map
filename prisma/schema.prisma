@@ -50,7 +50,40 @@ model ThinkingMap {
 
   messages Message[]
   nodes    MapNode[]
+  themes   Theme[]
   events   MapEvent[]
+}
+
+// ──────────────────────────────────────────────
+// Themes — the galaxies
+//
+// A theme is a group of questions that belong together ("Context", "Who it is
+// for"). Themes are NOT a fixed vocabulary: which groupings an idea falls into
+// is a property of that idea, so the agent names them as it discovers them.
+//
+// The hue is the exception. The agent supplies a label and the app assigns the
+// colour, because colour is the navigation affordance on the board — you find
+// your way around the galaxy by it — and that only works if the hues stay
+// mutually distinguishable however many themes appear. Left to a model, two
+// consecutive themes eventually land on two neighbouring blues.
+// ──────────────────────────────────────────────
+
+model Theme {
+  id    String      @id @default(cuid())
+  mapId String
+  map   ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  /// What the agent called this galaxy. Free text, shown as the cluster label.
+  label String
+  /// 0–359, assigned by the app on the golden angle. See app/lib/themeHue.ts.
+  hue   Int
+  /// Position among sibling themes, which is also the order they were opened.
+  order Int         @default(0)
+
+  createdAt DateTime @default(now())
+
+  nodes MapNode[]
+
+  @@index([mapId])
 }
 
 model Message {
@@ -86,8 +119,14 @@ model MapNode {
   kind      String
   /// The short text shown inside the node pill.
   label     String
-  /// Longer supporting text, shown when the node is inspected.
+  /// Longer supporting text, shown when the node is inspected. For an answered
+  /// question this is what the person said.
   detail    String?
+  /// For a question: the options offered, as a JSON array of strings. Null
+  /// means the question is open-ended. Stored as JSON rather than as a relation
+  /// because choices have no identity of their own — they are part of how one
+  /// question is phrased, and nothing ever needs to link to a single option.
+  choices   String?
   /// open | answered | updated — drives the dashed / solid / highlighted
   /// node treatment in the mockups.
   status    String  @default("open")
@@ -95,6 +134,10 @@ model MapNode {
   sourceUrl String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
+  /// The galaxy this node belongs to. Null for the root idea, which belongs to
+  /// no theme precisely because it is what every theme orbits.
+  themeId   String?
+  theme     Theme?  @relation(fields: [themeId], references: [id], onDelete: SetNull)
   /// user | agent. Without this an agent re-reading the map cannot tell its
   /// own writes from the person's, and will re-ingest its own output as new
   /// information. It is also what lets the UI mark what the person contributed.

@@ -136,6 +136,7 @@ describe('planMapMutations', () => {
   // A turn that only talks changes nothing on the map.
   it('returns an empty plan for no calls', () => {
     expect(planMapMutations([])).toEqual({
+      themes: [],
       inserts: [],
       updates: [],
       phase: null,

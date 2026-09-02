@@ -19,6 +19,18 @@ export interface PlannedInsert {
   status: NodeStatus;
   sourceUrl: string | null;
   order: number;
+  /** A ref from earlier in this plan, or the real id of an existing theme. */
+  themeRef: string | null;
+  /** Offered options, or null for an open-ended question. */
+  choices: string[] | null;
+}
+
+/** A theme the model asked to open, validated but not yet written. The hue is
+ *  absent on purpose: it is assigned at write time from the map's existing
+ *  theme count, which this pure function cannot know. */
+export interface PlannedTheme {
+  ref: string;
+  label: string;
 }
 
 /** A change to a node that already exists. */
@@ -33,6 +45,7 @@ export interface PlannedUpdate {
 }
 
 export interface MapMutationPlan {
+  themes: PlannedTheme[];
   inserts: PlannedInsert[];
   updates: PlannedUpdate[];
   phase: Phase | null;
@@ -55,6 +68,7 @@ export interface ToolInvocation {
  * that names it.
  */
 export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
+  const themes: PlannedTheme[] = [];
   const inserts: PlannedInsert[] = [];
   const updates: PlannedUpdate[] = [];
   let phase: Phase | null = null;
@@ -67,6 +81,21 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
       // Last valid set_phase wins; an invalid one leaves the phase untouched
       // rather than dropping the map into a state the nav cannot render.
       if (isPhase(next)) phase = next;
+      continue;
+    }
+
+    if (call.name === 'create_themes') {
+      const incoming = Array.isArray(input.themes) ? input.themes : [];
+      for (const raw of incoming) {
+        const theme = (raw ?? {}) as Record<string, unknown>;
+        const ref = String(theme.ref ?? '').trim();
+        const label = String(theme.label ?? '').trim();
+        // A theme with no ref is unreachable — no node could name it — and one
+        // with no label would render as an unlabelled cluster. Drop both rather
+        // than put a galaxy on the board that cannot be navigated to.
+        if (!ref || !label) continue;
+        themes.push({ ref, label });
+      }
       continue;
     }
 
@@ -89,6 +118,18 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           status: isNodeStatus(status) ? status : 'answered',
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
           order: order++,
+          themeRef: node.themeRef ? String(node.themeRef) : null,
+          // Blank options are dropped rather than rendered as empty pills, and
+          // a list that empties out becomes null — an open-ended question,
+          // which is the honest fallback.
+          choices: Array.isArray(node.choices)
+            ? (() => {
+                const cleaned = (node.choices as unknown[])
+                  .map((c) => String(c ?? '').trim())
+                  .filter(Boolean);
+                return cleaned.length > 0 ? cleaned : null;
+              })()
+            : null,
         });
       }
       continue;
@@ -111,5 +152,5 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
     }
   }
 
-  return { inserts, updates, phase };
+  return { themes, inserts, updates, phase };
 }

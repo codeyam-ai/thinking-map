@@ -47,6 +47,39 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     };
   },
 
+  async create_themes(
+    ctx,
+    input: { themes: unknown[]; requestId?: string },
+  ) {
+    const result = await applyToolCalls(
+      ctx.mapId,
+      [{ name: 'create_themes', input: { themes: input.themes } }],
+      { origin: ctx.origin, requestId: input.requestId },
+    );
+    if (result.deduped) {
+      return {
+        text: `Already applied (requestId ${input.requestId}). The map is at revision ${result.revision}.`,
+        structured: { revision: result.revision, deduped: true },
+      };
+    }
+    // Hand the ids back rather than only a count: the agent named these by
+    // ref, and without the real ids it could only attach nodes to them inside
+    // the same call.
+    const opened = result.events.filter((e) => e.kind === 'theme.added');
+    return {
+      text:
+        `Opened ${opened.length} theme(s): ` +
+        opened
+          .map((e) => {
+            const p = e.payload as { id: string; label: string };
+            return `${p.label} (${p.id})`;
+          })
+          .join(', ') +
+        `. The map is now at revision ${result.revision}.`,
+      structured: { revision: result.revision, themes: opened.map((e) => e.payload) },
+    };
+  },
+
   async add_nodes(ctx, input: { nodes: unknown[]; requestId?: string }) {
     const result = await applyToolCalls(
       ctx.mapId,
