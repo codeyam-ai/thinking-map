@@ -1,0 +1,12 @@
+{
+  "name": "PendingNote - AgentWorking",
+  "id": "dad1bca4-170c-4fdf-80a3-32e0b3d4d41b",
+  "url": "/isolated-components/PendingNote?s=AgentWorking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingNote",
+  "scenarioType": "component",
+  "description": "An agent mid-turn has what was added. The strongest of the three claims, and the only one entitled to say so."
+}

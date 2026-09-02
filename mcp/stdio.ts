@@ -6,6 +6,15 @@
 //
 // Run with:  npm run mcp
 //
+// That script sets `--conditions=react-server`, and the door does not open
+// without it. `app/lib/toolRuntime.ts` and `app/lib/briefText.ts` both import
+// `server-only`, whose whole job is to throw when it is reached from anywhere
+// but a server component — out here there is no bundler mapping it away, so
+// plain Node runs the throwing module and this process dies before the
+// transport is ever connected. The condition resolves it to the package's own
+// empty module, exactly as Next does, which keeps the guard meaningful in the
+// app without making it fatal here.
+//
 // The Prisma client resolves DATABASE_URL through the usual dotenv cascade, so
 // a client launching this needs no environment beyond the working directory.
 

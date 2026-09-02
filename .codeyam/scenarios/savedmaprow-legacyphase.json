@@ -1,0 +1,12 @@
+{
+  "name": "SavedMapRow - LegacyPhase",
+  "id": "5e99afd1-41f9-4291-a2af-b6b350b99061",
+  "url": "/isolated-components/SavedMapRow?s=LegacyPhase",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "SavedMapRow",
+  "scenarioType": "component",
+  "description": "A map still stored under the phase that no longer exists. Every other fixture moved to 'map' when the two phases merged; this one is kept behind on 'deconstruct' deliberately, so the alias is demonstrated on screen rather than only unit-tested — it must render as '02 Map', never as the raw word the row holds."
+}

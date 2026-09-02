@@ -37,23 +37,26 @@ const TOOL_NAMES = [
   'await_user_activity',
 ];
 
-/** Answer the tools route with the pending shape ask_user really returns. */
+/** Answer the tools route with the pending shape ask_user really returns.
+ *
+ *  Real `Response` objects rather than `{ ok, json }` stand-ins: the bridge
+ *  reads a reply through `readJson`, which consumes the body as text so a
+ *  truncated one cannot throw a parse error at a callback. A hand-rolled fake
+ *  with only `json` on it does not answer that, and a mock that is missing the
+ *  half of the API under test proves nothing about the half it does have. */
 function mockAskUser(questions: string[]) {
   const fetchMock = vi.fn(async (url: string) => {
     if (String(url).includes('/tools')) {
-      return {
-        ok: true,
-        json: async () => ({
-          content: [{ type: 'text', text: 'asked' }],
-          structuredContent: {
-            status: 'pending',
-            questions: questions.map((text, i) => ({ id: `q-${i}`, text })),
-          },
-        }),
-      };
+      return Response.json({
+        content: [{ type: 'text', text: 'asked' }],
+        structuredContent: {
+          status: 'pending',
+          questions: questions.map((text, i) => ({ id: `q-${i}`, text })),
+        },
+      });
     }
     // The exchange route, where an answer is recorded.
-    return { ok: true, json: async () => ({ revision: 15, events: [], deduped: false }) };
+    return Response.json({ revision: 15, events: [], deduped: false });
   });
   vi.stubGlobal('fetch', fetchMock as unknown as typeof fetch);
   return fetchMock;

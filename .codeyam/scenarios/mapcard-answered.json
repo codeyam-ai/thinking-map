@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - Answered",
+ "id": "55cb4b20-7c18-4a0f-ae8f-33b5e1aa827b",
+ "url": "/isolated-components/MapCard?s=Answered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "Answered in place \u2014 the eyebrow flips from Open, the answer takes the card's body, and Edit offers the way back in."
+}

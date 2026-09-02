@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - NoOptions",
+ "id": "a06ee8a5-9b4e-4ce7-8547-f93f495e403c",
+ "url": "/isolated-components/MapCard?s=NoOptions",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "A question with no shortlist: just the box. Proves the options field is genuinely optional and an agent that never learned it still produces a usable card."
+}

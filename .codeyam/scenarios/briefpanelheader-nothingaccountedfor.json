@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanelHeader - NothingAccountedFor",
+  "id": "c11440a3-2e06-4828-a36e-75d059005182",
+  "url": "/isolated-components/BriefPanelHeader?s=NothingAccountedFor",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanelHeader",
+  "scenarioType": "component",
+  "description": "Zero of eight, from a pasted brief rather than a file. Day one, before the agent has cited anything."
+}

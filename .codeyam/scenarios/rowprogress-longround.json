@@ -1,0 +1,12 @@
+{
+  "name": "RowProgress - LongRound",
+  "id": "fce61347-397c-4d14-bce2-4c820c28a1bb",
+  "url": "/isolated-components/RowProgress?s=LongRound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowProgress",
+  "scenarioType": "component",
+  "description": "Four of seven, where the count is genuinely doing work rather than restating what the eye can see."
+}

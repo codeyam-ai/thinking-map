@@ -1,0 +1,19 @@
+{
+ "name": "MapCardAnswer - ChipFilledTheBox",
+ "id": "c701e60b-4e4e-4ec8-b724-78ba5d4a380d",
+ "url": "/isolated-components/MapCardAnswer?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardAnswer.tsx",
+ "description": "After clicking a suggested answer: the words are IN the box, unsent, with the send button still waiting. This is the rule the resting render cannot show \u2014 a chip fills rather than submits, so the person can edit it or ignore it and the answer recorded is always their own.",
+ "interactions": [
+  {
+   "action": "click",
+   "text": "The building's bike room"
+  }
+ ]
+}

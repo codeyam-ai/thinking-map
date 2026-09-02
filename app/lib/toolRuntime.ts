@@ -9,7 +9,9 @@ import 'server-only';
 // a tool means the same thing whichever way it was called.
 
 import type { z } from 'zod';
-import { applyToolCalls, getMap } from './mapStore';
+import { applyToolCalls, getBrief, getMap } from './mapStore';
+import { splitIntoSections } from './briefSections';
+import { computeBriefCoverage } from './briefCoverage';
 import { formatMapDetail } from './mcpFormat';
 import {
   currentRevision,
@@ -29,6 +31,11 @@ import {
 } from './toolCatalog';
 
 type Impl = (ctx: ToolContext, input: never) => Promise<ToolResult>;
+
+/** One question as `ask_user` accepts it: the bare string it has always taken,
+ *  or that string with a few suggested answers attached. The union is what
+ *  makes the field additive — nothing an existing agent sends stops working. */
+type AskedQuestion = string | { text: string; options?: string[] };
 
 const IMPLEMENTATIONS: Record<string, Impl> = {
   async read_map(ctx, input: { sinceRevision?: number }) {
@@ -77,6 +84,90 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
           .join(', ') +
         `. The map is now at revision ${result.revision}.`,
       structured: { revision: result.revision, themes: opened.map((e) => e.payload) },
+    };
+  },
+
+  async read_brief(ctx, input: { section?: string }) {
+    const brief = await getBrief(ctx.mapId);
+
+    // No brief is a perfectly ordinary state — most maps start from a sentence.
+    // Saying so plainly, without `isError`, is the difference between an agent
+    // moving on and an agent retrying a tool that will never succeed.
+    if (!brief) {
+      return {
+        text: 'This map was not started from a brief — there is no document to read. The seed idea in read_map is all there is.',
+        structured: { hasBrief: false },
+      };
+    }
+
+    const sections = splitIntoSections(brief.text);
+
+    // Coverage belongs in the outline because the person is being shown it. An
+    // agent that has been working for twenty turns should be able to ask "what
+    // have I not dealt with?" and get an answer, instead of re-reading the
+    // whole document to find out — and if only the panel knew, the two halves
+    // of the exchange would disagree about the same document.
+    const map = await getMap(ctx.mapId);
+    const coverage = computeBriefCoverage(sections, map?.nodes ?? []);
+    const counted = new Map(coverage.sections.map((s) => [s.id, s]));
+
+    const outline = [
+      `# ${brief.sourceName}`,
+      `${brief.charCount} characters, ${sections.length} section(s).`,
+      `${coverage.covered} of ${coverage.total} accounted for by nodes on the map.`,
+      '',
+      ...sections.map((s) => {
+        const n = counted.get(s.id)?.nodeCount ?? 0;
+        return `[${s.id}] ${s.heading} — ${s.charCount} characters, ${n} node(s)`;
+      }),
+      '',
+      coverage.untouched.length === 0
+        ? 'Every section is cited by at least one node.'
+        : `Nothing on the map cites ${coverage.untouched
+            .map((s) => s.id)
+            .join(', ')} yet.`,
+      'Call read_brief again with a section id to read one in full.',
+    ].join('\n');
+
+    if (!input.section) {
+      return {
+        text: outline,
+        structured: {
+          hasBrief: true,
+          sourceName: brief.sourceName,
+          charCount: brief.charCount,
+          covered: coverage.covered,
+          total: coverage.total,
+          untouched: coverage.untouched.map((s) => s.id),
+          sections: sections.map(({ id, heading, charCount }) => ({
+            id,
+            heading,
+            charCount,
+            nodeCount: counted.get(id)?.nodeCount ?? 0,
+          })),
+        },
+      };
+    }
+
+    const found = sections.find((s) => s.id === input.section);
+    // An unknown id gets the outline back rather than an error: the agent's
+    // next move is to pick a real section, and the outline is exactly what it
+    // needs to do that.
+    if (!found) {
+      return {
+        text: `There is no section ${input.section} in this brief.\n\n${outline}`,
+        structured: { hasBrief: true, unknownSection: input.section },
+      };
+    }
+
+    return {
+      text: `# ${found.heading}\n(${found.id}, ${found.charCount} characters, from ${brief.sourceName})\n\n${found.text}`,
+      structured: {
+        hasBrief: true,
+        section: found.id,
+        heading: found.heading,
+        charCount: found.charCount,
+      },
     };
   },
 
@@ -165,8 +256,18 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
       [{ name: 'set_phase', input: { phase: input.phase } }],
       { origin: ctx.origin },
     );
+    // The tool replies are this app's only channel for steering an agent that
+    // brings its own reasoning, so the one phase with a right answer says what
+    // that answer looks like. A plan that ends in a numbered list of everything
+    // reads as a plan to build all of it in order — which is the outcome this
+    // whole product exists to prevent.
+    const guidance =
+      input.phase === 'next-steps'
+        ? ' End this map on a build sequence, not just a to-do list: add "slice" nodes for the smallest increments worth building, smallest first, each naming with `tests` the assumption, risk, or open question it would settle. If an increment settles nothing, add it without `tests` rather than picking the nearest node — it will be shown as proving nothing, which is the honest answer. Put its rough effort in `detail`, in your own words.'
+        : '';
+
     return {
-      text: `The map is now in the ${input.phase} phase, at revision ${result.revision}.`,
+      text: `The map is now in the ${input.phase} phase, at revision ${result.revision}.${guidance}`,
       structured: { revision: result.revision, phase: input.phase },
     };
   },
@@ -181,8 +282,19 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     };
   },
 
-  async ask_user(ctx, input: { questions: string[]; timeoutSeconds?: number }) {
+  async ask_user(
+    ctx,
+    input: { questions: AskedQuestion[]; timeoutSeconds?: number },
+  ) {
     const before = await currentRevision(ctx.mapId);
+
+    // A question is either a bare string or that string with suggested answers
+    // attached. Normalising here rather than at each use is what lets the rest
+    // of this tool stay exactly as it was — and what keeps `questions: ["…"]`,
+    // the shape every existing agent sends, working verbatim.
+    const asking = input.questions.map((question) =>
+      typeof question === 'string' ? { text: question } : question,
+    );
 
     // The questions become real open-question nodes FIRST, so they survive the
     // agent giving up, the page reloading, and the agent never coming back.
@@ -192,11 +304,12 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
         {
           name: 'add_nodes',
           input: {
-            nodes: input.questions.map((text, i) => ({
+            nodes: asking.map((question, i) => ({
               ref: `q${i}`,
               kind: 'open-question',
-              label: text,
+              label: question.text,
               status: 'open',
+              ...(question.options ? { options: question.options } : {}),
             })),
           },
         },
@@ -208,7 +321,7 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
       .filter((e: ExchangeEvent) => e.kind === 'node.added')
       .map((e: ExchangeEvent, i: number) => ({
         id: String((e.payload as Record<string, unknown>)?.id ?? `q${i}`),
-        text: input.questions[i] ?? '',
+        text: asking[i]?.text ?? '',
       }));
 
     await recordEvents(ctx.mapId, [

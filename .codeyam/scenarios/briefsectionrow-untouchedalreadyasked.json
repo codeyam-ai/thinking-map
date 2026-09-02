@@ -1,0 +1,12 @@
+{
+  "name": "BriefSectionRow - UntouchedAlreadyAsked",
+  "id": "cb6faf4e-67db-4ec9-95f5-f1d20348dce6",
+  "url": "/isolated-components/BriefSectionRow?s=UntouchedAlreadyAsked",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefSectionRow",
+  "scenarioType": "component",
+  "description": "Asked about already this turn. The row keeps its ink because the section is still unaccounted for, but the button is gone - the panel drops onAsk rather than letting a second click send a duplicate note."
+}

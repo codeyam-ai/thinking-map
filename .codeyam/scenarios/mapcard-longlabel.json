@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - LongLabel",
+ "id": "d289fc25-0a45-4dbf-9628-75ea15a4f6db",
+ "url": "/isolated-components/MapCard?s=LongLabel",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "A question long enough to hit the three-line clamp, against the card's minimum height \u2014 where the title has to stop rather than push the answer box off the card."
+}

@@ -1,0 +1,16 @@
+{
+ "name": "MapWorkspace - ManyRounds",
+ "id": "d77b5b65-1599-431d-b619-af6b481c6061",
+ "url": "/isolated-components/MapWorkspace?s=ManyRounds",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapWorkspace",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapWorkspace.tsx",
+ "description": "Six rounds of give-and-take, so the column runs past the frame and has to be scrolled \u2014 the claim the whole change makes, that a long conversation becomes a long page rather than a plane to navigate. Two of the agent's batches sit at the same tree depth on purpose: by depth they would collapse into one row, by round they stay two.",
+ "demonstratesState": {
+  "events": "many"
+ }
+}

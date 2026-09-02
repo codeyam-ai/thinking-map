@@ -1,12 +1,12 @@
 {
-  "name": "SendButton - Disabled",
-  "id": "6a31acf4-5c50-4de7-a3c4-e351ac47c2ca",
-  "url": "/isolated-components/SendButton?s=Disabled",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SendButton",
-  "scenarioType": "component",
-  "description": "Dimmed while there is nothing to send - the state the landing page shows before you type."
+ "name": "SendButton - Disabled",
+ "id": "6a31acf4-5c50-4de7-a3c4-e351ac47c2ca",
+ "url": "/isolated-components/SendButton?s=Disabled",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SendButton",
+ "scenarioType": "component",
+ "description": "Dimmed while there is nothing to send - the state the landing page shows before you type."
 }

@@ -1,0 +1,759 @@
+{
+  "timestamp": "2026-09-01T13:45:25Z",
+  "title": "Direct Map Manipulation",
+  "type": "feature",
+  "userRequest": "## Summary\n\nMake the map directly manipulable: zoom and pan it, nudge a node where you want\nit, and collapse a branch you are done with. Today the map plane is entirely\nautomatic — `useFitToFrame` scales it to fit down to a legibility floor and\ncentres the scroll, and the person has no say in any of it. That was the right\nfirst answer, and the sprawling scenario proved its limit: past the floor the\nmap scrolls, and a 3820px-wide tree becomes something you pan blindly rather\nthan read. Collapse is the real fix for that, zoom is the fix for wanting a\ncloser look, and a nudge is the fix for the one node the tidy tree puts\nsomewhere unhelpful. All three are listed as nice-to-have in the project scope\ndoc and were held out of the three-day build.\n\n## Key Decisions\n\n- **Manual viewport takes over from auto-fit, and does not fight it.** Auto-fit\n  becomes the *initial* state rather than a standing invariant. `useFitToFrame`\n  currently re-fits on every `ResizeObserver` tick, which would stamp on a\n  person's zoom the moment the window moved. Once the viewport is touched it\n  stays where it was put; an explicit \"fit to map\" control puts it back. The\n  existing centre-the-scroll layout effect stays, but only on the initial fit.\n- **A drag is a nudge, not a coordinate.** The dragged position persists as an\n  *offset* from the node's computed tidy position, not as an absolute x/y. This\n  keeps the tidy tree authoritative: siblings still never overlap by default,\n  parents still centre over children, and a node an agent adds tomorrow still\n  places itself sensibly instead of landing on top of something the person\n  moved last week. It also means the offsets degrade gracefully — drop them and\n  the map is exactly what it is today.\n- **Offsets persist on the node, but stay out of the agent's view of the map.**\n  They go in the database so an arrangement survives a refresh and is the same\n  for every viewer. They do NOT go into `read_map`'s rendering: `formatMapDetail`\n  and `summarizeMap` describe the *thinking*, and pixel offsets are arrangement,\n  not thinking. Feeding an agent coordinates it cannot act on is noise in a\n  context window that is better spent on the map's content.\n- **Moving a node is not an exchange event.** Every other change to the map\n  becomes an ordered `MapEvent`, and this deliberately does not. The activity\n  rail is the record of what the two sides *thought*; \"moved a node 40px left\"\n  would bury that under furniture-rearranging. The honest cost is that a move\n  does not bump `revision`, so a second viewer sees it on next load rather than\n  immediately — acceptable for a tool that is one person and their agent, and\n  called out here so it is a decision rather than a surprise.\n- **Collapse is per-viewer and unpersisted.** It is a reading posture, not a\n  property of the map — two people can reasonably want different branches folded\n  at the same moment, and an agent has no business seeing a subtree disappear.\n  It lives in component state.\n- **Collapse works by filtering the layout input, not by hiding rendered nodes.**\n  A collapsed subtree is removed from the array handed to `layoutMap`, so the\n  remaining tree genuinely re-tidies and gets narrower — which is what lets\n  `useFitToFrame` scale it back up above the legibility floor. Hiding nodes\n  after layout would leave the holes and keep the map just as wide, delivering\n  none of the benefit.\n- **A pointer threshold separates a click from a drag.** The pill needs to carry\n  both, and the follow-on plan adds click-to-ask on the same element. Movement\n  under a few pixels before pointerup is a click; beyond it is a drag. Settling\n  this here means the next plan does not have to rewrite the pill's pointer\n  handling.\n\n## Implementation\n\n### 1. Store a per-node arrangement offset\n\n**File**: `prisma/schema.prisma`\n\nAdd `offsetX Float @default(0)` and `offsetY Float @default(0)` to `MapNode`,\nwith a comment saying what the earlier decision established: these are a nudge\naway from the computed tidy position, not a position, and they are deliberately\nabsent from the agent's rendering of the map. Defaulting to `0` rather than\nmaking them nullable means every existing row is already valid and `db push`\nneeds no backfill.\n\n### 2. Apply offsets in the layout, and grow the bounds to match\n\n**File**: `app/lib/mapLayout.ts`\n\n`FlatNode` gains optional `offsetX` / `offsetY` (optional for the same reason\n`origin` is: a caller that only wants geometry should not have to carry them).\nAfter the existing tidy placement pass, add each node's offset to its `x`/`y`.\nThe bounds computation must run *after* offsets are applied, or a node nudged\nright of the widest column gets clipped out of the scroll extent. Everything\nbefore that — depth, subtree widths, sibling ordering, parent centring — is\nuntouched, so the existing invariants and their tests still hold.\n\n### 3. Filter collapsed subtrees before layout\n\n**New file**: `app/lib/collapse.ts`\n\nA pure `visibleNodes(nodes, collapsedIds)` that drops every descendant of a\ncollapsed node while keeping the collapsed node itself, plus a\n`collapsedDescendantCount(nodes, id)` so a folded pill can say how much is\nunderneath it. Pure and separate from the layout so it is unit-testable without\na DOM, in the same spirit as `mapCaption` and `nodeShellClasses`.\n\n### 4. Give the viewport to the person\n\n**New file**: `app/hooks/useMapViewport.ts`\n\nOwns `scale` and pan offset, seeded from the initial auto-fit and thereafter\nunder the person's control: wheel and trackpad pinch to zoom about the pointer,\ndrag on empty canvas to pan, and a `fitToMap()` reset. Tracks whether the\nviewport has been touched, which is the flag `useFitToFrame` needs to stop\nre-fitting.\n\n**File**: `app/hooks/useFitToFrame.ts`\n\nBecomes initial-fit-only: keep the `MIN_SCALE` floor and the centre-the-scroll\nlayout effect, but stop re-fitting once the viewport is user-controlled. Do not\ndelete the floor — it is still the right initial scale, and the `sprawling`\nscenario depends on it.\n\n### 5. Wire the plane and add zoom controls\n\n**File**: `app/components/ThinkingMapView.tsx`\n\nDrive the existing scaled plane from the viewport hook instead of directly from\n`useFitToFrame`, filter `nodes` through `visibleNodes` before `layoutMap`, and\nadd a small control cluster — zoom in, zoom out, fit to map — plus a live\npercentage. Keep the `min-w-0` comment and the `marginInline` centring rule\nintact; both are load-bearing and were each a real bug once.\n\n### 6. Make the pill draggable and foldable\n\n**File**: `app/components/MapNodePill.tsx`\n\nPointer handlers implementing the drag threshold, reporting a committed drag\nupward as an offset delta. A node with children gains a fold affordance showing\nthe hidden count when collapsed. The pill is currently a pure presentational\ncomponent and should stay one: it takes `onNudge` / `onToggleCollapse`\ncallbacks rather than reaching for a store.\n\n### 7. Persist a nudge\n\n**New file**: `app/api/maps/[id]/positions/route.ts`\n\nA `PATCH` taking `{ nodeId, offsetX, offsetY }` (batched as an array, since a\ndrag can settle several nodes at once) and writing straight to `MapNode`. It\ndeliberately does not go through `recordEvents` — see the Key Decision above.\nIt must still verify the node belongs to the map in the route, the same check\n`app/api/maps/[id]/exchange/route.ts` already performs.\n\n## Reused existing code\n\n- `layoutMap` and `connectorPath` from `app/lib/mapLayout.ts` (glossary entries:\n  `layoutMap`, `connectorPath`) — offsets are applied inside the existing\n  placement pass rather than in a parallel layout path.\n- `measureWidth` from `app/lib/mapLayout.ts` (glossary entry: `measureWidth`) —\n  unchanged; node sizing is independent of arrangement.\n- `useFitToFrame` from `app/hooks/useFitToFrame.ts` and its `MIN_SCALE` floor —\n  narrowed to initial fit rather than replaced.\n- `MapNodePill` and `MapConnectors` from `app/components/` (glossary entries:\n  `MapNodePill`, `MapConnectors`) — both already consume `LaidOutNode`\n  coordinates, so both pick up offsets with no change to their own geometry.\n- `nodeShellClasses` from `app/lib/nodeAppearance.ts` (glossary entry:\n  `nodeShellClasses`) — the fold affordance must not disturb the\n  status-precedence rule this owns.\n- `ThinkingMapView` from `app/components/ThinkingMapView.tsx` (glossary entry:\n  `ThinkingMapView`).\n\n**Existing-implementation survey.** `MapNode` has no position, coordinate, or\nlayout column today — checked against `prisma/schema.prisma`, whose `MapNode`\ncarries only `kind`, `label`, `detail`, `status`, `sourceUrl`, `order` and\n`origin`. There is no existing viewport, zoom, or collapse state anywhere in the\napp: `useFitToFrame` is the only thing that computes a scale, and grepping\n`app/` for the browser storage APIs (local storage and session storage) returns\nnothing, so there is no per-viewer persistence convention this should follow. `order` is sibling\nsequence, not position, and is not a candidate for reuse here.\n\n## Scenarios to Demonstrate\n\n- Default view — a researched map at its initial auto-fit, unchanged from today\n- Zoomed in — the viewport at ~150%, proving the person's scale survives\n- A nudged node — one node visibly offset from its tidy position, with the\n  connector still meeting it correctly\n- A collapsed branch — a folded parent showing its hidden-descendant count\n- Collapse rescues the sprawling map — the 21-node map that today scrolls past\n  the legibility floor, folded down until it fits and is readable\n- Empty map — the day-one state, where there is nothing to zoom, drag or fold\n  and the controls must not imply otherwise",
+  "description": "Made the map handleable: person-controlled zoom and pan with an exact fit-to-map reset, drag-to-nudge a node, and per-viewer folding of a branch. Auto-fit became the map's INITIAL state rather than a standing invariant — useFitToFrame stops re-fitting once the viewport is the person's, so a set scale survives the ResizeObserver ticks that used to stamp on it. A drag persists as an offset from the node's computed tidy position, never a coordinate, so the tidy tree stays authoritative: siblings still never overlap, parents still centre over children, and a node added later still places itself sensibly. Folding filters the layout's INPUT rather than hiding rendered nodes, so the remaining tree genuinely re-tidies and narrows — on the 21-node sprawling map that takes it from 62% and clipped at both edges to 66% and whole.\n\nDeliberate limits, recorded as decisions rather than gaps: collapse is per-viewer and unpersisted (a reading posture, not a property of the map, and an agent has no business seeing a subtree disappear); offsets stay out of read_map's rendering (arrangement is not thinking, and pixel coordinates an agent cannot act on are noise in its context window); and a move is NOT an exchange event, so it does not bump revision — a second viewer sees it on their next load rather than immediately.\n\nSCOPE VERDICT — this cycle delivered the three nice-to-haves the project scope doc had held out of the three-day build (zoom, nudge, collapse). All 10 project deliverables were already resolved before it started, so none was delivered or deferred here. The one standing deferral is unchanged: registering the MCP server in a client such as Claude Desktop, which is machine configuration on the assist track and was deferred by the USER at the plan gate (decidedBy: user), not by an agent. No agent-decided deferrals exist on this project.\n\nTwo things outside the feature's own footprint. A pre-existing scaffold bug was fixed: app/api/__codeyam_revalidate/ sat in an underscore-prefixed folder, which Next's App Router treats as private and excludes from routing, so the capture path's cache-flush route had never been reachable; it was renamed to the documented %5F%5F escaped form and now answers 200. And one plan scenario — 'collapse rescues the sprawling map' — has no registered scenario, because folding is unpersisted by design and no seed can express it; it is covered by the driven demo filmstrip and by a ThinkingMapView render test asserting the branch leaves the layout.\n\nOne bug worth remembering was found during the demo gate: the live drag moved nothing until pointerup, because .node-in animates transform with animation-fill-mode: both and an animated property beats an inline one in the cascade, silently swallowing the translate. The drag now drives left/top, and the in-flight offset was lifted into ThinkingMapView so the layout re-runs on every pointermove and a node's dotted connector travels with it.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/direct-map-manipulation.md\t.codeyam/plans/completed/direct-map-manipulation.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapconnectors-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapconnectors-singlechild--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-gap--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-justupdated--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-openquestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-pro--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-research--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-risk--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-rootidea--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/sprawling-a-deep-wide-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2def11f73eb10d5f3955011dd19c6a575bcbf4097c25e6b8e33385c532a9234e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b87520e58d029613bb01eef9b1b1a7425a79fc2180bccb0acd8e2148de726a6c.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/__codeyam_revalidate/route.ts\tapp/api/%5F%5Fcodeyam_revalidate/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapNodePill.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/ThinkingMapView.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/globals.css",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useFitToFrame.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapNodePill/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/ThinkingMapView/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapLayout.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapLayout.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/arranged-a-map-tidied-by-hand.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-foldable.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapnodepill-folded.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapviewportcontrols-autofit.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapviewportcontrols-zoomedin.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapviewportcontrols-zoomedout.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodefoldtoggle-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodefoldtoggle-folded.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nodefoldtoggle-largebranch.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-foldable--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-foldable--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-folded--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapnodepill-folded--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-autofit--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-autofit--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedin--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedin--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedout--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedout--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-folded--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-folded--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-largebranch--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-largebranch--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/thinkingmapview-nudged.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/direct-map-manipulation.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/101f7cfda680377866077e0884f7af353e997b8425d0ea30ae4d268c496318a1.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2d7ca3559bfb00424d4dddbe42e914d6b4d6a49b9f5d2f4606089cca5ee63969.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a1453749c6d6b241dfbc2e99082cdd815bf383064664f11f89d896afcd37d115.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a5c3fe94daac14f1caed9527196a4067e012761b02ecfa7579d12c5224154ce6.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/d3c108556d38f88fa0c256a1e84084d9f37f08588d4d42310668cbf4e09f3d34.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f6c22e5850395e1d4313c0e554226ffeb3cd36ba1b1d6ef62e414aacf38ea8ae.json",
+      "status": "added"
+    },
+    {
+      "path": "app/api/maps/[id]/positions/route.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/components/MapNodePill.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/MapViewportControls.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/NodeFoldToggle.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/ThinkingMapView.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useMapViewport.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useNodeDrag.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/MapViewportControls/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/NodeFoldToggle/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/collapse.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/collapse.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/nodePositions.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/nodePositions.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/textSelection.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/textSelection.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "Arranged - a map tidied by hand",
+      "screenshotPath": "arranged-a-map-tidied-by-hand--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Default",
+      "screenshotPath": "exchangecolumn-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - NothingWaiting",
+      "screenshotPath": "exchangecolumn-nothingwaiting--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Quiet",
+      "screenshotPath": "exchangecolumn-quiet--desktop.png"
+    },
+    {
+      "name": "MapConnectors - Default",
+      "screenshotPath": "mapconnectors-default--desktop.png"
+    },
+    {
+      "name": "MapConnectors - SingleChild",
+      "screenshotPath": "mapconnectors-singlechild--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Default",
+      "screenshotPath": "mapnodepill-default--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Foldable",
+      "screenshotPath": "mapnodepill-foldable--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Folded",
+      "screenshotPath": "mapnodepill-folded--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Gap",
+      "screenshotPath": "mapnodepill-gap--desktop.png"
+    },
+    {
+      "name": "MapNodePill - JustUpdated",
+      "screenshotPath": "mapnodepill-justupdated--desktop.png"
+    },
+    {
+      "name": "MapNodePill - OpenQuestion",
+      "screenshotPath": "mapnodepill-openquestion--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Pro",
+      "screenshotPath": "mapnodepill-pro--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Research",
+      "screenshotPath": "mapnodepill-research--desktop.png"
+    },
+    {
+      "name": "MapNodePill - Risk",
+      "screenshotPath": "mapnodepill-risk--desktop.png"
+    },
+    {
+      "name": "MapNodePill - RootIdea",
+      "screenshotPath": "mapnodepill-rootidea--desktop.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--desktop.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--desktop.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--desktop.png"
+    },
+    {
+      "name": "MapViewportControls - AutoFit",
+      "screenshotPath": "mapviewportcontrols-autofit--desktop.png"
+    },
+    {
+      "name": "MapViewportControls - ZoomedIn",
+      "screenshotPath": "mapviewportcontrols-zoomedin--desktop.png"
+    },
+    {
+      "name": "MapViewportControls - ZoomedOut",
+      "screenshotPath": "mapviewportcontrols-zoomedout--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--desktop.png"
+    },
+    {
+      "name": "NodeFoldToggle - Default",
+      "screenshotPath": "nodefoldtoggle-default--desktop.png"
+    },
+    {
+      "name": "NodeFoldToggle - Folded",
+      "screenshotPath": "nodefoldtoggle-folded--desktop.png"
+    },
+    {
+      "name": "NodeFoldToggle - LargeBranch",
+      "screenshotPath": "nodefoldtoggle-largebranch--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Many",
+      "screenshotPath": "openquestions-many--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - One",
+      "screenshotPath": "openquestions-one--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Two",
+      "screenshotPath": "openquestions-two--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Nudged",
+      "screenshotPath": "thinkingmapview-nudged--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 267,
+    "passed": 1,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 267,
+        "passed": 1
+      }
+    ]
+  }
+}

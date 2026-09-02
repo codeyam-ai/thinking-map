@@ -1,0 +1,12 @@
+{
+  "name": "AskAboutSectionButton - LongHeading",
+  "id": "f2f9dee0-c103-46e2-a36c-819743519e84",
+  "url": "/isolated-components/AskAboutSectionButton?s=LongHeading",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AskAboutSectionButton",
+  "scenarioType": "component",
+  "description": "The heading that caused the label to be the mark rather than the words - spelled out, this button wrapped to three lines in the 276px rail."
+}

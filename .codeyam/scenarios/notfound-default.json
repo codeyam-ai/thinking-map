@@ -1,0 +1,12 @@
+{
+  "name": "NotFound - Default",
+  "id": "8d07ca8b-f34b-4748-ae5b-681b9c0b572c",
+  "url": "/isolated-components/NotFound?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "NotFound",
+  "scenarioType": "component",
+  "description": "A link to a map that is not there. The point of the capture is the chrome: the header and phase track are still present, so a dead bookmark looks like this app rather than like Next's stock 404."
+}

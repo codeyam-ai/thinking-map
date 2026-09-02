@@ -1,0 +1,12 @@
+{
+  "name": "MapRow - Receded",
+  "id": "489d0658-7a25-4340-ab80-e59e81c03234",
+  "url": "/isolated-components/MapRow?s=Receded",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapRow",
+  "scenarioType": "component",
+  "description": "An older round, stepped back so the two newest sit forward of it. Recession, not perspective: opacity only, and applied to the cards rather than the row — opacity on the row would make a stacking context and trap the cards underneath the thread layer, so a receded row would have its own threads drawn over its card text."
+}

@@ -1,0 +1,13 @@
+{
+  "name": "AnswerChips - Single",
+  "id": "0c681170-094c-4bd8-8c4c-805c4ed90bac",
+  "url": "/isolated-components/AnswerChips?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerChips",
+  "scenarioType": "component",
+  "pageFilePath": "app/components/AnswerChips.tsx",
+  "description": "One suggestion is a legitimate shortlist, and it must not read as a submit button."
+}

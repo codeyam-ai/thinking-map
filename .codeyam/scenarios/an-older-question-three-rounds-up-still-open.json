@@ -1,0 +1,234 @@
+{
+  "name": "An older question, three rounds up, still open",
+  "id": "23b27381-2c9a-413d-824b-7cf5100bb2b9",
+  "url": "/map/map-skipped",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-skipped-1",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "user",
+        "payload": "{\"id\": \"s-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A tool library for the street\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-skipped-2",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-q-who\", \"parentId\": \"s-idea\", \"kind\": \"open-question\", \"label\": \"Who is this for — you, or the whole street?\", \"status\": \"open\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-skipped-3",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-q-broken\", \"parentId\": \"s-idea\", \"kind\": \"open-question\", \"label\": \"What happens when something comes back broken?\", \"status\": \"open\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-skipped-4",
+        "kind": "question.asked",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"count\": 2}",
+        "revision": 4
+      },
+      {
+        "id": "ev-skipped-5",
+        "kind": "user.answer",
+        "mapId": "map-skipped",
+        "origin": "user",
+        "payload": "{\"answers\": [{\"id\": \"s-q-who\", \"answer\": \"The whole street, or it is not worth the bother\"}]}",
+        "revision": 5
+      },
+      {
+        "id": "ev-skipped-6",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-f-existing\", \"parentId\": \"s-q-who\", \"kind\": \"finding\", \"label\": \"Two library-of-things schemes within four miles\", \"status\": \"answered\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-skipped-7",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-f-insurance\", \"parentId\": \"s-q-who\", \"kind\": \"finding\", \"label\": \"Neither scheme insures the tools\", \"status\": \"answered\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-skipped-8",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-g-storage\", \"parentId\": \"s-q-who\", \"kind\": \"gap\", \"label\": \"Nobody has said where the tools live\", \"status\": \"answered\"}",
+        "revision": 8
+      },
+      {
+        "id": "ev-skipped-9",
+        "kind": "agent.note",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"text\": \"Went and looked. The storage question is the one nobody in this space has solved.\"}",
+        "revision": 9
+      },
+      {
+        "id": "ev-skipped-10",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-q-where\", \"parentId\": \"s-f-existing\", \"kind\": \"open-question\", \"label\": \"Whose garage, and what happens when they move?\", \"status\": \"open\"}",
+        "revision": 10
+      },
+      {
+        "id": "ev-skipped-11",
+        "kind": "node.added",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"id\": \"s-q-cost\", \"parentId\": \"s-f-existing\", \"kind\": \"open-question\", \"label\": \"Would people pay a yearly membership?\", \"status\": \"open\"}",
+        "revision": 11
+      },
+      {
+        "id": "ev-skipped-12",
+        "kind": "question.asked",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "payload": "{\"count\": 2}",
+        "revision": 12
+      },
+      {
+        "id": "ev-skipped-13",
+        "kind": "user.answer",
+        "mapId": "map-skipped",
+        "origin": "user",
+        "payload": "{\"answers\": [{\"id\": \"s-q-where\", \"answer\": \"Mine for now, and that is exactly the fragile bit\"}, {\"id\": \"s-q-cost\", \"answer\": \"Only if it covers breakage\"}]}",
+        "revision": 13
+      }
+    ],
+    "mapNode": [
+      {
+        "detail": "Four of us have each bought a tile cutter we used once.",
+        "id": "s-idea",
+        "kind": "idea",
+        "label": "A tool library for the street",
+        "mapId": "map-skipped",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "s-q-who",
+        "kind": "open-question",
+        "label": "Who is this for — you, or the whole street?",
+        "mapId": "map-skipped",
+        "options": "[\"Just my building\", \"The whole street\"]",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "s-idea",
+        "status": "answered"
+      },
+      {
+        "id": "s-q-broken",
+        "kind": "open-question",
+        "label": "What happens when something comes back broken?",
+        "mapId": "map-skipped",
+        "options": "[\"The borrower replaces it\", \"A shared kitty\", \"I genuinely do not know\"]",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "s-idea",
+        "status": "open"
+      },
+      {
+        "detail": "Both charge a yearly membership and both are oversubscribed for exactly the heavy tools you named.",
+        "id": "s-f-existing",
+        "kind": "finding",
+        "label": "Two library-of-things schemes within four miles",
+        "mapId": "map-skipped",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "s-q-who",
+        "status": "answered"
+      },
+      {
+        "detail": "They both push the risk onto the borrower with a signed form, which is the cheap answer rather than the good one.",
+        "id": "s-f-insurance",
+        "kind": "finding",
+        "label": "Neither scheme insures the tools",
+        "mapId": "map-skipped",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "s-q-who",
+        "status": "answered"
+      },
+      {
+        "id": "s-g-storage",
+        "kind": "gap",
+        "label": "Nobody has said where the tools live",
+        "mapId": "map-skipped",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "s-q-who",
+        "status": "answered"
+      },
+      {
+        "id": "s-q-where",
+        "kind": "open-question",
+        "label": "Whose garage, and what happens when they move?",
+        "mapId": "map-skipped",
+        "options": "[\"Mine, and I stay put\", \"Rotating\", \"The church hall\"]",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "s-f-existing",
+        "status": "answered"
+      },
+      {
+        "id": "s-q-cost",
+        "kind": "open-question",
+        "label": "Would people pay a yearly membership?",
+        "mapId": "map-skipped",
+        "options": "[\"A small one\", \"Only if it covers breakage\", \"No\"]",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "s-f-existing",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "Four people on my street have each bought a tile cutter they used once. I want to fix that.",
+        "id": "sm-1",
+        "mapId": "map-skipped",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Two questions before we design anything: who it is for, and what happens when something comes back broken.",
+        "id": "sm-2",
+        "mapId": "map-skipped",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-skipped",
+        "phase": "map",
+        "revision": 13,
+        "seedIdea": "A tool library for the street, run out of somebody's garage.",
+        "title": "A tool library for the street"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "A question skipped early does not hold the loop hostage. Round two's second question was never answered and is still sitting there, answerable in place — but completion is read off the NEWEST round only, so the map has moved on regardless and is already reaching for what comes next."
+}

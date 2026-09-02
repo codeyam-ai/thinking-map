@@ -1,12 +1,12 @@
 {
-  "name": "LandingScreen - Default",
-  "id": "52be4154-f065-4cc6-adb1-f6332c661b26",
-  "url": "/isolated-components/LandingScreen?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "LandingScreen",
-  "scenarioType": "component",
-  "description": "The landing surface for someone returning, with saved maps below the prompt."
+ "name": "LandingScreen - Default",
+ "id": "52be4154-f065-4cc6-adb1-f6332c661b26",
+ "url": "/isolated-components/LandingScreen?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "LandingScreen",
+ "scenarioType": "component",
+ "description": "The landing surface for someone returning, with saved maps below the prompt."
 }

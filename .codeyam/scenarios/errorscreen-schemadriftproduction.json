@@ -1,0 +1,12 @@
+{
+  "name": "ErrorScreen - SchemaDriftProduction",
+  "id": "7725d4ce-ab87-4189-ae60-5935ad6a75a1",
+  "url": "/isolated-components/ErrorScreen?s=SchemaDriftProduction",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ErrorScreen",
+  "scenarioType": "component",
+  "description": "The same failure deployed. The diagnosis survives; the command and the column name do not, because neither is anything a visitor can act on and both describe our schema rather than their problem."
+}

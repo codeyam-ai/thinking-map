@@ -1,0 +1,12 @@
+{
+  "name": "RowThreads - ParentTwoRoundsBack",
+  "id": "dc154d72-c088-419a-a159-e63109deeef8",
+  "url": "/isolated-components/RowThreads?s=ParentTwoRoundsBack",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowThreads",
+  "scenarioType": "component",
+  "description": "A card whose parent is two rounds back draws nothing — the third row here is unthreaded. The rows already record the ancestry, and a line spanning the cards in between is a claim no reader could actually follow."
+}

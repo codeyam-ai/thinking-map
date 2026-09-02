@@ -3,10 +3,20 @@
 // implementation rather than drifting apart.
 
 import { prisma } from './prisma';
+import type { BriefInput } from './briefInput';
+import { computeBriefCoverage, type CoverageNode } from './briefCoverage';
+import { splitIntoSections } from './briefSections';
 import { KIND_EYEBROW } from './mapKinds';
 import { hueForIndex } from './themeHue';
 import { planMapMutations, type ToolInvocation } from './nodePlan';
-import { recordEvents, type EventInput, type Origin } from './exchange';
+import {
+  MAP_CREATED,
+  mapEvents,
+  recordEvents,
+  type EventInput,
+  type NewMapSummary,
+  type Origin,
+} from './exchange';
 
 export async function listMaps() {
   return prisma.thinkingMap.findMany({
@@ -29,19 +39,88 @@ export async function getMap(id: string) {
       messages: { orderBy: { createdAt: 'asc' } },
       nodes: { orderBy: [{ createdAt: 'asc' }, { order: 'asc' }] },
       themes: { orderBy: { order: 'asc' } },
+      // Metadata only. The brief's text has exactly one reader — `read_brief` —
+      // and pulling it in here would put tens of thousands of characters into
+      // every page render and every full `read_map`.
+      brief: { select: { sourceName: true, mediaType: true, charCount: true } },
     },
   });
 }
 
+/** The brief's text, for the one caller that is allowed to want it. */
+export async function getBrief(mapId: string) {
+  return prisma.mapBrief.findUnique({ where: { mapId } });
+}
+
+/**
+ * The brief's coverage by the nodes on the map, ready to render.
+ *
+ * Lives here rather than in `briefCoverage.ts` on purpose: that module is
+ * deliberately pure — sections and nodes in, counts out, no database — and it
+ * is the pure half that is worth testing. This is the thin part that reaches
+ * for the text.
+ *
+ * Note what does NOT come back: the brief's text. `getMap` fetches the brief's
+ * metadata without it precisely because a document can be tens of thousands of
+ * characters, and splitting into sections needs the text but yields only
+ * headings and lengths. So the panel can be rendered on the server without the
+ * document ever crossing to the client.
+ *
+ * Returns null when the map has no brief — the workspace renders that by
+ * mounting no panel at all, not by rendering an empty one.
+ */
+export async function getBriefCoverage(mapId: string, nodes: CoverageNode[]) {
+  const brief = await getBrief(mapId);
+  if (!brief) return null;
+  return {
+    sourceName: brief.sourceName,
+    coverage: computeBriefCoverage(splitIntoSections(brief.text), nodes),
+  };
+}
+
+/**
+ * Name the map from whatever the person gave us.
+ *
+ * A brief's first markdown heading is the document's own title and is almost
+ * always the right answer; its first non-empty line is the next best guess.
+ * Without a brief this is the original behaviour, unchanged: the seed idea,
+ * clipped — which is how every map that already exists was named.
+ */
+export function deriveTitle(seedIdea: string, brief?: BriefInput): string {
+  const clip = (text: string) =>
+    text.length > 60 ? `${text.slice(0, 57)}…` : text;
+
+  if (brief) {
+    const lines = brief.text.split('\n');
+    const heading = lines.find((line) => /^#{1,6}\s+\S/.test(line));
+    if (heading) return clip(heading.replace(/^#{1,6}\s+/, '').trim());
+    const firstLine = lines.find((line) => line.trim().length > 0);
+    if (firstLine) return clip(firstLine.trim());
+  }
+
+  return clip(seedIdea.trim());
+}
+
 /** Start a new map from an unstructured idea. The seed idea becomes both the
  *  root node and the person's first message — the conversation and the map are
- *  two views of the same thing from the very first turn. */
+ *  two views of the same thing from the very first turn.
+ *
+ *  A brief, when there is one, is written in the SAME transaction: it is the
+ *  map's source, so a map existing without the document it was started from is
+ *  a state nothing downstream should have to handle. It is written once here
+ *  and never again — a revised brief is a new map.
+ *
+ *  Attachments are names, not bytes, and are a different thing from a brief: a
+ *  brief is a document the map is DERIVED from and can cite into, while these
+ *  are things the person mentioned bringing along. Conflating them would let a
+ *  filename be cited as a source. */
 export async function createMap(
   seedIdea: string,
+  brief?: BriefInput,
   attachments: { name: string }[] = [],
 ) {
   const trimmed = seedIdea.trim();
-  const title = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+  const title = deriveTitle(trimmed, brief);
 
   // The seed idea is the person's, so the root node and the opening message are
   // user-origin. An agent reading the log must not mistake the human's starting
@@ -51,8 +130,29 @@ export async function createMap(
       title,
       seedIdea: trimmed,
       attachments: attachments.length ? JSON.stringify(attachments) : null,
-      phase: 'deconstruct',
-      messages: { create: [{ role: 'user', origin: 'user', content: trimmed }] },
+      phase: 'map',
+      ...(brief
+        ? {
+            brief: {
+              create: {
+                text: brief.text,
+                sourceName: brief.sourceName,
+                mediaType: brief.mediaType,
+                charCount: brief.text.length,
+              },
+            },
+          }
+        : {}),
+      // A brief can arrive with no sentence beside it, and an empty opening
+      // message would read to an agent as a person who said nothing — worse
+      // than a conversation that has not started yet.
+      ...(trimmed
+        ? {
+            messages: {
+              create: [{ role: 'user', origin: 'user', content: trimmed }],
+            },
+          }
+        : {}),
       nodes: {
         create: [
           {
@@ -79,6 +179,25 @@ export async function createMap(
       payload: { id: root?.id, kind: 'idea', label: title },
     },
   ]);
+
+  // Wake anyone parked in `waitForNewMap`.
+  //
+  // AFTER `recordEvents`, deliberately: a waiter woken before the root node's
+  // event exists would read a map whose log is empty and conclude there was
+  // nothing to do — the one race that would make parking worse than polling.
+  //
+  // Best-effort and in-process only. Correctness across processes is the
+  // waiter's poll, not this: the stdio MCP server does not share an emitter
+  // with Next, so an agent connected there is woken by the poll and this emit
+  // is purely the same-process fast path.
+  const summary: NewMapSummary = {
+    id: map.id,
+    title: map.title,
+    seedIdea: map.seedIdea,
+    hasBrief: brief !== undefined,
+    createdAt: map.createdAt,
+  };
+  mapEvents.emit(MAP_CREATED, summary);
 
   return map;
 }
@@ -164,6 +283,16 @@ export async function applyToolCalls(
       ? (refToId.get(node.parentRef) ?? node.parentRef)
       : null;
 
+    // The same resolution, for the same reason: a slice usually names an
+    // assumption created earlier in this very call, so the ref has to become a
+    // real id before it is stored. Unresolvable values are written through
+    // rather than dropped — a dangling link is reported on screen, and losing
+    // it silently would hide the fact that the slice claimed to settle
+    // something at all.
+    const testsNodeId = node.testsRef
+      ? (refToId.get(node.testsRef) ?? node.testsRef)
+      : null;
+
     const created = await prisma.mapNode.create({
       data: {
         mapId,
@@ -177,6 +306,9 @@ export async function applyToolCalls(
         diagram: node.diagram ? JSON.stringify(node.diagram) : null,
         imageUrl: node.imageUrl,
         imageAlt: node.imageAlt,
+        testsNodeId,
+        sourceRef: node.sourceRef,
+        options: node.options,
         order: node.order,
         // Same two-source resolution as parentRef: a ref from this call, or an
         // id of a theme already on the board.
@@ -197,6 +329,24 @@ export async function applyToolCalls(
         label: created.label,
         status: created.status,
         themeId: created.themeId,
+        // Carried on the event so an agent reading the log after the fact can
+        // see which assumption a slice claimed to settle, not just that a
+        // slice appeared.
+        ...(testsNodeId ? { testsNodeId } : {}),
+        // Carried in the payload so a second front door reading the log learns
+        // where a claim came from, rather than that provenance existing only in
+        // the database where the log's readers cannot see it. Omitted entirely
+        // when absent, so an unreferenced node's event is unchanged.
+        ...(created.sourceRef ? { sourceRef: created.sourceRef } : {}),
+        // Carried for the same reason `sourceRef` is: a second front door
+        // reading the log should learn what was offered alongside a question,
+        // not just that a question appeared. Sent as the array the tools take
+        // rather than the JSON string the column holds — the log speaks the
+        // contract's language, not the database's. Omitted when absent, so an
+        // ordinary question's event is byte-for-byte what it always was.
+        ...(created.options
+          ? { options: JSON.parse(created.options) as string[] }
+          : {}),
       },
     });
   }

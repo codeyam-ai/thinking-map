@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanel - NothingCitedYet",
+  "id": "72a5b920-e92a-4e55-b636-4dee2ba7c9e6",
+  "url": "/isolated-components/BriefPanel?s=NothingCitedYet",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanel",
+  "scenarioType": "component",
+  "description": "A brief just attached, with nothing on the map citing any of it. The honest day-one picture rather than an empty component - and the state that makes the difference between reading a brief and inferring it most visible."
+}

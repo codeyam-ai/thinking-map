@@ -1,0 +1,24 @@
+{
+  "surface": "AnswerChips",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "options",
+      "value": "empty",
+      "rationale": "source-derived state options=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "options",
+      "value": "one",
+      "rationale": "source-derived state options=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "options",
+      "value": "many",
+      "rationale": "source-derived state options=many",
+      "status": "covered"
+    }
+  ]
+}

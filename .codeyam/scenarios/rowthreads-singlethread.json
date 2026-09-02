@@ -1,0 +1,12 @@
+{
+  "name": "RowThreads - SingleThread",
+  "id": "9fa85b2b-afd6-4715-9d4b-2de2ce0349c8",
+  "url": "/isolated-components/RowThreads?s=SingleThread",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowThreads",
+  "scenarioType": "component",
+  "description": "One child is not a fan. The thread leaves from the middle of the card, which is what makes a single connection read as a straight drop rather than an off-centre one."
+}

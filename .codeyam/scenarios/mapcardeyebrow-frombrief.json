@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - FromBrief",
+ "id": "fd0236a4-31a7-4947-8ff1-24537d2523c4",
+ "url": "/isolated-components/MapCardEyebrow?s=FromBrief",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "A claim traced to one identifiable section of the client's brief \u2014 the only fact in the line about the document rather than the node."
+}

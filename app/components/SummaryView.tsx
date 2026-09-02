@@ -1,3 +1,4 @@
+import BuildSequence from './BuildSequence';
 import BulletCard from './BulletCard';
 import DirectionsCard from './DirectionsCard';
 import NextStepsTrack from './NextStepsTrack';
@@ -20,6 +21,8 @@ export default function SummaryView({ nodes }: { nodes: SummaryNode[] }) {
         <BulletCard title="What we don't know" items={unknown} />
         <DirectionsCard items={directions} />
       </div>
+      {/* What you build comes before what you go and find out. */}
+      <BuildSequence nodes={nodes} />
       <NextStepsTrack steps={steps} />
     </div>
   );

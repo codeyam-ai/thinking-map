@@ -18,6 +18,7 @@ describe('the shared tool catalog', () => {
     expect(TOOL_CATALOG.map((t) => t.name)).toEqual([
       'read_map',
       'create_themes',
+      'read_brief',
       'add_nodes',
       'update_node',
       'set_phase',
@@ -36,8 +37,11 @@ describe('the shared tool catalog', () => {
   });
 
   // An agent decides whether it may call a tool speculatively from this hint.
-  it('marks the two read-only tools as read-only', () => {
+  // read_brief is one of them: an agent should feel free to call it on any
+  // turn, which is the whole reason it answers with an outline by default.
+  it('marks the three read-only tools as read-only', () => {
     expect(findTool('read_map')?.annotations?.readOnlyHint).toBe(true);
+    expect(findTool('read_brief')?.annotations?.readOnlyHint).toBe(true);
     expect(findTool('await_user_activity')?.annotations?.readOnlyHint).toBe(true);
     expect(findTool('add_nodes')?.annotations?.readOnlyHint).toBeUndefined();
   });

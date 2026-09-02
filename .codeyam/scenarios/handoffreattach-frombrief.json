@@ -1,0 +1,12 @@
+{
+  "name": "HandoffReattach - FromBrief",
+  "id": "1e9071a2-a809-4128-a2bb-8297662df2d3",
+  "url": "/isolated-components/HandoffReattach?s=FromBrief",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffReattach",
+  "scenarioType": "component",
+  "description": "A map started from a document rather than a sentence, so the prompt has no quoted idea folded into it and names read_brief instead of read_map. The shortest the prompt cell ever gets, which is the layout risk this frame covers: two short blocks side by side must still read as a pair rather than as two stray fragments."
+}

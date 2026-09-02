@@ -1,9 +1,9 @@
 {
   "name": "AgentStatus - Connected",
-  "id": "91b86bee-fd20-413f-a802-7b1b109e04f5",
+  "id": "513b1426-4a2f-48ad-96d4-1a87d554699a",
   "url": "/isolated-components/AgentStatus?s=Connected",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentStatus",

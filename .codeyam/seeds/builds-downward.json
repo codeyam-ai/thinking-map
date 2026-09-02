@@ -1,0 +1,232 @@
+{
+ "thinkingMap": [
+  {
+   "id": "map-downward",
+   "title": "A tool library for the street",
+   "phase": "explore",
+   "revision": 14,
+   "seedIdea": "Four people on my street have each bought a tile cutter they used once. I want to fix that, but every version of it I imagine collapses the moment someone moves away."
+  }
+ ],
+ "message": [
+  {
+   "id": "dm-1",
+   "mapId": "map-downward",
+   "role": "user",
+   "origin": "user",
+   "content": "Four people on my street have each bought a tile cutter they used once. I want to fix that, but every version of it I imagine collapses the moment someone moves away."
+  },
+  {
+   "id": "dm-2",
+   "mapId": "map-downward",
+   "role": "assistant",
+   "origin": "agent",
+   "content": "The collapsing is the interesting part. Before we design the lending: who is it for, what happens when something comes back broken, and where do the tools actually live?"
+  }
+ ],
+ "mapNode": [
+  {
+   "id": "d-idea",
+   "parentId": null,
+   "kind": "idea",
+   "order": 0,
+   "origin": "user",
+   "status": "answered",
+   "label": "A tool library for the street",
+   "detail": "Nobody on this street needs to own a tile cutter, and four of us have bought one.",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-q-who",
+   "parentId": "d-idea",
+   "kind": "open-question",
+   "order": 0,
+   "origin": "agent",
+   "status": "open",
+   "label": "Who is this for \u2014 you, or the whole street?",
+   "options": "[\"Just my building\", \"The whole street\", \"Anyone who can walk here\"]",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-q-lend",
+   "parentId": "d-idea",
+   "kind": "open-question",
+   "order": 1,
+   "origin": "agent",
+   "status": "answered",
+   "label": "What happens when something comes back broken?",
+   "options": "[\"The borrower replaces it\", \"A shared repair fund\", \"We just accept the loss\"]",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-q-store",
+   "parentId": "d-idea",
+   "kind": "open-question",
+   "order": 2,
+   "origin": "agent",
+   "status": "open",
+   "label": "Where would the tools physically live?",
+   "options": "[\"Somebody's garage\", \"The building's bike room\", \"A rented locker\"]",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-own",
+   "parentId": "d-idea",
+   "kind": "constraint",
+   "order": 3,
+   "origin": "user",
+   "status": "answered",
+   "label": "It has to survive me going away for a month",
+   "detail": "Contributed directly: if the whole thing stops working the moment one person is unavailable, it is not a library, it is a favour.",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-find",
+   "parentId": "d-idea",
+   "kind": "finding",
+   "order": 4,
+   "origin": "agent",
+   "status": "answered",
+   "label": "Every tool library that lasted had two keyholders",
+   "detail": "Across the four write-ups I could find, the ones that folded had a single custodian and the ones still running had at least two.",
+   "sourceUrl": "https://www.sharestarter.org/tool-library-startup-guide",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-q-key",
+   "parentId": "d-idea",
+   "kind": "open-question",
+   "order": 5,
+   "origin": "agent",
+   "status": "open",
+   "label": "Who is the second person holding a key?",
+   "options": "[\"Someone already named\", \"Nobody yet\", \"I would rather it be a lockbox\"]",
+   "mapId": "map-downward"
+  },
+  {
+   "id": "d-q-money",
+   "parentId": "d-idea",
+   "kind": "open-question",
+   "order": 6,
+   "origin": "agent",
+   "status": "open",
+   "label": "Does anyone pay anything, ever?",
+   "options": "[\"Free, always\", \"A yearly membership\", \"Pay only when you break something\"]",
+   "mapId": "map-downward"
+  }
+ ],
+ "mapEvent": [
+  {
+   "id": "ev-map-downward-1",
+   "mapId": "map-downward",
+   "revision": 1,
+   "kind": "node.added",
+   "origin": "user",
+   "payload": "{\"id\": \"d-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A tool library for the street\", \"status\": \"answered\", \"detail\": \"Nobody on this street needs to own a tile cutter, and four of us have bought one.\"}"
+  },
+  {
+   "id": "ev-map-downward-2",
+   "mapId": "map-downward",
+   "revision": 2,
+   "kind": "agent.note",
+   "origin": "agent",
+   "payload": "{\"text\": \"Taking the ownership duplication as the real problem rather than the borrowing.\"}"
+  },
+  {
+   "id": "ev-map-downward-3",
+   "mapId": "map-downward",
+   "revision": 3,
+   "kind": "node.added",
+   "origin": "agent",
+   "payload": "{\"id\": \"d-q-who\", \"parentId\": \"d-idea\", \"kind\": \"open-question\", \"label\": \"Who is this for \\u2014 you, or the whole street?\", \"status\": \"open\", \"options\": [\"Just my building\", \"The whole street\", \"Anyone who can walk here\"]}"
+  },
+  {
+   "id": "ev-map-downward-4",
+   "mapId": "map-downward",
+   "revision": 4,
+   "kind": "node.added",
+   "origin": "agent",
+   "payload": "{\"id\": \"d-q-lend\", \"parentId\": \"d-idea\", \"kind\": \"open-question\", \"label\": \"What happens when something comes back broken?\", \"status\": \"answered\", \"options\": [\"The borrower replaces it\", \"A shared repair fund\", \"We just accept the loss\"]}"
+  },
+  {
+   "id": "ev-map-downward-5",
+   "mapId": "map-downward",
+   "revision": 5,
+   "kind": "node.added",
+   "origin": "agent",
+   "payload": "{\"id\": \"d-q-store\", \"parentId\": \"d-idea\", \"kind\": \"open-question\", \"label\": \"Where would the tools physically live?\", \"status\": \"open\", \"options\": [\"Somebody's garage\", \"The building's bike room\", \"A rented locker\"]}"
+  },
+  {
+   "id": "ev-map-downward-6",
+   "mapId": "map-downward",
+   "revision": 6,
+   "kind": "question.asked",
+   "origin": "agent",
+   "payload": "{\"questions\": [{\"id\": \"d-q-who\", \"text\": \"Who is this for \\u2014 you, or the whole street?\"}, {\"id\": \"d-q-lend\", \"text\": \"What happens when something comes back broken?\"}, {\"id\": \"d-q-store\", \"text\": \"Where would the tools physically live?\"}]}"
+  },
+  {
+   "id": "ev-map-downward-7",
+   "mapId": "map-downward",
+   "revision": 7,
+   "kind": "user.answer",
+   "origin": "user",
+   "payload": "{\"answers\": [{\"id\": \"d-q-lend\", \"text\": \"What happens when something comes back broken?\", \"answer\": \"A shared repair fund \\u2014 asking one neighbour to replace a \\u00a3200 sander is how you lose the neighbour.\"}]}"
+  },
+  {
+   "id": "ev-map-downward-8",
+   "mapId": "map-downward",
+   "revision": 8,
+   "kind": "user.node",
+   "origin": "user",
+   "payload": "{\"id\": \"d-own\", \"parentId\": \"d-idea\", \"kind\": \"constraint\", \"label\": \"It has to survive me going away for a month\", \"status\": \"answered\", \"detail\": \"Contributed directly: if the whole thing stops working the moment one person is unavailable, it is not a library, it is a favour.\"}"
+  },
+  {
+   "id": "ev-map-downward-9",
+   "mapId": "map-downward",
+   "revision": 9,
+   "kind": "agent.note",
+   "origin": "agent",
+   "payload": "{\"text\": \"That constraint rules out the single-custodian shape, so I went looking for what actually survives.\"}"
+  },
+  {
+   "id": "ev-map-downward-10",
+   "mapId": "map-downward",
+   "revision": 10,
+   "kind": "node.added",
+   "origin": "agent",
+   "payload": "{\"id\": \"d-find\", \"parentId\": \"d-idea\", \"kind\": \"finding\", \"label\": \"Every tool library that lasted had two keyholders\", \"status\": \"answered\", \"detail\": \"Across the four write-ups I could find, the ones that folded had a single custodian and the ones still running had at least two.\"}"
+  },
+  {
+   "id": "ev-map-downward-11",
+   "mapId": "map-downward",
+   "revision": 11,
+   "kind": "node.added",
+   "origin": "agent",
+   "payload": "{\"id\": \"d-q-key\", \"parentId\": \"d-idea\", \"kind\": \"open-question\", \"label\": \"Who is the second person holding a key?\", \"status\": \"open\", \"options\": [\"Someone already named\", \"Nobody yet\", \"I would rather it be a lockbox\"]}"
+  },
+  {
+   "id": "ev-map-downward-12",
+   "mapId": "map-downward",
+   "revision": 12,
+   "kind": "node.added",
+   "origin": "agent",
+   "payload": "{\"id\": \"d-q-money\", \"parentId\": \"d-idea\", \"kind\": \"open-question\", \"label\": \"Does anyone pay anything, ever?\", \"status\": \"open\", \"options\": [\"Free, always\", \"A yearly membership\", \"Pay only when you break something\"]}"
+  },
+  {
+   "id": "ev-map-downward-13",
+   "mapId": "map-downward",
+   "revision": 13,
+   "kind": "question.asked",
+   "origin": "agent",
+   "payload": "{\"questions\": [{\"id\": \"d-q-key\", \"text\": \"Who is the second person holding a key?\"}, {\"id\": \"d-q-money\", \"text\": \"Does anyone pay anything, ever?\"}]}"
+  },
+  {
+   "id": "ev-map-downward-14",
+   "mapId": "map-downward",
+   "revision": 14,
+   "kind": "phase.set",
+   "origin": "agent",
+   "payload": "{\"phase\": \"explore\"}"
+  }
+ ]
+}

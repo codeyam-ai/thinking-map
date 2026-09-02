@@ -1,5 +1,5 @@
 // codeyam-generated — DO NOT EDIT.
-// codeyam-editor: 0.1.7  build: 407033bd6731c87a0f16f396f2fb0241a14b4c84  source-sha256: d8b013d0cb4c1a686f889f66d9fd682b4a6b31458bc618ab492231594c7370d3
+// codeyam-editor: 0.1.7  build: 93463d02c2106dade496718a19a6711c3c626c9a  source-sha256: d8b013d0cb4c1a686f889f66d9fd682b4a6b31458bc618ab492231594c7370d3
 // Route matcher for the capture harness — one of THREE implementations of a
 // single semantic. The authority is the Rust engine
 // (crates/mock-engine/src/route_parser.rs), where the contract is written down;

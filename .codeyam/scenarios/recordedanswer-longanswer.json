@@ -1,0 +1,13 @@
+{
+ "name": "RecordedAnswer - LongAnswer",
+ "id": "1e0aa66e-1c8f-4cda-8dae-9549b06adf7d",
+ "url": "/isolated-components/RecordedAnswer?s=LongAnswer",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "RecordedAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/RecordedAnswer.tsx",
+ "description": "A sentence with its reasoning, wrapping in full \u2014 clipping what the person actually said would be the one thing this component must not do."
+}

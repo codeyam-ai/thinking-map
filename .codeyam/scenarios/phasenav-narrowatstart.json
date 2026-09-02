@@ -1,0 +1,12 @@
+{
+  "name": "PhaseNav - NarrowAtStart",
+  "id": "cf7963ab-2640-485c-8025-0945e9b3c7ea",
+  "url": "/isolated-components/PhaseNav?s=NarrowAtStart",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseNav",
+  "scenarioType": "component",
+  "description": "A track squeezed narrow enough to genuinely overflow, parked at its start. Only the trailing edge fades - the old always-on behaviour, now shown where it is actually earned - and 01 IDEA reads solid against a hard left edge."
+}

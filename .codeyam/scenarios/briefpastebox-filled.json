@@ -1,0 +1,12 @@
+{
+  "name": "BriefPasteBox - Filled",
+  "id": "de99e569-fcf9-4616-b090-c9796d60e06e",
+  "url": "/isolated-components/BriefPasteBox?s=Filled",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefPasteBox",
+  "scenarioType": "component",
+  "description": "A real document in the box: the Attach it button comes alive, and the panel holds a brief that would never have fitted in the one-line input above it."
+}

@@ -1,9 +1,9 @@
 {
   "name": "AgentToolRunner - Busy",
-  "id": "b3a2f16e-e644-4ec8-8510-d4faeccf7d43",
+  "id": "ff936de7-254d-41b2-ac3c-6ef713bf0831",
   "url": "/isolated-components/AgentToolRunner?s=Busy",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentToolRunner",

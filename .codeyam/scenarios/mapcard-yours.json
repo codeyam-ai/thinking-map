@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - Yours",
+ "id": "e0224a77-fad5-4f4b-bba4-ed1ed6ab94d5",
+ "url": "/isolated-components/MapCard?s=Yours",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "A node the person contributed, badged as theirs. The map is co-authored, and the parts they wrote say so."
+}

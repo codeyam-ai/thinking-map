@@ -1,9 +1,9 @@
 {
   "name": "AgentStatusDot - Connected",
-  "id": "dd62b73a-83fc-4ef6-950f-ff10bca81be8",
+  "id": "74d5cfb1-18f0-4c17-8327-ec28851aa5bb",
   "url": "/isolated-components/AgentStatusDot?s=Connected",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentStatusDot",

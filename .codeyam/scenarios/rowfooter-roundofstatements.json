@@ -1,0 +1,12 @@
+{
+  "name": "RowFooter - RoundOfStatements",
+  "id": "f66f8100-9153-40eb-a18f-16d64b0667e9",
+  "url": "/isolated-components/RowFooter?s=RoundOfStatements",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowFooter",
+  "scenarioType": "component",
+  "description": "A round of statements rather than questions is complete on arrival — there was never anything in it to answer, so it reaches the action without ever showing a count."
+}

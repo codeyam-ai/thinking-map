@@ -1,0 +1,19 @@
+{
+ "name": "MapCard - EditingAnAnswer",
+ "id": "315e8620-a7a1-420c-baf2-169ef0ce7289",
+ "url": "/isolated-components/MapCard?s=Answered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "Edit pressed on an answered card: the box returns PRE-FILLED with what was said before, because an edit is almost always a correction rather than a different answer typed from nothing. Invisible in any resting render of the card.",
+ "interactions": [
+  {
+   "action": "click",
+   "text": "Edit"
+  }
+ ]
+}

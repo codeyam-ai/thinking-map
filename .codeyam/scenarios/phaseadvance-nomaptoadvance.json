@@ -1,0 +1,12 @@
+{
+  "name": "PhaseAdvance - NoMapToAdvance",
+  "id": "1a3f5b7e-961e-48b7-a8b6-64c97de98d79",
+  "url": "/isolated-components/PhaseAdvance?s=NoMapToAdvance",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseAdvance",
+  "scenarioType": "component",
+  "description": "No map to advance. The button is disabled rather than absent, so the next step stays legible even where it cannot be taken."
+}

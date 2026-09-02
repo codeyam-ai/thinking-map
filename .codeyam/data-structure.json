@@ -45,7 +45,7 @@
   },
   {
     "name": "Message",
-    "description": "One turn of the conversation, in order. Nothing in the page renders these any more — the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
+    "description": "One turn of the conversation, in order. Nothing in the page renders these any more \u2014 the agent lives in the browser, so its conversation is its own and the page cannot see it. They are kept as the record of how a map got started, and an agent calling read_map is given them as context. New thinking is recorded as MapEvent instead. 'origin' records whether the user or the agent produced the turn.",
     "category": "datastore",
     "order": 2,
     "fields": [
@@ -84,7 +84,7 @@
   },
   {
     "name": "MapNode",
-    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step) and 'status' drives the dashed / solid / highlighted treatment from the mockups. 'origin' says whether the person or the agent contributed it, which is what stops an agent re-ingesting its own writes as new information. Self-referencing, so parents must precede children in seed input order.",
+    "description": "One node in the visual map. A tree via nullable parentId, so no separate edge table is needed. 'kind' says what the node represents (idea, problem, assumption, open-question, research, finding, gap, approach, pro, risk, known, unknown, direction, next-step, slice) and 'status' drives the dashed / solid / highlighted treatment from the mockups. 'origin' says whether the person or the agent contributed it, which is what stops an agent re-ingesting its own writes as new information. Self-referencing, so parents must precede children in seed input order. 'offsetX' / 'offsetY' are an arrangement nudge away from the node's computed tidy position, not a position: the tidy layout stays authoritative, so siblings still never overlap and a node added later still places itself sensibly. They default to 0, and they are deliberately absent from the agent's rendering of the map \u2014 arrangement is not thinking. 'testsNodeId' is the id of the node a slice would settle \u2014 the assumption, risk, or open question that building it would answer. It is a pointer, not an edge: it is deliberately not a Prisma relation and never draws on the map, because hijacking parentId for it would drag every tested assumption out of where it belongs in the tree. Optional, and a dangling id is tolerated \u2014 the node it names may since have been deleted, which the build sequence reports rather than rendering as a blank. 'kind' also admits 'slice': the smallest buildable increment, which carries its rough effort in 'detail' as a sentence a human can argue with rather than a number that looks computed. 'sourceRef' is the brief section id a node was derived from, and it is the deliberate contrast to 'sourceUrl': sourceUrl points out of the map at the web, sourceRef points into the client's own document \u2014 and unlike 'testsNodeId', which points at another node on this map, it points at a passage in the document the map came from. It stores the section id (e.g. 's7') rather than the quoted passage, so the two cannot drift \u2014 the text it points into is immutable. It is optional and always will be: a node the person typed, or one the agent inferred across the whole document, genuinely has no single source section, and forcing one would produce fabricated citations. Coverage of the brief is counted from the nodes that actually cite each section, never asserted. 'options' holds a JSON array of a few likely answers to offer as chips beside an open question; it is optional, meaningful only on an open-question, and the chips fill the answer input rather than submitting it, so it never makes a question multiple-choice.",
     "category": "datastore",
     "order": 3,
     "fields": [
@@ -130,6 +130,16 @@
         "required": false
       },
       {
+        "name": "testsNodeId",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sourceRef",
+        "type": "string",
+        "required": false
+      },
+      {
         "name": "order",
         "type": "number",
         "required": true
@@ -137,6 +147,21 @@
       {
         "name": "origin",
         "type": "string",
+        "required": true
+      },
+      {
+        "name": "options",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "offsetX",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "offsetY",
+        "type": "number",
         "required": true
       },
       {
@@ -192,6 +217,50 @@
         "name": "requestId",
         "type": "string",
         "required": false
+      },
+      {
+        "name": "createdAt",
+        "type": "datetime",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "MapBrief",
+    "description": "The client's own document, kept whole as the map's source. Written once when the map is created and never overwritten \u2014 a revised brief is a new map, not an edit to this one \u2014 which is what makes section ids derivable from the text rather than stored as rows. Held in its own model so listMaps and getMap never drag tens of thousands of characters into memory; the text has exactly one reader, the agent's read_brief tool, which returns an outline by default and a single passage on request. 'sourceName' is the uploaded filename or \"pasted\"; only the extracted text is persisted, never the file it arrived in.",
+    "category": "datastore",
+    "order": 5,
+    "fields": [
+      {
+        "name": "id",
+        "type": "string",
+        "isId": true,
+        "required": true
+      },
+      {
+        "name": "mapId",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sourceName",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "mediaType",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "text",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "charCount",
+        "type": "number",
+        "required": true
       },
       {
         "name": "createdAt",

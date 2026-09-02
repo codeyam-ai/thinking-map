@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanel - MidDeconstruction",
+  "id": "ed8610b8-1140-4ce7-be4a-174235d2dc56",
+  "url": "/isolated-components/BriefPanel?s=MidDeconstruction",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanel",
+  "scenarioType": "component",
+  "description": "A brief roughly half accounted for - the ordinary working state. The untouched sections carry the ink and the covered ones recede, because the map beside the panel is already the covered sections' evidence and what is left for the panel to say is what nobody has dealt with."
+}

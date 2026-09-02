@@ -1,0 +1,13 @@
+{
+ "name": "MapCardAnswer - Default",
+ "id": "775bec71-d45f-49de-b45e-3be8fed30e67",
+ "url": "/isolated-components/MapCardAnswer?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardAnswer.tsx",
+ "description": "Chips over a box. Clicking a chip FILLS the box rather than sending it, so the words recorded are always the person's own."
+}

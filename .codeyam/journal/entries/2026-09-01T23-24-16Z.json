@@ -1,0 +1,515 @@
+{
+  "timestamp": "2026-09-01T23:24:16Z",
+  "title": "The Phase Track Fades Its Own Active Step",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe phase track's trailing fade is applied unconditionally below `lg`, so it\nfades whatever sits at the right edge — including the active step, which is the\none element on the track that must read clearly. On the summary phase the lime\n`06 NEXT STEPS` pill is washed out to near-illegibility, and on a track narrow\nenough to need no scrolling at all the fade still appears, promising content to\nthe right that does not exist. Make the fade conditional on there actually being\nmore track in that direction.\n\n## Key Decisions\n\n- **The fade is the bug, not the scrolling track.** `PhaseNav` deliberately\n  scrolls horizontally below `lg` rather than collapsing to a \"3 of 6\" summary,\n  and it scrolls the active pill into view on mount and on change. Both of those\n  are right and stay. The defect is one always-on `mask-image`: it says \"there is\n  more to the right\" as a static decoration rather than as a fact about the\n  current scroll position.\n- **Fade only when there is something to fade toward.** Derive the mask from\n  scroll state — no trailing fade once `scrollLeft` has reached the end, no\n  leading fade at the start. The mask exists to signal reachable-but-unseen\n  content, so it should be absent exactly when there is none.\n- **Add the leading fade too.** Today only the right edge fades. Once the track\n  is scrolled away from the start, content is cut off on the LEFT with nothing\n  saying so, which is the same omission mirrored. The symmetric treatment is what\n  makes the affordance mean \"more this way\" rather than \"right edge\".\n- **This is why it hid for so long.** `lg` is 1024px, and the project captured\n  scenarios at Desktop (1440) until the default moved to Tablet (768). The mask\n  was off in every captured frame and on for every real half-screen user — the\n  gap between the two is what the size switch closed.\n- **No unit-level reproduction is writable, and the existing test file already\n  says why.** `PhaseNav.render.test.tsx` states that jsdom has no layout engine,\n  so `getBoundingClientRect`, `scrollWidth` and `clientWidth` all read zero and a\n  mask/overflow assertion would pass whether or not the bug were present. Its\n  three existing tests cover the one genuinely testable behavior — that\n  `scrollIntoView` is called on mount and on phase change — and those must keep\n  passing. This one is demonstrated by scenario capture.\n\n## Implementation\n\n### 1. Make the fade reflect scroll position\n\n**File**: `app/components/PhaseNav.tsx`\n\nHold the track element in a ref and track two booleans — whether it is scrolled\naway from the start, and whether it has more to reveal at the end — updated on\n`scroll`, on mount, and on resize. Derive the `mask-image` from them:\n\n- neither end reachable (the track fits) → no mask at all\n- more to the right only → fade the right edge (today's behaviour, now earned)\n- more to the left only → fade the left edge\n- both → fade both edges\n\nKeep `lg:[mask-image:none]`, since above `lg` the track never overflows. Keep the\nexisting `scrollIntoView` effect and the `no-scrollbar` / `overscroll-x-contain`\ntreatment exactly as they are.\n\nThe resize listener matters as much as the scroll listener: the window can cross\nthe fits/does-not-fit boundary without any scrolling, and a stale \"more to the\nright\" would leave the fade stuck on over a track that now fits.\n\n### 2. Show the corrected states\n\n**File**: `app/isolated-components/PhaseNav/page.tsx`\n\nThe three existing scenarios (`Default`, `Research`, `NextSteps`) already sit at\nTablet and will re-capture with the fix. Add a narrow scenario that is genuinely\nscrolled mid-track, so the both-edges-fading state is demonstrated rather than\ninferred — the current three cannot show it, because at 768px the track fits and\nafter the fix none of them will fade at all.\n\n## Reused existing code\n\n- `PhaseNav` in `app/components/PhaseNav.tsx` (glossary entry: `PhaseNav`) — the\n  component being fixed; its scrolling track, `scrollIntoView` effect and\n  `no-scrollbar` treatment all stay.\n- `PHASES` and `PHASE_LABELS` from `app/lib/mapKinds.ts` (glossary entries:\n  `PHASES`, `PHASE_LABELS`) — unchanged; the fix touches only the mask.\n- `app/components/PhaseNav.render.test.tsx` (registered against the `PhaseNav`\n  glossary entry) — its three `scrollIntoView` tests must keep passing, and its\n  header comment already documents why layout assertions are not testable here.\n- **Existing-implementation survey.** Grepped `app/` for any other scroll-state\n  or fade-mask handling: there is none. `MapRow` and the map column wrap or\n  scroll vertically without a mask, and no shared \"scrolled-away-from-edge\" hook\n  exists. The scroll-state derivation in change 1 is genuinely new, and small\n  enough to stay local to `PhaseNav` rather than becoming a shared hook on first\n  use.\n\n## Reproduction Test\n\nThe active phase pill is faded by the track's trailing mask when it sits at the\nright edge, including when the track fits entirely and nothing is hidden.\n\nNo unit-level reproduction is writable. The behaviour is pure layout — a\n`mask-image` applied over an element whose overflow state depends on measured\nwidths — and jsdom reports every width as zero, so an assertion about the mask\nwould pass with or without the bug. `PhaseNav.render.test.tsx` already records\nthis reasoning for the same component.\n\nDemonstrate with scenario capture instead: `phasenav-nextsteps` at Tablet is the\nreproduction. Before the fix its lime `06 NEXT STEPS` pill fades to near-white at\nthe right edge despite the whole six-pill track fitting inside the frame; after\nthe fix the pill is solid lime and no mask is applied.\n\n## Scenarios to Demonstrate\n\n- **The last phase active, narrow** — `06 NEXT STEPS` solid lime with no fade\n  over it, on a track that fits. The reported case.\n- **The first phase active, narrow** — no leading fade at the start of the track.\n- **Mid-track, scrolled** — both edges fading, because content is genuinely cut\n  off on both sides. The state that proves the mask still does its job.\n- **Scrolled fully to the end** — trailing fade gone, leading fade present.\n- **Desktop width** — no mask in any position, unchanged from today.\n- **The summary screen at narrow width** — the whole header in context, since\n  that is where the washed-out pill was found.",
+  "description": "The phase track's trailing fade was applied unconditionally below lg, so it washed out whatever sat at the right edge - including the active lime pill, and including on a track narrow enough that nothing was hidden behind it at all. The fade is now derived from scroll position: an edge fades only when there is genuinely more track past it, a matching leading fade was added for the mirror case, and where the track fits no mask is applied. Six PhaseNav scenarios pin the four states (fits / at-start / mid-track / at-end), and seven new tests pin the decision itself - jsdom cannot lay the track out, but once the choice moved from static CSS into JavaScript it became a pure function of three stubbable numbers, and prove-red confirms five of six go red with the fix reverted.\n\nSCOPE VERDICT. This cycle delivered the plan in full: both changes in the Implementation section landed, plus two extra demonstration scenarios so all four fade states are captured rather than inferred. Nothing was deferred by this cycle. The project's deliverable ledger is unchanged by it - 9 of 10 delivered, and the single deferred row (registering the MCP server with a client) was deferred by the user in an earlier cycle as assist-track work rather than code. No agent-decided deferral is outstanding.\n\nTwo corrections made in passing, both the same stale fact: the PhaseNav glossary entry and the PhaseNav - Default scenario each described a six-phase track. It has five.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/the-phase-track-fades-its-own-active-step.md\t.codeyam/plans/completed/the-phase-track-fades-its-own-active-step.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/phasenav-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/phasenav-nextsteps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-explore--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-explore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-nextsteps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-nextsteps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-research--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-research--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/35c586ccb812865d2f33d62011cb140a3718d929e1f0378e697eea6dae2e484e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c730b0e54bad576e60a23b0962949428938d8f3cd69ec3028d0ce2b06e9b6274.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/PhaseNav.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/PhaseNav.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/PhaseNav/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/phasenav.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/phasenav-narrowatend.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/phasenav-narrowatstart.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/phasenav-narrowscrolled.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowatend--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowatend--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowatstart--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowatstart--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowscrolled--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowscrolled--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/the-phase-track-fades-its-own-active-step.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/373a29e82bc97f99a0c7beaf0ced34cfb9a34db5ad7a2c5d5536834fd4e62fb8.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/4aa4d2a71cf87c18fe7e4c702b00710a6bce678ab7ef0728b94a77eaa4951783.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7c613d41d6b12d5602269a38b90d1ed67b8d6d584e13f05147131fc14433f30d.json",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "AppHeader - Default",
+      "screenshotPath": "appheader-default--tablet.png"
+    },
+    {
+      "name": "AppHeader - Explore",
+      "screenshotPath": "appheader-explore--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "PhaseNav - Default",
+      "screenshotPath": "phasenav-default--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NarrowAtEnd",
+      "screenshotPath": "phasenav-narrowatend--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NarrowAtStart",
+      "screenshotPath": "phasenav-narrowatstart--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NarrowScrolled",
+      "screenshotPath": "phasenav-narrowscrolled--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NextSteps",
+      "screenshotPath": "phasenav-nextsteps--tablet.png"
+    },
+    {
+      "name": "PhaseNav - Research",
+      "screenshotPath": "phasenav-research--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 12,
+        "passed": 12
+      }
+    ]
+  }
+}

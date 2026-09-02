@@ -185,6 +185,30 @@ Budget for it: on a scenario-heavy repo this run takes minutes, not seconds.
 It is a backgrounded long command like any other; wait on the completion
 sentinel rather than assuming it hung.
 
+**Finish your source edits BEFORE you warm the cache.** The warm is only
+durable until the next source edit: touching one tracked file re-stales the
+partition that owns it, and a stale partition is what step 4a's
+`reconcile-registry --auto-apply` pre-flight pays a full package test run to
+rediscover. That makes the warm **order-sensitive with respect to step 4**,
+which nothing above says and the natural reading gets backwards — warm, size
+the run, *then* start fixing is the expensive sequence. Measured on
+`editor-improvements-78` (2026-08-31): a 31-minute warm left all 20
+partitions green, **one** added comment line in
+`crates/codeyam-editor/src/commands/editor/pre_commit_sync.rs` invalidated
+it, and the next `--auto-apply` spent 55 minutes re-running partitions to
+learn nothing had changed.
+
+Keep warming before you quote a count — that instruction is correct and
+load-bearing, and a cold count mis-prices the run. Just do the step-4b
+judgment edits you already know you are making first, so the warm you pay
+for is the warm that survives. When an edit after the warm is unavoidable,
+re-check freshness before the pre-flight rather than assuming the warm
+still holds:
+
+```bash
+codeyam-editor editor test-status
+```
+
 **`--findings-only` is a smaller ANSWER, not a faster run — do not reach for
 it to save time.** It skips the per-file `git log` attribution walk and the
 per-entity evidence projection, and that is genuinely all it skips. Measured
@@ -234,6 +258,19 @@ revert:
   `GLOSSARY_ENTRY_LACKS_TEST` are computed from runner emission, so a cold
   cache manufactures them by the hundred. Warm the cache; do not fix them by
   hand.
+
+**A cost being documented is not evidence the cost is correct.** Everything
+in this band is churn you should stop chasing — but the inverse error is
+just as expensive, and it wears the docs as camouflage: you recognise a slow
+command's shape from `CLAUDE.md`, confirm it is healthy, and let it run,
+because the duration was written down as *expected* rather than as a
+*symptom*. Documentation records what a command does today, not that today's
+behaviour is right. When a command's own progress output says the work it
+just did was unnecessary — a partition reporting `already fresh` after
+paying a multi-minute test run for it — that is a defect to report, not a
+duration to absorb. This file already makes the argument one layer down for
+the RSS runaway (two sessions let `reconcile-registry` reach 2 GB because
+"this one is slow" was in the docs); it holds for wall-clock too.
 
 > GOTCHA — **a git hook invoking a flag the binary doesn't have.** When a
 > commit or push dies on something like `error: unexpected argument '--check'
@@ -288,6 +325,36 @@ Apply the failures whose fix is unambiguous and scripted. These have a
 
 Re-run `codeyam-editor editor audit --format json` after the mechanical pass so
 the remaining set is only the judgment calls.
+
+> GOTCHA — **`reconcile-registry --auto-apply` is order-sensitive with your
+> source edits, and getting the order wrong costs the better part of an
+> hour.** Read-only `reconcile-registry` is a ~20-second command here. Under
+> `--auto-apply` *only*, it first runs a stale-partition pre-flight, and in
+> its eviction shape that is **one package-scoped `cargo test` per stale
+> partition, run one at a time** — so its cost is set by how many partitions
+> are stale when it starts, which is set by which files you edited since the
+> warm.
+>
+> Measured on `editor-improvements-78` (2026-08-31): all 20 partitions green
+> after a 31-minute warm, then a single one-line description comment added to
+> one file, then `--auto-apply` spent **55 minutes** in the pre-flight — and
+> **10 of the 11 partitions it ran reported "already fresh"** after paying
+> 144–429 seconds each. One edited file re-invalidated the cache and bought
+> nearly a whole-workspace re-run to rediscover that nothing had changed.
+>
+> Two orderings avoid it entirely, and at least one is always available:
+> run reconcile **before** you make step-4b judgment edits, or finish those
+> edits **before** the step-2 warm (see "Finish your source edits BEFORE you
+> warm the cache"). When neither is possible, make the price visible before
+> you pay it rather than after — `codeyam-editor editor test-status` is
+> cheap and answers "is the warm still valid?" directly, and the count of
+> non-green partitions it reports is the number of package test runs the
+> pre-flight is about to spend.
+>
+> While it runs, the pre-flight announces its run count and prints
+> per-partition progress with elapsed time. Read that output as a claim to
+> check, not a progress bar to wait out: a partition reporting `already
+> fresh` after a full run is the tool telling you the run was wasted.
 
 > GOTCHA — **Platform-gate drift can only be reconciled AFTER a full
 > `refresh-tests`, so do not hand-run `reconcile-registry` for it here.**

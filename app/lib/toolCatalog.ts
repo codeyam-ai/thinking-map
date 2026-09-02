@@ -13,7 +13,7 @@
 // itself execute.
 
 import { z } from 'zod';
-import { NODE_KINDS, NODE_STATUSES, PHASES } from './mapKinds';
+import { ACCEPTED_PHASE_NAMES, NODE_KINDS, NODE_STATUSES } from './mapKinds';
 import type { Origin } from './exchange';
 
 /**
@@ -125,6 +125,24 @@ const themeShape = z.object({
   label: z
     .string()
     .describe('What this group of questions is about. Two or three words: "Context", "Who it is for".'),
+  tests: z
+    .string()
+    .optional()
+    .describe(
+      'Only for a "slice": the ref or real id of the ONE node this slice would settle — the assumption, risk, or open question that building it would answer. If it settles nothing, leave this off rather than picking the nearest node; an increment that tests nothing is shown as proving nothing, which is the honest answer.',
+    ),
+  sourceRef: z
+    .string()
+    .optional()
+    .describe(
+      "The brief section this claim came from, as the section id read_brief reported (e.g. 's7'). Cite the section a claim actually came from; leave it off rather than guessing. A node you inferred across the whole document, or one the person typed, has no single source — an omitted ref is correct there, and a wrong one is worse than none.",
+    ),
+  options: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Only meaningful on an "open-question": a few likely answers to offer as one-tap chips. The person can always type their own — a chip fills the box rather than sending it — so these are a head start, not a closed set of choices. Omit them when you genuinely cannot guess; a question with no options is an ordinary question with a text box.',
+    ),
 });
 
 export interface ToolSpec {
@@ -171,6 +189,21 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     }),
   },
   {
+    name: 'read_brief',
+    title: 'Read the client brief',
+    description:
+      "Read the client's own document, when the map was started from one. With no section, returns the OUTLINE — one line per section with its id, heading and length — which is cheap enough to call on any turn. With a section id, returns that passage in full. Read the outline first and pull only the passages you actually need; walking every section of a long spec into your context is how you run out of room to think. The client did not send this to have it summarised back at them — read it to find what it does NOT say, and ask about that.",
+    inputSchema: z.object({
+      section: z
+        .string()
+        .optional()
+        .describe(
+          'A section id from the outline, e.g. "s3". Omit to get the outline.',
+        ),
+    }),
+    annotations: { readOnlyHint: true },
+  },
+  {
     name: 'add_nodes',
     title: 'Add nodes to the map',
     description:
@@ -194,6 +227,12 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
       detail: z.string().optional(),
       kind: z.enum(NODE_KINDS).optional(),
       status: z.enum(NODE_STATUSES).optional(),
+      tests: z
+        .string()
+        .optional()
+        .describe(
+          'The id of the node this slice would settle. A slice\'s purpose usually sharpens once the whole sequence is laid out, so this is editable after the fact.',
+        ),
       expectedRevision: z
         .number()
         .int()
@@ -209,7 +248,13 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     title: 'Move the map to a new phase',
     description:
       'Advance the map through the loop once the conversation has genuinely reached the next phase.',
-    inputSchema: z.object({ phase: z.enum(PHASES) }),
+    inputSchema: z.object({
+      phase: z
+        .enum(ACCEPTED_PHASE_NAMES)
+        .describe(
+          'One of: idea, map, research, explore, next-steps. `deconstruct` is also accepted and is treated as `map` — the two were merged into one phase, and the old name keeps working for agents that learned it.',
+        ),
+    }),
   },
   {
     name: 'post_note',
@@ -224,7 +269,26 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     description:
       'Put one or more questions on the map and wait for the person to answer them in the page. Bounded: if they do not answer in time you get status "pending" and a cursor, the questions stay on screen, and their answer lands in the log for your next read. Nothing is lost by giving up.',
     inputSchema: z.object({
-      questions: z.array(z.string()).min(1),
+      // A question is either the bare string it always was, or that string with
+      // a few suggested answers attached. The union rather than a replacement
+      // is what keeps every agent written against the old shape working
+      // verbatim — `questions: ["…"]` is still valid input.
+      questions: z
+        .array(
+          z.union([
+            z.string(),
+            z.object({
+              text: z.string(),
+              options: z
+                .array(z.string())
+                .optional()
+                .describe(
+                  'A few likely answers, offered as one-tap chips. A chip fills the answer box rather than sending it, so the person can still edit or ignore them.',
+                ),
+            }),
+          ]),
+        )
+        .min(1),
       timeoutSeconds: z.number().int().optional(),
     }),
   },

@@ -1,0 +1,18 @@
+{
+  "surface": "IdeaPrompt",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "brief",
+      "value": "true",
+      "rationale": "source-derived state brief=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "brief",
+      "value": "false",
+      "rationale": "source-derived state brief=false",
+      "status": "covered"
+    }
+  ]
+}

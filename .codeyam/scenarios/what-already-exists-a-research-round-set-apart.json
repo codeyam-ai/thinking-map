@@ -1,0 +1,192 @@
+{
+  "name": "What already exists - a research round set apart",
+  "id": "5cdeafd5-2f29-43f0-94ba-99ac218fa0dd",
+  "url": "/map/map-lending",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-lending-1",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "user",
+        "payload": "{\"id\": \"l-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A tool library for the street\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-lending-2",
+        "kind": "agent.note",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"text\": \"Before proposing anything, I went and looked at what already exists.\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-lending-3",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"id\": \"l-res\", \"parentId\": \"l-idea\", \"kind\": \"research\", \"label\": \"Looked at eleven street tool libraries\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-lending-4",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"id\": \"l-f1\", \"parentId\": \"l-idea\", \"kind\": \"finding\", \"label\": \"Every one that lasted had a single named keyholder\", \"status\": \"answered\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-lending-5",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"id\": \"l-f2\", \"parentId\": \"l-idea\", \"kind\": \"finding\", \"label\": \"None of them charged money, and none of them wanted to\", \"status\": \"answered\"}",
+        "revision": 5
+      },
+      {
+        "id": "ev-lending-6",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"id\": \"l-gap\", \"parentId\": \"l-idea\", \"kind\": \"gap\", \"label\": \"Nobody tracks what happens after the first winter\", \"status\": \"open\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-lending-7",
+        "kind": "phase.set",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"phase\": \"research\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-lending-8",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"id\": \"l-appr\", \"parentId\": \"l-res\", \"kind\": \"approach\", \"label\": \"One keyholder, one shelf, no money\", \"status\": \"answered\"}",
+        "revision": 8
+      },
+      {
+        "id": "ev-lending-9",
+        "kind": "node.added",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "payload": "{\"id\": \"l-risk\", \"parentId\": \"l-res\", \"kind\": \"risk\", \"label\": \"One keyholder is also one person who can move away\", \"status\": \"answered\"}",
+        "revision": 9
+      }
+    ],
+    "mapNode": [
+      {
+        "detail": "Four of us have bought a tile cutter and none of us has used it twice.",
+        "id": "l-idea",
+        "kind": "idea",
+        "label": "A tool library for the street",
+        "mapId": "map-lending",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "detail": "Six were still running after two years; five had folded inside one.",
+        "id": "l-res",
+        "kind": "research",
+        "label": "Looked at eleven street tool libraries",
+        "mapId": "map-lending",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "l-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "Shared custody was the strongest predictor of a library folding.",
+        "id": "l-f1",
+        "kind": "finding",
+        "label": "Every one that lasted had a single named keyholder",
+        "mapId": "map-lending",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "l-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "Every organiser who tried a subscription described it as the point it stopped feeling like a favour.",
+        "id": "l-f2",
+        "kind": "finding",
+        "label": "None of them charged money, and none of them wanted to",
+        "mapId": "map-lending",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "l-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "Every write-up stops at the launch. What breaks, and who stops turning up, is unrecorded.",
+        "id": "l-gap",
+        "kind": "gap",
+        "label": "Nobody tracks what happens after the first winter",
+        "mapId": "map-lending",
+        "order": 3,
+        "origin": "agent",
+        "parentId": "l-idea",
+        "status": "open"
+      },
+      {
+        "detail": "Take the three things every surviving library had and nothing else.",
+        "id": "l-appr",
+        "kind": "approach",
+        "label": "One keyholder, one shelf, no money",
+        "mapId": "map-lending",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "l-res",
+        "status": "answered"
+      },
+      {
+        "detail": "The thing that keeps it alive is the thing that can end it.",
+        "id": "l-risk",
+        "kind": "risk",
+        "label": "One keyholder is also one person who can move away",
+        "mapId": "map-lending",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "l-res",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "A tool library for the street - nobody needs to own a tile cutter, and four of us have bought one.",
+        "id": "lmsg-1",
+        "mapId": "map-lending",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Before proposing anything, I went and looked at what already exists.",
+        "id": "lmsg-2",
+        "mapId": "map-lending",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-lending",
+        "phase": "research",
+        "revision": 9,
+        "seedIdea": "A tool library for the street - nobody needs to own a tile cutter.",
+        "title": "A tool library for the street"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "A round that is entirely research, on the real route: the row wears its own tinted ground, a hairline enclosure and the eyebrow WHAT ALREADY EXISTS, so what has already been looked up reads as its own territory before any card in it is read. The round above it is unbanded, so the contrast is in one frame. The map's other research scenario is the boundary case — exactly half its round is research, which is not a majority, so it correctly gets no band."
+}

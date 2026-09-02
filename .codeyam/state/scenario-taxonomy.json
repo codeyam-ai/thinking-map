@@ -1,5 +1,157 @@
 {
   "views": {
+    "AgentHandoff": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The panel is itself the empty-ish state of a map. It renders only when nothing has worked the map, and when there is no seed idea to show it drops the quote and points at the brief instead - that is the FromBrief scenario, not a separate empty one."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It renders one card of fixed copy, never a list, so there is no overflow or truncation boundary. Length variation is the edge archetype, covered by LongIdea."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Nothing here is asynchronous. The panel reads bridge state already resolved by the provider and renders synchronously; there is no pending phase to picture."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure this panel can be in. Its whole purpose is to state an ordinary absence honestly - the states where it must NOT render are asserted in AgentHandoff.render.test.tsx, where 'nothing' is a real assertion rather than a blank frame."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Its one action is the copy button, which belongs to CopyablePrompt and is recorded on that view. The copied label needs a successful navigator.clipboard write, which the capture browser refuses."
+      }
+    },
+    "BriefDrop": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "A map has exactly one brief or none - it is written once at creation and never replaced - so there is no list here and no empty-to-many boundary. The one-item case IS the typical case, captured as BriefDrop - Attached."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "One brief per map is a schema-level rule: MapBrief.mapId is unique and the row is never overwritten. Attaching a second brief is not an action this surface offers, so a many state cannot occur."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The in-flight upload state is internal to this component - it is set when the fetch starts and cleared when it returns, with no prop seam to preset it - so it cannot be captured at this level. The pixels it produces ARE captured one level down, where the state is a prop: BriefDropTarget - Reading."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "Both failure states are held below this component and captured there: an upload that failed is BriefDropTarget - Failed, and a file that extracted to almost nothing is BriefReadout - ScannedPdf. This component owns the error string but renders none of it itself."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
+    "BuildSequence": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "added"
+      },
+      "many": {
+        "status": "added"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The region is server-rendered from nodes already in hand - buildSequence is a pure function over an in-memory list, so there is no fetch that could be pending."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure path to render. The two things that can go wrong with a slice - naming no node, or naming a deleted one - are modelled as ordinary reported states, and each has its own scenario."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The region is read-only: it renders slices and binds no handlers. The plan is something the client reads and argues with, not something they operate."
+      }
+    },
+    "CardIcon": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The mark is drawn from a kind string that is always present; there is no zero-data state. A kind the map does not recognise still gets a mark - the neutral ground glyph - which is the edge archetype, captured as UnknownKind."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It draws exactly one mark and never a list, so there is no overflow or truncation boundary. The breadth of the set is shown as six sibling scenarios rather than as a many state."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "A pure synchronous render from one string prop. Nothing is fetched and nothing is deferred, so there is no pending phase to picture."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "An unrecognised kind is not a failure here - it falls back to the neutral ground family deliberately, so a kind loses its precision and never its mark. That fallback is captured as UnknownKind under edge."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The icon is aria-hidden decoration and binds no handlers. It restates the family that the card eyebrow beneath it already names in words."
+      }
+    },
+    "CopyablePrompt": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The only caller builds the text from handoffCopy, which always returns a non-empty prompt. An empty string would render an empty bordered box, which is a caller bug rather than a state of this component."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "This renders one block of text, never a list, so there is no overflow or truncation boundary to show. Length variation is the edge archetype, covered by ShortPrompt and DefaultLabel."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "There is nothing asynchronous to wait for on render. The clipboard write is instantaneous from the component's point of view and resolves into the copied label, not a loading state."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The failure path - a refused or unavailable clipboard - is deliberately indistinguishable from the resting state: the button simply does not change, and the text stays on screen so the person can select it by hand. It is therefore already shown by Default, and a separate capture would be a byte-identical duplicate."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The copied label is reachable only through a successful navigator.clipboard write, which the capture browser refuses - a registered interaction scenario captured the pre-click state and was deleted rather than shipped as a misleading duplicate of Default. The state is covered instead by app/components/AgentHandoff.render.test.tsx and the CopyablePrompt behaviour is asserted there rather than pictured."
+      }
+    },
     "Home": {
       "empty": {
         "status": "covered"
@@ -26,6 +178,38 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "MapCardHeader": {
+      "empty": {
+        "status": "n-a",
+        "reason": "Both marks are always present: a card always belongs to a round and always has a kind, so there is no zero-data state to render."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "It renders two fixed marks rather than a list, so there is no empty-to-many boundary here. The one-of-each case IS the typical case."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Never a list - two marks at opposite corners, always exactly two. The widest the row can get is a double-digit round marker, which is the edge archetype rather than an overflow one."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "A synchronous render from four scalar props. Nothing here is fetched or deferred."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure state. An unrecognised kind falls back to the neutral family, which is a deliberate fallback rather than an error, and is captured on CardIcon - UnknownKind."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The header binds no handlers - a text span and an aria-hidden icon. The card's one action, answering a question, lives in MapCardAnswer and is recorded there."
       }
     },
     "MapPage": {
@@ -57,6 +241,65 @@
         "status": "covered"
       }
     },
+    "MapRow": {
+      "empty": {
+        "status": "n-a",
+        "reason": "A round always holds at least one node: groupIntoRounds only emits a round for a run of node-adds it actually found, so an empty row cannot occur."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The row is rendered from nodes already in hand - grouping is a pure function over an in-memory list, so there is no fetch that could be pending."
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "The row's own edges are its wrap boundary and its banded form, both captured as their own states. Long and missing text are a CARD concern and are captured on MapCard - LongLabel and MapCard - NoOptions."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The row has no failure state of its own. A failed answer write is rolled back inside useMapAnswers so the card returns to asking, and the row is unchanged throughout."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The row composes cards and binds no handlers itself. The key action - answering a question - happens on the card and is recorded on MapCardAnswer; PartlyAnswered shows the result of it landing in a row."
+      }
+    },
+    "MapScreen": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The route is force-dynamic and server-renders the map with its log already read, so the page never paints a pending state - by the time MapScreen mounts, its data is resolved."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "covered"
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "MapScreen composes the surface; answering a question - the key action on this view - is owned by the card that asks it and is captured as MapCardAnswer - ChipFilledTheBox and MapCard - EditingAnAnswer, driven as real interactions rather than duplicated here."
+      }
+    },
     "MapWorkspace": {
       "empty": {
         "status": "covered"
@@ -72,17 +315,199 @@
       },
       "loading": {
         "status": "n-a",
-        "reason": "The workspace is server-rendered from the map, so it has no in-flight state of its own. The only work-in-progress a person sees on this surface belongs to the reply box while a turn is running, which is captured separately as ReplyForm - Busy."
+        "reason": "The workspace is server-rendered from the map with its event log already read, so it has no in-flight state of its own. The one piece of waiting a person sees is an answer being sent from a card, which is held inside MapCardAnswer and captured on that view."
       },
       "edge": {
         "status": "covered"
       },
       "error": {
         "status": "n-a",
-        "reason": "The workspace renders whatever the map contains and has no failure state: a missing map is a 404 before this view mounts, and the one error a person actually meets - no model credential configured - is raised by the reply box and captured as ReplyForm - WithError."
+        "reason": "The workspace renders whatever the map contains and has no failure state of its own: a missing map is a 404 before this view mounts, and a failed answer write is rolled back inside useMapAnswers so the card returns to asking rather than the workspace showing an error."
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "PhaseNav": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The track renders the PHASES module constant, not data. There is no zero-item state - a build with no phases would be a broken constant, not a state a person can reach."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "Same fixed constant: the phase count is set in source, never by a query or a prop, so the empty-to-many boundary is not a state this component can be in."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "added"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Nothing is fetched. The labels are a constant and the only prop is which phase is active, so there is no pending state to render."
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "Every label is a fixed string in PHASE_LABELS, so no long, short, unicode or missing-field text can reach this component. What varies at the edge is the WIDTH, and that is the many archetype - the narrow overflow scenarios."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No failure path. An unknown phase cannot arrive - the prop is a union type over the same constant the track renders."
+      },
+      "key-interaction": {
+        "status": "added"
+      }
+    },
+    "RowThreads": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The layer measures the laid-out DOM in an effect and renders nothing until it has. That pre-measure moment is a single frame on mount, not a state a person can see or a capture can hold."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure path. A thread whose cards cannot be measured, or whose lane runs through other cards, is simply not drawn - the honest picture for it is the absence, which is captured as SomeUnattached and WrappedRow."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The overlay is pointer-events-none and aria-hidden. It restates a relationship the rows and eyebrows already carry in text, so nothing here is the only way to learn anything and nothing here can be operated."
+      }
+    },
+    "SeedIdeaQuote": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The empty case renders nothing at all by design - a blank seed idea produces no element rather than empty quote marks. A capture of it would be an empty frame indistinguishable from a broken one, so it is pinned in handoffCopy.test.ts and the AgentHandoff render tests instead."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It renders exactly one quote, never a list. Length variation is the edge archetype, covered by LongIdea and ShortIdea."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "It is a pure presentational component over a string prop with no asynchronous work, so there is no pending phase."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "It takes a single optional string and has no failure mode; an absent value is the blank case, which renders nothing by design."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "It is static text with no handlers - there is no action a person can take on it."
+      }
+    },
+    "SliceCard": {
+      "empty": {
+        "status": "n-a",
+        "reason": "A card always renders exactly one slice - there is no zero-slice card. The empty state belongs to BuildSequence, the region that decides whether there is anything to list, and it is covered there."
+      },
+      "single": {
+        "status": "added"
+      },
+      "typical": {
+        "status": "added"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "One card is one increment by definition. Many slices is BuildSequence's state, not this component's, and it is covered there."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Props in, markup out. Nothing is fetched, so nothing can be pending."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No failure path. A slice that settles nothing, or names a deleted node, is a legitimate state this card is built to report - each has its own scenario rather than being an error."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Purely presentational - no handlers, no controls. Nothing on the card responds to being touched."
+      }
+    },
+    "SummaryView": {
+      "empty": {
+        "status": "added"
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "The summary is five regions rendered at once, so a one-item state is not a state of this screen - it belongs to the individual cards, and BulletCard, NextStepsTrack and BuildSequence each cover it in isolation."
+      },
+      "typical": {
+        "status": "added"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Composition only - this component sorts nothing and truncates nothing. Overflow is each region's own state and is covered where the rendering actually happens."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Server-rendered from the map's nodes, which the route has already loaded. There is no fetch on this screen to be pending."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No failure path here. A region with nothing to show renders its own hint, which is the NoSlices and Empty scenarios rather than an error."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Read-only composition with no handlers. The one place to act on this screen is KeepThinkingPanel, which sits outside SummaryView and is covered separately."
+      }
+    },
+    "ThinkingMapView": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The map is server-rendered from nodes already read, and the rounds are derived by a pure function over them - so the view has no pending phase of its own."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The view renders whatever the map contains and has no failure state: a missing map is a 404 before it mounts, and a failed answer write is rolled back inside useMapAnswers so the card returns to asking."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The view composes rows and binds no handlers. The key action - answering a question on its own card - lives in MapCardAnswer and is recorded there."
       }
     },
     "WebMcpBridge": {

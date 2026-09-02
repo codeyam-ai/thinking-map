@@ -1,0 +1,12 @@
+{
+  "name": "InlineError - Default",
+  "id": "4cc6f988-764d-44cd-9946-2e8e01504586",
+  "url": "/isolated-components/InlineError?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InlineError",
+  "scenarioType": "component",
+  "description": "The reported case once the page can read it. A failed request with no body to quote, so the caller's own sentence carries it and the status says how far the request got - where the browser's JSON parser error used to be. Nothing to offer as a fix, so no pill."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BuildSequence - Default",
+  "id": "91c6f38b-f1a3-46f5-9828-420d8d3d0588",
+  "url": "/isolated-components/BuildSequence?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BuildSequence",
+  "scenarioType": "component",
+  "description": "A validated sequence: three slices in order, each naming what it would settle, the first one clearly the smallest - paper cards before any app at all."
+}

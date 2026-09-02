@@ -36,7 +36,9 @@ export default function AgentStatus() {
       <AgentStatusDot status={status} />
       <span className="text-[12px] font-semibold text-ink">{headline}</span>
       {status === 'unavailable' && reason ? (
-        <span className="max-w-[190px] truncate text-[11.5px] text-muted">
+        // Hidden under `lg`, where the header has no room for it. Nothing is
+        // lost: the `title` above already carries UNAVAILABLE_HELP in full.
+        <span className="hidden max-w-[190px] truncate text-[11.5px] text-muted lg:inline">
           — {reason}
         </span>
       ) : null}

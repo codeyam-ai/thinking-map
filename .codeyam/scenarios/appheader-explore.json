@@ -1,9 +1,9 @@
 {
   "name": "AppHeader - Explore",
-  "id": "97bc831b-eff0-40b8-a366-0376f1b9813c",
+  "id": "f10f322e-4d51-438a-8de9-a0c1994d2c74",
   "url": "/isolated-components/AppHeader?s=Explore",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AppHeader",

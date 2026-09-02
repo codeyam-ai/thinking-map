@@ -43,11 +43,30 @@ const SPRAWLING: FlatNode[] = [
     { id: "appr2", parentId: "appr", kind: "approach", label: "Nothing software - a paper protocol", detail: null, status: "answered", sourceUrl: null, order: 2 },
   ];
 
+// The same three questions, each carrying a few suggested answers. Chips fill
+// the box rather than sending it, so they are a head start on the person's own
+// words rather than a set of choices.
+const WITH_OPTIONS: FlatNode[] = SEEDED.map((node) => {
+  const options: Record<string, string[]> = {
+    q1: ["Kids around 6 to 8", "Older kids, 9 to 12", "A parent and child together"],
+    q2: ["Reading falls off after school", "Their vocabulary is narrow"],
+    q3: ["Learn new words", "Keep reading daily"],
+  };
+  const forNode = options[node.id];
+  return forNode ? { ...node, options: JSON.stringify(forNode) } : node;
+});
+
 const scenarios: Record<string, Props> = {
   Default: { nodes: RESEARCHED, caption: "5 answered, 1 still open" },
   // Day one: the panel has to invite the next answer, not show a void.
   Empty: { nodes: [], caption: "one seed, nothing else yet" },
+  // No event log at all, so every round here comes from the depth fallback —
+  // which is exactly what an old map, or a seeded scenario, renders as. The
+  // questions carry no options, proving the field is genuinely optional: a card
+  // without them is just a card with an answer box.
   Seeded: { nodes: SEEDED, caption: "one seed, 3 open questions" },
+  // The same questions with suggested answers attached.
+  WithOptions: { nodes: WITH_OPTIONS, caption: "one seed, 3 open questions" },
   Sprawling: { nodes: SPRAWLING, caption: "13 answered, 4 still open" },
   // The caption is optional; without it the header shows only the LIVE MAP
   // eyebrow and must not collapse or leave a gap.

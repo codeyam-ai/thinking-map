@@ -17,6 +17,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 let dir: string;
 let exchange: typeof import('./exchange');
+let mapStore: typeof import('./mapStore');
 let prisma: typeof import('./prisma').prisma;
 
 const MAP = 'map-under-test';
@@ -36,6 +37,7 @@ beforeAll(async () => {
   });
 
   exchange = await import('./exchange');
+  mapStore = await import('./mapStore');
   prisma = (await import('./prisma')).prisma;
 }, 120_000);
 
@@ -270,5 +272,126 @@ describe('waitForUserActivity', () => {
     expect(result.timedOut).toBe(true);
     expect(result.revision).toBe(1);
     expect(Date.now() - started).toBeGreaterThanOrEqual(300);
+  });
+});
+
+// The cross-map sibling of the waiter above. It is what lets an agent with
+// nothing to do park until somebody starts a map, so a submitted idea is picked
+// up rather than sitting on an empty page. Cursored by createdAt rather than
+// revision, because a map that does not exist yet has no revision to resume
+// from.
+describe('waitForNewMap', () => {
+  async function noMaps() {
+    await prisma.mapEvent.deleteMany({});
+    await prisma.message.deleteMany({});
+    await prisma.mapNode.deleteMany({});
+    await prisma.thinkingMap.deleteMany({});
+  }
+
+  // The check-first guarantee: a map created between the agent's last call and
+  // this one is already waiting, and a waiter that subscribed before checking
+  // would sleep straight through it.
+  it('returns immediately when a map already exists after the cursor', async () => {
+    await noMaps();
+    const since = new Date(Date.now() - 60_000);
+    await mapStore.createMap('Already here before the wait started');
+
+    const result = await exchange.waitForNewMap(since, 5_000);
+    expect(result.timedOut).toBe(false);
+    expect(result.maps.map((m) => m.seedIdea)).toEqual([
+      'Already here before the wait started',
+    ]);
+  });
+
+  // The wake path, and the reason the feature exists at all.
+  it('releases when a map is created during the wait', async () => {
+    await noMaps();
+    const since = new Date();
+    setTimeout(() => {
+      void mapStore.createMap('Submitted while the agent was parked');
+    }, 100);
+
+    const result = await exchange.waitForNewMap(since, 5_000, {
+      pollIntervalMs: 50,
+    });
+    expect(result.timedOut).toBe(false);
+    expect(result.maps).toHaveLength(1);
+    expect(result.maps[0]!.seedIdea).toBe('Submitted while the agent was parked');
+  });
+
+  // A timeout must RESOLVE and must carry a usable cursor — an agent looping on
+  // this sees the empty case far more often than the full one.
+  it('times out cleanly with a usable cursor when nobody starts anything', async () => {
+    await noMaps();
+    const since = new Date();
+    const started = Date.now();
+
+    const result = await exchange.waitForNewMap(since, 400, {
+      pollIntervalMs: 50,
+    });
+    expect(result.timedOut).toBe(true);
+    expect(result.maps).toEqual([]);
+    expect(result.cursor).toBe(since.toISOString());
+    expect(Date.now() - started).toBeGreaterThanOrEqual(300);
+  });
+
+  // The whole point of handing the cursor back: re-parking with it must not
+  // re-deliver work the agent has already been given.
+  it('does not re-deliver a map through the cursor it handed back', async () => {
+    await noMaps();
+    await mapStore.createMap('The first idea');
+
+    // Take a real cursor off a real delivery — this is the value an agent
+    // would re-park with.
+    const delivered = await exchange.waitForNewMap(
+      new Date(Date.now() - 60_000),
+      5_000,
+    );
+    expect(delivered.timedOut).toBe(false);
+    expect(delivered.maps).toHaveLength(1);
+
+    const again = await exchange.waitForNewMap(new Date(delivered.cursor), 400, {
+      pollIntervalMs: 50,
+    });
+    expect(again.timedOut).toBe(true);
+    expect(again.maps).toEqual([]);
+  });
+
+  // One wait can cover several submissions, and creation order is the order an
+  // agent should work them in.
+  it('returns several maps in creation order when they arrive together', async () => {
+    await noMaps();
+    // Comfortably before both writes. The cursor comparison is exclusive
+    // (`gt`), deliberately — that is what stops a re-park from re-delivering
+    // the map just handed over — so a `since` taken in the same millisecond as
+    // a create would drop it. An agent's real `since` is either call time or a
+    // previous cursor, both of which precede the maps it is waiting for.
+    const since = new Date(Date.now() - 60_000);
+    await mapStore.createMap('The earlier idea');
+    await mapStore.createMap('The later idea');
+
+    const result = await exchange.waitForNewMap(since, 5_000);
+    expect(result.timedOut).toBe(false);
+    expect(result.maps.map((m) => m.seedIdea)).toEqual([
+      'The earlier idea',
+      'The later idea',
+    ]);
+  });
+
+  // hasBrief is what decides read_brief over read_map downstream, so it has to
+  // be right for both shapes of map.
+  it('reports whether each map was started from a brief', async () => {
+    await noMaps();
+    // Before both writes, for the same exclusive-cursor reason as above.
+    const since = new Date(Date.now() - 60_000);
+    await mapStore.createMap('Just a sentence');
+    await mapStore.createMap('', {
+      text: 'A client brief with several sections.',
+      sourceName: 'brief.md',
+      mediaType: 'text/markdown',
+    });
+
+    const result = await exchange.waitForNewMap(since, 5_000);
+    expect(result.maps.map((m) => m.hasBrief)).toEqual([false, true]);
   });
 });

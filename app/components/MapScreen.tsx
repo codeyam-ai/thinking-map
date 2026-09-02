@@ -1,3 +1,4 @@
+import AgentHandoff from './AgentHandoff';
 import AgentStatus from './AgentStatus';
 import AppHeader from './AppHeader';
 import BoardWorkspace from './BoardWorkspace';
@@ -53,6 +54,7 @@ export default function MapScreen({
   attachments,
   themes,
   nodes,
+  brief,
 }: {
   phase: Phase;
   seedIdea: string;
@@ -60,6 +62,8 @@ export default function MapScreen({
   maps?: { id: string; title: string }[];
   currentId?: string;
   attachments?: { name: string }[];
+  /** Main's brief: the document a map was derived from, when there is one. */
+  brief?: unknown;
   themes: GalaxyTheme[];
   nodes: (FlatNode &
     SummaryNode & {

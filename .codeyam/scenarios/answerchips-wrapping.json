@@ -1,0 +1,13 @@
+{
+  "name": "AnswerChips - Wrapping",
+  "id": "cd61cfb8-e952-421d-b36c-ede6a44ad9c7",
+  "url": "/isolated-components/AnswerChips?s=Wrapping",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerChips",
+  "scenarioType": "component",
+  "pageFilePath": "app/components/AnswerChips.tsx",
+  "description": "Four options including a long one, wrapping onto several rows while staying legible."
+}

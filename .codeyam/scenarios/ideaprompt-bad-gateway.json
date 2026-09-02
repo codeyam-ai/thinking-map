@@ -1,0 +1,24 @@
+{
+  "name": "IdeaPrompt - Bad Gateway",
+  "id": "74a526c0-3fab-4d50-8ba8-7c4cd44085ca",
+  "url": "/isolated-components/IdeaPrompt?s=BadGateway",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "IdeaPrompt",
+  "scenarioType": "component",
+  "description": "A 502 of HTML from a proxy - a failure no route ever saw, so no route could have made it JSON. The reason the fix is in two places rather than one: the wrapper cannot help here, and only the client-side reader keeps this from reaching the screen as a parser error.",
+  "interactions": [
+    {
+      "action": "fill",
+      "selector": "#idea",
+      "value": "a subscription box for hot sauce"
+    },
+    {
+      "action": "press",
+      "selector": "#idea",
+      "value": "Enter"
+    }
+  ]
+}

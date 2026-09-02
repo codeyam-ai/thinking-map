@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - Asked",
+ "id": "ff62bd07-0613-45de-b390-f48ce37ba7a1",
+ "url": "/isolated-components/MapCardEyebrow?s=Asked",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "Something has been asked about this node. Provenance, so it sits in the eyebrow beside the other facts rather than on the card."
+}

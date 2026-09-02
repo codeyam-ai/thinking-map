@@ -1,0 +1,13 @@
+{
+  "name": "AnswerChips - Empty",
+  "id": "bd5c4280-3713-4001-b819-47ae4199e78e",
+  "url": "/isolated-components/AnswerChips?s=Empty",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerChips",
+  "scenarioType": "component",
+  "pageFilePath": "app/components/AnswerChips.tsx",
+  "description": "No suggestions renders nothing at all rather than an empty strip, which is what lets a card without options be simply a card with a box."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AskPresenceNote - NoAgent",
+  "id": "0b730197-bb7b-4abf-a461-5793333b2511",
+  "url": "/isolated-components/AskPresenceNote?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AskPresenceNote",
+  "scenarioType": "component",
+  "description": "The honest half: no agent is attached, so the question waits in the log. This is the line the whole feature's credibility rests on, which is why it is its own component and its own capture."
+}

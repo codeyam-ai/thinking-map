@@ -1,12 +1,12 @@
 {
-  "name": "NextStepsTrack - Empty",
-  "id": "1d66e756-488b-4600-8c2e-7eb9b6a87942",
-  "url": "/isolated-components/NextStepsTrack?s=Empty",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "NextStepsTrack",
-  "scenarioType": "component",
-  "description": "The track before any steps exist."
+ "name": "NextStepsTrack - Empty",
+ "id": "1d66e756-488b-4600-8c2e-7eb9b6a87942",
+ "url": "/isolated-components/NextStepsTrack?s=Empty",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NextStepsTrack",
+ "scenarioType": "component",
+ "description": "The track before any steps exist."
 }

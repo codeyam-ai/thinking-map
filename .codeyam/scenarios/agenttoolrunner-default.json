@@ -1,9 +1,9 @@
 {
   "name": "AgentToolRunner - Default",
-  "id": "201dad45-401d-4ba3-aa73-a454d5aa43d1",
+  "id": "2341b0f8-01e9-4da4-8257-b8907a668529",
   "url": "/isolated-components/AgentToolRunner?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentToolRunner",

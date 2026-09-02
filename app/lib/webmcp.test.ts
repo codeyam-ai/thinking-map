@@ -5,6 +5,13 @@ import {
   publishAgentDriver,
   webMcpUnavailableReason,
 } from './webmcp';
+import { TOOL_CATALOG } from './toolCatalog';
+
+// Counted from the catalog rather than written down: the claim these tests
+// make is "every shared tool is bound", and a literal would restate the
+// catalog's size as a second source of truth that goes stale the next time a
+// tool is added.
+const CATALOG_SIZE = TOOL_CATALOG.length;
 
 // WebMCP is top-level-secure-context only. Getting these gates wrong in either
 // direction is costly: too strict and a real agent silently cannot attach; too
@@ -120,7 +127,7 @@ describe('bindTools', () => {
     bindTools({ mapId: 'm' });
     expect(registered).toContain('read_map');
     expect(registered).toContain('await_user_activity');
-    expect(registered).toHaveLength(8);
+    expect(registered).toHaveLength(9);
   });
 
   // Disposal must remove exactly what was registered, or re-binding the same
@@ -134,12 +141,12 @@ describe('bindTools', () => {
       },
     });
     bindTools({ mapId: 'm' })();
-    expect(removed).toHaveLength(8);
+    expect(removed).toHaveLength(9);
     expect(removed).toContain('post_note');
   });
 
   // A name left registered by a binding that failed to dispose must not take
-  // down the whole binding — losing one tool beats losing all seven.
+  // down the whole binding — losing one tool beats losing all of them.
   it('keeps binding the rest when one registration throws', () => {
     let calls = 0;
     vi.stubGlobal('navigator', {
@@ -152,7 +159,7 @@ describe('bindTools', () => {
       },
     });
     expect(() => bindTools({ mapId: 'm' })).not.toThrow();
-    expect(calls).toBe(8);
+    expect(calls).toBe(9);
   });
 
   // The pre-March-2026 convention the @mcp-b/global polyfill still ships:
@@ -166,7 +173,7 @@ describe('bindTools', () => {
     });
     const dispose = bindTools({ mapId: 'm' });
     dispose();
-    expect(sets).toEqual([8, 0]);
+    expect(sets).toEqual([9, 0]);
   });
 
   // No agent at all — the common case, including every codeyam capture. It must
@@ -190,7 +197,7 @@ describe('publishAgentDriver', () => {
     };
     expect(driver.mapId).toBe('map-1');
     expect(driver.listTools().map((t) => t.name)).toContain('read_map');
-    expect(driver.listTools()).toHaveLength(8);
+    expect(driver.listTools()).toHaveLength(9);
   });
 
   // Disposal removes the driver so a stale one cannot answer for a map the

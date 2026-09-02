@@ -1,0 +1,12 @@
+{
+  "name": "BriefDrop - Pasting",
+  "id": "41cebde4-e06f-4564-a5af-cbc628bd940a",
+  "url": "/isolated-components/BriefDrop?s=Pasting",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefDrop",
+  "scenarioType": "component",
+  "description": "Mid-paste: the person chose Paste a brief from the + menu and the box is open. This is now the only state BriefDrop renders besides the readout - at rest it renders nothing at all, because the dashed panel that used to sit here moved into the menu inside the input frame."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "PhaseAdvance - EndOfExplore",
+  "id": "9a66b750-eb2e-423a-a127-e44888738597",
+  "url": "/isolated-components/PhaseAdvance?s=EndOfExplore",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseAdvance",
+  "scenarioType": "component",
+  "description": "The end of 04 Explore: the directions are laid out, so what is left is deciding what to build first."
+}

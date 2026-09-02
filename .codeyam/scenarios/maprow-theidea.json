@@ -1,0 +1,13 @@
+{
+ "name": "MapRow - TheIdea",
+ "id": "a34f7abd-10b1-46a4-ae9a-b39791b7df79",
+ "url": "/isolated-components/MapRow?s=TheIdea",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapRow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapRow.tsx",
+ "description": "The map's first row, eyebrowed as the idea rather than numbered \u2014 a row that called it Round 1 would read as though somebody had asked it."
+}

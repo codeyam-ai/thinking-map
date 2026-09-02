@@ -1,0 +1,13 @@
+{
+ "name": "MapRow - PartlyAnswered",
+ "id": "8fe0a298-73d6-472d-afb8-eb1d046f15c6",
+ "url": "/isolated-components/MapRow?s=PartlyAnswered",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapRow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapRow.tsx",
+ "description": "One settled, two still asking. The mixed state is the one most likely to look wrong, because the answered card is a different height from its neighbours."
+}

@@ -1,12 +1,12 @@
 {
-  "name": "ExchangeRow - AgentNote",
-  "id": "ddab3165-26b6-47b9-8532-57e346800a5a",
-  "url": "/isolated-components/ExchangeRow?s=AgentNote",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ExchangeRow",
-  "scenarioType": "component",
-  "description": "An agent note carrying a question, which keeps the bold treatment inside the row."
+ "name": "ExchangeRow - AgentNote",
+ "id": "ddab3165-26b6-47b9-8532-57e346800a5a",
+ "url": "/isolated-components/ExchangeRow?s=AgentNote",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ExchangeRow",
+ "scenarioType": "component",
+ "description": "An agent note carrying a question, which keeps the bold treatment inside the row."
 }

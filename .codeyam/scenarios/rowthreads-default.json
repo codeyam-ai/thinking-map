@@ -1,0 +1,17 @@
+{
+ "name": "RowThreads - Default",
+ "id": "1e9cc550-f2e7-4c9a-8956-162822907219",
+ "url": "/isolated-components/RowThreads?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "RowThreads",
+ "scenarioType": "component",
+ "description": "The fan: four threads leaving one card, spread across its bottom edge in the order of the children they land on, each in the child's own family colour. Departing from a single point instead would make these four curves read as one frayed rope. The boxes are stand-ins for cards, labelled with their kind, so the threads are what there is to look at.",
+ "demonstratesState": {
+  "lines": "many",
+  "landings": "many",
+  "tops": "many"
+ }
+}

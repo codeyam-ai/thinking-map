@@ -1,0 +1,2147 @@
+{
+ "timestamp": "2026-09-01T19:58:14Z",
+ "title": "The Map Builds Downward",
+ "type": "feature",
+ "userRequest": "## Summary\n\nReplace the map. Today it is a tidy tree of small pills on a zoomable plane,\nsitting in the left column of a two-column workspace, with every question the\nagent has asked collected into a separate panel on the right \u2014 so the thing you\nare answering and the thing your answer builds are two different surfaces you look\nat in turn. At half-screen width this is worse than untidy: the map frame is\nnarrower than one root pill, and the pills run off its edge mid-sentence.\n\nMake the map a single column of **stage rows built out of cards**, growing\ndownward. Each round of questions the agent asks is one row. Each question is a\ncard, and the card holds the question, a few suggested answers, and the input you\nanswer it in \u2014 so you answer inside the map rather than beside it. Once answered,\nthe answer takes the card's body and stays editable. The next round appears as the\nnext row down. There is no second column, no zoom, no pan: the map is a page you\nscroll.\n\n### The card language\n\n![Staggered rows of tall rounded cards \u2014 a counter top-left, an icon top-right, a bold title, body copy, and one lime card carrying the emphasis](assets/the-map-builds-downward/ref-cards.jpg)\n\nThat is the shape: tall rounded rectangles, staggered rather than aligned to a\nstrict grid, a small marker top-left and an icon top-right, a bold short title\nover lighter body copy, and fills doing the work \u2014 near-white, grey, and one lime\ncard that is the thing to look at.\n\n## Key Decisions\n\n- **A row is a *round*, not a tree depth.** The obvious mapping \u2014 one row per\n  `depth` in the existing tree \u2014 breaks the moment the agent asks a second batch\n  of questions as further children of the root, which is the ordinary case: both\n  batches land at depth 1 and collapse into one row. Derive the round from the\n  event log instead: nodes added by one `add_nodes` write share a contiguous run\n  of revisions, and `app/lib/exchange.ts` is the only place revisions are minted,\n  so the grouping is well-founded. One `add_nodes` call is one row. Put the\n  derivation in its own pure module so it is unit-tested rather than inferred\n  inside a component. If it proves too clever in practice, the fallback is an\n  explicit round column on `MapNode` \u2014 a schema change this plan deliberately does\n  not take yet.\n- **The tree stays in the data; only the drawing changes.** `parentId`, `order`,\n  `kind`, `status` and the whole tool contract are untouched. No migration, no\n  change to what an agent sends. This is a rendering change plus one additive tool\n  field, which is what keeps it a plan rather than a rewrite.\n- **The answer lives in the event log, not on the node \u2014 and that is already\n  right.** `resolveAnswered` in `app/lib/contributions.ts` flips a question to\n  `answered` and never stores the text; the text is in the `user.answer` event. So\n  the card reads its answer back from the log the same way `askedNodeIds` already\n  reads which nodes have been asked about. Editing an answer is simply posting\n  another `user.answer` \u2014 and the existing comment on `resolveAnswered` says a\n  second answer is logged without inventing a second change, so the server side\n  already anticipates exactly this. No schema change, and edit history is free.\n- **Suggested answers need one additive field on the tools.** `ask_user` takes\n  `questions: string[]` and `add_nodes`'s node shape has no options \u2014 so there is\n  nowhere for \"who is this for? \u2014 *just me* / *a group of friends* / *any\n  traveler*\" to come from. Add an optional `options: string[]` to both, described\n  as *a few likely answers to offer as one-tap chips; the person can always type\n  their own*. Optional and additive, so every existing agent keeps working and a\n  card with no options is just a card with an input.\n- **This retires the plane, and that is the point.** Zoom, pan, fit-to-frame,\n  drag-to-nudge, fold-a-branch, the connector layer and the stored position\n  offsets all exist to make a large 2D tree navigable. A scrolling column of rows\n  needs none of them, and keeping them would be keeping a second map alive\n  underneath the first. Retire them in this plan rather than leaving them dead \u2014\n  see change 7 for the exact list. The `offsetX` / `offsetY` columns and the\n  positions route are left in place but unread, because dropping columns is a\n  migration and this plan is deliberately not one.\n- **Scrolling is the navigation, so the earlier click-to-zoom idea is dropped.**\n  It was the right answer for a 2D plane that outgrew its frame. A column that\n  grows downward is navigated by scrolling, and the row you are being asked about\n  is scrolled to for you (see the progression plan).\n- **One column at every width.** This is what removes the half-screen problem\n  rather than accommodating it: cards are `min-w-[220px] max-w-[300px]` and a row\n  wraps, so a 760px window shows two cards abreast and a 1440px window shows four.\n  Nothing needs a breakpoint to decide which layout it is in.\n\n## Implementation\n\n### 1. Derive the rounds\n\n**New file**: `app/lib/mapRounds.ts`\n\n`groupIntoRounds(nodes: FlatNode[], events: ExchangeEvent[]): Round[]`, where a\n`Round` is `{ index: number; nodes: FlatNode[] }`. Walk the log's `node.added` /\n`user.node` events in revision order, cut a new round whenever the origin changes\nor the revisions are not contiguous, and fall back to grouping by `depth` for any\nnode the log does not account for (a seeded scenario, a map written before this\nshipped). The root idea is always its own first round.\n\nPure and dependency-free, in the manner of `mapLayout.ts` and `collapse.ts`. Test\nit for: an empty map; root only; one batch; two batches at the same depth landing\nin two rounds (the case that motivates the whole decision); a user-added node\nbetween two agent batches; and a map with no events at all falling back to depth.\n\n### 2. The card\n\n**New file**: `app/components/MapCard.tsx`\n\nOne node, rendered in the reference's language:\n\n- **Top row** \u2014 the round marker (`2/3`) on the left, the kind icon on the right.\n- **Title** \u2014 `node.label`, `text-[15px] font-bold leading-snug`, up to three\n  lines.\n- **Body** \u2014 one of three things: `node.detail` for a statement card; the answer\n  affordance for an unanswered question; the recorded answer for an answered one.\n- **Shape** \u2014 `rounded-[20px]`, `p-5`, `min-h-[240px]`, `flex flex-col`, with the\n  body pushed to the bottom the way the reference does. Fill and treatment come\n  from the existing status precedence and are the subject of the card-visual plan;\n  this plan gives every card the neutral `bg-surface border border-line` and lets\n  that plan colour them.\n\n**New file**: `app/components/MapCardAnswer.tsx`\n\nThe answer affordance, which is where the product's whole loop now happens:\n\n- Suggested-answer chips from the node's `options`, in the existing\n  `SuggestionChips` idiom \u2014 clicking one fills the input rather than submitting,\n  so the person keeps their own words. That rule is already written down in\n  `SuggestionChips` and should not be quietly reversed here.\n- A text input with the `SendButton` inside it, exactly as `OpenQuestionRow` has\n  today.\n- Once answered: the answer as body text with a subtle *Edit* affordance; clicking\n  it returns the input pre-filled, and saving posts another `user.answer`.\n\n**New file**: `app/lib/mapAnswers.ts` \u2014 `answersByNodeId(events): Map<string, string>`,\ntaking the latest `user.answer` per question id. Modelled directly on\n`askedNodeIds` in `app/lib/exchangeRail.ts`, and unit-tested alongside it: no\nanswers, one answer, a re-answer overriding the first, an answer for a node that\nno longer exists.\n\n### 3. The row\n\n**New file**: `app/components/MapRow.tsx`\n\nA round: an eyebrow naming it (`ROUND 2 \u00b7 3 QUESTIONS`, or the phase name for the\nround that opened a phase), then the cards in a wrapping, staggered band \u2014\n`flex flex-wrap gap-4`, with a repeating vertical offset applied by\n`nth-child` so the band steps the way the reference does rather than sitting on a\nrule. The stagger is decoration and must not affect reading order or hit targets.\n\n### 4. The map surface\n\n**File**: `app/components/ThinkingMapView.tsx`\n\nGutted and rebuilt as composition: take `nodes` and the bridge's `events`, call\n`groupIntoRounds`, render `MapRow` per round inside a single\n`min-h-0 flex-1 overflow-y-auto` column. The `mapId`, `caption` and the `Live map`\neyebrow header survive. Everything about the plane \u2014 `layoutMap`, the scale\ntransform, the absolute plane, `useMapViewport`, the drag state, the collapse\nstate, the `MapConnectors` layer, `NodeQuestionComposer` anchoring \u2014 goes.\n\nAsking about a node stays, and gets simpler: the composer becomes a control on the\ncard itself rather than a popover positioned in map coordinates.\n\n### 5. Collapse the two columns into one\n\n**File**: `app/components/MapWorkspace.tsx`\n\nNo longer a split. It renders the map column and, beneath it, the contribution bar\nand the activity rail as two compact disclosures \u2014 the two things in the old\nexchange column that are not questions, and that no longer have a column to live\nin. Its doc comment currently argues that the map gets the frame and the column\nbeside it is what the page owns; rewrite it, because the answer changed: the page\nowns the map *and* the answering, and they are the same surface now.\n\n**File**: `app/components/ExchangeColumn.tsx` \u2014 deleted. `OpenQuestions` and\n`OpenQuestionRow` are deleted with it: the questions are in the cards.\n`ContributionBar` and `ExchangeRail` survive and move into `MapWorkspace`.\n\n### 6. Offer suggested answers through the tools\n\n**File**: `app/lib/toolCatalog.ts`\n\n- `nodeShape` gains `options: z.array(z.string()).optional()`, described as above\n  and noted as meaningful only on an `open-question`.\n- `ask_user`'s `questions` widens from `z.array(z.string())` to accept either a\n  string or `{ text: string; options?: string[] }`, so the simple form keeps\n  working verbatim.\n\n**File**: `prisma/schema.prisma` \u2014 `MapNode` gains `options String?` holding a JSON\narray, in the same manner the schema's own comment describes for enum-less\nStrings. This is additive and nullable, so `npm run db:push` covers it.\n\n**Files**: `app/lib/mapStore.ts`, `app/lib/toolRuntime.ts` \u2014 carry `options`\nthrough the write path and back out on read. `app/lib/mapLayout.ts`'s `FlatNode`\ngains an optional `options` field alongside `origin` and `offsetX`, for the same\nstated reason those are optional.\n\n### 7. Retire the plane\n\n**Deleted**: `app/components/MapConnectors.tsx`, `app/components/MapNodePill.tsx`,\n`app/components/NodeFoldToggle.tsx`, `app/components/MapViewportControls.tsx`,\n`app/hooks/useMapViewport.ts`, `app/hooks/useFitToFrame.ts`,\n`app/hooks/useNodeDrag.ts`, `app/lib/collapse.ts`, `app/lib/nodePositions.ts`, and\nthe tidy-tree half of `app/lib/mapLayout.ts` (`layoutMap`, `connectorPath`,\n`measureWidth`, `LaidOutNode` and the geometry constants). `FlatNode` stays \u2014 it is\nthe shape every caller passes around.\n\nTheir tests and registry entries go with them\n(`app/lib/mapLayout.test.ts`, `app/lib/collapse.test.ts`,\n`app/lib/nodePositions.test.ts`, `app/components/MapNodePill.render.test.tsx`, and\nthe viewport cases in `app/components/ThinkingMapView.render.test.tsx`), as do\ntheir glossary entries and their registered scenarios \u2014 use\n`codeyam-editor editor delete <slug>` rather than removing the JSON by hand.\n\n`PATCH /api/maps/:id/positions` and the `offsetX` / `offsetY` columns stay but\nbecome unread. Leave a one-line comment on each saying so and naming this plan, so\nthe next reader knows it is vestigial rather than load-bearing.\n\n**File**: `README.md` \u2014 the *Handling the map* section describes zoom, pan, nudge\nand fold, and two deliberate limits about folding and moving. All of it is about\na surface that no longer exists. Replace it with how the card map is handled:\nscrolling, answering in place, editing an answer. The *Two notes for anyone\npicking this up* section and the WebMCP contract section are unaffected.\n\n## Reused existing code\n\n- `FlatNode` from `app/lib/mapLayout.ts` (glossary entry: `FlatNode`) \u2014 the shape\n  every consumer already passes; it survives the plane's retirement and gains one\n  optional field.\n- `askedNodeIds` from `app/lib/exchangeRail.ts` (glossary entry: `askedNodeIds`) \u2014\n  the working precedent for deriving per-node facts from the event log, which is\n  exactly what the new answer lookup does. It also keeps working unchanged.\n- `resolveAnswered` in `app/lib/contributions.ts` (glossary entry:\n  `contributionEvents`) \u2014 already only touches a node that is *genuinely still\n  open*, and its doc comment already states that answering twice logs the second\n  answer without a second change. Editing an answer needs no server change at all.\n- `bridge.answer(answers, questions)` in `app/components/WebMcpBridge.tsx` \u2014 takes\n  a map of answers and the questions they belong to, writes to the log before\n  releasing any parked `ask_user`, and is called identically from a card as from\n  the old row.\n- `OpenQuestionRow`'s draft/busy/submit logic and its per-question `SendButton`\n  label (`app/components/OpenQuestionRow.tsx`) \u2014 lifted into the card's answer\n  component (change 2, new file) rather than reinvented, including the reason the\n  label names the question.\n- `SendButton` from `app/components/SendButton.tsx` (glossary entry: `SendButton`)\n  \u2014 unchanged, in its small size, inside the card's input.\n- `SuggestionChips` from `app/components/SuggestionChips.tsx` (glossary entry:\n  `SuggestionChips`) \u2014 the chip idiom and, more importantly, its rule that a chip\n  *fills* the input rather than submitting it.\n- `KIND_EYEBROW` and `ACCENT_KINDS` from `app/lib/mapKinds.ts` (glossary entries:\n  `KIND_EYEBROW`, `ACCENT_KINDS`) \u2014 the card's eyebrow and its icon slot read from\n  the same vocabulary the pill did.\n- `nodeShellClasses` from `app/lib/nodeAppearance.ts` (glossary entry:\n  `nodeShellClasses`) \u2014 its status precedence (root, updated, open, accent,\n  answered) transfers to card fills intact; the rule is right and only the shapes\n  it names change.\n- `mapCaption` from `app/lib/mapCaption.ts` (glossary entry: `mapCaption`) \u2014 still\n  the header line above the column.\n- `readSince` / `ExchangeEvent` from `app/lib/exchange.ts` (glossary entries:\n  `readSince`, `ExchangeEvent`) \u2014 the log is already fetched on the server render\n  and polled in the page, so the round and answer derivations need no new data\n  fetching whatsoever.\n- **Existing-implementation survey (round / batch grouping).** Grepped `app/` for\n  any existing grouping of nodes by write, batch, or revision: there is none.\n  `app/lib/summaryGroups.ts` groups by `kind` for the summary screen's cards and\n  `app/lib/buildSequence.ts` orders slices \u2014 neither answers \"which nodes arrived\n  together\". The round grouping in change 1 is genuinely new (new file).\n- **Existing-implementation survey (suggested answers on a question).** Grepped\n  the tool schemas and the Prisma schema for any options/choices field: none.\n  `ask_user` takes bare strings (`app/lib/toolCatalog.ts`) and `nodeShape` has\n  `label` / `detail` / `kind` / `status` / `sourceUrl` / `tests` only. `SUGGESTIONS`\n  in `app/lib/suggestions.ts` is a fixed landing-page list, not per-question. The\n  `options` field is genuinely new, not a duplicate.\n- **Existing-implementation survey (card components).** `SliceCard` and\n  `BulletCard` exist but are summary-screen list items, not the map's card;\n  `SavedMapRow` is a row. None is reusable as the map card, though `SliceCard`'s\n  eyebrow-plus-title-plus-detail composition is the closest existing shape and is\n  worth reading before writing the card component in change 2.\n\n## Scenarios to Demonstrate\n\n- **Round one, unanswered** \u2014 the root idea card, then a row of three question\n  cards each with chips and an input. The first thing anyone sees.\n- **Round one, partly answered** \u2014 one card showing its recorded answer, two still\n  asking. The mixed state is the one most likely to look wrong.\n- **Editing an answer** \u2014 the input returns pre-filled with the previous answer.\n- **A question with no options** \u2014 just the input, proving the field is genuinely\n  optional and an agent that never learned it still produces a usable card.\n- **Three rounds deep** \u2014 the column scrolled to the third row, the earlier rounds\n  readable above it. This is the \"the map builds downward\" claim.\n- **Two batches at the same tree depth** \u2014 the case that motivates round-grouping:\n  they must be two rows, not one.\n- **A map with seeded nodes and no event log** \u2014 the depth fallback, so an old map\n  or a captured scenario still renders as rows.\n- **A user-added node** \u2014 still badged *yours*, now on a card.\n- **Half screen (760\u00d71000)** \u2014 two cards abreast, one column, nothing clipped. The\n  direct answer to the original screenshot.\n- **Desktop (1440\u00d7900)** \u2014 four cards abreast, the same layout, no breakpoint.\n- **An empty map** \u2014 `The map fills in as you answer.` with no rows.\n- **The summary phase** \u2014 `SummaryScreen` still renders instead of the card map;\n  confirm it is untouched by the workspace collapse.",
+ "description": "The thinking map is now a single column of stage rows that grows downward, one row per round of the conversation, where every node is a card and a question card carries its suggested answers and the box you answer it in. Answering happens inside the map rather than in a panel beside it: a suggested answer fills the box instead of sending it, the recorded answer takes the card's body with an Edit that returns it pre-filled, and editing is simply a second user.answer in the log, so no schema change was needed for it. A row is a ROUND, not a tree depth \u2014 nodes written together share a contiguous run of revisions, and grouping by depth would collapse an agent's second batch of questions into its first and stop recording that the conversation had two turns.\n\nThe zoomable plane is retired rather than left alive underneath: zoom, pan, fit-to-frame, drag-to-nudge, fold-a-branch, the connector layer, the node pill and the whole second column are deleted, along with their tests, 32 scenarios and their glossary entries. The offsetX / offsetY columns and the positions route stay but are unread and marked vestigial, because dropping a column is a migration this plan deliberately is not \u2014 the old-arrangement-data-now-inert scenario exists to prove they are genuinely inert. One additive field was added end to end: an optional options list on the node schema, add_nodes, and ask_user (which now takes either a bare string or {text, options}, so every existing agent keeps working verbatim).\n\nSCOPE VERDICT. Delivered: 'A live visual map that grows as the conversation develops' \u2014 re-delivered by this cycle on the new rendering, and its note updated, because the tidy-tree layout and MapNodePill scenarios the old note credited no longer exist. The other eight delivered rows are untouched by this change and still stand. Deferred: one \u2014 'ASSIST TRACK: registering the MCP server in a client such as Claude Desktop', which was deferred in an earlier cycle and is not part of this build flow; nothing was deferred by this cycle, and no deferral here is agent-decided.\n\nTwo things a reader should not have to discover. The narrow-width case is captured at Tablet's 768px rather than the configured 760px Half screen, because the register/capture path rejects that size name with 'Unknown screen size' even though preview accepts it and editor.json defines it \u2014 same proof, eight pixels wider. And card fill is deliberately neutral on every card: the status precedence that drove the pill's treatment transfers intact, but which card wears the lime belongs to the separate card-visual plan, not this one.\n\nSCENARIO CAPTURE SIZE. At the user's request the project's defaultScreenSize moved from Desktop to Tablet and all 217 scenarios were recaptured there, so the gallery shows the app at the width it is actually used \u2014 beside a terminal, at roughly half a screen. Tablet (768x1024) rather than the configured Half screen (760x1000) because of an editor bug: the register / recapture-stale capture path resolves dimension names against a hardcoded built-in set instead of the project's screenSizes map, so 'Half screen' captures fine under preview but fails under register with 'Unknown screen size'. A no-space alias with identical dimensions failed the same way, ruling out the name's whitespace; Desktop, Tablet, Laptop and Mobile all succeed. The Half screen entry is left in editor.json so it can become the default once the capture path reads configured sizes. One consequence worth knowing: the phase nav clips its last item at this width, a pre-existing chrome overflow that is now visible across the whole gallery rather than only at half screen. Two scenarios stayed at Desktop: a-plan-with-a-gap-one-slice-proves-nothing and complete-what-to-do-next exist as a pair to prove whether the middle increment settles an assumption or proves nothing, and at 768px the summary stacks taller so the frame lands on the page bottom with the distinguishing slice just above it - both captured byte-identical, which the audit caught as a distinct-capture collision. They are the only two not at Tablet.",
+ "modifiedFiles": [
+  {
+   "path": ".codeyam/data-structure.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/dependency-graph.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/glossary.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/per-test-evidence.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/plans/assets/the-map-builds-downward/ref-cards.jpg\t.codeyam/plans/completed/assets/the-map-builds-downward/ref-cards.jpg",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/plans/the-map-builds-downward.md\t.codeyam/plans/completed/the-map-builds-downward.md",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/project-deliverables.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/arranged-a-map-tidied-by-hand.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/mapworkspace.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/thinkingmapview.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/exchangecolumn-default.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/exchangecolumn-nothingwaiting.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/exchangecolumn-quiet.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapconnectors-default.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapconnectors-singlechild.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-asked.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-default.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-foldable.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-folded.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-frombriefsection.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-gap.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-justupdated.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-openquestion.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-pro.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-research.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-risk.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-rootidea.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-yoursandasked.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapnodepill-yoursaskedandfrombrief.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapviewportcontrols-autofit.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapviewportcontrols-zoomedin.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapviewportcontrols-zoomedout.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/mapworkspace-default.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/mapworkspace-justanswered.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/mapworkspace-quiet.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/mapworkspace-seeded.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/nodefoldtoggle-default.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/nodefoldtoggle-folded.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/nodefoldtoggle-largebranch.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/openquestionrow-default.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/openquestionrow-longquestion.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/openquestionrow-typed.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/openquestions-many.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/openquestions-one.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/openquestions-two.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agenthandoff-default--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agentstatus-connected--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agentstatus-working--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/contributionbar-default--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/just-started--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapconnectors-default--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapconnectors-default--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapconnectors-singlechild--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapconnectors-singlechild--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-asked--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-asked--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-default--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-default--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-foldable--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-foldable--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-folded--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-folded--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-frombriefsection--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-frombriefsection--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-gap--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-gap--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-justupdated--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-justupdated--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-openquestion--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-openquestion--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-pro--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-pro--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-research--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-research--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-risk--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-risk--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-rootidea--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-rootidea--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursandasked--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursandasked--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursaskedandfrombrief--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapnodepill-yoursaskedandfrombrief--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-autofit--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-autofit--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedin--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedin--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedout--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapviewportcontrols-zoomedout--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-default--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-default--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-folded--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-folded--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-largebranch--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodefoldtoggle-largebranch--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestionrow-default--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestionrow-default--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestionrow-longquestion--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestionrow-longquestion--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestionrow-typed--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestionrow-typed--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/summaryscreen-default--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png.hash",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png.hash",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/sprawling-a-deep-wide-map.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/thinkingmapview-default.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/thinkingmapview-nudged.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/scenarios/thinkingmapview-seeded.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/thinkingmapview-sprawling.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/seeds/mid-exchange.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/seeds/seed-planted.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/state/finalize-debt.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/state/scenario-taxonomy.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/test-cache.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/test-cache/all.json",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/test-cache/blobs/4b36c7cefae2610c79e1668cf04bdbee484df820790c7d30c86069b583102601.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/test-cache/blobs/69b452a2361e33f00e9eda86eb855515ec1943ae3acdd11272f7e53a22d26b55.json",
+   "status": "deleted"
+  },
+  {
+   "path": ".codeyam/test-registry.json",
+   "status": "modified"
+  },
+  {
+   "path": "README.md",
+   "status": "modified"
+  },
+  {
+   "path": "app/api/maps/[id]/positions/route.ts",
+   "status": "modified"
+  },
+  {
+   "path": "app/components/ExchangeColumn.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/MapConnectors.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/MapNodePill.render.test.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/MapNodePill.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/MapViewportControls.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/MapWorkspace.tsx",
+   "status": "modified"
+  },
+  {
+   "path": "app/components/NodeFoldToggle.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/OpenQuestionRow.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/OpenQuestions.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/ThinkingMapView.render.test.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/components/ThinkingMapView.tsx",
+   "status": "modified"
+  },
+  {
+   "path": "app/hooks/useFitToFrame.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/hooks/useMapViewport.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/hooks/useNodeDrag.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/ExchangeColumn/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/MapConnectors/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/MapNodePill/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/MapViewportControls/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/MapWorkspace/page.tsx",
+   "status": "modified"
+  },
+  {
+   "path": "app/isolated-components/NodeFoldToggle/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/OpenQuestionRow/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/OpenQuestions/page.tsx",
+   "status": "deleted"
+  },
+  {
+   "path": "app/isolated-components/ThinkingMapView/page.tsx",
+   "status": "modified"
+  },
+  {
+   "path": "app/lib/collapse.test.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/lib/collapse.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/lib/mapLayout.test.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/lib/mapLayout.ts",
+   "status": "modified"
+  },
+  {
+   "path": "app/lib/mapStore.ts",
+   "status": "modified"
+  },
+  {
+   "path": "app/lib/nodePlan.test.ts",
+   "status": "modified"
+  },
+  {
+   "path": "app/lib/nodePlan.ts",
+   "status": "modified"
+  },
+  {
+   "path": "app/lib/nodePositions.test.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/lib/nodePositions.ts",
+   "status": "deleted"
+  },
+  {
+   "path": "app/lib/toolCatalog.ts",
+   "status": "modified"
+  },
+  {
+   "path": "app/lib/toolRuntime.ts",
+   "status": "modified"
+  },
+  {
+   "path": "prisma/schema.prisma",
+   "status": "modified"
+  },
+  {
+   "path": ".codeyam/scenarios/answerchips-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/answerchips-empty.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/answerchips-picked.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/answerchips-single.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/answerchips-wrapping.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/answerchips.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/disclosure.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/mapcard.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/mapcardanswer.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/mapcardeyebrow.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/mapemptystate.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/maprow.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/nodeaccentmark.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/coverage-plan/recordedanswer.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/disclosure-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/disclosure-open.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/disclosure-withcount.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-answered.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-editingananswer.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-finding.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-longlabel.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-nooptions.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-rootidea.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcard-yours.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardanswer-answered.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardanswer-chipfilledthebox.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardanswer-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardanswer-longanswer.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardanswer-manyoptions.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardanswer-nooptions.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-answered.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-asked.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-everything.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-finding.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-frombrief.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapcardeyebrow-yours.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapemptystate-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/maprow-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/maprow-namedbyphase.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/maprow-partlyanswered.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/maprow-theidea.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/maprow-wrapping.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/mapworkspace-manyrounds.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/nodeaccentmark-none.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/nodeaccentmark-pro.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/nodeaccentmark-research.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/nodeaccentmark-risk.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/nodeaccentmark-slice.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/old-arrangement-data-now-inert.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/recordedanswer-default.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/recordedanswer-longanswer.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/recordedanswer-terse.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-empty--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-empty--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-picked--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-picked--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-single--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-single--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-wrapping--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/answerchips-wrapping--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/disclosure-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/disclosure-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/disclosure-open--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/disclosure-open--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/disclosure-withcount--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/disclosure-withcount--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-answered--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-answered--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-finding--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-finding--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-yours--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcard-yours--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-answered--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-answered--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-chipfilledthebox--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-chipfilledthebox--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-longanswer--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-longanswer--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-manyoptions--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-manyoptions--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-nooptions--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardanswer-nooptions--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-answered--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-answered--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-asked--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-asked--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-everything--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-everything--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-finding--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-finding--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-frombrief--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-frombrief--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-yours--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-yours--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapemptystate-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapemptystate-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-theidea--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-theidea--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-wrapping--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/maprow-wrapping--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-none--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-none--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-pro--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-pro--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-research--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-research--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-risk--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-risk--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-slice--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/nodeaccentmark-slice--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/recordedanswer-default--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/recordedanswer-default--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/recordedanswer-longanswer--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/recordedanswer-longanswer--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/recordedanswer-terse--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/recordedanswer-terse--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--desktop.png",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--desktop.png.hash",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/the-map-builds-downward-four-rounds.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/scenarios/thinkingmapview-withoptions.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/seeds/builds-downward.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/test-cache/blobs/59ca7399ad1ff5cf75ecbbc31f81627afb347544543b06ecf993046afaf0d305.json",
+   "status": "added"
+  },
+  {
+   "path": ".codeyam/test-cache/blobs/ecea9099b7777896b6e6fa9c8cc94a00017ba5ed4496eb73e9a06ed72ebf6dae.json",
+   "status": "added"
+  },
+  {
+   "path": "app/api/maps/[id]/positions/route.test.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/components/AnswerChips.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/Disclosure.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/MapCard.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/MapCardAnswer.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/MapCardEyebrow.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/MapEmptyState.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/MapRow.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/NodeAccentMark.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/components/RecordedAnswer.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/hooks/useMapAnswers.test.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/hooks/useMapAnswers.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/AnswerChips/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/Disclosure/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/MapCard/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/MapCardAnswer/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/MapCardEyebrow/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/MapEmptyState/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/MapRow/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/NodeAccentMark/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/isolated-components/RecordedAnswer/page.tsx",
+   "status": "added"
+  },
+  {
+   "path": "app/lib/cardEyebrow.test.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/lib/cardEyebrow.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/lib/mapAnswers.test.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/lib/mapAnswers.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/lib/mapRounds.test.ts",
+   "status": "added"
+  },
+  {
+   "path": "app/lib/mapRounds.ts",
+   "status": "added"
+  }
+ ],
+ "scenarioScreenshots": [
+  {
+   "name": "A brief, and nobody has picked it up yet",
+   "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--desktop.png"
+  },
+  {
+   "name": "A plan with a gap - one slice proves nothing",
+   "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+  },
+  {
+   "name": "Complete - what to do next",
+   "screenshotPath": "complete-what-to-do-next--desktop.png"
+  },
+  {
+   "name": "Conflict declined - the person rewording survived",
+   "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+  },
+  {
+   "name": "Day one - nothing yet",
+   "screenshotPath": "day-one-nothing-yet--desktop.png"
+  },
+  {
+   "name": "Grounded - research and its gaps",
+   "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+  },
+  {
+   "name": "Just started",
+   "screenshotPath": "just-started--desktop.png"
+  },
+  {
+   "name": "Many saved maps",
+   "screenshotPath": "many-saved-maps--desktop.png"
+  },
+  {
+   "name": "Mid-exchange - agent and human on one map",
+   "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+  },
+  {
+   "name": "Nobody has picked this up yet",
+   "screenshotPath": "nobody-has-picked-this-up-yet--desktop.png"
+  },
+  {
+   "name": "Old arrangement data, now inert",
+   "screenshotPath": "old-arrangement-data-now-inert--desktop.png"
+  },
+  {
+   "name": "One saved map",
+   "screenshotPath": "one-saved-map--desktop.png"
+  },
+  {
+   "name": "Partly answered - two settled, one open",
+   "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+  },
+  {
+   "name": "Pivoted - now it is for teachers",
+   "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+  },
+  {
+   "name": "Returning - four saved maps",
+   "screenshotPath": "returning-four-saved-maps--desktop.png"
+  },
+  {
+   "name": "Seed planted - three open questions",
+   "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+  },
+  {
+   "name": "Sprawling - a deep, wide map",
+   "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+  },
+  {
+   "name": "Started from a client brief",
+   "screenshotPath": "started-from-a-client-brief--desktop.png"
+  },
+  {
+   "name": "The map builds downward - four rounds",
+   "screenshotPath": "the-map-builds-downward-four-rounds--desktop.png"
+  },
+  {
+   "name": "AgentHandoff - Default",
+   "screenshotPath": "agenthandoff-default--desktop.png"
+  },
+  {
+   "name": "AgentHandoff - FromBrief",
+   "screenshotPath": "agenthandoff-frombrief--desktop.png"
+  },
+  {
+   "name": "AgentHandoff - LongIdea",
+   "screenshotPath": "agenthandoff-longidea--desktop.png"
+  },
+  {
+   "name": "AgentStatus - Connected",
+   "screenshotPath": "agentstatus-connected--desktop.png"
+  },
+  {
+   "name": "AgentStatus - NoAgent",
+   "screenshotPath": "agentstatus-noagent--desktop.png"
+  },
+  {
+   "name": "AgentStatus - Working",
+   "screenshotPath": "agentstatus-working--desktop.png"
+  },
+  {
+   "name": "AgentStatusDot - Connected",
+   "screenshotPath": "agentstatusdot-connected--desktop.png"
+  },
+  {
+   "name": "AgentStatusDot - Unavailable",
+   "screenshotPath": "agentstatusdot-unavailable--desktop.png"
+  },
+  {
+   "name": "AgentStatusDot - Working",
+   "screenshotPath": "agentstatusdot-working--desktop.png"
+  },
+  {
+   "name": "AnswerChips - Default",
+   "screenshotPath": "answerchips-default--desktop.png"
+  },
+  {
+   "name": "AnswerChips - Empty",
+   "screenshotPath": "answerchips-empty--desktop.png"
+  },
+  {
+   "name": "AnswerChips - Picked",
+   "screenshotPath": "answerchips-picked--desktop.png"
+  },
+  {
+   "name": "AnswerChips - Single",
+   "screenshotPath": "answerchips-single--desktop.png"
+  },
+  {
+   "name": "AnswerChips - Wrapping",
+   "screenshotPath": "answerchips-wrapping--desktop.png"
+  },
+  {
+   "name": "BriefPanel - DanglingReference",
+   "screenshotPath": "briefpanel-danglingreference--desktop.png"
+  },
+  {
+   "name": "BriefPanel - FullyAccountedFor",
+   "screenshotPath": "briefpanel-fullyaccountedfor--desktop.png"
+  },
+  {
+   "name": "BriefPanel - MidDeconstruction",
+   "screenshotPath": "briefpanel-middeconstruction--desktop.png"
+  },
+  {
+   "name": "BriefPanel - NothingCitedYet",
+   "screenshotPath": "briefpanel-nothingcitedyet--desktop.png"
+  },
+  {
+   "name": "ContributionBar - AddNode",
+   "screenshotPath": "contributionbar-addnode--desktop.png"
+  },
+  {
+   "name": "ContributionBar - Default",
+   "screenshotPath": "contributionbar-default--desktop.png"
+  },
+  {
+   "name": "Disclosure - Default",
+   "screenshotPath": "disclosure-default--desktop.png"
+  },
+  {
+   "name": "Disclosure - Open",
+   "screenshotPath": "disclosure-open--desktop.png"
+  },
+  {
+   "name": "Disclosure - WithCount",
+   "screenshotPath": "disclosure-withcount--desktop.png"
+  },
+  {
+   "name": "KeepThinkingPanel - Default",
+   "screenshotPath": "keepthinkingpanel-default--desktop.png"
+  },
+  {
+   "name": "KeepThinkingPanel - Quiet",
+   "screenshotPath": "keepthinkingpanel-quiet--desktop.png"
+  },
+  {
+   "name": "MapCard - Answered",
+   "screenshotPath": "mapcard-answered--desktop.png"
+  },
+  {
+   "name": "MapCard - Default",
+   "screenshotPath": "mapcard-default--desktop.png"
+  },
+  {
+   "name": "MapCard - EditingAnAnswer",
+   "screenshotPath": "mapcard-editingananswer--desktop.png"
+  },
+  {
+   "name": "MapCard - Finding",
+   "screenshotPath": "mapcard-finding--desktop.png"
+  },
+  {
+   "name": "MapCard - LongLabel",
+   "screenshotPath": "mapcard-longlabel--desktop.png"
+  },
+  {
+   "name": "MapCard - NoOptions",
+   "screenshotPath": "mapcard-nooptions--desktop.png"
+  },
+  {
+   "name": "MapCard - RootIdea",
+   "screenshotPath": "mapcard-rootidea--desktop.png"
+  },
+  {
+   "name": "MapCard - Yours",
+   "screenshotPath": "mapcard-yours--desktop.png"
+  },
+  {
+   "name": "MapCardAnswer - Answered",
+   "screenshotPath": "mapcardanswer-answered--desktop.png"
+  },
+  {
+   "name": "MapCardAnswer - ChipFilledTheBox",
+   "screenshotPath": "mapcardanswer-chipfilledthebox--desktop.png"
+  },
+  {
+   "name": "MapCardAnswer - Default",
+   "screenshotPath": "mapcardanswer-default--desktop.png"
+  },
+  {
+   "name": "MapCardAnswer - LongAnswer",
+   "screenshotPath": "mapcardanswer-longanswer--desktop.png"
+  },
+  {
+   "name": "MapCardAnswer - ManyOptions",
+   "screenshotPath": "mapcardanswer-manyoptions--desktop.png"
+  },
+  {
+   "name": "MapCardAnswer - NoOptions",
+   "screenshotPath": "mapcardanswer-nooptions--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - Answered",
+   "screenshotPath": "mapcardeyebrow-answered--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - Asked",
+   "screenshotPath": "mapcardeyebrow-asked--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - Default",
+   "screenshotPath": "mapcardeyebrow-default--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - Everything",
+   "screenshotPath": "mapcardeyebrow-everything--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - Finding",
+   "screenshotPath": "mapcardeyebrow-finding--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - FromBrief",
+   "screenshotPath": "mapcardeyebrow-frombrief--desktop.png"
+  },
+  {
+   "name": "MapCardEyebrow - Yours",
+   "screenshotPath": "mapcardeyebrow-yours--desktop.png"
+  },
+  {
+   "name": "MapEmptyState - Default",
+   "screenshotPath": "mapemptystate-default--desktop.png"
+  },
+  {
+   "name": "MapRow - Default",
+   "screenshotPath": "maprow-default--desktop.png"
+  },
+  {
+   "name": "MapRow - NamedByPhase",
+   "screenshotPath": "maprow-namedbyphase--desktop.png"
+  },
+  {
+   "name": "MapRow - PartlyAnswered",
+   "screenshotPath": "maprow-partlyanswered--desktop.png"
+  },
+  {
+   "name": "MapRow - TheIdea",
+   "screenshotPath": "maprow-theidea--desktop.png"
+  },
+  {
+   "name": "MapRow - Wrapping",
+   "screenshotPath": "maprow-wrapping--desktop.png"
+  },
+  {
+   "name": "MapScreen - NoAgent",
+   "screenshotPath": "mapscreen-noagent--desktop.png"
+  },
+  {
+   "name": "MapScreen - Summary",
+   "screenshotPath": "mapscreen-summary--desktop.png"
+  },
+  {
+   "name": "MapScreen - Working",
+   "screenshotPath": "mapscreen-working--desktop.png"
+  },
+  {
+   "name": "MapWorkspace - AwaitingAnswer",
+   "screenshotPath": "mapworkspace-awaitinganswer--desktop.png"
+  },
+  {
+   "name": "MapWorkspace - Default",
+   "screenshotPath": "mapworkspace-default--desktop.png"
+  },
+  {
+   "name": "MapWorkspace - JustAnswered",
+   "screenshotPath": "mapworkspace-justanswered--desktop.png"
+  },
+  {
+   "name": "MapWorkspace - ManyRounds",
+   "screenshotPath": "mapworkspace-manyrounds--desktop.png"
+  },
+  {
+   "name": "MapWorkspace - Quiet",
+   "screenshotPath": "mapworkspace-quiet--desktop.png"
+  },
+  {
+   "name": "MapWorkspace - Seeded",
+   "screenshotPath": "mapworkspace-seeded--desktop.png"
+  },
+  {
+   "name": "NodeAccentMark - None",
+   "screenshotPath": "nodeaccentmark-none--desktop.png"
+  },
+  {
+   "name": "NodeAccentMark - Pro",
+   "screenshotPath": "nodeaccentmark-pro--desktop.png"
+  },
+  {
+   "name": "NodeAccentMark - Research",
+   "screenshotPath": "nodeaccentmark-research--desktop.png"
+  },
+  {
+   "name": "NodeAccentMark - Risk",
+   "screenshotPath": "nodeaccentmark-risk--desktop.png"
+  },
+  {
+   "name": "NodeAccentMark - Slice",
+   "screenshotPath": "nodeaccentmark-slice--desktop.png"
+  },
+  {
+   "name": "NodeQuestionComposer - AgentWorking",
+   "screenshotPath": "nodequestioncomposer-agentworking--desktop.png"
+  },
+  {
+   "name": "NodeQuestionComposer - Listening",
+   "screenshotPath": "nodequestioncomposer-listening--desktop.png"
+  },
+  {
+   "name": "NodeQuestionComposer - LongLabel",
+   "screenshotPath": "nodequestioncomposer-longlabel--desktop.png"
+  },
+  {
+   "name": "NodeQuestionComposer - NoAgent",
+   "screenshotPath": "nodequestioncomposer-noagent--desktop.png"
+  },
+  {
+   "name": "RecordedAnswer - Default",
+   "screenshotPath": "recordedanswer-default--desktop.png"
+  },
+  {
+   "name": "RecordedAnswer - LongAnswer",
+   "screenshotPath": "recordedanswer-longanswer--desktop.png"
+  },
+  {
+   "name": "RecordedAnswer - Terse",
+   "screenshotPath": "recordedanswer-terse--desktop.png"
+  },
+  {
+   "name": "SummaryScreen - Default",
+   "screenshotPath": "summaryscreen-default--desktop.png"
+  },
+  {
+   "name": "ThinkingMapView - Default",
+   "screenshotPath": "thinkingmapview-default--desktop.png"
+  },
+  {
+   "name": "ThinkingMapView - Empty",
+   "screenshotPath": "thinkingmapview-empty--desktop.png"
+  },
+  {
+   "name": "ThinkingMapView - NoCaption",
+   "screenshotPath": "thinkingmapview-nocaption--desktop.png"
+  },
+  {
+   "name": "ThinkingMapView - Seeded",
+   "screenshotPath": "thinkingmapview-seeded--desktop.png"
+  },
+  {
+   "name": "ThinkingMapView - Sprawling",
+   "screenshotPath": "thinkingmapview-sprawling--desktop.png"
+  },
+  {
+   "name": "ThinkingMapView - WithOptions",
+   "screenshotPath": "thinkingmapview-withoptions--desktop.png"
+  },
+  {
+   "name": "WebMcpBridge - AwaitingAnswer",
+   "screenshotPath": "webmcpbridge-awaitinganswer--desktop.png"
+  },
+  {
+   "name": "WebMcpBridge - ManyQuestions",
+   "screenshotPath": "webmcpbridge-manyquestions--desktop.png"
+  },
+  {
+   "name": "WebMcpBridge - NoAgent",
+   "screenshotPath": "webmcpbridge-noagent--desktop.png"
+  },
+  {
+   "name": "WebMcpBridge - OneQuestion",
+   "screenshotPath": "webmcpbridge-onequestion--desktop.png"
+  }
+ ],
+ "testResults": {
+  "total": 400,
+  "passed": 400,
+  "failed": 0,
+  "runners": [
+   {
+    "name": "tests",
+    "total": 400,
+    "passed": 400
+   }
+  ]
+ }
+}

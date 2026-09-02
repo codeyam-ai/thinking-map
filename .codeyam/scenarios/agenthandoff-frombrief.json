@@ -1,0 +1,12 @@
+{
+  "name": "AgentHandoff - FromBrief",
+  "id": "b8eea6cb-b3fa-4fba-94c3-9553a0f73de7",
+  "url": "/isolated-components/AgentHandoff?s=FromBrief",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentHandoff",
+  "scenarioType": "component",
+  "description": "A map started from a document instead of a sentence. There is nothing to quote back, so the quote block is absent entirely rather than showing empty marks, and the prompt points at read_brief - sending an agent to read_map first would show it the emptier of the two things it could read."
+}

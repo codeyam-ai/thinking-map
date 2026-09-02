@@ -1,0 +1,19 @@
+{
+ "name": "Disclosure - Open",
+ "id": "3c179ef1-cd51-41e2-9748-22beff381b5b",
+ "url": "/isolated-components/Disclosure?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "Disclosure",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/Disclosure.tsx",
+ "description": "The fold open, showing what it was holding. A closed disclosure reveals nothing about its contents by design, so the open state is the only capture that proves the summary line actually leads somewhere.",
+ "interactions": [
+  {
+   "action": "click",
+   "text": "Add something of your own"
+  }
+ ]
+}

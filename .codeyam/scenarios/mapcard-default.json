@@ -1,0 +1,13 @@
+{
+ "name": "MapCard - Default",
+ "id": "12550da4-c576-4672-910b-ef2b5a45a0ea",
+ "url": "/isolated-components/MapCard?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCard",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCard.tsx",
+ "description": "A question card with its suggested answers and the box you answer it in \u2014 one object, which is the whole change. Marked 2/4 so the card says which round it belongs to."
+}

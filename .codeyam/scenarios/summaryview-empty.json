@@ -1,12 +1,12 @@
 {
-  "name": "SummaryView - Empty",
-  "id": "39ed88b4-e5da-469a-839e-6f9d5bca5948",
-  "url": "/isolated-components/SummaryView?s=Empty",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SummaryView",
-  "scenarioType": "component",
-  "description": "A map that reached the phase with nothing filled in - every region shows its hint instead of breaking."
+ "name": "SummaryView - Empty",
+ "id": "39ed88b4-e5da-469a-839e-6f9d5bca5948",
+ "url": "/isolated-components/SummaryView?s=Empty",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SummaryView",
+ "scenarioType": "component",
+ "description": "A map that reached the phase with nothing filled in - every region shows its hint instead of breaking."
 }

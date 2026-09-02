@@ -1,0 +1,12 @@
+{
+  "name": "PendingRow - SettledAgentIdle",
+  "id": "d979d5e0-8653-457d-b112-8902fa4a94c3",
+  "url": "/isolated-components/PendingRow?s=SettledAgentIdle",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingRow",
+  "scenarioType": "component",
+  "description": "Attached but not in a turn. It will see what was added when its turn comes round, which is a weaker claim than working and is phrased as one."
+}

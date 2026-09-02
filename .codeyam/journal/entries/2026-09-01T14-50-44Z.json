@@ -1,0 +1,959 @@
+{
+  "timestamp": "2026-09-01T14:50:44Z",
+  "title": "Start a Map From a Client Brief",
+  "type": "feature",
+  "userRequest": "## Summary\n\nA client arrives with a twenty-page spec, not a sentence. Today the only way in\nis one line: `IdeaPrompt` POSTs `seedIdea` to `/api/maps`, `createMap` slices the\nfirst 57 characters into a title, and the agent's only view of it is `read_map`,\nwhich prints `seedIdea` verbatim inside every full read. Paste a real brief into\nthat and you get a nonsense title, a root pill nobody can read, and a document\nthat either swamps the agent's context on every single read or is not reachable\nat all. This makes the brief a first-class part of a map: it comes in whole\n(pasted, or a `.pdf` / `.docx` / `.md` / `.txt` file whose text is extracted\nserver-side), it is stored immutably as the map's source, and the agent reads it\nthe way anyone reads a long document — an outline first, then the passages that\nmatter — through one new shared tool, `read_brief`. Nothing here makes the agent\nsmarter; it makes the brief *legible* to the agent that is already there, which\nis the precondition for it asking the questions the document does not answer.\n\n## Key Decisions\n\n- **The brief is stored; the uploaded file is not.** Extraction happens in a\n  request and only the resulting text is persisted. That keeps\n  `FEATURE_PATTERNS.md`'s `public/uploads/` path — and its whole\n  swap-to-S3-later story — out of scope entirely, because there is no file to\n  serve. A brief is text; the `.docx` it arrived in is packaging.\n- **One brief per map, written at creation, never overwritten.** This is the\n  same rule `seedIdea` already lives under, and it is what makes the next\n  decision safe. A revised brief is a new map — a v2 spec is a different\n  conversation, not an edit to this one. Attaching or replacing a brief on a\n  running map is deliberately out of scope; it needs a document-version model\n  and a story for references pointing into a passage that no longer exists.\n- **Sections are derived from the text, not stored as rows.** Because the text\n  is immutable, a pure splitter yields the same `s1..sN` every time it runs, so\n  section ids are stable without a table to keep in sync — and the splitter can\n  be tested as pure logic rather than through a database. This is also what lets\n  a later plan hang node provenance off a section id.\n- **`read_brief` gives an outline by default and one passage on request.** A\n  no-argument call returns the section list — number, heading, character count —\n  which is cheap enough to call on every turn. A call naming a section returns\n  that passage in full. An agent that needs the whole document can walk it, but\n  it can never be handed 40,000 characters by accident. This is the central\n  design constraint: the tool that reads a long document must not be able to\n  blow up a context window in one call.\n- **The brief never rides inside `read_map`.** `formatMapDetail` gains one line\n  saying a brief exists, how long it is, and which tool reads it — not the text.\n  A full `read_map` is called constantly; the brief is called deliberately.\n- **Extraction failure is visible before the map exists.** A scanned PDF\n  extracts to almost nothing. The intake shows the character count and the first\n  extracted lines *in the landing screen*, so a client sees the empty extraction\n  and pastes instead — rather than starting a map whose source is silently\n  blank and only discovering it three questions later.\n- **`unpdf` for PDF and `mammoth` for `.docx`, behind one module.** Both are\n  reached only from `app/lib/briefText.ts`, so the choice is one file's problem.\n  Note for execution: `pdf-parse` is a common first reach and is known to run a\n  debug branch at import that reads a fixture file off disk; `unpdf` wraps the\n  same pdfjs without that. Whatever is chosen, the extraction route must be the\n  Node runtime, not edge.\n\n## Implementation\n\n### 1. The brief on the schema\n\n**File**: `prisma/schema.prisma`\n\nA `MapBrief` model: `id`, `mapId` (unique — one per map, `onDelete: Cascade`\nlike the other three relations), `sourceName` (the filename, or \"pasted\"),\n`mediaType`, `text`, `charCount`, `createdAt`. A separate model rather than\ncolumns on `ThinkingMap` so that `listMaps` and every `getMap` do not drag tens\nof thousands of characters into memory on every page render — the brief is read\nonly when something asks for it. Add the back-relation `brief MapBrief?` to\n`ThinkingMap`, and document above the model that it is write-once, in the same\nvoice the other models are commented in. `npm run db:push` after; per\n`DATABASE.md` this needs no default because the relation is optional.\n\n### 2. Extract text from what the client actually sends\n\n**New file**: `app/lib/briefText.ts`\n\n`extractBriefText(bytes: ArrayBuffer, mediaType: string, filename: string):\nPromise<{ text: string; warning: string | null }>`. Dispatches on media type and\nextension: PDF via `unpdf`, `.docx` via `mammoth`'s raw-text extraction,\n`.md`/`.txt` decoded directly. Normalises line endings and collapses runs of\nmore than two blank lines so the section splitter sees consistent input. Returns\na `warning` rather than throwing when the extraction is suspiciously thin\n(roughly under 200 characters for a file over 50KB — the scanned-PDF signature)\nor when the type is unsupported. Add the two dependencies to `package.json`.\n\n### 3. The extraction endpoint\n\n**New file**: `app/api/briefs/extract/route.ts`\n\n`POST` multipart form data, one `file` field, returning\n`{ text, sourceName, mediaType, charCount, warning }`. Deliberately does not\ncreate anything: it turns a file into text and hands it back to the browser,\nwhich then submits it with the rest of the form. That keeps map creation a single\ntransaction and means an abandoned upload leaves nothing behind. Cap the accepted\nbody (10MB is generous for a spec) and return a readable message rather than a\nstack trace on an unparseable file.\n\n### 4. Paste or drop it on the landing screen\n\n**New file**: `app/components/BriefDrop.tsx`\n\nThe intake affordance under the idea input: a drop target / file picker, and a\n\"paste it instead\" textarea. Once text is in hand it renders what was actually\nextracted — source name, character count, an approximate page count, and the\nfirst few lines — plus any `warning` from extraction, with a control to discard\nand try again. This readout is the point of the component: it is where a client\nfinds out their PDF was a photograph.\n\n**File**: `app/components/IdeaPrompt.tsx`\n\nHold the brief alongside `value`, mount `BriefDrop`, and include the brief in the\nPOST body. When a brief is attached the one-line input becomes optional and its\nlabel shifts to what it now means — the sentence that says what you want out of\nthe document, not the idea itself.\n\n**File**: `app/components/IdeaForm.tsx`\n\nTake a `hasBrief` prop that switches the placeholder and the send label\n(\"Start thinking this through\" reads wrong over a spec), and allow submission\nwith an empty line when a brief is present.\n\n### 5. Carry the brief into map creation\n\n**File**: `app/api/maps/route.ts`\n\nAccept an optional `brief: { text, sourceName, mediaType }` beside `seedIdea`,\nand relax the current hard 400 so a request carrying a brief and no `seedIdea`\nis valid. A request with neither is still an error.\n\n**File**: `app/lib/mapStore.ts`\n\n`createMap(seedIdea, brief?)` writes the `MapBrief` in the same\n`prisma.thinkingMap.create` as the root node. Title derivation moves out of the\ninline 57-character slice into a small helper: when there is a brief, prefer its\nfirst markdown heading, else its first non-empty line, trimmed to 60 characters;\notherwise the existing behaviour, unchanged. `getMap` should select the brief's\nmetadata but **not** its `text` — the text has exactly one reader, and that is\n`read_brief`. Add a `getBrief(mapId)` for that reader.\n\n### 6. Section the brief\n\n**New file**: `app/lib/briefSections.ts`\n\n`splitIntoSections(text): BriefSection[]` — pure, no database. A section is\n`{ id: 's1', index, heading, text, charCount }`. Split on markdown headings\nwhere the document has them, and fall back to paragraph groups under a target\nsize (roughly 1,500–2,500 characters) where it does not, so a plain-prose brief\nstill sections sensibly instead of returning one enormous block. Worth testing:\nstable ids across repeated runs, a heading-less document, a document that is one\nlong paragraph, and an empty document (returns `[]`, not one empty section).\n\n### 7. The `read_brief` tool\n\n**File**: `app/lib/toolCatalog.ts`\n\nAdd a `read_brief` spec to `TOOL_CATALOG` with\n`{ section?: string }` and `annotations: { readOnlyHint: true }`. The description\nis load-bearing — it is the only channel this app has for steering an agent that\nbrings its own reasoning — so it should say what the tool is *for*: read the\noutline first, pull only the passages you need, and remember the client wants\ntheir document interrogated, not summarised back at them. Because\n`buildMcpServer` loops the catalog and splices `mapId` onto each schema, and the\npage's `bindTools` reads the same catalog, adding it here lights it up on all\nthree front doors with no per-door work.\n\n**File**: `app/lib/toolRuntime.ts`\n\nImplement it in `IMPLEMENTATIONS` beside the others: no `section` argument\nreturns the outline (source name, total characters, and one line per section);\na `section` returns that passage in full, and an unknown section id returns the\noutline again with a line saying which ids exist rather than an error. When the\nmap has no brief, say so plainly — that is a normal state, not a fault, so it\nmust not set `isError`.\n\n### 8. Let the brief announce itself\n\n**File**: `app/lib/mcpFormat.ts`\n\n`MapDetail` gains optional brief metadata, and `formatMapDetail` prints one line\n— source, character count, section count, and \"read it with `read_brief`\" —\nbetween the seed idea and the conversation. Never the text.\n\n**File**: `app/lib/agentDemo.ts`\n\nAdd a `read_brief` step to `DEMO_SEQUENCE` before the `read_map` step, with a\nnote explaining that the agent orients on the outline before deciding what to\npull. WebMCP cannot bind inside the capture iframe, so this scripted sequence is\nthe only way the new tool is exercisable in a preview or a scenario.\n\n## Reused existing code\n\n- `createMap`, `getMap`, `listMaps`, `applyToolCalls` from `app/lib/mapStore.ts`\n  (glossary entries: `createMap`, `getMap`, `applyToolCalls`) — the brief is\n  written inside the existing creation transaction; nothing about the root-node\n  or revision-1 behaviour changes.\n- `TOOL_CATALOG`, `findTool`, `ToolContext`, `ToolResult` from\n  `app/lib/toolCatalog.ts` — the new tool is one more entry in the list every\n  door already loops, which is the whole reason a fourth tool costs almost\n  nothing.\n- `runTool` and the `IMPLEMENTATIONS` table in `app/lib/toolRuntime.ts` — the\n  validate-then-dispatch path, including the rule that a normal-but-empty result\n  is text rather than `isError`.\n- `buildMcpServer` from `app/lib/mcpServer.ts` (glossary entry: `buildMcpServer`)\n  — no change needed; it splices `mapId` onto every catalog schema already.\n- `formatMapDetail` and `MapDetail` from `app/lib/mcpFormat.ts` (glossary entry:\n  `formatMapDetail`) — extended by one line.\n- `DEMO_SEQUENCE` from `app/lib/agentDemo.ts` (glossary entry: `DEMO_SEQUENCE`).\n- `IdeaPrompt`, `IdeaForm`, `SendButton` from `app/components/` (glossary\n  entries: `IdeaPrompt`, `IdeaForm`, `SendButton`) — the intake is added beside\n  the existing input rather than replacing it.\n- `prisma` from `app/lib/prisma.ts` and the temp-database integration-test\n  pattern in `DATABASE.md` — `app/lib/contributions.integration.test.ts` and\n  `app/lib/exchange.integration.test.ts` are the two worked examples in-tree.\n\n**Existing-implementation survey.** Nothing document-shaped exists anywhere in\nthe app today. `grep -rniE \"brief|document|upload|multipart|formdata|pdf|docx\"`\nover `app/`, `mcp/` and `prisma/` returns only `document` as the DOM global in\n`app/lib/textSelection.ts` and two prose comments. There is no upload route, no\nuploads directory, no multipart handling, and no PDF or docx dependency in\n`package.json` — so all three of those are genuinely new, not duplicates.\nThe `seedIdea` column is the closest existing thing and is a single verbatim\nstring with no notion of length, structure, or sections; extending it would mean\ngiving one column two meanings and putting a 40,000-character field into every\n`listMaps` row.\n\n## Scenarios to Demonstrate\n\n- Landing with a brief attached — the readout showing source name, character\n  count, page estimate and the first extracted lines under the idea input\n- Landing with a thin extraction — a scanned PDF's warning, and the paste\n  fallback offered rather than the map being started blind\n- Landing with an unsupported file — the message naming what is accepted\n- Landing day one, no brief — the existing one-line flow, visibly unchanged\n- A map started from a brief — the title taken from the brief's first heading\n  and a root pill that reads as a project rather than a truncated paragraph\n- A map with no brief at all — every surface behaving exactly as it does now",
+  "description": "A map can now start from a client's whole document rather than a sentence. A brief arrives pasted or as a .pdf / .docx / .md / .txt whose text is extracted server-side (unpdf and mammoth, behind app/lib/briefText.ts — only the text is kept, never the file), is stored write-once as MapBrief, and names the map from its own first heading instead of a 57-character slice of a spec. The intake shows the character count, an approximate page count and the first extracted lines BEFORE a map exists, so a client whose PDF was a photograph finds out there rather than three questions later. The agent reads it through one new shared tool, read_brief, which returns an outline of derived sections (id, heading, length) by default and a single passage on request; section ids come from a pure splitter over immutable text, so they are stable without a table. read_map gains one line saying a brief exists and which tool opens it — never the text, so a long brief cannot fill the context window that ought to be spent thinking about it.\n\nSCOPE VERDICT — delivered: this cycle extends the project's first deliverable, \"enter a vague idea, problem, or goal as free text and start immediately\", so that the thing you arrive with may also be a whole document. Deferred: NONE. All 10 project deliverables were already resolved before this cycle began and none was reopened; the single standing deferral (registering the MCP server in a client config, an assist-track item) was decided by the user in an earlier cycle and is untouched here. No deliverable was deferred by agent judgement in this cycle.\n\nDeliberately out of scope, per the plan: attaching or replacing a brief on a running map (it would need a document-version model and a story for references pointing into a passage that no longer exists — a revised brief is a new map), and persisting the uploaded file (there is no uploads directory because there is no file to serve).\n\nTwo findings worth carrying forward. First, a real bug caught and fixed during the build: pdfjs TRANSFERS the upload buffer to its worker, which detaches it, so reading bytes.byteLength after extraction returned 0 and the scanned-PDF warning could never fire for the one file type it exists for. The size is now read before extraction, and the decision itself was extracted into the pure, tested extractionWarning. Its redness is AGENT-ATTESTED rather than tool-measured — the fix is an ordering at a call site in a server-only module that cannot load under vitest — and was established empirically against the running app (buggy order: charCount 10, warning null; fixed: the warning fires; healthy control PDF unaffected). Second, PRE-EXISTING and untouched by this work: the `server-only` package is not installed anywhere in this project, so app/lib/toolRuntime.ts and app/lib/briefText.ts cannot load outside Next's bundler and `npm run mcp` (the stdio MCP server) cannot start. The web app is unaffected because Next aliases the import. Worth its own ticket.\n\nTests: 317 passing, 0 failing — 43 new cases across briefFormat, briefSections, briefInput and deriveTitle. The four existing suites that pin the tool catalog were updated for the eighth tool; webmcp.test.ts now counts from TOOL_CATALOG.length rather than a hardcoded 7, so the next tool will not break it. Scenarios: 16 new — 15 component states across BriefDrop, BriefDropTarget, BriefPasteBox, BriefReadout, BriefExcerpt and BriefWarning plus IdeaForm - WithBrief, and one application scenario, \"Started from a client brief\", showing a brief-backed map whose open questions are what the document does not answer. Audit passed with 0 findings.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/start-a-map-from-a-client-brief.md\t.codeyam/plans/completed/start-a-map-from-a-client-brief.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/day-one-nothing-yet.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c266d56346ed8abaf474e022f2018d85e25a14cd6a24676ca7f872f860ce88e6.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e287b75740ca66515c0302a8b65fe59f4c1fad1718724d3ac51bef9b36461b01.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaForm.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaPrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/IdeaForm/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/agentDemo.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/agentDemo.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolInvocation.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolRuntime.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/webmcp.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": "package.json",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdrop-attached.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdrop-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdroptarget-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdroptarget-failed.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefdroptarget-reading.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefexcerpt-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefexcerpt-nothingextracted.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpastebox-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefpastebox-filled.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefreadout-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefreadout-pasted.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefreadout-scannedpdf.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefwarning-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/briefwarning-unsupported.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/ideaform-withbrief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-attached--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-attached--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdrop-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-failed--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-failed--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-reading--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefdroptarget-reading--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-nothingextracted--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefexcerpt-nothingextracted--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpastebox-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpastebox-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpastebox-filled--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpastebox-filled--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-pasted--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-pasted--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-scannedpdf--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefreadout-scannedpdf--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefwarning-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefwarning-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefwarning-unsupported--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefwarning-unsupported--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/started-from-a-client-brief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/start-a-map-from-a-client-brief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/777f7f192ba59b754ef9ae7aa0ea6d5f62648cf424830688119d18ef4e082c6f.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/8ee42ac4705e5e86aebf0faccbad280634575078904a83359754e531595c24c1.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/dc33e0f33336d73852a0ee7c13187b8f7243db15082c30cc0bdf7829b215460b.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f2011f0c0ed99608c71755d0489ebb3710d1bb5747d739ca9c8012e04e40ee76.json",
+      "status": "added"
+    },
+    {
+      "path": "app/api/briefs/extract/route.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefDrop.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefDropTarget.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefExcerpt.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefPasteBox.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefReadout.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BriefWarning.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefDrop/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefDropTarget/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefExcerpt/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefPasteBox/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefReadout/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BriefWarning/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefFormat.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefFormat.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefInput.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefInput.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefSections.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefSections.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefText.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/deriveTitle.test.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "Arranged - a map tidied by hand",
+      "screenshotPath": "arranged-a-map-tidied-by-hand--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--desktop.png"
+    },
+    {
+      "name": "AgentSimulator - Default",
+      "screenshotPath": "agentsimulator-default--desktop.png"
+    },
+    {
+      "name": "AgentSimulator - Open",
+      "screenshotPath": "agentsimulator-open--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--desktop.png"
+    },
+    {
+      "name": "BriefDrop - Attached",
+      "screenshotPath": "briefdrop-attached--desktop.png"
+    },
+    {
+      "name": "BriefDrop - Default",
+      "screenshotPath": "briefdrop-default--desktop.png"
+    },
+    {
+      "name": "BriefDropTarget - Default",
+      "screenshotPath": "briefdroptarget-default--desktop.png"
+    },
+    {
+      "name": "BriefDropTarget - Failed",
+      "screenshotPath": "briefdroptarget-failed--desktop.png"
+    },
+    {
+      "name": "BriefDropTarget - Reading",
+      "screenshotPath": "briefdroptarget-reading--desktop.png"
+    },
+    {
+      "name": "BriefExcerpt - Default",
+      "screenshotPath": "briefexcerpt-default--desktop.png"
+    },
+    {
+      "name": "BriefExcerpt - NothingExtracted",
+      "screenshotPath": "briefexcerpt-nothingextracted--desktop.png"
+    },
+    {
+      "name": "BriefPasteBox - Default",
+      "screenshotPath": "briefpastebox-default--desktop.png"
+    },
+    {
+      "name": "BriefPasteBox - Filled",
+      "screenshotPath": "briefpastebox-filled--desktop.png"
+    },
+    {
+      "name": "BriefReadout - Default",
+      "screenshotPath": "briefreadout-default--desktop.png"
+    },
+    {
+      "name": "BriefReadout - Pasted",
+      "screenshotPath": "briefreadout-pasted--desktop.png"
+    },
+    {
+      "name": "BriefReadout - ScannedPdf",
+      "screenshotPath": "briefreadout-scannedpdf--desktop.png"
+    },
+    {
+      "name": "BriefWarning - Default",
+      "screenshotPath": "briefwarning-default--desktop.png"
+    },
+    {
+      "name": "BriefWarning - Unsupported",
+      "screenshotPath": "briefwarning-unsupported--desktop.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--desktop.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Default",
+      "screenshotPath": "exchangecolumn-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - NothingWaiting",
+      "screenshotPath": "exchangecolumn-nothingwaiting--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Quiet",
+      "screenshotPath": "exchangecolumn-quiet--desktop.png"
+    },
+    {
+      "name": "IdeaForm - Busy",
+      "screenshotPath": "ideaform-busy--desktop.png"
+    },
+    {
+      "name": "IdeaForm - Default",
+      "screenshotPath": "ideaform-default--desktop.png"
+    },
+    {
+      "name": "IdeaForm - Filled",
+      "screenshotPath": "ideaform-filled--desktop.png"
+    },
+    {
+      "name": "IdeaForm - WithBrief",
+      "screenshotPath": "ideaform-withbrief--desktop.png"
+    },
+    {
+      "name": "IdeaPrompt - Default",
+      "screenshotPath": "ideaprompt-default--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--desktop.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--desktop.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--desktop.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--desktop.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--desktop.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Many",
+      "screenshotPath": "openquestions-many--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - One",
+      "screenshotPath": "openquestions-one--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Two",
+      "screenshotPath": "openquestions-two--desktop.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 317,
+    "passed": 317,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 317,
+        "passed": 317
+      }
+    ]
+  }
+}

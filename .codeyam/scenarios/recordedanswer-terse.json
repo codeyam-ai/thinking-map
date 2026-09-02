@@ -1,0 +1,13 @@
+{
+ "name": "RecordedAnswer - Terse",
+ "id": "42c392af-faa3-48fa-8a7b-15deaccb5f15",
+ "url": "/isolated-components/RecordedAnswer?s=Terse",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "RecordedAnswer",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/RecordedAnswer.tsx",
+ "description": "The shortest real answer, where Edit still has to read as a control rather than a second line of the answer."
+}

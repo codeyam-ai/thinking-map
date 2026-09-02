@@ -1,9 +1,9 @@
 {
   "name": "BulletCard - Default",
-  "id": "624383e0-8d50-47f7-ac63-33a1a0ca6da3",
+  "id": "17abf082-a1e7-4103-aed4-0b8d54b24507",
   "url": "/isolated-components/BulletCard?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "BulletCard",

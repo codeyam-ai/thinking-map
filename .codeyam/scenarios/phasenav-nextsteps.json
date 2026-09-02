@@ -1,12 +1,12 @@
 {
   "name": "PhaseNav - NextSteps",
-  "id": "89466e02-c611-46f8-a179-de900dd4ff3d",
+  "id": "4af46432-fb01-4550-a9c9-c1a22bba89d7",
   "url": "/isolated-components/PhaseNav?s=NextSteps",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "PhaseNav",
   "scenarioType": "component",
-  "description": "The end of the loop, with Next steps active at the far right."
+  "description": "The end of the loop, with Next steps active at the far right. This is the reported case: the track fits entirely, so the lime pill reads solid rather than being washed out by a fade promising content that is not there."
 }

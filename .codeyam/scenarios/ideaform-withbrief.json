@@ -1,0 +1,12 @@
+{
+ "name": "IdeaForm - WithBrief",
+ "id": "6ee2bf04-5593-4491-8df3-04cc0e1ee356",
+ "url": "/isolated-components/IdeaForm?s=WithBrief",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "IdeaForm",
+ "scenarioType": "component",
+ "description": "With a brief attached the line stops being the idea and becomes the ask, so it goes optional - the send button is live on an empty input, which is the opposite of every other state of this form."
+}

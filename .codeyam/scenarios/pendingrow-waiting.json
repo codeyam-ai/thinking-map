@@ -1,0 +1,12 @@
+{
+  "name": "PendingRow - Waiting",
+  "id": "d717e276-7445-4a48-bca1-1b7a129317c7",
+  "url": "/isolated-components/PendingRow?s=Waiting",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingRow",
+  "scenarioType": "component",
+  "description": "The map reaching for a round it does not have yet. Placeholder cards at the real card's exact dimensions, sweeping rather than pulsing — the page is waiting on a person, not loading a resource, and a throb would overstate how imminent the answer is. The band is aria-hidden, with the same message given in words to a live region beside it."
+}

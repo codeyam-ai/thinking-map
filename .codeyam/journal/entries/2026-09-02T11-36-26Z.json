@@ -1,0 +1,483 @@
+{
+  "timestamp": "2026-09-02T11:36:26Z",
+  "title": "Lead With the Prompt to Hand the Agent",
+  "type": "feature",
+  "userRequest": "## Summary\n\nSomeone types an idea, presses return, and lands on a map that nothing is\nworking on. The pieces that fix that by hand already exist — `AgentHandoff`\nrenders a start prompt naming the map, and `CopyablePrompt` offers a button\nthat copies it — but the panel sits in the same weight as everything else on\nthe page, opens by explaining why nobody is attached, and reaches the prompt\nthird. It never says the one thing the person actually needs to be told:\n*paste this into your agent's chat window*. It reads as a footnote about agent\navailability rather than as the next step.\n\nThis makes the handoff the headline of arriving on an unattached map. Same\nshowing condition, same prompt, same copy behaviour, promoted to a hero band\ndirectly under the header: an instruction at heading weight telling them to\ncopy the prompt and paste it into their agent's chat, the prompt itself, and a\ncopy button that reads as the primary action on the screen. The explanation\nstays, demoted, below the prompt. The map remains visible underneath, because\nit is what they just made and hiding it to explain the tooling would be the\nwrong trade.\n\nNothing about the write path changes. The prompt is already built the moment\nthe map exists, `IdeaPrompt` needs no new behaviour, and no new state is\nintroduced. This is a wording and presentation change across three components\nthat already exist.\n\n## Key Decisions\n\n- **A band above the map, not a takeover or a modal.** A takeover hides the\n  thing the person just made in order to explain the tooling. A modal is\n  dismissible, and a dismissed modal needs a re-entry point that would itself\n  have to be findable — new state and a new affordance for a case that is not\n  rare. A band is unmissable while it is true and gone the moment it is not.\n- **The showing condition does not change.** `AgentHandoff` already hides when\n  an agent is listening (using the same predicate `NodeQuestionComposer` uses,\n  so the two surfaces cannot contradict each other) and when the log carries an\n  agent-origin event. No `?new=1` flag, no storage, no \"seen it once\" state.\n  While the condition holds the map genuinely has not been picked up, so saying\n  so on every visit is not nagging — it is the state of the map.\n- **The instruction leads; the explanation follows.** Today `handoffCopy`\n  returns an eyebrow and an explanation first, and the prompt after the quoted\n  idea. That order is backwards for someone who just pressed return: they want\n  to know what to do, not why. The steps go first at heading weight, the honest\n  paragraph moves below the prompt where it is available to whoever wants it.\n- **The new wording goes in `handoffCopy`, not into the component.** That\n  module's whole argument is that the wording IS the interface here and belongs\n  somewhere tests can pin it. Adding the instruction as strings inside\n  `AgentHandoff` would put the most important sentence on the page in the one\n  place the tests cannot see it.\n- **Copy/paste is named as the path that works, not as a fallback.** The\n  `await_new_map` door is real but conditional — it only helps an agent already\n  connected and already parked in that call. For the person on this page,\n  pasting the prompt is the thing that works, and the copy should say so rather\n  than implying that attaching an agent would have made this automatic.\n- **The copy confirmation must be announced, not just seen.** `CopyablePrompt`\n  already flips its label to \"Copied\"; promoted to the primary action, that flip\n  needs `aria-live` so it is not a purely visual success signal.\n- **The band must not squeeze the map into nothing.** `MapScreen` is a\n  `flex h-screen flex-col`, so a taller child competes with `MapWorkspace` for\n  height. The band takes its natural height and the workspace keeps the\n  remainder, so a short viewport scrolls the map rather than collapsing it.\n\n## Implementation\n\n### 1. Add the instruction to the copy\n\n**File**: `app/lib/handoffCopy.ts`\n\nExtend `HandoffCopy` with the instruction the panel currently lacks: a headline\nin the register of \"Hand this to your agent\", and the two steps stated as steps\n— copy the prompt, paste it into your agent's chat window. Keep `explanation`\nand `attachHint` as they are; they stay honest and simply move down the page.\n\nThe existing `startPrompt` branching on `hasBrief` is unchanged.\n\n**File**: `app/lib/handoffCopy.test.ts`\n\nExtend the existing wording tests to pin the new fields, including that the\nsteps name pasting into an agent's chat — the sentence this whole plan exists\nto add is exactly the kind of wording the module says tests should hold.\n\n### 2. Reshape the panel into a hero band\n\n**File**: `app/components/AgentHandoff.tsx`\n\nKeep the contract and the hiding logic exactly as they are — same props, same\n`useOptionalWebMcpBridge` reads, same early return. Only the arrangement\nchanges: headline and steps first at heading weight, then the prompt and its\ncopy button, then the quoted idea demoted, then the explanation and attach hint\nat small type. Give the band a visual weight distinct from the surrounding\ncards — it is the one thing on this screen asking to be acted on; `--lime` /\n`--lime-deep` in `app/globals.css` are the existing accent tokens.\n\nIt stays a renderer: every string still comes from `handoffCopy`.\n\n**File**: `app/components/AgentHandoff.render.test.tsx`\n\nKeep the existing cases, which pin the hiding logic this plan does not touch.\nAdd that the instruction and both steps render, and that they appear before the\nexplanation in document order — the ordering is the change, so asserting only\npresence would let a regression back in.\n\n### 3. Let the copy button read as the primary action\n\n**File**: `app/components/CopyablePrompt.tsx`\n\nIt is currently a bordered pill sized like a secondary control. Give it an\nemphasis it can carry in the band without breaking its other callers — either a\nsize/tone prop defaulting to today's appearance, or a restyle if this is its\nonly caller (check before choosing). Add `aria-live=\"polite\"` to the copied\nstate.\n\nIts deliberate failure behaviour stays: a refused clipboard leaves the text on\nscreen and the label unflipped, so the select-and-copy path underneath is\nuntouched.\n\n**New file**: `app/components/CopyablePrompt.render.test.tsx`\n\nIt has no test of its own today, and it is about to become the most important\nbutton on the arrival screen. Cover: the text renders; clicking writes exactly\nthat text with `navigator.clipboard.writeText` stubbed and flips the label; a\nrejected `writeText` neither throws nor claims success.\n\n### 4. Give the band its own row in the map layout\n\n**File**: `app/components/MapScreen.tsx`\n\nThe conditional render and the props are already in place. What this adds is\nlayout correctness: the band takes its natural height and `MapWorkspace` keeps\n`min-h-0 flex-1` beneath it, so the map region absorbs the remainder and\nscrolls instead of being crushed on a short viewport. Confirm the summary phase\n(`next-steps`) still reads sensibly with a band above it, or scope the band to\nthe working phases.\n\n### 5. Refresh the isolated scenarios\n\n**File**: `app/isolated-components/AgentHandoff/page.tsx`\n\nThe scenario page exists; extend its `scenarios` record so the band is captured\nin the states that matter: a short idea, a long idea that wraps the prompt\nblock, a brief-only map, and the attached case that renders nothing.\n\n## Reused existing code\n\n- `handoffCopy` from `app/lib/handoffCopy.ts` (glossary entry: `handoffCopy`) —\n  the wording module the new instruction joins, and its existing `startPrompt`\n  and `hasBrief` branching, which are unchanged.\n- `AgentHandoff` from `app/components/AgentHandoff.tsx` (glossary entry:\n  `AgentHandoff`) — the panel being reshaped, including the hiding predicate\n  this plan deliberately leaves alone.\n- `CopyablePrompt` from `app/components/CopyablePrompt.tsx` (glossary entry:\n  `CopyablePrompt`) — the copy behaviour and its refused-clipboard handling.\n- `SeedIdeaQuote` from `app/components/SeedIdeaQuote.tsx` (glossary entry:\n  `SeedIdeaQuote`) — blank-in-nothing-out, so the brief-only case needs no\n  branch in the band.\n- `useOptionalWebMcpBridge` from `app/components/WebMcpBridge.tsx` (glossary\n  entry: `useOptionalWebMcpBridge`) — how the panel reads presence without\n  crashing in an isolated scenario.\n- `MapScreen` from `app/components/MapScreen.tsx` (glossary entry: `MapScreen`)\n  — already renders the panel; this only adjusts the row it gets.\n\n**Existing-implementation survey.** Grepped for prompt-building and copy\nbehaviour before proposing any: `handoffCopy` is the only builder of a start\nprompt, and `CopyablePrompt` is the only component that touches the browser\nclipboard. This plan adds no prompt logic and no copy logic — it adds one\nwording field and rearranges what already exists, which is why it is a\npresentation plan rather than a feature.\n\n## Scenarios to Demonstrate\n\n- **Just arrived from the landing input** — the band leads the page with the\n  paste instruction, the prompt names this map, and the map is visible below.\n- **Brief-only map** — no sentence quoted, and the prompt points at\n  `read_brief`.\n- **A long seed idea** — the prompt block wraps without pushing the copy button\n  off screen or crushing the map.\n- **Copy pressed** — the confirmation is visible and announced.\n- **Clipboard refused** — the prompt stays on screen and nothing claims success.\n- **An agent has already contributed** — no band; the map has the full height.\n- **An agent is attached right now** — no band, header reads \"Agent attached\".\n- **Short viewport** — the band keeps its height and the map scrolls beneath it.",
+  "description": "Arriving on a map nobody has picked up now leads with what to do about it. The handoff panel became a hero band under the header: an instruction at heading weight telling the person to copy the prompt and paste it into their agent's chat window, the two moves stated as numbered steps, the prompt itself, and a lime-filled copy button that reads as the primary action on the screen. The honest paragraph about why nobody is attached is kept but demoted below the prompt, and the map stays visible underneath, because it is what the person just made. Nothing about the write path changed: no new state, no new prompt logic, no change to the showing condition - the band appears exactly when AgentHandoff already appeared. The new wording lives in handoffCopy, where tests pin it, rather than as strings inside the component. AgentHandoff was decomposed into HandoffInstruction (the steps are an ordered list because their order is the content) and HandoffFootnote (the explanation and attach hint travel together, below the action), and CopyablePrompt gained a tone prop that defaults to its original appearance so promoting one caller cannot restyle the others, plus an aria-live region so the copied confirmation is announced and not merely seen. SCOPE VERDICT: this cycle delivered no new project deliverable - all 10 were already resolved before it began (9 delivered, 1 deferred by the user: the assist-track registering item). It deferred nothing, and introduced no agent-decided deferral. Two things are worth recording. First, a self-inflicted regression caught and fixed mid-build: wrapping the band in a sizing div left a zero-height flex item in the DOM on every map where the band hides, collecting a gap on both sides and pushing the map down; shrink-0 moved onto the band's own section and the agent-attached map captures returned byte-identical to their baselines. Second, the plan asked for a 'Copy pressed' scenario showing the confirmation, and that state cannot be captured - the capture browser refuses clipboard access, so a scenario named for it would show the resting frame. The successful flip is pinned by a render test instead, and the refused-clipboard path is pinned by its own test; a scenario registered for it was consolidated away as a visual duplicate with the user's confirmation. Incidentally fixed, with the user's approval, a pre-existing gap in a different view: ThinkingMapView's taxonomy claimed a many-rounds state it had no scenario for - the fixture was already written and wired in the isolation page but had never been registered.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/lead-with-the-prompt-to-hand-the-agent.md\t.codeyam/plans/completed/lead-with-the-prompt-to-hand-the-agent.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/copyableprompt-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/copyableprompt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-defaultlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-shortprompt--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/thinkingmapview-sprawling.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/849bbb62bb13a853a8cce2ba14b595be65aa98420f7a792c1cea8dd3123974b5.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b47ad1b1e388d93910532f3aaf28a3bd0a19d5b47e3b63fe7ef5ed6dc369bbce.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentHandoff.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentHandoff.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CopyablePrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/CopyablePrompt/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapScreen/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/handoffCopy.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/handoffCopy.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/copyableprompt-primary.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/handofffootnote.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/handoffinstruction.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handofffootnote-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffinstruction-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffinstruction-longwording.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapscreen-justarrived.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-primary--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-primary--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffinstruction-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffinstruction-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffinstruction-longwording--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffinstruction-longwording--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/lead-with-the-prompt-to-hand-the-agent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/49040e5ece223352ed3ff8d5bb222a4dd0f7c43f40544f7f6170fde58ccea69c.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ba987a05c06b7d78297c603a4a5c810fbbde5ae803721c0982d52dfd173c48c1.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CopyablePrompt.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/HandoffFootnote.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/HandoffInstruction.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/HandoffFootnote/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/HandoffInstruction/page.tsx",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - Default",
+      "screenshotPath": "copyableprompt-default--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - DefaultLabel",
+      "screenshotPath": "copyableprompt-defaultlabel--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - Primary",
+      "screenshotPath": "copyableprompt-primary--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - ShortPrompt",
+      "screenshotPath": "copyableprompt-shortprompt--tablet.png"
+    },
+    {
+      "name": "HandoffFootnote - Default",
+      "screenshotPath": "handofffootnote-default--tablet.png"
+    },
+    {
+      "name": "HandoffInstruction - Default",
+      "screenshotPath": "handoffinstruction-default--tablet.png"
+    },
+    {
+      "name": "HandoffInstruction - LongWording",
+      "screenshotPath": "handoffinstruction-longwording--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 29,
+    "passed": 29,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 29,
+        "passed": 29
+      }
+    ]
+  }
+}

@@ -1,12 +1,12 @@
 {
   "name": "AgentSimulator - Default",
-  "id": "9068a6e6-4b7f-4588-bd26-2c858adf0394",
+  "id": "fd68ed26-fe18-4fa6-b55d-93b215d438f9",
   "url": "/isolated-components/AgentSimulator?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentSimulator",
   "scenarioType": "component",
-  "description": "The stand-in agent at rest. It renders outside production only, and is the only reason the exchange can be demonstrated where no real agent can attach."
+  "description": "The stand-in agent at rest, and the only reason the exchange can be demonstrated where no real agent can attach. It is no longer rendered just because this is a dev build: on the map page it now takes a deliberate ?agentPanel=1, because an agent driving an ordinary `npm run dev` session used to find this launcher on every real map and press it. Here in isolation it is shown unconditionally - the gate lives at the call site, not in the component."
 }

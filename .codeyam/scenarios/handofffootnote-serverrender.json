@@ -1,0 +1,12 @@
+{
+  "name": "HandoffFootnote - ServerRender",
+  "id": "51c77177-3d20-4872-868c-fffd970179d6",
+  "url": "/isolated-components/HandoffFootnote?s=ServerRender",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffFootnote",
+  "scenarioType": "component",
+  "description": "The same footnote on the server render, where the browser's own address is not knowable yet, so the MCP command falls back to `npm run mcp`. Its pair with Default is the point: the copyable block shrinks to a fraction of its width while the two grey paragraphs above it do not move, which is the arrangement where a small mono box is most at risk of reading as a stray fragment instead of the third thing in a group."
+}

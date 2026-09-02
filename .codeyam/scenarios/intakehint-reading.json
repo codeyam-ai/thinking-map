@@ -1,0 +1,12 @@
+{
+  "name": "IntakeHint - Reading",
+  "id": "75e21044-e24c-49fd-b31d-4a90d191cd6d",
+  "url": "/isolated-components/IntakeHint?s=Reading",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "IntakeHint",
+  "scenarioType": "component",
+  "description": "The same line doing double duty while a document is extracted. The indicator lives here rather than elsewhere because the person is already looking at this spot, and a second spinner would split their attention."
+}

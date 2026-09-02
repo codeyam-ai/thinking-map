@@ -153,6 +153,39 @@ describe('planMapMutations', () => {
     expect(plan.inserts).toEqual([]);
   });
 
+  // A slice carries the node it would settle. Like parentRef this stays a REF
+  // here — resolving it to a real id is applyToolCalls' job — so the plan must
+  // hand it through untouched rather than validating it against a map it
+  // cannot see.
+  it('carries a slice tests ref through as testsRef', () => {
+    const plan = planMapMutations([
+      addNodes([
+        { ref: 'a', kind: 'assumption', label: 'People reread their notes' },
+        { ref: 'b', kind: 'slice', label: 'Capture-only build', tests: 'a' },
+      ]),
+    ]);
+    expect(plan.inserts[1].testsRef).toBe('a');
+  });
+
+  // An increment that settles nothing is a real state the summary screen
+  // reports, so the absent link must survive as null rather than being
+  // invented or dropped.
+  it('leaves testsRef null when a slice names nothing', () => {
+    const plan = planMapMutations([
+      addNodes([{ ref: 'a', kind: 'slice', label: 'Admin console' }]),
+    ]);
+    expect(plan.inserts[0].testsRef).toBeNull();
+  });
+
+  // A slice's purpose usually sharpens once the whole sequence is laid out, so
+  // the link is editable after the fact.
+  it('plans an update to what a slice settles', () => {
+    const plan = planMapMutations([
+      { name: 'update_node', input: { id: 'n-b1', tests: 'n-u2' } },
+    ]);
+    expect(plan.updates[0].data.testsNodeId).toBe('n-u2');
+  });
+
   // One turn routinely adds nodes, resolves a question, and moves the phase on.
   it('handles adds, updates and a phase change in one turn', () => {
     const plan = planMapMutations([
@@ -163,5 +196,84 @@ describe('planMapMutations', () => {
     expect(plan.inserts).toHaveLength(1);
     expect(plan.updates).toHaveLength(1);
     expect(plan.phase).toBe('explore');
+  });
+});
+
+// The suggested answers a question can carry. The field is optional and
+// additive, so the cases that matter are the ones where it must produce NO
+// options at all — a question with an empty array stored on it would render a
+// chip row with nothing in it.
+describe('planMapMutations suggested answers', () => {
+  const optionsOf = (node: unknown) =>
+    planMapMutations([addNodes([node])]).inserts[0]!.options;
+
+  // The ordinary path: a shortlist survives as the JSON array the column holds.
+  it('serialises a question’s suggested answers to a JSON array', () => {
+    const options = optionsOf({
+      ref: 'q',
+      kind: 'open-question',
+      label: 'Who is it for?',
+      options: ['Just me', 'The whole street'],
+    });
+    expect(JSON.parse(options!)).toEqual(['Just me', 'The whole street']);
+  });
+
+  // Most questions have no obvious shortlist, and that is not a degraded case.
+  it('stores nothing when the model offered no options', () => {
+    expect(optionsOf({ ref: 'q', kind: 'open-question', label: 'Why?' })).toBeNull();
+  });
+
+  // An empty array must not become a stored empty array — that would render a
+  // chip row holding nothing.
+  it('stores nothing for an empty option list', () => {
+    expect(
+      optionsOf({ ref: 'q', kind: 'open-question', label: 'Why?', options: [] }),
+    ).toBeNull();
+  });
+
+  // A list of blanks is the same situation as an empty list.
+  it('stores nothing when every option is blank', () => {
+    expect(
+      optionsOf({
+        ref: 'q',
+        kind: 'open-question',
+        label: 'Why?',
+        options: ['', '   '],
+      }),
+    ).toBeNull();
+  });
+
+  // Non-strings are dropped rather than coerced: a numeric option is a mistake,
+  // and rendering it as "1" would hide the mistake behind a plausible chip.
+  it('drops non-string options rather than stringifying them', () => {
+    const options = optionsOf({
+      ref: 'q',
+      kind: 'open-question',
+      label: 'Why?',
+      options: ['Keep', 7, null, { a: 1 }],
+    });
+    expect(JSON.parse(options!)).toEqual(['Keep']);
+  });
+
+  // Anything that is not a list at all is not a shortlist.
+  it('stores nothing when options is not an array', () => {
+    expect(
+      optionsOf({
+        ref: 'q',
+        kind: 'open-question',
+        label: 'Why?',
+        options: 'Just me',
+      }),
+    ).toBeNull();
+  });
+
+  // The field is additive: every node the model already knew how to send still
+  // plans exactly as it did, carrying no options.
+  it('leaves a node that predates the field unchanged', () => {
+    const plan = planMapMutations([
+      addNodes([{ ref: 'a', kind: 'finding', label: 'Two keyholders' }]),
+    ]);
+    expect(plan.inserts[0]!.options).toBeNull();
+    expect(plan.inserts[0]!.label).toBe('Two keyholders');
   });
 });

@@ -1,12 +1,12 @@
 {
-  "name": "SendButton - Default",
-  "id": "845859d1-5f9b-4d1e-b42f-18c389b6a3d0",
-  "url": "/isolated-components/SendButton?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SendButton",
-  "scenarioType": "component",
-  "description": "Enabled, in the reply-box pill it positions itself inside."
+ "name": "SendButton - Default",
+ "id": "845859d1-5f9b-4d1e-b42f-18c389b6a3d0",
+ "url": "/isolated-components/SendButton?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SendButton",
+ "scenarioType": "component",
+ "description": "Enabled, in the reply-box pill it positions itself inside."
 }

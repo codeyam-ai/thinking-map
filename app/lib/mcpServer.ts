@@ -8,9 +8,10 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { waitForNewMap } from './exchange';
 import { createMap, listMaps } from './mapStore';
-import { formatMapList } from './mcpFormat';
-import { TOOL_CATALOG } from './toolCatalog';
+import { formatMapList, formatNewMaps } from './mcpFormat';
+import { TOOL_CATALOG, timeoutMsFrom } from './toolCatalog';
 import { runTool } from './toolRuntime';
 
 function textResult(text: string, structured?: Record<string, unknown>) {
@@ -57,6 +58,46 @@ export function buildMcpServer(): McpServer {
     async ({ seedIdea }) => {
       const map = await createMap(seedIdea);
       return textResult(`Created map ${map.id} — "${map.title}".`);
+    },
+  );
+
+  server.registerTool(
+    'await_new_map',
+    {
+      title: 'Wait for someone to start a map',
+      // The description IS the interface here: it is the only thing an agent
+      // reads before deciding whether to call this, so it has to say what the
+      // call is for and what to do with the result, not just what it returns.
+      description:
+        'Park here when you have nothing else to do. Blocks until someone starts a new thinking map, then hands you each one with its id, title and seed idea, and whether it was started from a brief. Then read it — read_brief when it has a brief, otherwise read_map — and begin deconstructing the idea. Bounded: on expiry you get timedOut true and a cursor; that is normal, not an error, so call again with the cursor and keep waiting. Pass the cursor every time and you cannot miss a map created in the gap.',
+      inputSchema: {
+        since: z.string().optional(),
+        timeoutSeconds: z.number().int().optional(),
+      },
+      annotations: { readOnlyHint: true },
+    },
+    async ({ since, timeoutSeconds }) => {
+      // An absent or unparseable `since` means "from now" — an agent parking
+      // for the first time wants what happens next, not the entire backlog.
+      const parsed = since ? new Date(since) : null;
+      const from =
+        parsed && !Number.isNaN(parsed.getTime()) ? parsed : new Date();
+
+      // The existing clamp, not a fresh one, so this cannot be talked into an
+      // unbounded wait any more than `await_user_activity` can.
+      const result = await waitForNewMap(from, timeoutMsFrom(timeoutSeconds));
+
+      return textResult(formatNewMaps(result.maps, result.cursor), {
+        timedOut: result.timedOut,
+        cursor: result.cursor,
+        maps: result.maps.map((map) => ({
+          id: map.id,
+          title: map.title,
+          seedIdea: map.seedIdea,
+          hasBrief: map.hasBrief,
+          createdAt: map.createdAt.toISOString(),
+        })),
+      });
     },
   );
 

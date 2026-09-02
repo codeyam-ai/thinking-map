@@ -1,0 +1,12 @@
+{
+  "name": "BriefSectionRow - Untouched",
+  "id": "6a271056-f701-4a39-84bd-60fa170c6c0e",
+  "url": "/isolated-components/BriefSectionRow?s=Untouched",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefSectionRow",
+  "scenarioType": "component",
+  "description": "The state the feature exists for: full ink, a dashed zero, 'nothing cites this', and the ask affordance. The weight is deliberately inverted against the covered row, because rendering the most important finding as the quietest thing on the panel would bury it."
+}

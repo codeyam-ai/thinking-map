@@ -1,62 +1,62 @@
 {
-  "name": "Just started",
-  "id": "5f5ebdf0-9232-46e3-bed6-9ae80a4235cd",
-  "url": "/map/map-game",
-  "dimensions": [
-    "Desktop"
+ "name": "Just started",
+ "id": "5f5ebdf0-9232-46e3-bed6-9ae80a4235cd",
+ "url": "/map/map-game",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "seed": {
+  "mapNode": [
+   {
+    "id": "j-idea",
+    "kind": "idea",
+    "label": "Educational game for kids",
+    "mapId": "map-game",
+    "order": 0,
+    "parentId": null,
+    "status": "answered",
+    "origin": "user"
+   }
   ],
-  "mocks": {},
-  "seed": {
-    "mapNode": [
-      {
-        "id": "j-idea",
-        "kind": "idea",
-        "label": "Educational game for kids",
-        "mapId": "map-game",
-        "order": 0,
-        "parentId": null,
-        "status": "answered",
-        "origin": "user"
-      }
-    ],
-    "message": [
-      {
-        "content": "I want to build an educational game for kids, but I don't know what it should be.",
-        "id": "j1",
-        "mapId": "map-game",
-        "role": "user",
-        "origin": "user"
-      }
-    ],
-    "thinkingMap": [
-      {
-        "id": "map-game",
-        "phase": "deconstruct",
-        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-        "title": "Educational game for kids",
-        "revision": 2
-      }
-    ],
-    "mapEvent": [
-      {
-        "id": "ev-map-game-1",
-        "mapId": "map-game",
-        "revision": 1,
-        "kind": "node.added",
-        "origin": "user",
-        "payload": "{\"id\": \"j-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
-      },
-      {
-        "id": "ev-map-game-2",
-        "mapId": "map-game",
-        "revision": 2,
-        "kind": "phase.set",
-        "origin": "agent",
-        "payload": "{\"phase\": \"deconstruct\"}"
-      }
-    ]
-  },
-  "scenarioType": "application",
-  "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "A map one second old: the seed idea alone on the map, before the partner has asked anything. The map panel has to invite the next answer rather than look broken."
+  "message": [
+   {
+    "content": "I want to build an educational game for kids, but I don't know what it should be.",
+    "id": "j1",
+    "mapId": "map-game",
+    "role": "user",
+    "origin": "user"
+   }
+  ],
+  "thinkingMap": [
+   {
+    "id": "map-game",
+    "phase": "map",
+    "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+    "title": "Educational game for kids",
+    "revision": 2
+   }
+  ],
+  "mapEvent": [
+   {
+    "id": "ev-map-game-1",
+    "mapId": "map-game",
+    "revision": 1,
+    "kind": "node.added",
+    "origin": "user",
+    "payload": "{\"id\": \"j-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
+   },
+   {
+    "id": "ev-map-game-2",
+    "mapId": "map-game",
+    "revision": 2,
+    "kind": "phase.set",
+    "origin": "agent",
+    "payload": "{\"phase\": \"deconstruct\"}"
+   }
+  ]
+ },
+ "scenarioType": "application",
+ "pageFilePath": "app/map/[id]/page.tsx",
+ "description": "A map one second old: the seed idea alone on the map, before the partner has asked anything. The map panel has to invite the next answer rather than look broken."
 }

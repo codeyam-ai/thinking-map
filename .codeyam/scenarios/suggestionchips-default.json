@@ -1,12 +1,12 @@
 {
-  "name": "SuggestionChips - Default",
-  "id": "26cde221-b8c4-458a-acdb-f8ca26d58a66",
-  "url": "/isolated-components/SuggestionChips?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SuggestionChips",
-  "scenarioType": "component",
-  "description": "The four starter chips; clicking one fills the prompt rather than submitting it."
+ "name": "SuggestionChips - Default",
+ "id": "26cde221-b8c4-458a-acdb-f8ca26d58a66",
+ "url": "/isolated-components/SuggestionChips?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SuggestionChips",
+ "scenarioType": "component",
+ "description": "The four starter chips; clicking one fills the prompt rather than submitting it."
 }

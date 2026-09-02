@@ -1,0 +1,18 @@
+{
+  "surface": "MapScreen",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "mapId",
+      "value": "true",
+      "rationale": "source-derived state mapId=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "mapId",
+      "value": "false",
+      "rationale": "source-derived state mapId=false",
+      "status": "covered"
+    }
+  ]
+}

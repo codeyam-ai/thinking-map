@@ -1,0 +1,931 @@
+{
+  "timestamp": "2026-09-02T14:35:10Z",
+  "title": "An API Failure the Page Can Read",
+  "type": "feature",
+  "userRequest": "## Summary\n\nStarting a map against a database that is behind `prisma/schema.prisma` throws P2022 (`MapNode.testsNodeId does not exist`) out of `createMap`, and `POST /api/maps` has no catch around it. Next turns the escaped throw into a 500 with a body the browser cannot parse, and `IdeaPrompt` calls `response.json()` *before* checking `response.ok` — so the only thing the person sees is `Failed to execute 'json' on 'Response': Unexpected end of JSON input`, a message about the fetch API rather than about their app. The real fault is in the terminal and nowhere else. This plan makes every mutating API route answer with a JSON error body when something unexpected throws, and makes every client fetch site read a response that is *not* JSON without exploding — so a failed request produces a sentence about what broke instead of a parser error. (Confirmed drift: `dev.db`'s `MapNode` has 14 columns and is missing `testsNodeId`, `sourceRef` and `options`; `MapBrief` exists but is likewise behind. `npm run db:push` is the remediation — this plan changes no schema and no data, it makes the app *say* it.)\n\n## Key Decisions\n\n- **The route is where the JSON contract is kept.** A client that has to survive a non-JSON body is a workaround; a route that always answers in JSON is the fix. Both are needed — the browser can also receive a proxy 502 or a network-level failure no route ever saw — but the route wrapper is the primary change and the client helper is the belt.\n- **One wrapper, `withFailure`, not a try/catch in eight handlers.** Every route under `app/api/` already returns `NextResponse.json({ error }, { status })` for the faults it anticipates. `withFailure` extends that same shape to the ones it does not, so a 500 is indistinguishable in form from a 400 and every client can read both the same way.\n- **Reuse `classifyLoadError` rather than inventing a second classifier.** The queued plan `say-what-broke-not-prisma-s-stack` introduces `classifyLoadError` in `app/lib/loadError.ts` for the *page render* path; the API path wants exactly the same P2022 → \"the database is behind the app\" diagnosis, with the same dev/production gating. Two classifiers would drift, and the second one would be the one nobody updated. This plan therefore declares `dependsOn` on that plan — it is not merged into it because that plan is about server-rendered pages having an error surface, while this one is about the fetch/JSON contract between the browser and the API, a different surface with a different failure mode.\n- **`response.ok` is checked before the body is read, everywhere.** `forward` in `app/lib/webmcp.ts` already does this correctly (`res.text().catch()` on a non-ok response) and is the pattern the rest should match. `IdeaPrompt` does it backwards in both of its fetches, which is why this specific error reached the screen.\n- **No schema and no database changes.** The drift is fixed by running `npm run db:push`. This plan is about the app's behaviour when a database is behind — which will happen again on every teammate's checkout and every deploy that ships a migration late.\n- **`postUserEvent` stays fire-and-forget.** It deliberately ignores its response today (`app/lib/webmcp.ts`); a failed user-event post is not worth interrupting an agent's turn over. It gains no handling, and that is recorded here so the omission reads as intentional.\n\n## Implementation\n\n### 1. A failure wrapper for route handlers\n\n**New file**: `app/lib/apiFailure.ts`\n\n`withFailure(handler)` wraps a Next route handler of any arity, awaits it, and on a thrown value:\n\n- `console.error`s the original error, so the terminal keeps the full Prisma output.\n- Runs it through `classifyLoadError` (from `app/lib/loadError.ts`, introduced by the plan this one depends on) and returns `NextResponse.json({ error, hint?, detail? }, { status: 500 })`, where `error` is the classifier's `message`, and `hint`/`detail` are present only in development exactly as the classifier already gates them.\n- Preserves the handler's own returned response untouched — it only intervenes on a throw.\n\nTyped so it composes with both `(request)` and `(request, { params })` handlers without the call sites casting.\n\n### 2. Wrap the mutating routes\n\n**File**: `app/api/maps/route.ts`\n\nExport `POST` (and `GET`, which calls `listMaps` and fails identically) through `withFailure`. This is the route in the report.\n\n**File**: `app/api/maps/[id]/exchange/route.ts`\n\n**File**: `app/api/maps/[id]/positions/route.ts`\n\n**File**: `app/api/maps/[id]/tools/route.ts`\n\n**File**: `app/api/maps/[id]/route.ts`\n\n**File**: `app/api/briefs/extract/route.ts`\n\nSame treatment. Each already handles its anticipated faults; the wrapper only covers the unanticipated throw. `app/api/mcp/route.ts` is deliberately excluded — it speaks the MCP wire protocol, where a bare `{ error }` JSON body is not a valid response; it needs its own transport-correct handling and is out of scope here.\n\n### 3. A client-side reader that tolerates a non-JSON body\n\n**New file**: `app/lib/readJson.ts`\n\n`readJson<T>(response: Response, fallback: string): Promise<{ ok: boolean; data: T | null; error: string | null }>` — reads the body as text once, attempts `JSON.parse`, and:\n\n- On a parseable body with `response.ok`, returns the data.\n- On a parseable body without `response.ok`, returns its `error` field as the message.\n- On an unparseable body, returns `${fallback} (HTTP ${response.status})` — never the `SyntaxError` from `JSON.parse`, which is the message that reached the screen in this report.\n- On an empty body with a non-ok status, the same.\n\nPure over a `Response`, so it is unit-testable with a constructed `Response` and no network.\n\n### 4. `IdeaPrompt` reads its two responses safely\n\n**File**: `app/components/IdeaPrompt.tsx`\n\nBoth fetches currently call `await response.json()` before testing `response.ok`. Route both through `readJson`:\n\n- `upload` → fallback `'Could not read that file.'`\n- `submit` → fallback `'Could not start a map.'`\n\nThe existing `setError` / `setBriefError` display is unchanged; only the message reaching it changes. `setBusy(false)` on the failure path stays as it is.\n\n### 5. `WebMcpBridge` reads its contribution reply safely\n\n**File**: `app/components/WebMcpBridge.tsx`\n\n`contribute` already checks `res.ok` first, so it cannot produce the reported error — but its `await res.json()` on a 200 with a truncated body would still throw a raw `SyntaxError` into a callback with no boundary. Route it through `readJson` with fallback `Could not record ${kind}.` for consistency with the rest.\n\n`useExchangeLog`'s poll (`app/hooks/useExchangeLog.ts`) is already correct: it checks `res.ok` and wraps the whole tick in a `try`/`catch` that deliberately swallows a dropped poll. It is not changed.\n\n### 6. Tests\n\n**New file**: `app/lib/readJson.test.ts`\n\nUnit tests over constructed `Response` objects: a 200 with valid JSON yields the data; a 400 with `{ error }` yields that error text; a 500 with an empty body yields the fallback plus the status and never a `SyntaxError` message; a 500 with an HTML body does the same.\n\n**New file**: `app/lib/apiFailure.test.ts`\n\nA handler that throws a P2022-shaped object yields a 500 whose JSON body carries the drift message and, in development, the hint. A handler that returns normally is passed through unchanged. A handler that throws an ordinary `Error` yields the generic message with nothing internal leaked.\n\n**New file**: `app/components/IdeaPrompt.render.test.tsx`\n\nThe reproduction below, following the `*.render.test.tsx` convention already used by `app/components/AgentHandoff.render.test.tsx`.\n\n## Reused existing code\n\n- `createMap` from `app/lib/mapStore.ts` (glossary entry: `createMap`) — the call that throws P2022; unchanged, only its route gains handling.\n- `IdeaPrompt` from `app/components/IdeaPrompt.tsx` (glossary entry: `IdeaPrompt`) — the component showing the parser error today.\n- `parseBriefInput` from `app/lib/briefInput.ts` (glossary entry: `parseBriefInput`) — unchanged; named because it sits in the same handler being wrapped.\n- `forward` in `app/lib/webmcp.ts` — the correct existing pattern (`res.ok` first, `res.text().catch()` second) that `readJson` generalises. Left alone; it already behaves.\n- `classifyLoadError` from `app/lib/loadError.ts` — introduced by the plan this one depends on, `say-what-broke-not-prisma-s-stack`. Not present in the tree yet; this plan must not land before it.\n- **Existing-implementation survey**: there is no route-level error wrapper and no shared client fetch helper in the repo today. `grep -rn \"withFailure\\|readJson\\|safeJson\" app` returns nothing; every route hand-rolls its own `NextResponse.json({ error }, { status })` and every client fetch hand-rolls its own `.json()`. `errorResponse` in `app/lib/toolInvocation.ts` (glossary entry: `errorResponse`) is the nearest existing helper and is deliberately NOT reused — it marks an *MCP tool result* as a fault for an agent to reason about, which is a different payload for a different audience than an HTTP error body.\n\n## Reproduction Test\n\nPins the reported symptom: a failed `POST /api/maps` makes `IdeaPrompt` show the browser's JSON parser error instead of a sentence about the app.\n\n**Target**: `app/components/IdeaPrompt.render.test.tsx` (new) — run with `codeyam-editor editor refresh-tests --test ideaPromptSurfacesServerFailure`.\n\n```tsx\n// A 500 with an empty body shows what broke, not the JSON parser's complaint.\nit('surfaces a server failure without leaking a parse error', async () => {\n  vi.stubGlobal(\n    'fetch',\n    vi.fn(async () => new Response('', { status: 500 })),\n  );\n  render(<IdeaPrompt />);\n  await userEvent.type(\n    screen.getByRole('textbox'),\n    'a subscription box for hot sauce',\n  );\n  await userEvent.click(screen.getByRole('button', { name: /start|send|→/i }));\n\n  const message = await screen.findByText(/could not start a map/i);\n  expect(message).toBeTruthy();\n  expect(document.body.textContent).not.toMatch(/Unexpected end of JSON input/);\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: today `submit` calls `response.json()` on the empty 500 body, the thrown `SyntaxError` is caught by the existing `catch`, and `setError` is handed `Failed to execute 'json' on 'Response': Unexpected end of JSON input` — so `findByText(/could not start a map/i)` times out and the `not.toMatch` assertion would fail too. The submit button's accessible name should be read off `IdeaForm` at execution rather than trusted from this regex.\n\n## Scenarios to Demonstrate\n\n- **Map creation against a drifted database, development** — the landing screen with the in-voice failure and the `npm run db:push` hint, no parser error anywhere.\n- **Map creation against a drifted database, production** — the same screen with the message only: no command, no column name, no Prisma code.\n- **Brief extraction fails** — the upload path's readout showing its own fallback rather than a `SyntaxError`.\n- **A 502 with an HTML body** — a failure no route ever saw, still rendered as a sentence.\n- **Happy path unchanged** — an idea typed and submitted against a healthy database still routes to `/map/:id` on the 201.\n- **Exchange contribution fails** — `contribute` reporting `Could not record user.note.` instead of throwing a raw parse error into a callback.",
+  "description": "Starting a map against a database behind the schema threw P2022 out of createMap, POST /api/maps had no catch, and the browser got a 500 with a body it could not parse - so the only thing on screen was \"Failed to execute 'json' on 'Response': Unexpected end of JSON input\", a message about the fetch API rather than about the app. The fix is in two places because the failure can come from two places: withFailure (app/lib/apiFailure.ts) wraps the handlers in six route files so an unanticipated throw answers as JSON with the same shape a deliberate 400 uses, and readJson (app/lib/readJson.ts) lets IdeaPrompt and WebMcpBridge read a response that is not JSON at all - a proxy 502 of HTML is a failure no route ever sees, so the wrapper alone could not cover it. Classification reuses classifyLoadError rather than adding a second classifier that would drift; app/api/mcp/route.ts is deliberately excluded because a bare { error } body is not valid on the MCP wire.\n\nSCOPE VERDICT: no project deliverable was delivered or deferred by this cycle. All 10 were already resolved before it began - 9 delivered, and 1 deferred (registering the MCP server in a client) which the user approved at an earlier plan gate. Nothing was deferred by agent judgement here, and no deliverable row was touched.\n\nThree things worth knowing later. First, the fix-command pill was nearly missed: withFailure put command: 'npm run db:push' in the body, but readJson returned only the message, so IdeaPrompt never rendered it and the development and production captures came out pixel-identical. That duplicate is what surfaced the gap - the plan had asked for the hint on the landing screen. readJson now hands back the rest of a failing body and InlineError renders the command in a monospace pill, matching ErrorScreen. Second, handlers were briefly renamed (getMaps, postMap, ...) to keep the diff small, which moved nine of them out of Next's route-handler convention and into glossary entity tracking, creating coverage obligations the plan never intended - including for a vestigial route. They were reverted to the canonical GET/POST/PATCH names. Third, that revert surfaced pre-existing debt: app/api/maps/[id]/positions/route.ts exported a parseNudges helper, which Next forbids in a route file; it had been invisible only because the generated route types were stale. With the user's approval it moved to app/lib/nudges.ts with its test.\n\nThe plan listed a scenario for a failing exchange contribution. That one is covered by readJson's unit tests rather than a scenario, because the failure surfaces as a thrown error inside an agent callback with no visual state to capture. postUserEvent stays fire-and-forget by design and gained no handling. The schema drift that prompted the report has since been remediated on this machine, so the scenarios induce the failure through a capture-only fetch fixture (FetchFailureFixture, beside BridgeFixture and ErrorBoundaryFixture) rather than relying on ambient drift.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/an-api-failure-the-page-can-read.md\t.codeyam/plans/completed/an-api-failure-the-page-can-read.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6f6f70fc8935de26cc2a87488ac140e5a0638fdd9fc461c7d84c56f624463d2c.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c8a209e94ffeb3d31740b2aaee1d354100f1363a84b69dbf270ada788537ba04.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/briefs/extract/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/exchange/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/positions/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/tools/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefFileInput.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaPrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/WebMcpBridge.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/WebMcpBridge.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/IdeaPrompt/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/positions/route.test.ts\tapp/lib/nudges.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/ideaprompt.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/inlineerror.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/intakehint.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/ideaprompt-bad-gateway.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/ideaprompt-schema-drift-in-production.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/ideaprompt-schema-drift.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/ideaprompt-server-failure.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/inlineerror-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/inlineerror-diagnosis-in-production.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/inlineerror-diagnosis.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/inlineerror-silent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/inlineerror-upload.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/intakehint-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/intakehint-reading.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-bad-gateway--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-bad-gateway--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift-in-production--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift-in-production--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-server-failure--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-server-failure--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-diagnosis--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-diagnosis--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-diagnosis-in-production--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-diagnosis-in-production--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-silent--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-silent--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-upload--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/inlineerror-upload--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-reading--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/intakehint-reading--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/03ccf24e65d43aaa95a2cc9b42ead5b6f4e742c96711ee1af808f9843ff20431.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6ccfb129b8fad503c03f4ec182b347de4ff86733ae0b16390119f5ed5d7778d7.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/IdeaPrompt.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InlineError.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/IntakeHint.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FetchFailureFixture.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InlineError/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/IntakeHint/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/apiFailure.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/apiFailure.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/nudges.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/readJson.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/readJson.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Bad Gateway",
+      "screenshotPath": "ideaprompt-bad-gateway--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Default",
+      "screenshotPath": "ideaprompt-default--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift",
+      "screenshotPath": "ideaprompt-schema-drift--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift In Production",
+      "screenshotPath": "ideaprompt-schema-drift-in-production--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Server Failure",
+      "screenshotPath": "ideaprompt-server-failure--tablet.png"
+    },
+    {
+      "name": "InlineError - Default",
+      "screenshotPath": "inlineerror-default--tablet.png"
+    },
+    {
+      "name": "InlineError - Diagnosis",
+      "screenshotPath": "inlineerror-diagnosis--tablet.png"
+    },
+    {
+      "name": "InlineError - Diagnosis In Production",
+      "screenshotPath": "inlineerror-diagnosis-in-production--tablet.png"
+    },
+    {
+      "name": "InlineError - Silent",
+      "screenshotPath": "inlineerror-silent--tablet.png"
+    },
+    {
+      "name": "InlineError - Upload",
+      "screenshotPath": "inlineerror-upload--tablet.png"
+    },
+    {
+      "name": "IntakeHint - Default",
+      "screenshotPath": "intakehint-default--tablet.png"
+    },
+    {
+      "name": "IntakeHint - Reading",
+      "screenshotPath": "intakehint-reading--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--tablet.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 53,
+    "passed": 53,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 53,
+        "passed": 53
+      }
+    ]
+  }
+}

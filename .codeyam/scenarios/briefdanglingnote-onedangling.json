@@ -1,0 +1,12 @@
+{
+  "name": "BriefDanglingNote - OneDangling",
+  "id": "eb88b2a4-9e8e-4134-9b97-be316b0cd223",
+  "url": "/isolated-components/BriefDanglingNote?s=OneDangling",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefDanglingNote",
+  "scenarioType": "component",
+  "description": "A node citing a section this brief does not have, phrased as its own sentence. Surfaced rather than swallowed: a dropped citation would let the accounted-for count overstate itself."
+}

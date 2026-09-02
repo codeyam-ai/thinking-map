@@ -1,0 +1,895 @@
+{
+  "timestamp": "2026-09-01T18:14:17Z",
+  "title": "Hand the Seed Idea to an Agent",
+  "type": "feature",
+  "userRequest": "## Summary\n\nSomeone types an idea into \"What would you like to figure out?\", presses send, and lands on a map with a single root node and a header that says \"No agent attached\". Nothing is wrong with the write path — `IdeaPrompt` POSTs `/api/maps`, `createMap` writes the root node, the opening message and revision 1, and the router pushes to `/map/<id>`. What is missing is any path from that write to an agent. `app/lib/exchange.ts` already states the constraint in its own header comment: *\"WebMCP is pull-only. A page cannot wake an agent, there is no push channel.\"* That is true of the browser door — `navigator.modelContext` exposes `registerTool` / `unregisterTool` (and the legacy `provideContext`) and nothing that starts a turn. It is **not** true of the server doors: an agent connected over stdio or `/api/mcp` can park in a bounded blocking call, exactly as `await_user_activity` already lets it park on one map. This plan closes both halves of the gap — a `await_new_map` server-door wait that map creation releases, so a connected agent starts work the moment someone submits an idea; and an honest handoff panel on the map page for the ordinary case where no agent is connected at all, which is what the reporter hit.\n\nThis is filed as an enhancement rather than a bug fix: no code is behaving incorrectly, the capability was never built. There is no red-first unit repro to capture, so no `## Reproduction Test` section.\n\n## Key Decisions\n\n- **Push over the server door, not the browser door.** WebMCP genuinely has no page→agent channel; inventing one would mean pretending `navigator.modelContext` has a call it does not have. MCP the protocol has `sampling/createMessage` and elicitation (both present in the installed `@modelcontextprotocol/sdk`), but those are client capabilities the connected client must advertise, and they cannot reach an agent that is not connected. A bounded blocking wait needs neither: it is a tool call the agent makes, released by a write. Same idiom the codebase already ships.\n- **Reuse `waitForUserActivity`'s three-way race verbatim.** Re-check first, then race an in-process emitter against a ~500ms database poll. The poll is not belt-and-braces: the page writes in the Next process and a stdio-connected agent waits in another, so an emitter alone would be silently correct in dev and silently wrong in the case that matters.\n- **Cursor is a timestamp, not a revision.** `revision` is per-map and a brand-new map has none the waiter could have read. `createdAt` is the only ordering that exists across maps. The tool takes an optional `since` ISO string and defaults it to call time, and always hands back the cursor to resume from — so an agent that times out and re-parks cannot miss a map created in the gap.\n- **A timeout is a normal result, never an error.** Matching `await_user_activity`: `timedOut: true` plus a cursor. An agent looping on this must never see a failure for the ordinary case of nobody having submitted anything.\n- **The handoff panel is honest, not a spinner.** It says nothing is working on this map yet and why, and gives the person the one thing that actually helps — a copyable prompt naming this map's id. A progress indicator for work that will never start on its own would be a lie.\n- **The panel's copy is a pure module, not strings in a component.** `app/lib/askPresence.ts` and `app/components/AskPresenceNote.tsx` already solve exactly this problem for the node-question composer, and their header comments make the same argument this plan makes: the wording IS the interface, and the only way to check a ternary buried in JSX is to look at a screenshot. So the handoff copy goes in a pure, test-pinned module beside `askPresence.ts`, with `AgentHandoff.tsx` as a thin renderer. This supersedes an earlier draft of this plan that proposed hoisting `UNAVAILABLE_HELP` out of the agent-status header component — that would have spread the copy across two idioms instead of adopting the one already established.\n- **\"Attached\" means the same thing on both surfaces.** `askPresence` treats `working` as listening, not just `connected`, because a bridge mid-tool-call still sees the contribution when its turn comes round — `NodeQuestionComposer.tsx:53` computes it as `bridge.status !== 'unavailable'`. The handoff panel uses that identical predicate. Two surfaces on the same page disagreeing about whether an agent is attached would be worse than either one being wrong alone.\n- **The panel keys off agent-origin events, not just bridge status.** A map an agent has already contributed to should not show a \"waiting\" panel just because the person reopened it in a browser with no agent.\n\n## Implementation\n\n### 1. A global \"a map was created\" channel and its waiter\n\n**File**: `app/lib/exchange.ts`\n\n`mapEvents` is keyed by `mapId`, which cannot carry an event about a map no waiter knows the id of. Add a reserved channel name alongside it (e.g. `MAP_CREATED = 'map.created'` — a constant, so the string is not repeated) and export:\n\n```\nexport interface NewMapSummary {\n  id: string; title: string; seedIdea: string;\n  hasBrief: boolean; createdAt: Date;\n}\nexport type NewMapWaitResult =\n  | { timedOut: false; cursor: string; maps: NewMapSummary[] }\n  | { timedOut: true; cursor: string; maps: [] };\n\nexport async function waitForNewMap(\n  since: Date, timeoutMs: number, options?: { pollIntervalMs?: number },\n): Promise<NewMapWaitResult>\n```\n\nStructure it as a near-copy of `waitForUserActivity` (`app/lib/exchange.ts:279` onward) so the two read as one pattern:\n\n- `check()` queries `prisma.thinkingMap.findMany({ where: { createdAt: { gt: since } }, orderBy: { createdAt: 'asc' }, select: { id, title, seedIdea, createdAt, brief: { select: { mapId: true } } } })` and resolves when it is non-empty.\n- Call `check()` **before** subscribing — a map created between the agent's last call and this one is already waiting.\n- Race the emitter (`mapEvents.on(MAP_CREATED, onEvent)` — `mapEvents` is at `app/lib/exchange.ts:104`) against `setInterval(pollIntervalMs)`, default the same `POLL_INTERVAL_MS` (`app/lib/exchange.ts:262`).\n- `poll.unref?.()` (`app/lib/exchange.ts:332`), and deliberately **do not** unref the deadline — the comment there explains why, and the same reasoning applies unchanged here.\n- `cursor` is the ISO string of the newest `createdAt` returned, or of `since` on a timeout, so a re-park is always exact.\n\n### 2. Release the waiter when a map is created\n\n**File**: `app/lib/mapStore.ts`\n\nIn `createMap` (`app/lib/mapStore.ts:103`), after the `recordEvents` call (`app/lib/exchange.ts:152`) that mints revision 1, emit on the new channel with the same summary shape the waiter returns. It goes after `recordEvents` deliberately: a waiter woken before the root node's event exists would read a map whose log is empty and conclude there is nothing to do.\n\nEmitting is best-effort in-process only; correctness across processes is the poll's job, per decision 2.\n\n### 3. The `await_new_map` server-door tool\n\n**File**: `app/lib/mcpServer.ts`\n\nRegister it beside `list_thinking_maps` and `create_thinking_map` in the server-door-only block (`app/lib/mcpServer.ts:34`-`61`). It does **not** go in `TOOL_CATALOG`: a page is already on a map and has no use for it, which is the exact reason given for the other two.\n\n- Input: `{ since: z.string().optional(), timeoutSeconds: z.number().int().optional() }`. Clamp with the existing `timeoutMsFrom` from `app/lib/toolCatalog.ts:229` rather than a fresh cap. Absent/unparseable `since` means \"now\".\n- Description carries the instruction, because the description is the only thing an agent reads before deciding to call it. It should say plainly: park here when you have nothing else to do; you will be handed maps as people start them, with the seed idea and whether there is a brief; then read the map and begin deconstructing it; a timeout is normal — re-call with the cursor.\n- Result text lists each new map as id, title and seed idea, with the next call spelled out (`read_map` / `read_brief` with that `mapId`); `structuredContent` carries `{ timedOut, cursor, maps }`.\n\n### 4. Pass the seed idea down to the map surface\n\nThis step is smaller than an earlier draft of this plan assumed: the brief half of it is already built.\n\n**File**: `app/map/[id]/page.tsx`\n\nThe page already computes `brief` via `getBriefCoverage` (`app/map/[id]/page.tsx:28`) and passes it down (`:45`). `getMap` already selects `seedIdea`. So the only change is passing `seedIdea` alongside the `brief` prop that is already there — no new plumbing, and **no `hasBrief` prop at all**, since `brief !== undefined` already answers that question at the point of use.\n\n**File**: `app/components/MapScreen.tsx`\n\n`MapScreen` already declares `brief?: { sourceName: string; coverage: BriefCoverage }` (`app/components/MapScreen.tsx:30`). Add one optional `seedIdea?: string` beside it and render the handoff panel below `AppHeader`, above the workspace. Optional the whole way down, matching how `brief` and `mapId` are already threaded, so an isolated scenario can mount the map without inventing it.\n\n`AppHeader` is unchanged by this plan — it is named here only as the element the panel renders below.\n\n### 5. The handoff panel — copy module first, renderer second\n\nThis step follows `askPresence` rather than inventing its own shape. Two files, split the same way `askPresence.ts` / `AskPresenceNote.tsx` are split.\n\n**New file**: `app/lib/handoffCopy.ts`\n\nPure. No React, no bridge, no DOM. Takes what it needs as arguments and returns the strings:\n\n```\nexport interface HandoffCopy {\n  eyebrow: string;\n  explanation: string;   // why nothing is working on this map yet\n  startPrompt: string;   // copyable, names this map's id and the first tool\n  attachHint: string;    // the two ways to attach an agent\n}\n\nexport function handoffCopy(input: {\n  mapId: string;\n  seedIdea?: string;\n  hasBrief: boolean;\n}): HandoffCopy\n```\n\nCarry a header comment in the same voice as `askPresence.ts`'s, stating the same reason: the wording IS the interface here, and a person being told work is underway when nothing is attached is the exact thing this feature could mislead about.\n\nThe content it returns:\n\n- One plain sentence on why nothing is working on this map yet — WebMCP is pull-only, so a map does not summon an agent.\n- A start prompt naming this map's id and the first tool to call: `read_brief` when `hasBrief`, otherwise `read_map`. This is why the brief-only case is a `handoffCopy` argument rather than a branch in JSX.\n- One line on the two ways to attach: a browser agent (Chrome 146+, top-level, secure context) or the MCP server (`npm run mcp` / `/api/mcp`), where `await_new_map` means the next idea is picked up with no copying at all.\n\nDo **not** hoist `UNAVAILABLE_HELP` out of the agent-status header component. An earlier draft of this plan called for that; it predates `askPresence` and would spread this project's honest-copy handling across two idioms. That component keeps its string; the panel's wording lives here.\n\n**New file**: `app/lib/handoffCopy.test.ts`\n\nPins the wording, exactly as `app/lib/askPresence.test.ts` does for its module — no DOM needed. Cover: the start prompt contains the map id; it names `read_map` for a seed-idea map and `read_brief` for a brief-only one; the explanation never promises that an agent is coming.\n\n**New file**: `app/components/AgentHandoff.tsx`\n\nA thin client renderer. It reads the bridge through `useOptionalWebMcpBridge()` (`app/components/WebMcpBridge.tsx:96`), which returns `null` outside a provider instead of throwing — so the panel is mountable in an isolated scenario with no bridge at all.\n\nIt renders only when **both** hold:\n\n- **Nothing is listening**, using the identical predicate `NodeQuestionComposer.tsx:53` uses: `bridge.status !== 'unavailable'` is *listening*, so the panel shows on `!listening`. `working` counts as listening, same as `connected`. A `null` bridge is treated as not listening.\n- **`events` carries no event whose `origin === 'agent'`** — a map an agent has already worked is not waiting for one.\n\nEverything it displays comes from `handoffCopy(...)` plus the seed idea quoted back, so the person sees their input was kept. Visuals follow the established card idiom — see `DirectionsCard` (`app/components/DirectionsCard.tsx`) and `BriefWarning` (`app/components/BriefWarning.tsx`) for the border/radius/type conventions.\n\n**New file**: `app/components/AgentHandoff.render.test.tsx`\n\nMount through the existing `app/isolated-components/BridgeFixture.tsx`, which supplies a bridge state the browser cannot produce. Cover: renders when unavailable with no agent events; renders nothing when `connected`; **renders nothing when `working`** (the shared-predicate guarantee — this is the case that would drift if the two surfaces disagreed); renders nothing when the log already has an agent-origin event; renders without a provider at all via `useOptionalWebMcpBridge`.\n\n### 6. Tests for the wait\n\n**File**: `app/lib/exchange.integration.test.ts`\n\nAdd a `waitForNewMap` block beside the existing `waitForUserActivity` one (`app/lib/exchange.integration.test.ts:214`):\n\n- Returns immediately when a map already exists after `since` (the check-first guarantee).\n- Releases when `createMap` runs while the wait is in flight.\n- Times out cleanly with `timedOut: true` and a usable cursor, using a short `pollIntervalMs` as the existing tests do.\n- The cursor it returns, fed back into a second wait, does not re-deliver the map it already handed over.\n\n## Reused existing code\n\n- `waitForUserActivity` from `app/lib/exchange.ts` (glossary entry: `waitForUserActivity`) — the check-first / emitter-vs-poll / bounded-deadline structure `waitForNewMap` copies, including the unref reasoning.\n- `mapEvents` and `recordEvents` from `app/lib/exchange.ts` — the emitter the new channel joins, and the write the creation emit must follow.\n- `timeoutMsFrom` from `app/lib/toolCatalog.ts:229` — the existing clamp, so `await_new_map` cannot be talked into an unbounded wait.\n- `createMap` from `app/lib/mapStore.ts:103` — the single creation path, so one emit covers the page door, the HTTP door and `create_thinking_map`.\n- `useOptionalWebMcpBridge` from `app/components/WebMcpBridge.tsx:96` — returns `null` outside a provider rather than throwing, so `AgentHandoff` is mountable without a bridge. `status`, `reason` and `events` are all already on `BridgeState`; the panel adds no new state.\n- `askPresence` / `AskPresenceNote` (`app/lib/askPresence.ts`, `app/components/AskPresenceNote.tsx`) — the pure-copy-module + thin-renderer split that `handoffCopy` / `AgentHandoff` copies, and the source of the `listening` rule that counts `working` as attached.\n- `app/lib/askPresence.test.ts` — the shape of a test that pins wording without a DOM, which `handoffCopy.test.ts` follows.\n- The `listening` predicate at `app/components/NodeQuestionComposer.tsx:53` — reused verbatim so the composer and the handoff panel cannot contradict each other about whether an agent is attached.\n- The existing `brief` threading (`app/map/[id]/page.tsx:28`, `app/components/MapScreen.tsx:30`) — already built, so `seedIdea` joins the prop that is already there rather than adding new plumbing.\n- `BridgeFixture` from `app/isolated-components/BridgeFixture.tsx` — how a bridge-dependent component is mounted under test.\n- `DirectionsCard` / `BriefWarning` (`app/components/DirectionsCard.tsx`, `app/components/BriefWarning.tsx`) — the card and alert visual conventions the panel follows.\n\n**Existing-implementation survey.** Grepped for a cross-map or global waiter before proposing one: `app/lib/exchange.ts` has `waitForUserActivity` (map-scoped, revision-cursored) and `currentRevision`, and `mapEvents` is emitted only under a `mapId` key. There is no global channel, no `createdAt`-cursored query, and no server-door tool that blocks on anything. Nothing equivalent exists to reuse or extend; `waitForNewMap` is genuinely new surface, deliberately shaped as a sibling of the existing waiter.\n\n**Re-verified against `main` at plan-confirmation time.** This plan was investigated on `feat/thinking-map`, several commits behind `main`, and its citations were rechecked against the merged tree before approval. Still true: nothing named `waitForNewMap`, `await_new_map`, `MAP_CREATED` or `AgentHandoff` exists anywhere; `TOOL_CATALOG` still ends at `await_user_activity` (`app/lib/toolCatalog.ts:208`, array closes `:218`); the server-door-only block still holds only `list_thinking_maps` and `create_thinking_map`. Changed since the investigation, and reflected above: every line number in this plan, the `askPresence` prior art that reshapes step 5, the already-built `brief` prop that shrinks step 4, and the availability of `useOptionalWebMcpBridge`. Steps 1-3 and 6 stand as written apart from the line numbers. `AppHeader` already exists and is not created by this plan — it is only the anchor the panel renders below.\n\n## Scenarios to Demonstrate\n\n- **Idea submitted, no agent anywhere** — the reported case. The map page shows the root node and the handoff panel with the seed idea quoted and a copyable prompt.\n- **Idea submitted while an agent is parked in `await_new_map`** — the wait releases with the new map's id, title and seed idea, and the agent's first `add_nodes` lands; the panel never appears because the log already carries agent-origin events.\n- **Agent parked, times out, re-parks with the cursor, then a map is created** — nothing is missed across the gap.\n- **Map created between two waits** — the check-first path returns it immediately rather than sleeping through it.\n- **Brief-only map** (no seed sentence) — the wait reports `hasBrief`, and `handoffCopy` returns a prompt pointing at `read_brief` rather than quoting an empty idea.\n- **Agent mid-tool-call (`working`) on a map with no agent events yet** — no handoff panel, because `working` counts as attached under the shared `listening` rule.\n- **Reopening a map an agent already worked** — no handoff panel, even with no agent attached.\n- **Two maps created in quick succession** — one wait returns both, in creation order.",
+  "description": "Closes the gap between submitting an idea and anything working on it. Two halves: a new server-door MCP tool, await_new_map, lets a connected agent park until somebody starts a map — released the instant createMap writes one, cursored by createdAt because a map that does not exist yet has no revision to resume from; and an honest handoff panel on the map page for the ordinary case where no agent is connected at all, which is what the reporter hit. The panel quotes the person's idea back and hands over a copyable prompt naming that map and the first tool to call, rather than a spinner for work that will never start on its own. WebMCP is still pull-only and nothing here pretends otherwise — the page cannot wake an agent; the agent can be already waiting.\n\nBuilt as: waitForNewMap in app/lib/exchange.ts (a deliberate near-copy of waitForUserActivity — check-first, emitter raced against a database poll, bounded deadline); a best-effort MAP_CREATED emit from createMap placed AFTER recordEvents so a woken agent never reads a map whose log is still empty; the await_new_map registration in mcpServer.ts, clamped by the existing timeoutMsFrom; formatNewMaps in mcpFormat.ts, which spells out read_brief vs read_map per row; and the panel as a pure copy module (handoffCopy) plus thin renderers (AgentHandoff, CopyablePrompt, SeedIdeaQuote), following the askPresence pattern already in the codebase rather than hoisting UNAVAILABLE_HELP as an earlier draft of the plan proposed. The panel hides when an agent is listening — using the identical predicate NodeQuestionComposer uses, so 'working' counts as attached and the two surfaces on one page cannot contradict each other — and hides when the log already carries an agent-origin event.\n\nVerified live on all three tool paths: check-first returned an existing map with the right next call, a parked call released the moment an idea was submitted through the real HTTP door, and expiry returned timedOut with the cursor intact and no error flag. 30 new tests, all green; audit passed with 0 findings.\n\nSCOPE VERDICT — this cycle DELIVERED the plan in full: the cross-map wait, the creation emit, the MCP tool, and the handoff panel, plus 9 component scenarios and 2 app scenarios. It DEFERRED nothing. The project's deliverables list had no open rows when this cycle began (9 delivered, 1 deferred), so this cycle neither closed nor deferred a deliverable; the single deferred row was decided by the user, not by an agent. Two limitations are recorded rather than hidden: CopyablePrompt's 'Copied' state cannot be captured because the capture browser refuses clipboard access — an interaction scenario was registered, inspected, found to show the pre-click state, and deleted rather than shipped as a misleading duplicate, with the reason recorded in the scenario taxonomy and the behaviour asserted in the render tests instead. The exclusive createdAt cursor also means a map created in the same millisecond as an agent's 'since' is skipped; that is the correct trade, because the alternative re-delivers the just-handed-over map on every re-park, and it is noted in the tests.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/hand-the-seed-idea-to-an-agent.md\t.codeyam/plans/completed/hand-the-seed-idea-to-an-agent.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/arranged-a-map-tidied-by-hand--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-nothingwaiting--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangecolumn-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-bigturn--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-empty--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentadded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentaddedmany--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentnote--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-youranswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-many--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-one--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/openquestions-two--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nudged--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/835c7344e5b035a2e9b02e54221703135a4f2859262da0d881d87c111d2899ec.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/9ac7c5e59ccb1efbf221330c68a809a6c28fcc6c4aeb2a359c2fc0d7e621772e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchange.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchange.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpServer.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/a-brief-and-nobody-has-picked-it-up-yet.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/agenthandoff-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/agenthandoff-frombrief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/agenthandoff-longidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/copyableprompt-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/copyableprompt-defaultlabel.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/copyableprompt-shortprompt.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/agenthandoff.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/copyableprompt.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/mapscreen.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/seedideaquote.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/nobody-has-picked-this-up-yet.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-defaultlabel--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-defaultlabel--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-shortprompt--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-shortprompt--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seedideaquote-default--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seedideaquote-default--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seedideaquote-longidea--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seedideaquote-longidea--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seedideaquote-shortidea--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seedideaquote-shortidea--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/seedideaquote-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/seedideaquote-longidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/seedideaquote-shortidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/51e0662cd39da10bbab130dfd4caeb97f326e0cc45b53363aff04db262f2e00f.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/8ba4ea5f1c396b202cd6d40fbd2d944772c82239aaa929acda9c0766525119bc.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/962ff2bfa9204306aaf2a6f3914c8266bd02f1a4571cd16229d2787dc3988a31.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b52f9e692b42443368afb8fdd1fd2bfc7a4f78d2c45f73e30f143963efcdb053.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/cf694eab3279a2998e09a8a64e8db6673b0a14d4b074d39fd42f64dea611d710.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AgentHandoff.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AgentHandoff.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CopyablePrompt.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/SeedIdeaQuote.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AgentHandoff/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/CopyablePrompt/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/SeedIdeaQuote/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/handoffCopy.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/handoffCopy.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--desktop.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "Arranged - a map tidied by hand",
+      "screenshotPath": "arranged-a-map-tidied-by-hand--desktop.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--desktop.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--desktop.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--desktop.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--desktop.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--desktop.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--desktop.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--desktop.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--desktop.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--desktop.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--desktop.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--desktop.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--desktop.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--desktop.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--desktop.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--desktop.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--desktop.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--desktop.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--desktop.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--desktop.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--desktop.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--desktop.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--desktop.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--desktop.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--desktop.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--desktop.png"
+    },
+    {
+      "name": "CopyablePrompt - Default",
+      "screenshotPath": "copyableprompt-default--desktop.png"
+    },
+    {
+      "name": "CopyablePrompt - DefaultLabel",
+      "screenshotPath": "copyableprompt-defaultlabel--desktop.png"
+    },
+    {
+      "name": "CopyablePrompt - ShortPrompt",
+      "screenshotPath": "copyableprompt-shortprompt--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Default",
+      "screenshotPath": "exchangecolumn-default--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - NothingWaiting",
+      "screenshotPath": "exchangecolumn-nothingwaiting--desktop.png"
+    },
+    {
+      "name": "ExchangeColumn - Quiet",
+      "screenshotPath": "exchangecolumn-quiet--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - BigTurn",
+      "screenshotPath": "exchangerail-bigturn--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - Default",
+      "screenshotPath": "exchangerail-default--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - Empty",
+      "screenshotPath": "exchangerail-empty--desktop.png"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered",
+      "screenshotPath": "exchangerail-justanswered--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded",
+      "screenshotPath": "exchangerow-agentadded--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany",
+      "screenshotPath": "exchangerow-agentaddedmany--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - AgentNote",
+      "screenshotPath": "exchangerow-agentnote--desktop.png"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer",
+      "screenshotPath": "exchangerow-youranswer--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--desktop.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--desktop.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--desktop.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--desktop.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--desktop.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--desktop.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Many",
+      "screenshotPath": "openquestions-many--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - One",
+      "screenshotPath": "openquestions-one--desktop.png"
+    },
+    {
+      "name": "OpenQuestions - Two",
+      "screenshotPath": "openquestions-two--desktop.png"
+    },
+    {
+      "name": "SeedIdeaQuote - Default",
+      "screenshotPath": "seedideaquote-default--desktop.png"
+    },
+    {
+      "name": "SeedIdeaQuote - LongIdea",
+      "screenshotPath": "seedideaquote-longidea--desktop.png"
+    },
+    {
+      "name": "SeedIdeaQuote - ShortIdea",
+      "screenshotPath": "seedideaquote-shortidea--desktop.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Nudged",
+      "screenshotPath": "thinkingmapview-nudged--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--desktop.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--desktop.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--desktop.png"
+    }
+  ],
+  "testResults": {
+    "total": 81,
+    "passed": 81,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 81,
+        "passed": 81
+      }
+    ]
+  }
+}

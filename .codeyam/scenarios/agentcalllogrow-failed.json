@@ -1,9 +1,9 @@
 {
   "name": "AgentCallLogRow - Failed",
-  "id": "5da66b5b-fe37-4da6-bf5a-84bfc5eda789",
+  "id": "44914d96-27c5-4744-ba2e-1af058b6aed2",
   "url": "/isolated-components/AgentCallLogRow?s=Failed",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentCallLogRow",

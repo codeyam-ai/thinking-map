@@ -1,12 +1,12 @@
 {
-  "name": "IdeaPrompt - Default",
-  "id": "f770242d-8e7e-45a7-9826-255fba239919",
-  "url": "/isolated-components/IdeaPrompt?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "IdeaPrompt",
-  "scenarioType": "component",
-  "description": "The full entry point: the free-text pill, the lime send button, and the four starter chips."
+ "name": "IdeaPrompt - Default",
+ "id": "f770242d-8e7e-45a7-9826-255fba239919",
+ "url": "/isolated-components/IdeaPrompt?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "IdeaPrompt",
+ "scenarioType": "component",
+ "description": "The full entry point: the free-text pill, the lime send button, and the four starter chips."
 }

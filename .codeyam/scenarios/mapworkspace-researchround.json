@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - ResearchRound",
+  "id": "790a7e86-b0bc-4e30-84b6-4aef1e5f4d84",
+  "url": "/isolated-components/MapWorkspace?s=ResearchRound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "The headline of the card-visual change, in the workspace: a banded research round directly under the unbanded idea row, so the contrast is in one frame. Ochre threads leave the idea card in a fan and cross the band to land on the cards inside it."
+}

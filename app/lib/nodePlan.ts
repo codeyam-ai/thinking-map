@@ -18,6 +18,22 @@ export interface PlannedInsert {
   detail: string | null;
   status: NodeStatus;
   sourceUrl: string | null;
+  /**
+   * What this slice would settle. Like `parentRef`, this is either a ref from
+   * earlier in this same plan or the real id of an existing node — a slice
+   * usually names an assumption the agent created moments before it — so it
+   * has to survive the same resolution pass rather than being written raw.
+   */
+  testsRef: string | null;
+  /** The brief section this node came from, when it came from one. Dropped
+   *  when absent, exactly as `sourceUrl` is. Unlike `testsRef` above it is
+   *  NOT a node ref, so it needs no resolution pass — it points out of the
+   *  map at the document, not at another node. */
+  sourceRef: string | null;
+  /** Suggested answers for an open question, already serialised to the JSON
+   *  array the column stores — SQLite has no array type. Null when the model
+   *  offered none, which is the ordinary case. */
+  options: string | null;
   order: number;
   /** A ref from earlier in this plan, or the real id of an existing theme. */
   themeRef: string | null;
@@ -44,6 +60,10 @@ export interface PlannedUpdate {
     detail: string;
     kind: NodeKind;
     status: NodeStatus;
+    testsNodeId: string;
+    /** Settable after the fact: an agent often only works out where a claim
+     *  came from on a later pass, once it has read more of the brief. */
+    sourceRef: string;
   }>;
 }
 
@@ -57,6 +77,24 @@ export interface MapMutationPlan {
 export interface ToolInvocation {
   name: string;
   input: unknown;
+}
+
+/**
+ * Suggested answers, ready to store.
+ *
+ * Dropped entirely unless there is at least one usable string, so a model that
+ * sends `options: []` or a list of blanks produces a plain question rather than
+ * a node carrying an empty array nobody can render. Non-strings are filtered
+ * rather than stringified: `[1, 2]` is a mistake, and `"1"` as a suggested
+ * answer would hide it.
+ */
+function serialiseOptions(raw: unknown): string | null {
+  if (!Array.isArray(raw)) return null;
+  const options = raw.filter(
+    (option): option is string =>
+      typeof option === 'string' && option.trim().length > 0,
+  );
+  return options.length > 0 ? JSON.stringify(options) : null;
 }
 
 /**
@@ -135,6 +173,9 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           detail: node.detail ? String(node.detail) : null,
           status: isNodeStatus(status) ? status : 'answered',
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
+          testsRef: node.tests ? String(node.tests) : null,
+          sourceRef: node.sourceRef ? String(node.sourceRef) : null,
+          options: serialiseOptions(node.options),
           order: order++,
           themeRef: node.themeRef ? String(node.themeRef) : null,
           diagram: readDiagram(node.diagram),
@@ -168,6 +209,8 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
       if (input.status && isNodeStatus(String(input.status))) {
         data.status = String(input.status) as NodeStatus;
       }
+      if (input.tests) data.testsNodeId = String(input.tests);
+      if (input.sourceRef) data.sourceRef = String(input.sourceRef);
       if (Object.keys(data).length === 0) continue;
       updates.push({ id, data });
     }

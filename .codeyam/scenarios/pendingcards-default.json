@@ -1,0 +1,12 @@
+{
+  "name": "PendingCards - Default",
+  "id": "3c16e9ef-bade-4537-b0b0-abc14a63b99e",
+  "url": "/isolated-components/PendingCards?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingCards",
+  "scenarioType": "component",
+  "description": "The placeholder band on its own, on the white surface it really sits on. Its geometry mirrors MapRow's exactly, so the cards land where the real ones will and the row does not jump sideways when they arrive."
+}

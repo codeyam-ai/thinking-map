@@ -1,0 +1,12 @@
+{
+  "name": "AskAboutSectionButton - Default",
+  "id": "86d69792-a86c-4782-bcdc-56c706ac3c6a",
+  "url": "/isolated-components/AskAboutSectionButton?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AskAboutSectionButton",
+  "scenarioType": "component",
+  "description": "The affordance on an unaccounted-for section. Labelled by section mark, with the heading kept as the accessible name where length costs nothing."
+}

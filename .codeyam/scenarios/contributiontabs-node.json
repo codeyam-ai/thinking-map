@@ -1,12 +1,12 @@
 {
-  "name": "ContributionTabs - Node",
-  "id": "192e8174-3af6-44d0-9f14-a38f3dfaffed",
-  "url": "/isolated-components/ContributionTabs?s=Node",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ContributionTabs",
-  "scenarioType": "component",
-  "description": "Composing a node, which lands on the map. The difference between the two tabs is what happens afterwards."
+ "name": "ContributionTabs - Node",
+ "id": "192e8174-3af6-44d0-9f14-a38f3dfaffed",
+ "url": "/isolated-components/ContributionTabs?s=Node",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ContributionTabs",
+ "scenarioType": "component",
+ "description": "Composing a node, which lands on the map. The difference between the two tabs is what happens afterwards."
 }

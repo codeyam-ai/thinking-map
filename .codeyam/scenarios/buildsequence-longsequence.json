@@ -1,0 +1,15 @@
+{
+  "name": "BuildSequence - LongSequence",
+  "id": "8c6c162f-d6f1-4094-b600-f3f39597693d",
+  "url": "/isolated-components/BuildSequence?s=LongSequence",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BuildSequence",
+  "scenarioType": "component",
+  "description": "Six increments deep - the length at which a build sequence starts drifting back toward the plan-everything list it exists to replace. Worth seeing whole: the slices settle unknowns, a risk and an open question, and the one at the end that settles nothing stands out precisely because the list is long.",
+  "demonstratesState": {
+    "sequence": "many"
+  }
+}

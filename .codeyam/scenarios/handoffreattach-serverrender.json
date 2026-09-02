@@ -1,0 +1,12 @@
+{
+  "name": "HandoffReattach - ServerRender",
+  "id": "5a84f6df-d5bd-46dd-8913-8f8d86db7d10",
+  "url": "/isolated-components/HandoffReattach?s=ServerRender",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffReattach",
+  "scenarioType": "component",
+  "description": "The first paint, before the browser's own address has reached the component. The MCP command falls back to `npm run mcp` - correct only for someone in this checkout, but the one of the two forms that cannot point at the wrong machine. It is also much shorter than the HTTP form, so this is where the two-column grid is seen holding its shape with one cell nearly empty."
+}

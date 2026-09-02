@@ -1,0 +1,18 @@
+{
+  "surface": "PendingRow",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "kind",
+      "value": "settled",
+      "rationale": "source-derived state kind=settled",
+      "status": "planned"
+    },
+    {
+      "dimension": "kind",
+      "value": "hidden",
+      "rationale": "source-derived state kind=hidden",
+      "status": "covered"
+    }
+  ]
+}

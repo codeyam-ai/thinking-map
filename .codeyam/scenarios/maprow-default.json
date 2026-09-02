@@ -1,0 +1,13 @@
+{
+ "name": "MapRow - Default",
+ "id": "019382e1-ec36-4561-a40c-2c0f8882eedf",
+ "url": "/isolated-components/MapRow?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapRow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapRow.tsx",
+ "description": "One round of three questions. The cards share a top edge and end where their content does \u2014 the stagger was removed because varying heights plus an offset read as misalignment rather than rhythm."
+}

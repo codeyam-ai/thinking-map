@@ -1,0 +1,78 @@
+{
+  "surface": "MapNodePill",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "foldable",
+      "value": "true",
+      "rationale": "source-derived state foldable=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "foldable",
+      "value": "false",
+      "rationale": "source-derived state foldable=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "isRoot",
+      "value": "true",
+      "rationale": "source-derived state isRoot=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "isRoot",
+      "value": "false",
+      "rationale": "source-derived state isRoot=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "asked",
+      "value": "true",
+      "rationale": "source-derived state asked=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "asked",
+      "value": "false",
+      "rationale": "source-derived state asked=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "onNudge",
+      "value": "true",
+      "rationale": "source-derived state onNudge=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "onNudge",
+      "value": "false",
+      "rationale": "source-derived state onNudge=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "onAsk",
+      "value": "true",
+      "rationale": "source-derived state onAsk=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "onAsk",
+      "value": "false",
+      "rationale": "source-derived state onAsk=false",
+      "status": "planned"
+    },
+    {
+      "dimension": "dragging",
+      "value": "true",
+      "rationale": "source-derived state dragging=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "dragging",
+      "value": "false",
+      "rationale": "source-derived state dragging=false",
+      "status": "planned"
+    }
+  ]
+}

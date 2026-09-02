@@ -3,21 +3,21 @@
   "surface_kind": "component",
   "states": [
     {
-      "dimension": "nodes",
+      "dimension": "rounds",
       "value": "empty",
-      "rationale": "source-derived state nodes=empty",
+      "rationale": "source-derived state rounds=empty",
       "status": "covered"
     },
     {
-      "dimension": "nodes",
+      "dimension": "rounds",
       "value": "one",
-      "rationale": "source-derived state nodes=one",
+      "rationale": "source-derived state rounds=one",
       "status": "covered"
     },
     {
-      "dimension": "nodes",
+      "dimension": "rounds",
       "value": "many",
-      "rationale": "source-derived state nodes=many",
+      "rationale": "source-derived state rounds=many",
       "status": "planned"
     },
     {
@@ -30,7 +30,7 @@
       "dimension": "caption",
       "value": "false",
       "rationale": "source-derived state caption=false",
-      "status": "planned"
+      "status": "covered"
     }
   ]
 }

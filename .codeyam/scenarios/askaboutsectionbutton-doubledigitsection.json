@@ -1,0 +1,12 @@
+{
+  "name": "AskAboutSectionButton - DoubleDigitSection",
+  "id": "9e5f3cf1-b8a9-4163-9cd9-9d54599131fa",
+  "url": "/isolated-components/AskAboutSectionButton?s=DoubleDigitSection",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AskAboutSectionButton",
+  "scenarioType": "component",
+  "description": "Past section nine, where the label has to stay legible with a wider mark."
+}

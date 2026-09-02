@@ -1,0 +1,12 @@
+{
+  "name": "BriefReadout - Default",
+  "id": "9cae0f4d-922b-4c86-afbe-3afe229ba838",
+  "url": "/isolated-components/BriefReadout?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefReadout",
+  "scenarioType": "component",
+  "description": "A real spec that arrived as a PDF: source, character count, page estimate, and the first lines verbatim. The ordinary healthy case, and the one the feature exists for."
+}

@@ -1,0 +1,42 @@
+{
+  "surface": "MapCard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "isQuestion",
+      "value": "true",
+      "rationale": "source-derived state isQuestion=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "isQuestion",
+      "value": "false",
+      "rationale": "source-derived state isQuestion=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "answered",
+      "value": "true",
+      "rationale": "source-derived state answered=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "answered",
+      "value": "false",
+      "rationale": "source-derived state answered=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "isRoot",
+      "value": "true",
+      "rationale": "source-derived state isRoot=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "isRoot",
+      "value": "false",
+      "rationale": "source-derived state isRoot=false",
+      "status": "covered"
+    }
+  ]
+}

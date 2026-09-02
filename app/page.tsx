@@ -1,5 +1,8 @@
+import AppHeader from './components/AppHeader';
+import ErrorScreen from './components/ErrorScreen';
 import FirstCard from './components/FirstCard';
 import SavedMapList from './components/SavedMapList';
+import { classifyLoadError } from './lib/loadError';
 import { listMaps } from './lib/mapStore';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +16,21 @@ export const dynamic = 'force-dynamic';
  * the first card you fill in is already part of the map.
  */
 export default async function Home() {
-  const maps = await listMaps();
+  // Same database, same failure mode as the map page — so the same treatment.
+  // The header stays either way: a failed load should still look like the app,
+  // not like the app is gone.
+  let maps: Awaited<ReturnType<typeof listMaps>>;
+  try {
+    maps = await listMaps();
+  } catch (error) {
+    console.error('Failed to list maps:', error);
+    return (
+      <main className="flex min-h-screen flex-col bg-[#050505] px-4 py-4 sm:px-6 lg:px-10 lg:py-8">
+        <AppHeader />
+        <ErrorScreen {...classifyLoadError(error)} />
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen flex-col bg-[#050505] px-10 py-8">

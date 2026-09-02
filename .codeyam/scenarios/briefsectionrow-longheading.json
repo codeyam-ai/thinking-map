@@ -1,0 +1,12 @@
+{
+  "name": "BriefSectionRow - LongHeading",
+  "id": "24f65bab-e41f-4a95-949a-893d17447a6f",
+  "url": "/isolated-components/BriefSectionRow?s=LongHeading",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefSectionRow",
+  "scenarioType": "component",
+  "description": "A long heading in a narrow rail, and a double-digit section number. This is the case that made the ask button label the section mark rather than the heading."
+}

@@ -27,6 +27,16 @@
     ]
   },
   {
+    "description": "The band a person meets when they submit an idea and nothing picks it up. Before it existed the only sign of that was 'No agent attached' in the header, which states a fact about the page rather than telling the person what to do about it. It leads with the instruction and follows with the explanation, in that order, because someone who just pressed return wants to know what to DO - the panel used to open with the explanation and reach the prompt third, which read as a footnote about agent availability rather than as the next step. A renderer and a composer only: every string comes from handoffCopy where tests pin it, and the band itself is HandoffInstruction, CopyablePrompt, SeedIdeaQuote and HandoffFootnote in that order. What it decides is whether to appear at all - it hides when an agent is listening, using the identical predicate NodeQuestionComposer uses so working counts as attached and the two surfaces cannot contradict each other, and it hides when the log already carries an agent-origin event, because a map an agent has already worked is not waiting for one.",
+    "filePath": "app/components/AgentHandoff.tsx",
+    "name": "AgentHandoff",
+    "scenarios": [
+      "agenthandoff-default",
+      "agenthandoff-frombrief",
+      "agenthandoff-longidea"
+    ]
+  },
+  {
     "description": "The collapsed dev panel, pinned to the corner: present enough to find, quiet enough to ignore. It sits over the map rather than in the layout because it is not part of the product.",
     "filePath": "app/components/AgentPanelLauncher.tsx",
     "name": "AgentPanelLauncher",
@@ -75,12 +85,60 @@
     ]
   },
   {
+    "description": "A question's suggested answers, as chips. Clicking one FILLS the answer box rather than submitting it — the rule SuggestionChips established on the landing screen, and the reason these are a head start rather than a set of choices. Deliberately not SuggestionChips itself, which is bound to the landing page's fixed list and has no per-question input.",
+    "filePath": "app/components/AnswerChips.tsx",
+    "name": "AnswerChips",
+    "scenarios": [
+      "answerchips-default",
+      "answerchips-empty",
+      "answerchips-single",
+      "answerchips-wrapping"
+    ]
+  },
+  {
+    "description": "Just enough of the WebMCP bridge to record an answer. Narrowed deliberately: the answers hook has no business with tools or connection status, and the narrow shape is what lets a test hand it a plain function instead of standing up a context.",
+    "filePath": "app/hooks/useMapAnswers.ts",
+    "name": "AnswerWriter",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface — the narrowed slice of the WebMCP bridge the answers hook needs. It declares a shape and emits no runtime code, so there is nothing to execute; the behaviour behind it is covered by useMapAnswers.test.ts, which supplies this shape directly.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "The client error boundary under everything below app/ that the server-side catches do not cover. Deliberately generic: React replaces error.message with an opaque digest in production, so a boundary structurally cannot diagnose a database failure - which is why the two DB-backed pages catch their own load failure on the server instead of leaving it to here. What this owns is the way back, via the reset prop.",
+    "filePath": "app/error.tsx",
+    "name": "AppErrorBoundary",
+    "scenarios": [
+      "apperrorboundary-withdigest",
+      "apperrorboundary-nodigest"
+    ]
+  },
+  {
     "description": "Wordmark left, phase track right. Shared by the landing screen and the map workspace so the two never drift.",
     "filePath": "app/components/AppHeader.tsx",
     "name": "AppHeader",
     "scenarios": [
       "appheader-default",
       "appheader-explore"
+    ]
+  },
+  {
+    "description": "The affordance on a brief section nobody has accounted for. Its visible label and its accessible name deliberately differ: the label is the section mark, because a heading can run to a full sentence and the spelled-out version wrapped to three lines in a 276px rail, while the accessible name keeps the heading, where length costs nothing and a bare section number would tell a screen-reader user nothing about what they are asking after.",
+    "filePath": "app/components/AskAboutSectionButton.tsx",
+    "name": "AskAboutSectionButton",
+    "scenarios": [
+      "askaboutsectionbutton-default",
+      "askaboutsectionbutton-longheading",
+      "askaboutsectionbutton-doubledigitsection"
+    ]
+  },
+  {
+    "description": "The line that says what sending this question will actually do. Its own component because it is the part of the composer that has to be honest: an asked question reaches an agent already waiting and reaches nobody otherwise. The wording itself lives in askPresence, where tests pin it.",
+    "filePath": "app/components/AskPresenceNote.tsx",
+    "name": "AskPresenceNote",
+    "scenarios": [
+      "askpresencenote-listening",
+      "askpresencenote-noagent"
     ]
   },
   {
@@ -94,12 +152,163 @@
     }
   },
   {
+    "description": "The panel's one sentence, and the bar under it. It leads with what is UNTOUCHED rather than what is covered, because the covered sections already have their evidence sitting next to this. The character count gets its own line because a count of sections understates the finding on its own - four short sections and four long ones are not the same news for a client.",
+    "filePath": "app/components/BriefCoverageHeadline.tsx",
+    "name": "BriefCoverageHeadline",
+    "scenarios": [
+      "briefcoverageheadline-partlycovered",
+      "briefcoverageheadline-nothingcited",
+      "briefcoverageheadline-fullyaccountedfor",
+      "briefcoverageheadline-onesectionleft"
+    ]
+  },
+  {
+    "description": "Citations pointing at sections the brief does not have. Surfaced rather than swallowed: a dangling reference means the map and the document disagree about what the document contains, and a silently dropped citation would let the accounted-for count overstate itself - the one failure the whole panel exists to prevent. Renders nothing at all when there are none, so a healthy map pays nothing in space.",
+    "filePath": "app/components/BriefDanglingNote.tsx",
+    "name": "BriefDanglingNote",
+    "scenarios": [
+      "briefdanglingnote-onedangling",
+      "briefdanglingnote-severaldangling"
+    ]
+  },
+  {
+    "description": "The way a twenty-page spec gets into a map. Owns one question - what document, if any, is attached - and shows exactly one of three things depending on the answer: the readout of an attached brief, the paste box, or the drop target. Extraction goes over the wire because reading a PDF is a server's job, and nothing is persisted by it, so a brief the person discards leaves nothing behind.",
+    "filePath": "app/components/BriefDrop.tsx",
+    "name": "BriefDrop",
+    "scenarios": [
+      "briefdrop-default",
+      "briefdrop-attached"
+    ]
+  },
+  {
+    "description": "The opening lines of the brief, exactly as extracted. Verbatim on purpose, markdown marks and all: the claim being made is this is what we got out of your file, and prettifying it would undermine the one thing it is here to prove. A file that yielded nothing shows nothing, which is the signal.",
+    "filePath": "app/components/BriefExcerpt.tsx",
+    "name": "BriefExcerpt",
+    "scenarios": [
+      "briefexcerpt-default",
+      "briefexcerpt-nothingextracted"
+    ]
+  },
+  {
+    "description": "The brief intake with its dashed panel removed: a hidden file picker its parent opens plus the one error line an upload can produce, and the ACCEPT list keeping the picker and the extractor in step. Renders nothing at rest.",
+    "filePath": "app/components/BriefFileInput.tsx",
+    "name": "BriefFileInput",
+    "untestabilityReason": {
+      "justification": "A headless forwardRef wrapper around a hidden file input plus one conditional error line - it renders nothing at rest, so an isolated capture would be a blank frame. The picker it opens is driven by BriefMenu (covered by BriefMenu.render.test.tsx) and the upload path is exercised by the landing application scenarios.",
+      "kind": "scaffold"
+    }
+  },
+  {
+    "description": "The whole brief intake stated in 28px of width instead of 140px of height: a + button inside the input frame opening a two-item menu (Upload a file / Paste a brief), which becomes a chip naming the document once one is attached. Closes on outside click, Escape, and selection.",
+    "filePath": "app/components/BriefMenu.tsx",
+    "name": "BriefMenu",
+    "testFile": "app/components/BriefMenu.render.test.tsx"
+  },
+  {
+    "description": "The client's brief beside the map, marked with what has been accounted for. A client who hands over a twenty-page spec wants evidence you read all of it; the map is the evidence for the sections it cites, and this panel exists for the ones it does not - the difference between reading a brief and inferring it. Pure composition over a header, a headline, the section list and a dangling-reference note. Its one piece of behaviour is the untouched-section prompt, which rides the existing user.note channel so it wakes a waiting agent with no new mechanism.",
+    "filePath": "app/components/BriefPanel.tsx",
+    "name": "BriefPanel",
+    "scenarios": [
+      "briefpanel-middeconstruction",
+      "briefpanel-nothingcitedyet",
+      "briefpanel-fullyaccountedfor",
+      "briefpanel-danglingreference"
+    ]
+  },
+  {
+    "description": "What document this is and how much of it the map accounts for. The source name is the client's own filename rather than anything derived - a person recognises the thing they sent, and a tidied-up title would break that recognition for no gain. Truncated rather than wrapped, so a long filename cannot push the headline down the panel.",
+    "filePath": "app/components/BriefPanelHeader.tsx",
+    "name": "BriefPanelHeader",
+    "scenarios": [
+      "briefpanelheader-default",
+      "briefpanelheader-longsourcename",
+      "briefpanelheader-nothingaccountedfor"
+    ]
+  },
+  {
+    "description": "The other way in: paste the words. Not a fallback for when upload fails but a first-class door, because a client who cannot get their document out of the system it lives in still has the text, and the text is all this product ever wanted from the file.",
+    "filePath": "app/components/BriefPasteBox.tsx",
+    "name": "BriefPasteBox",
+    "scenarios": [
+      "briefpastebox-default",
+      "briefpastebox-filled"
+    ]
+  },
+  {
+    "description": "What we are holding, before any map exists. Says where the document came from, how much of it there is, and - through BriefExcerpt - what actually came out of the file, so a client finds out their PDF was a scan here rather than three questions into a map built on nothing.",
+    "filePath": "app/components/BriefReadout.tsx",
+    "name": "BriefReadout",
+    "scenarios": [
+      "briefreadout-default",
+      "briefreadout-pasted",
+      "briefreadout-scannedpdf"
+    ]
+  },
+  {
+    "description": "One section of the brief and what the map has to say about it. The weighting is deliberately the inverse of the obvious one: untouched sections carry the ink and accounted-for ones recede, because the covered sections already have their evidence beside the panel and rendering the one finding a client is owed as the quietest thing on screen would bury it. Not lime and not red on purpose - lime marks the one thing that just changed, and red would read as a defect rather than a prompt.",
+    "filePath": "app/components/BriefSectionRow.tsx",
+    "name": "BriefSectionRow",
+    "scenarios": [
+      "briefsectionrow-covered",
+      "briefsectionrow-untouched",
+      "briefsectionrow-untouchedalreadyasked",
+      "briefsectionrow-emptysection",
+      "briefsectionrow-longheading"
+    ]
+  },
+  {
+    "description": "What extraction wanted the person to know, in the risk colour. The safety net of the whole intake: where someone who uploaded a photograph of a document finds out no words came out of it. A warning rather than an error because nothing failed - their file is simply not what they thought, and they can still paste.",
+    "filePath": "app/components/BriefWarning.tsx",
+    "name": "BriefWarning",
+    "scenarios": [
+      "briefwarning-default",
+      "briefwarning-unsupported"
+    ]
+  },
+  {
+    "description": "What to build first, and what building it would prove. A numbered list of next steps is indistinguishable from a plan to build the whole thing in order - the failure this product exists to prevent - so this region leads with the smallest increment that would settle something, and a slice that settles nothing is marked in place rather than quietly filtered out. Sits above the next-steps track: what you build comes before what you go and find out.",
+    "filePath": "app/components/BuildSequence.tsx",
+    "name": "BuildSequence",
+    "scenarios": [
+      "buildsequence-default",
+      "buildsequence-provesnothing",
+      "buildsequence-danglinglink",
+      "buildsequence-firstsliceonly",
+      "buildsequence-empty"
+    ]
+  },
+  {
     "description": "A what-we-know or what-we-don't-know card on the summary screen, falling back to the keep-talking hint when its bucket is empty.",
     "filePath": "app/components/BulletCard.tsx",
     "name": "BulletCard",
     "scenarios": [
       "bulletcard-default",
       "bulletcard-empty"
+    ]
+  },
+  {
+    "description": "The facts a card knows about itself that its eyebrow can name: kind, origin, brief section, whether it has been asked about, and whether it has been answered.",
+    "filePath": "app/lib/cardEyebrow.ts",
+    "name": "CardEyebrowFacts",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface naming the facts a card's eyebrow can report. It declares a shape and emits no runtime code; every field is exercised through cardEyebrow in cardEyebrow.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "The mark in a card's top-right corner, naming its colour family. One glyph per FAMILY rather than per kind: eighteen glyphs would be a legend to learn, and the eyebrow beneath already names the exact kind — so the icon is the same six categories said a second way, which costs the reader nothing new. Drawn as inline SVG in the manner of Wordmark rather than pulled from a package; the design references put emoji in this slot, and emoji render differently on every platform and would be the only mark in the product this codebase did not draw. The magnifier is carried across from the retired node pill rather than redrawn.",
+    "filePath": "app/components/CardIcon.tsx",
+    "name": "CardIcon",
+    "scenarios": [
+      "cardicon-subject",
+      "cardicon-question",
+      "cardicon-gap",
+      "cardicon-ground",
+      "cardicon-found",
+      "cardicon-judgment",
+      "cardicon-pro",
+      "cardicon-forward",
+      "cardicon-unknownkind"
     ]
   },
   {
@@ -130,12 +339,33 @@
     ]
   },
   {
+    "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original secondary appearance and promotes to a lime-filled primary for the handoff band, so promoting that one caller cannot restyle the others. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation.",
+    "filePath": "app/components/CopyablePrompt.tsx",
+    "name": "CopyablePrompt",
+    "scenarios": [
+      "copyableprompt-default",
+      "copyableprompt-shortprompt",
+      "copyableprompt-defaultlabel",
+      "copyableprompt-primary"
+    ],
+    "testFile": "app/components/CopyablePrompt.render.test.tsx"
+  },
+  {
     "description": "The strongest directions on the summary screen, lettered A onward so they can be referred to by name in conversation.",
     "filePath": "app/components/DirectionsCard.tsx",
     "name": "DirectionsCard",
     "scenarios": [
       "directionscard-default",
       "directionscard-empty"
+    ]
+  },
+  {
+    "description": "A compact fold: a summary line you press to reveal what is under it. A native <details> rather than a hook and a boolean — keyboard-operable and announced correctly with nothing wired up, working before hydration, and open/closed is a reading posture no other component needs to know about. It exists because the map became the whole surface, leaving the contribution bar and the activity rail with no column to live in.",
+    "filePath": "app/components/Disclosure.tsx",
+    "name": "Disclosure",
+    "scenarios": [
+      "disclosure-default",
+      "disclosure-withcount"
     ]
   },
   {
@@ -147,14 +377,19 @@
     ]
   },
   {
-    "description": "The page's half of the exchange, in the order that matters: what is being waited on, then the ways to put something in, then the record of what has happened. It holds no reconstruction of the agent's conversation because there is none to hold — the page cannot see it and under WebMCP never will.",
-    "filePath": "app/components/ExchangeColumn.tsx",
-    "name": "ExchangeColumn",
-    "scenarios": [
-      "exchangecolumn-default",
-      "exchangecolumn-nothingwaiting",
-      "exchangecolumn-quiet"
-    ]
+    "description": "Mounts an error boundary in an isolated capture by building its props on the client. A boundary receives error and reset from React, and reset is a function, so a server-component isolation route cannot construct these props. Lives beside the isolation routes rather than in components/, for the same reason as BridgeFixture: the production boundary should not carry a capture-only seam.",
+    "filePath": "app/isolated-components/ErrorBoundaryFixture.tsx",
+    "name": "ErrorBoundaryFixture",
+    "untestabilityReason": {
+      "justification": "A capture-only seam, like BridgeFixture beside it. It exists so the isolation routes can mount an error boundary at all - a boundary prop is a function, and a server component cannot pass one to a client component. It ships no behaviour of its own and nothing in the app imports it.",
+      "kind": "test-fixture"
+    }
+  },
+  {
+    "description": "The one card every failure renders through - the map page, the landing page, the client error boundary and not-found - so four failure paths cannot drift into four different apologies. Presentational and server-renderable: the boundary that needs a button passes it in through the action slot. A runnable command renders as a monospace pill because you copy it; prose guidance renders as an ordinary line, since a sentence in that pill spans the card and reads as code you are meant to type.",
+    "filePath": "app/components/ErrorScreen.tsx",
+    "name": "ErrorScreen",
+    "testFile": "app/components/ErrorScreen.render.test.tsx"
   },
   {
     "description": "Free text a side actually wrote, inside an activity row. A question keeps its weight here for the reason it did in the conversation panel this replaces: the questions are the product, and one buried in an agent's note is the line the person is meant to act on.",
@@ -196,6 +431,50 @@
     ]
   },
   {
+    "description": "Supplies a failed API response to an isolated capture. The states this feature exists to handle - a 500 with an empty body, a proxy 502 carrying HTML - are exactly the ones a healthy dev server will not produce on request, so a capture reaches them by being given the response rather than by driving the app harder. Intercepts only /api/ requests, leaving framework traffic on the real fetch. Lives beside the isolation routes for the same reason as BridgeFixture: the production path should not carry a capture-only seam.",
+    "filePath": "app/isolated-components/FetchFailureFixture.tsx",
+    "name": "FetchFailureFixture",
+    "untestabilityReason": {
+      "justification": "A capture-only seam, like BridgeFixture and ErrorBoundaryFixture beside it. It exists so the isolation routes can show a failed request at all, and nothing in the app imports it. What it enables is asserted directly in readJson.test.ts and IdeaPrompt.render.test.tsx.",
+      "kind": "test-fixture"
+    }
+  },
+  {
+    "description": "The last resort: a failure in the root layout itself, where app/error.tsx has no layout left to render into. Supplies its own html and body, and deliberately does NOT use ErrorScreen - it cannot lean on anything that assumes the app chrome mounted. Imports globals.css directly for tokens and nothing else.",
+    "filePath": "app/global-error.tsx",
+    "name": "GlobalError",
+    "scenarios": [
+      "globalerror-default"
+    ]
+  },
+  {
+    "description": "The honest paragraph about why nobody is attached, and the two ways to fix that for good - kept, and kept small. Its own component because of the decision it owns: these two travel together and they travel BELOW the action. The panel used to lead with the explanation, which answered a question someone who just pressed return had not asked yet; deleting it would have been the other mistake, since it is the only thing on the page that says a map cannot summon a thinking partner. So it is demoted rather than dropped, and grouping it here is what makes demoted a structural fact instead of two loose paragraphs that could drift back up the page one edit at a time.",
+    "filePath": "app/components/HandoffFootnote.tsx",
+    "name": "HandoffFootnote",
+    "scenarios": [
+      "handofffootnote-default"
+    ]
+  },
+  {
+    "description": "What to do about a map nobody has picked up, said before anything explains why nobody has. Its own component because of the decision it owns: the steps are an ORDERED list, not a styled pair of lines. Their order is the content - copy, then paste - and someone skimming a band on arrival reads the numbers before they read the words, so rendering them unordered or as prose would lose the only thing that makes two short sentences into instructions. It is also the block whose POSITION is the point: the panel used to open with the explanation and reach the prompt third, and keeping this separable is what lets a test assert that ordering rather than merely assert both texts exist somewhere.",
+    "filePath": "app/components/HandoffInstruction.tsx",
+    "name": "HandoffInstruction",
+    "scenarios": [
+      "handoffinstruction-default",
+      "handoffinstruction-longwording"
+    ]
+  },
+  {
+    "description": "The way back in, for a map an agent has already worked and then left. Its own component because of the decision it owns — what to DROP: the full band's numbered steps, seed quote and explanatory paragraphs are written for a first meeting, and on a map carrying an agent's work they are either false or condescending. What survives is the pair still useful to someone reattaching — the prompt naming this map, and the MCP command — side by side from `sm` up, because this strip sits above the map and every row it costs is a row of the person's own thinking pushed off screen. Replaces the earlier behaviour of rendering nothing at all, which left a detached agent's map saying 'No agent attached' with no route to change that.",
+    "filePath": "app/components/HandoffReattach.tsx",
+    "name": "HandoffReattach",
+    "scenarios": [
+      "handoffreattach-default",
+      "handoffreattach-serverrender",
+      "handoffreattach-frombrief"
+    ]
+  },
+  {
     "description": "The landing route. Reads every saved map and composes the header with the landing screen - imports and composition only, no markup of its own.",
     "filePath": "app/page.tsx",
     "name": "Home",
@@ -231,6 +510,27 @@
     ]
   },
   {
+    "description": "One line of failure, under the thing that failed, with the fix beside it when the route named one. Renders nothing at all when there is no message, so a caller can hand it state directly rather than guarding at every use. The command goes in a monospace pill rather than the sentence, matching ErrorScreen: the point of a command is that you copy and run it. Extracted from two call sites that had drifted into near-identical markup; the value is not the lines saved but that role=alert now travels with the styling, so an error line added later is announced to a screen reader whether or not its author thought about it.",
+    "filePath": "app/components/InlineError.tsx",
+    "name": "InlineError",
+    "scenarios": [
+      "inlineerror-default",
+      "inlineerror-diagnosis",
+      "inlineerror-diagnosis-in-production",
+      "inlineerror-upload",
+      "inlineerror-silent"
+    ]
+  },
+  {
+    "description": "The muted line under the idea input saying what can be dropped on it, doubling as the reading indicator while a document is extracted - the person's attention is already there, and a second spinner elsewhere would only split it. Whether the line belongs on screen at all is the caller's decision, since that is a fact about the intake state rather than about this line.",
+    "filePath": "app/components/IntakeHint.tsx",
+    "name": "IntakeHint",
+    "scenarios": [
+      "intakehint-default",
+      "intakehint-reading"
+    ]
+  },
+  {
     "description": "Somewhere to put the next thought, under the finished plan. The summary is the end of the loop and deliberately not a dead end. There are no open questions on this screen by definition, so it is the contribution bar and the record without the waiting-on-you panel.",
     "filePath": "app/components/KeepThinkingPanel.tsx",
     "name": "KeepThinkingPanel",
@@ -249,38 +549,107 @@
     ]
   },
   {
-    "description": "The dotted edge layer beneath the node pills. Dotted because the structure is provisional - this is thinking in progress, not an org chart.",
-    "filePath": "app/components/MapConnectors.tsx",
-    "name": "MapConnectors",
+    "description": "The one channel on mapEvents that is not a map id. Every other emit is keyed by mapId, which cannot carry news of a map no waiter knows the id of yet - and that is exactly what a newly started map is. A constant rather than a literal because a waiter subscribed to a typo'd string would simply never wake, which is indistinguishable from nobody having submitted anything.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "MAP_CREATED",
+    "untestabilityReason": {
+      "justification": "A single string constant naming an event channel; the behaviour that depends on it is covered by the waitForNewMap tests in app/lib/exchange.integration.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "What useMapAnswers returns: every question's current answer, and the function that records one. The recorder is optional because an isolated scenario has no exchange to write to — the map still reads correctly there, it simply cannot be answered.",
+    "filePath": "app/hooks/useMapAnswers.ts",
+    "name": "MapAnswers",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface describing what useMapAnswers returns. It declares a shape and emits no runtime code; the values it describes are asserted in useMapAnswers.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "One node on the map, as a card. The card replaced the pill because a pill could only ever hold a label, and the thing a question most needs to hold is the answer to it — so the body is one of three things: what a statement node says, the affordance for an unanswered question, or the answer to one somebody has answered. Fill is deliberately neutral on every card; which card wears the lime belongs to the card-visual plan.",
+    "filePath": "app/components/MapCard.tsx",
+    "name": "MapCard",
     "scenarios": [
-      "mapconnectors-default",
-      "mapconnectors-singlechild"
+      "mapcard-default",
+      "mapcard-nooptions",
+      "mapcard-answered",
+      "mapcard-rootidea",
+      "mapcard-finding",
+      "mapcard-yours",
+      "mapcard-longlabel"
     ]
   },
   {
-    "description": "One node on the map. Carries an eyebrow naming its kind so the map reads without a legend, and takes its shell treatment from nodeShellClasses where the status-precedence rule lives.",
-    "filePath": "app/components/MapNodePill.tsx",
-    "name": "MapNodePill",
+    "description": "The answering affordance inside a question card — the change the whole plan is for, since the question and the place you answer it are now one object rather than a dashed pill on a map and a row in a panel beside it. Holds its own draft because each card owns exactly one answer, and swaps to the recorded answer once there is one.",
+    "filePath": "app/components/MapCardAnswer.tsx",
+    "name": "MapCardAnswer",
     "scenarios": [
-      "mapnodepill-default",
-      "mapnodepill-gap",
-      "mapnodepill-justupdated",
-      "mapnodepill-openquestion",
-      "mapnodepill-pro",
-      "mapnodepill-research",
-      "mapnodepill-risk",
-      "mapnodepill-rootidea"
+      "mapcardanswer-default",
+      "mapcardanswer-nooptions",
+      "mapcardanswer-answered",
+      "mapcardanswer-longanswer",
+      "mapcardanswer-manyoptions"
     ]
   },
   {
-    "description": "The map route. Loads one thinking map and switches between the two-panel workspace and the summary screen on the phase, deriving the live-map caption from the current nodes.",
+    "description": "The line above a card's title, naming what the card is. Presentational only: which words go in the line is cardEyebrow's business, because that is string logic with a rule worth testing rather than anything about rendering.",
+    "filePath": "app/components/MapCardEyebrow.tsx",
+    "name": "MapCardEyebrow",
+    "scenarios": [
+      "mapcardeyebrow-default",
+      "mapcardeyebrow-answered",
+      "mapcardeyebrow-finding",
+      "mapcardeyebrow-yours",
+      "mapcardeyebrow-asked",
+      "mapcardeyebrow-frombrief",
+      "mapcardeyebrow-everything"
+    ]
+  },
+  {
+    "description": "The top line of a card: which round it arrived in, and which family it is. The two marks sit at opposite corners and take the same colour on purpose — a card can be clipped by the edge of the column or by a narrow viewport, so putting the family colour at both ends means whichever corner survives still says what kind of thing this is. The root is the exception: its marker stays neutral grey, because the subject family's colour is ink and ink on a round number would read as emphasis on the number rather than as a category.",
+    "filePath": "app/components/MapCardHeader.tsx",
+    "name": "MapCardHeader",
+    "scenarios": [
+      "mapcardheader-default",
+      "mapcardheader-root",
+      "mapcardheader-risk",
+      "mapcardheader-found",
+      "mapcardheader-manyrounds"
+    ]
+  },
+  {
+    "description": "The map on day one. Per the design system an empty state describes what happens next rather than reporting an absence, so it says the map fills in as you answer. Deliberately not EmptyHint, which renders an <li> for the summary screen's list and would be invalid markup inside the map's column.",
+    "filePath": "app/components/MapEmptyState.tsx",
+    "name": "MapEmptyState",
+    "scenarios": [
+      "mapemptystate-default"
+    ]
+  },
+  {
+    "description": "The map route. Loads one thinking map with its whole exchange log, and switches between the working map and the summary screen on the phase, deriving the live-map caption from the current nodes. The log is read here rather than fetched later because the map is drawn from it: which nodes arrived together is what makes a round, and a round is what makes a row.",
     "filePath": "app/map/[id]/page.tsx",
     "name": "MapPage",
     "scenarios": [
       "grounded-research-and-its-gaps",
       "pivoted-now-it-is-for-teachers",
       "complete-what-to-do-next",
-      "sprawling-a-deep-wide-map"
+      "a-plan-with-a-gap-one-slice-proves-nothing",
+      "sprawling-a-deep-wide-map",
+      "the-round-is-answered-and-the-map-reaches-on",
+      "an-older-question-three-rounds-up-still-open"
+    ]
+  },
+  {
+    "description": "One round of thinking, as a row: everything in it arrived together, and the next round appears below it — the whole of what 'the map builds downward' means. The band wraps rather than scrolling sideways, which is what makes one layout work at every width with no breakpoint deciding which it is in.",
+    "filePath": "app/components/MapRow.tsx",
+    "name": "MapRow",
+    "scenarios": [
+      "maprow-default",
+      "maprow-partlyanswered",
+      "maprow-theidea",
+      "maprow-wrapping",
+      "maprow-namedbyphase"
     ]
   },
   {
@@ -288,9 +657,10 @@
     "filePath": "app/components/MapScreen.tsx",
     "name": "MapScreen",
     "scenarios": [
-      "mapscreen-working",
       "mapscreen-noagent",
-      "mapscreen-summary"
+      "mapscreen-working",
+      "mapscreen-summary",
+      "mapscreen-justarrived"
     ]
   },
   {
@@ -320,33 +690,108 @@
     ]
   },
   {
-    "description": "One question with an inline answer field. The row owns its own draft, since each row answers exactly one question, and its send control names that question — several sit in the panel at once, and one repeated label leaves a screen reader unable to tell them apart.",
-    "filePath": "app/components/OpenQuestionRow.tsx",
-    "name": "OpenQuestionRow",
+    "description": "Asking the agent about one specific node. Carries the node id, so the question arrives already attached to the thing it is about rather than leaving the agent to work out from prose which pill was meant. The send control and the note beneath it state whether an agent is actually listening, because WebMCP is pull-only and implying a reply is coming when nothing is attached is the one thing this feature could genuinely mislead about.",
+    "filePath": "app/components/NodeQuestionComposer.tsx",
+    "name": "NodeQuestionComposer",
     "scenarios": [
-      "openquestionrow-default",
-      "openquestionrow-longquestion",
-      "openquestionrow-typed"
+      "nodequestioncomposer-noagent",
+      "nodequestioncomposer-listening",
+      "nodequestioncomposer-agentworking",
+      "nodequestioncomposer-longlabel"
     ]
   },
   {
-    "description": "The questions addressed to the person, with somewhere to answer them. An open-question node is a request, not a shape, so leaving it only as a dashed pill buries the one thing anybody is waiting on. Empties as they are answered, and renders nothing when none are open.",
-    "filePath": "app/components/OpenQuestions.tsx",
-    "name": "OpenQuestions",
+    "description": "What the composer is about, and the way out of it. The node's own words are repeated from the pill because the composer covers part of the map, and someone mid-sentence should not have to move it to remember which node they clicked. The label truncates rather than wrapping, since nothing constrains how long an agent writes one.",
+    "filePath": "app/components/NodeQuestionHeader.tsx",
+    "name": "NodeQuestionHeader",
     "scenarios": [
-      "openquestions-one",
-      "openquestions-two",
-      "openquestions-many"
+      "nodequestionheader-default",
+      "nodequestionheader-longlabel"
     ]
   },
   {
-    "description": "The six-phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar.",
+    "description": "Where notFound() from the map route lands, and where a stale bookmark to a deleted map lands too. Renders ErrorScreen with a way back, because per the design system an empty state describes the next action rather than reporting the absence. Uses a plain anchor with suppressHydrationWarning, matching Wordmark and SavedMapRow - the preview proxy serves the app under a path prefix and rewrites href in the server HTML, so a next/link here hydrates against a different href and warns on every capture.",
+    "filePath": "app/not-found.tsx",
+    "name": "NotFound",
+    "scenarios": [
+      "notfound-default"
+    ]
+  },
+  {
+    "description": "One node's arrangement as a client would ask for it. Vestigial: the map is a scrolling column of card rows with no plane to drag a node around on, so nothing produces one any more.",
+    "filePath": "app/lib/nudges.ts",
+    "name": "Nudge",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface describing one node's arrangement as a client would request it. It declares a shape and emits no runtime code; parseNudges, which produces it, is covered by route.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "The placeholder band. Its geometry mirrors MapRow's exactly — same wrap, gap, and card min/max/height — so the placeholders stand where the real cards will and the row does not jump sideways when they arrive; that coupling is the point, which is why the numbers are repeated rather than approximated. The cards are aria-hidden, but the shimmer IS a message, so it is also said in words to a live region for a reader who cannot see it.",
+    "filePath": "app/components/PendingCards.tsx",
+    "name": "PendingCards",
+    "scenarios": [
+      "pendingcards-default",
+      "pendingcards-two"
+    ]
+  },
+  {
+    "description": "What the wait turned out to mean, in one line. Its own component for the same reason AskPresenceNote is: this is the part of the pending row that has to be honest, and a sentence that has to be honest is worth being able to point at. The wording lives in pendingRow, where tests pin it.",
+    "filePath": "app/components/PendingNote.tsx",
+    "name": "PendingNote",
+    "scenarios": [
+      "pendingnote-noagent",
+      "pendingnote-agentworking",
+      "pendingnote-agentidle"
+    ]
+  },
+  {
+    "description": "The row the map reaches for before it has one — the whole of what 'the app moves first' means. A round gets finished and the next row appears immediately as placeholders, so the column visibly grows downward instead of sitting still. It must never imply an agent is writing, because the page cannot start anyone's turn, so the shimmer is bounded and resolves into whichever of three sentences is actually true.",
+    "filePath": "app/components/PendingRow.tsx",
+    "name": "PendingRow",
+    "scenarios": [
+      "pendingrow-waiting",
+      "pendingrow-settlednoagent",
+      "pendingrow-settledagentworking",
+      "pendingrow-settledagentidle"
+    ]
+  },
+  {
+    "description": "The one action worth taking when a phase's work is done, at the bottom of the round you just finished rather than up in the chrome — with the map drawn as a column you answer in place, the eye is already there. Sentence and label both come from PHASE_ASK beside the phase labels, so the step the nav names and the step this offers to leave cannot drift apart; what the press does lives in useAdvancePhase.",
+    "filePath": "app/components/PhaseAdvance.tsx",
+    "name": "PhaseAdvance",
+    "scenarios": [
+      "phaseadvance-endofmap",
+      "phaseadvance-endofresearch",
+      "phaseadvance-endofexplore",
+      "phaseadvance-nomaptoadvance"
+    ]
+  },
+  {
+    "description": "The phase track. The active phase wears the lime; completed phases are deliberately not distinguished from upcoming ones, because this is a map of the process and not a progress bar. Below lg the track scrolls horizontally rather than collapsing to a summary, and its edge fades are derived from scroll position - each one appears only when there is genuinely more track past that edge, so the fade never washes out the active pill on a track that fits.",
     "filePath": "app/components/PhaseNav.tsx",
     "name": "PhaseNav",
     "scenarios": [
       "phasenav-default",
       "phasenav-nextsteps",
       "phasenav-research"
+    ],
+    "testFile": "app/components/PhaseNav.render.test.tsx"
+  },
+  {
+    "description": "Next's parsed query object as `agentPanelRequested` reads it: a record of string, string array, or undefined, since a repeated param arrives as an array. Named here so the map page can type its `searchParams` promise against the same shape the predicate consumes rather than restating it.",
+    "filePath": "app/lib/agentPanel.ts",
+    "name": "QueryParams",
+    "testFile": "app/lib/agentPanel.test.ts"
+  },
+  {
+    "description": "What the person said, shown back in the card's body. The Edit affordance is deliberately quiet — the eyebrow's weight rather than a button's — because an answered question is settled and reopening it should be available without being an invitation.",
+    "filePath": "app/components/RecordedAnswer.tsx",
+    "name": "RecordedAnswer",
+    "scenarios": [
+      "recordedanswer-default",
+      "recordedanswer-longanswer",
+      "recordedanswer-terse"
     ]
   },
   {
@@ -356,6 +801,59 @@
     "untestabilityReason": {
       "justification": "Framework-required document shell generated by the stack template. It renders its children inside html/body and carries the metadata export - there is no behaviour of this project's own to assert, and every application scenario renders through it.",
       "kind": "scaffold"
+    }
+  },
+  {
+    "description": "One round of thinking as the map draws it: a 1-based index shown to the person as the card's marker, the nodes that arrived together, and the phase this round opened when it opened one.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "Round",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface describing one round as the map draws it. It declares a shape and emits no runtime code; its values are asserted throughout mapRounds.test.ts.",
+      "kind": "type-only"
+    }
+  },
+  {
+    "description": "What to do when the round is done, under the round it is done with. Composition and one choice: the count while there is still answering to do, the phase's action once nothing more is coming, and deliberately NOTHING in between — while the map is still reaching, the shimmering row above is already saying it, and a second line one line apart was the first thing that looked wrong on screen. No presence line lives here for the same reason.",
+    "filePath": "app/components/RowFooter.tsx",
+    "name": "RowFooter",
+    "scenarios": [
+      "rowfooter-stillanswering",
+      "rowfooter-readytoresearch",
+      "rowfooter-roundofstatements"
+    ],
+    "testFile": "app/components/RowFooter.render.test.tsx"
+  },
+  {
+    "description": "How far through the round you are, as a count with no action beside it. A button here would invite skipping past questions the person has not looked at — while a round is still being answered, the cards ARE the action.",
+    "filePath": "app/components/RowProgress.tsx",
+    "name": "RowProgress",
+    "scenarios": [
+      "rowprogress-default",
+      "rowprogress-noneanswered",
+      "rowprogress-singlequestion",
+      "rowprogress-longround"
+    ]
+  },
+  {
+    "description": "The curves between the card rows: one short thread per card, rising from the card above that prompted it, in the child's family colour. Drawn as ONE overlay across the whole column rather than a layer per row gap — the rows are a CSS flex wrap, so there are no computed coordinates anywhere and every thread has to be measured off the DOM either way; a single overlay does that in one coordinate space with one ResizeObserver. It holds the measurement and the rendering only, with the shape of a thread living in threadGeometry. Purely decorative and aria-hidden, since a thread restates what the rows and eyebrows already carry in text.",
+    "filePath": "app/components/RowThreads.tsx",
+    "name": "RowThreads",
+    "scenarios": [
+      "rowthreads-default",
+      "rowthreads-singlethread",
+      "rowthreads-parenttworoundsback",
+      "rowthreads-someunattached",
+      "rowthreads-wrappedrow",
+      "rowthreads-nothingtodraw"
+    ]
+  },
+  {
+    "description": "A contiguous run of node-adds from one side of the exchange, with the revision span it covers so a phase set can be attributed to the round that closed it.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "Run",
+    "untestabilityReason": {
+      "justification": "A TypeScript interface, internal to the round grouping, describing a contiguous run of node-adds and the revision span it covers. It declares a shape and emits no runtime code; the grouping it serves is covered by mapRounds.test.ts.",
+      "kind": "type-only"
     }
   },
   {
@@ -372,7 +870,8 @@
     "name": "SavedMapRow",
     "scenarios": [
       "savedmaprow-default",
-      "savedmaprow-singlenode"
+      "savedmaprow-singlenode",
+      "savedmaprow-legacyphase"
     ]
   },
   {
@@ -385,6 +884,16 @@
     }
   },
   {
+    "description": "The person's own words, handed back to them. Its own component because of the decision it owns: a map started from a document rather than a sentence has no seed idea, and rendering empty quote marks around nothing would look like the text was lost - the precise anxiety this panel exists to answer. Blank in, nothing out.",
+    "filePath": "app/components/SeedIdeaQuote.tsx",
+    "name": "SeedIdeaQuote",
+    "scenarios": [
+      "seedideaquote-default",
+      "seedideaquote-longidea",
+      "seedideaquote-shortidea"
+    ]
+  },
+  {
     "description": "The lime circular send control with its arrow, positioned inside whichever input pill hosts it. Shared by the landing prompt and the conversation reply box.",
     "filePath": "app/components/SendButton.tsx",
     "name": "SendButton",
@@ -392,6 +901,17 @@
       "sendbutton-default",
       "sendbutton-disabled",
       "sendbutton-large"
+    ]
+  },
+  {
+    "description": "One increment in the build sequence: what you build, what it would prove, and roughly what it costs. Its own component so each state - validated, proves nothing, dangling link - gets an isolated scenario, following the BulletCard / DirectionsCard split. The effort note is the agent's own sentence printed as written: nothing parses or validates it, because a rough claim a human can argue with is more honest than a number that merely looks computed.",
+    "filePath": "app/components/SliceCard.tsx",
+    "name": "SliceCard",
+    "scenarios": [
+      "slicecard-default",
+      "slicecard-provesnothing",
+      "slicecard-danglinglink",
+      "slicecard-noeffortstated"
     ]
   },
   {
@@ -419,23 +939,36 @@
     ]
   },
   {
-    "description": "The final screen composed whole: the declaration, the three cards, and the next-steps track. Composition only - the sorting lives in groupSummaryNodes.",
+    "description": "The final screen composed whole: the declaration, the three cards, the build sequence and the next-steps track - what you build first coming before what you go and find out. Composition only; the sorting lives in groupSummaryNodes and the slice resolution in buildSequence.",
     "filePath": "app/components/SummaryView.tsx",
     "name": "SummaryView",
     "scenarios": [
       "summaryview-default",
+      "summaryview-noslices",
       "summaryview-empty"
     ]
   },
   {
-    "description": "The right-hand panel: the conversation rendered as structure. Composes the connector layer and the node pills over a plane that scales to fit, down to a legibility floor.",
+    "description": "The map: a single column of rows growing downward, scrolled like a page — and reaching for the next row before anyone asks it to. It was once a tidy tree on a zoomable plane; the tree is still in the data (parentId and order are untouched, the tool contract unchanged) but a column that grows downward is navigated by scrolling, so the zoom, pan, fit and fold all went. Composition only: rounds come from mapRounds, progress from roundProgress, what may honestly be claimed while waiting from pendingRow, the clock bounding that wait from useBoundedWait, and following the column down from useFollowColumn.",
     "filePath": "app/components/ThinkingMapView.tsx",
     "name": "ThinkingMapView",
     "scenarios": [
       "thinkingmapview-default",
       "thinkingmapview-empty",
-      "thinkingmapview-seeded"
+      "thinkingmapview-nocaption",
+      "thinkingmapview-seeded",
+      "thinkingmapview-withoptions",
+      "thinkingmapview-sprawling"
     ]
+  },
+  {
+    "description": "A stand-in for the map column, so RowThreads can be looked at on its own. The overlay measures the DOM — it asks where the cards ended up after a flex wrap and draws between them — so it renders nothing without laid-out cards to measure, and mounting it bare would capture an empty frame. This gives it the two things it needs and nothing else: an element to hold the ref, and labelled boxes carrying data-node-id in a wrapping band. Plain rectangles rather than real MapCards, because what the scenarios are for is the threads, and full cards would put 240px of text in front of them.",
+    "filePath": "app/isolated-components/RowThreads/ThreadsHarness.tsx",
+    "name": "ThreadsHarness",
+    "untestabilityReason": {
+      "justification": "Capture harness under app/isolated-components/, existing only so RowThreads has cards to measure in isolation. Not reachable from the app.",
+      "kind": "scaffold"
+    }
   },
   {
     "description": "Mounts the page's own front door. Binds the tool catalog to the current map for as long as the map page is open, disposing on unmount and on map change because re-registering a live tool name throws InvalidStateError. Holds the pending ask_user state and resolves the agent's turn when the person answers, writing the answer to the log BEFORE releasing it so an agent that already gave up still finds it. Publishes the headless driver whether or not a real agent is present, which is the only way the tools are reachable inside a capture iframe. Reports connection state through the same context, and exposes the tool names from the catalog rather than from the published driver - a consumer's effect runs before its parent's, so reading the driver would race the binding that creates it.",
@@ -464,6 +997,12 @@
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
+    "description": "Whether the dev agent panel has been deliberately asked for on this page, via `?agentPanel=1`. Replaces the old `NODE_ENV !== 'production'` render gate, which answered 'is this a dev build' when the question that matters is 'can a real agent reach this page' — every `npm run dev` session is a dev build, including the ones where a genuine agent is driving the browser. Keeps `NODE_ENV` as a floor underneath the opt-in so no query string can summon the panel into production, matches `=1` exactly rather than any truthy value, and reads the first entry of a repeated param.",
+    "filePath": "app/lib/agentPanel.ts",
+    "name": "agentPanelRequested",
+    "testFile": "app/lib/agentPanel.test.ts"
+  },
+  {
     "description": "The node ids a user.answer event closed. Same payload tolerance as questionIds, and the input to both the suppression rule and the answered-question count.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "answeredIds",
@@ -476,18 +1015,51 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "The latest answer per question id, read off the exchange log rather than the node — the node's status records that a question is settled, the log holds what was actually said. Latest wins because editing an answer IS posting another one, which is what makes an edit take effect and edit history free. A malformed entry is skipped rather than blanking every other answer.",
+    "filePath": "app/lib/mapAnswers.ts",
+    "name": "answersByNodeId",
+    "testFile": "app/lib/mapAnswers.test.ts"
+  },
+  {
     "description": "Reads the id/answer pairs out of a user.answer payload sent by the browser. Untrusted on this side of the wire, so a malformed payload yields an empty list rather than throwing.",
     "filePath": "app/lib/contributions.ts",
     "name": "answersOf",
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
-    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. All the rules live in planMapMutations, which is pure and tested. It now has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
+    "description": "Thin executor for a validated map-mutation plan: walks the inserts in order, resolving each temporary ref to the real id the database just returned so one call can create a parent and its children together, then applies updates and any phase change. A slice's testsRef goes through the same resolution as parentRef, since a slice usually names an assumption created moments earlier in the same call; an unresolvable value is written through rather than dropped, because a dangling link is reported on screen and losing it silently would hide that the slice claimed to settle anything. All the rules live in planMapMutations, which is pure and tested. It has a second output - every write also becomes an ordered event on the map's log, tagged with the origin that made it - which is what lets a person and an agent work the same map without either being told what the other did. Only changes that actually landed are logged, since an event for a node that was not there would be a revision no agent could reconcile.",
     "filePath": "app/lib/mapStore.ts",
     "name": "applyToolCalls",
     "scenarios": [
       "pivoted-now-it-is-for-teachers"
     ]
+  },
+  {
+    "description": "Turns a character count into an approximate page count at roughly 1,800 characters per page, so a person is shown a unit they think in. Anything with text in it is at least one page; an empty document is zero.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "approxPages",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "The copy that says what sending a node question will actually do. WebMCP is pull-only, so asking wakes an agent already parked on await_user_activity and reaches nobody otherwise; this returns the send label and the note for each case, so the one thing the feature could mislead about is pinned by tests rather than read off a screenshot.",
+    "filePath": "app/lib/askPresence.ts",
+    "name": "askPresence",
+    "testFile": "app/lib/askPresence.test.ts"
+  },
+  {
+    "description": "The nodes the person has asked about, derived from the log rather than tracked beside it, so the marks survive a reload and count questions asked from any front door. A malformed or missing nodeId is skipped rather than throwing.",
+    "filePath": "app/lib/exchangeRail.ts",
+    "name": "askedNodeIds",
+    "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Offers the exchange log as a subscribable MCP resource. Deliberately speculative: resource subscriptions are an open proposal, so this no-ops on every browser that exists today. Same feature-detection shape as bindTools, and kept in the only file allowed to name navigator.modelContext.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "bindExchangeResource",
+    "untestabilityReason": {
+      "justification": "branches entirely on navigator.modelContext.registerResource, an unshipped W3C proposal no browser or polyfill implements; every reachable path today is the no-op, so a test could only assert against a hand-built fake of an API whose shape is not yet settled",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Registers the catalog with the browser agent for one map and returns a disposer. The WebMCP draft has already moved once - provideContext was removed in the March 2026 revision in favour of registerTool/unregisterTool, while the polyfill still ships the older shape - so both conventions are handled here, the one file that names navigator.modelContext. Re-registering a live name throws InvalidStateError, which is why unregister-then-register is the only safe update path and why the disposer exists.",
@@ -505,6 +1077,12 @@
     }
   },
   {
+    "description": "Resolves a finished map's slices into the order they should be built in, each entry carrying the node it would settle. The whole opinion of the build sequence lives in its provesNothing flag: an increment that tests no assumption is not a validating slice but work scheduled early, so it is marked rather than filtered out, and a slice whose target has since been deleted is reported as dangling rather than rendered as a blank. Pure - nodes in, an ordered list out - so every interesting case is a test rather than a screenshot.",
+    "filePath": "app/lib/buildSequence.ts",
+    "name": "buildSequence",
+    "testFile": "app/lib/buildSequence.test.ts"
+  },
+  {
     "description": "The descriptors handed to a browser agent, one per catalog tool. Separated from registration so that WHAT the agent is offered can be checked without a navigator.modelContext: registering is a boundary call, but the set being registered is a contract. Each descriptor is bound to its own tool name, and annotations are carried only where the catalog declares them.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "buildToolDescriptors",
@@ -519,10 +1097,28 @@
     ]
   },
   {
-    "description": "Builds the orthogonal SVG path from a parent's bottom edge to a child's top edge, routed through a horizontal bus midway between the levels so siblings share it and the tree reads as one structure. Emits a straight line when the two are already aligned.",
-    "filePath": "app/lib/mapLayout.ts",
-    "name": "connectorPath",
-    "testFile": "app/lib/mapLayout.test.ts"
+    "description": "The line a card uses to say what it is: the node's kind, then who wrote it, then whether it has been asked about, then the brief section it came from, in that fixed order. The rule with teeth is that an answered question stops calling itself Open — leaving the kind's default would have the card label the answer printed directly beneath it as unanswered.",
+    "filePath": "app/lib/cardEyebrow.ts",
+    "name": "cardEyebrow",
+    "testFile": "app/lib/cardEyebrow.test.ts"
+  },
+  {
+    "description": "Which card prompted which — one thread per card, from the card in the round directly above it, and nothing otherwise. Deliberately narrower than the parent-child graph the retired tree drew: the layout is rows now, so the rows already carry the structure and a full edge graph would be a thicket crossing the column. A card whose parent is more than one round back, or has no parent, or whose parent is not on the map, draws nothing — the honest picture for 'nothing prompted this here' is no line.",
+    "filePath": "app/lib/cardThreads.ts",
+    "name": "cardThreads",
+    "testFile": "app/lib/cardThreads.test.ts"
+  },
+  {
+    "description": "Turns a thrown database failure into what a person should be told: a title, a message, and in development the command that fixes it plus the column or table Prisma named. Recognises a Prisma error structurally (a string code beside a clientVersion) rather than by instanceof, because the thrown value has usually crossed a server component boundary by the time it arrives. P2022/P2021 become the schema-drift diagnosis with npm run db:push; P1001/P1003 point at DATABASE_URL; everything else falls through to a generic message that leaks nothing. The dev flag is a parameter rather than a read of NODE_ENV so the production behaviour - the half that withholds - is testable.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "classifyLoadError",
+    "testFile": "app/lib/loadError.test.ts"
+  },
+  {
+    "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
+    "filePath": "app/lib/briefCoverage.ts",
+    "name": "computeBriefCoverage",
+    "testFile": "app/lib/briefCoverage.test.ts"
   },
   {
     "description": "Turns one contribution from the page into the events that should be recorded for it, performing the map writes it implies. A note is only ever an event; an answer also closes its question, and a node is created first so the event can carry its real id.",
@@ -545,10 +1141,34 @@
     "testFile": "app/lib/exchange.integration.test.ts"
   },
   {
+    "description": "The cubic path from a parent card's bottom edge to a child card's top edge. Both control points are pulled vertically off their endpoints and never horizontally, so the thread leaves the card it came from going down and arrives at the next one going down — that is what produces the S-travel of the design references instead of a rope slung between two points, and what keeps a thread readable when the two cards are far apart across a wide row.",
+    "filePath": "app/lib/threadGeometry.ts",
+    "name": "curve",
+    "testFile": "app/lib/threadGeometry.test.ts"
+  },
+  {
     "description": "Turns a stored row into a readable event. SQLite has no JSON column, so payloads are strings that could be anything; a payload that will not parse degrades to null rather than throwing, because one bad row must not take down the whole catch-up read an agent depends on. The revision and kind survive regardless.",
     "filePath": "app/lib/exchange.ts",
     "name": "decodeEvent",
     "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Whether replaying the demo sequence would write fixture content over something real. Reads the event log from `read_map`'s structured reply rather than the prose rendering, and discounts `phase.set` because a brand-new map already carries one root `node.added` plus a view change. Fails safe: an unreadable reply refuses, since the cost of a wrong refusal is a line in the call log and the cost of a wrong run is somebody's thinking with two invented nodes in it.",
+    "filePath": "app/lib/agentDemo.ts",
+    "name": "demoWouldOverwrite",
+    "testFile": "app/lib/agentDemo.test.ts"
+  },
+  {
+    "description": "How deep a node sits in the tree, following parentId upward. Used only by the round grouping's fallback, for a map whose history was never recorded. Stops rather than hanging on a cycle or a missing parent, so a half-written map still groups.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "depthOf",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Names a new map from whatever the person gave us. With a brief, prefers its first markdown heading, then its first non-empty line - so the root pill reads as a title instead of a 57-character slice of a twenty-page spec. Without a brief it is the original behaviour unchanged: the seed idea, clipped to 60 characters.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "deriveTitle",
+    "testFile": "app/lib/deriveTitle.test.ts"
   },
   {
     "description": "The rail line for one event that does not collapse — a note, an answer, a question, a phase change. The wording is the interface: it is the only account a person gets of what an agent did to their map, so it lives in one place and is pinned by tests.",
@@ -563,10 +1183,85 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
+    "description": "Takes the LAST non-empty line of a Prisma message, which is the diagnosis - The column X does not exist in the current database. Deliberately not the first line: a Prisma message opens with its own framing (Invalid prisma.thinkingMap.findUnique() invocation:), so taking the first puts the call site on screen and leaves out the column, which is exactly backwards for someone working out what to fix.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "diagnosisLine",
+    "testFile": "app/lib/loadError.test.ts"
+  },
+  {
     "description": "Marks a response as a genuine fault. Deliberately narrow: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "errorResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The exchange log's MCP resource URI, one per map, so a subscriber is subscribed to a specific map rather than to 'the exchange' in the abstract. Kept in the file that owns every navigator.modelContext name, so the registration and the notification cannot drift to different URIs.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "exchangeUri",
+    "untestabilityReason": {
+      "justification": "a single template string with no branching or input handling; the URI shape is exercised through its only two callers, bindExchangeResource and notifyExchangeUpdated, whose own behaviour is platform-glue against an unshipped browser API",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
+    "description": "The lower-cased extension of a filename, or empty when it has none. Needed because browsers are inconsistent about the media type they attach to a .md - several send application/octet-stream - so the extension is the fallback the type dispatch falls back to.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extensionOf",
+    "untestabilityReason": {
+      "justification": "Private to a module that imports server-only plus unpdf and mammoth, so the file cannot load under vitest to reach it. Exercised end to end instead: real .pdf, .docx, .md and .txt uploads were extracted through the running app, including a .md sent as application/octet-stream, which is the case this helper exists for.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Gets the words out of whatever the client sent - PDF via unpdf, .docx via mammoth, markdown and plain text decoded directly - dispatching on media type and falling back to the file extension, because browsers are inconsistent about the type they attach to a .md. Server-only, and the single place any format-specific dependency is reached. Reads the buffer's size before extracting, since pdfjs detaches it.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extractBriefText",
+    "untestabilityReason": {
+      "justification": "The module imports server-only plus unpdf and mammoth, so it does not load under vitest at all. Its decision logic is extracted into the pure, tested extractionWarning and normalizeBriefText; what remains is dispatch and two library calls. The format paths were verified end to end against the running app with real .pdf, .docx, .md and .txt uploads, including a scanned-PDF case.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Pulls the raw text out of a .docx through mammoth, discarding the formatting. A brief is words; the Word file it arrived in is packaging.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extractDocx",
+    "untestabilityReason": {
+      "justification": "A wrapper around mammoth inside a server-only module that does not load under vitest. Verified against the running app with a real .docx upload, which extracted its four paragraphs intact.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Pulls the text out of a PDF through unpdf, merging pages into one string. unpdf rather than pdf-parse because pdf-parse runs a debug branch at import that reads a fixture off disk and fails in a bundled server runtime. Note that pdfjs transfers the buffer to its worker and detaches it, so the caller must read the size first.",
+    "filePath": "app/lib/briefText.ts",
+    "name": "extractPdf",
+    "untestabilityReason": {
+      "justification": "A wrapper around unpdf inside a server-only module that does not load under vitest. Verified against the running app with two real PDFs: a healthy 924-byte document extracted 299 characters, and an 80KB document stripped of its text extracted 10 and correctly raised the scanned-PDF warning.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "Decides whether an extraction failed and says so in a sentence the person can act on: nothing at all came out, or a large file yielded almost no text - the scanned-PDF signature. Pure and separate from the extractor so the safety net of the whole intake is testable, and because the size it takes must be measured before extraction: pdfjs transfers the upload buffer to its worker and detaches it.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "extractionWarning",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "The colour a card's family draws its icon and its thread in, as a CSS variable reference rather than a class name — for the SVG thread layer and the icon, which need a paint value. Pro and risk resolve to their own two colours rather than a shared judgment hue, for the same reason nodeShellClasses keeps them apart: a thread rising to a risk should be the risk colour, not a family average.",
+    "filePath": "app/lib/nodeAppearance.ts",
+    "name": "familyLineVar",
+    "testFile": "app/lib/nodeAppearance.test.ts"
+  },
+  {
+    "description": "A node kind's colour family, via KIND_FAMILY. The eighteen kinds collapse into six families because one hue per kind would be a legend rather than a system, and the eyebrow above every card already names the exact kind for anyone who wants the precision. KIND_FAMILY is a total Record on purpose, so a nineteenth kind will not compile until it is given a family; this wrapper adds the runtime half of that safety, since kinds also arrive from the database and from the model unvalidated — an unrecognised one falls back to the neutral ground family rather than losing its colour entirely.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "familyOf",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Where along a parent card's bottom edge each of its threads departs. Every thread starting at the same point is what turns four curves into one frayed rope — they overlap for the first stretch and only separate once already travelling sideways — so the departures are fanned evenly across the card's own bottom edge, symmetric about its centre and inset from the rounded corners. The caller passes its threads in the order of the children they land on, which is what keeps one parent's threads from crossing each other.",
+    "filePath": "app/lib/threadGeometry.ts",
+    "name": "fanOrigins",
+    "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
     "description": "Read one non-empty string field off an event payload, or null. The single guard every rail reader goes through, so an unparseable row degrades to a plainer line rather than throwing.",
@@ -593,6 +1288,18 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
+    "description": "The first n non-empty lines of a document, for the intake's proof-of-extraction preview. Blank lines are skipped rather than counted, so a brief that opens with a heading and two blank lines still previews as three real lines.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "firstLines",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "A character count with grouped thousands. A bare 12690 reads as an identifier sitting in a column of otherwise short numbers; grouped, it reads as an amount, which is the only reason it is shown.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "formatCharCount",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
     "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, and the indented node tree - so a client sees both views of the thinking the way the UI shows them side by side.",
     "filePath": "app/lib/mcpFormat.ts",
     "name": "formatMapDetail",
@@ -605,6 +1312,12 @@
     "testFile": "app/lib/mcpFormat.test.ts"
   },
   {
+    "description": "Renders what await_new_map handed back, for an agent that arrives with no context about the map at all. Every row leads with the id and spells out the next call rather than leaving it to be inferred: read_brief when the map was started from a document, read_map otherwise. An expiry gets its own branch - no new maps yet plus the cursor to resume from - so an agent looping on this never reads the ordinary case as a failure.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatNewMaps",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
     "description": "Sends a page-side tool call to the tools route, where the shared runtime executes it. The page cannot run the catalog itself because every implementation ends in SQLite, so this one hop is the only difference between the page door and the two server doors.",
     "filePath": "app/lib/webmcp.ts",
     "name": "forward",
@@ -612,6 +1325,21 @@
       "justification": "A single fetch plus a non-2xx guard that turns a transport failure into a readable message. What it sends is decided by validateToolInput and what it receives is produced by runTool, both covered by their own entries.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Loads a map's brief including its text - the one reader allowed to want it. Everything else takes the metadata that getMap selects, so tens of thousands of characters never reach a page render or a full read_map.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "getBrief",
+    "untestabilityReason": {
+      "justification": "A one-line Prisma findUnique with no branching. The behaviour actually worth pinning is that getMap excludes the brief text while read_map still announces it, which mcpFormat.test.ts covers.",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
+    "description": "Loads a map's brief and returns its coverage by the nodes on that map, ready to render. The thin database half of computeBriefCoverage, kept here so that module stays pure and testable. Returns only headings and counts - never the brief's text - so rendering the panel on the server does not put a document of tens of thousands of characters on the wire. Null when the map has no brief, which the workspace renders by mounting no panel at all.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "getBriefCoverage",
+    "testFile": "app/lib/briefCoverage.test.ts"
   },
   {
     "description": "Reads one map with its full conversation and node tree in creation order. The single read behind the workspace, the summary screen and the MCP get_thinking_map tool.",
@@ -624,7 +1352,13 @@
     ]
   },
   {
-    "description": "Sorts a finished map's nodes into the four regions of the summary screen - known, unknown, directions and next steps - ignoring every other kind and ordering each bucket by its stored order, because the next steps are numbered on screen.",
+    "description": "Groups a map's nodes into the rounds that produced them — one round per write, read off the exchange log, because nodes written together share a contiguous run of revisions and one origin. Deliberately NOT grouped by tree depth: an agent's second batch of questions usually lands at the same depth as its first, so by depth the two turns would collapse into one row. The root idea is always its own first round, and nodes the log never mentions fall back to depth grouping so a seeded or pre-existing map still draws.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "groupIntoRounds",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Sorts a finished map's nodes into the regions of the summary screen - known, unknown, directions, next steps and the build sequence's slices - ignoring every other kind and ordering each bucket by its stored order, because the steps and the slices are both numbered on screen. Slices sit beside the next steps rather than replacing them: a next step can be to interview three teachers, which is not something you build.",
     "filePath": "app/lib/summaryGroups.ts",
     "name": "groupSummaryNodes",
     "testFile": "app/lib/summaryGroups.test.ts"
@@ -637,6 +1371,18 @@
       "justification": "Four straight-line statements with no branching: construct server, construct transport, connect, delegate. The tools underneath are covered by their own entries, and the endpoint was verified end to end against a live MCP client - initialize, tools/list, and a create/add-node/read round trip.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "What a map with nobody working on it says for itself, in words — pure, and pinned by tests rather than left as strings inside a component. `hasBrief` decides which tool the start prompt names. `worked` selects the demoted wording for a map an agent has already left, because 'No one is on this yet' is false there. `origin` builds `mcpCommand`, the MCP door as something an agent can RUN rather than prose about it — the HTTP form when the origin is known, `npm run mcp` on the server render where it is not.",
+    "filePath": "app/lib/handoffCopy.ts",
+    "name": "handoffCopy",
+    "testFile": "app/lib/handoffCopy.test.ts"
+  },
+  {
+    "description": "Stands in for a heading when a passage has none: the first nine words of its opening line, elided if there were more. A person scanning the outline needs to recognise the passage, not read it.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "impliedHeading",
+    "testFile": "app/lib/briefSections.test.ts"
   },
   {
     "description": "Guard for the eight kinds the exchange log can record. A kind outside the set would become a row that nothing knows how to render or resume past.",
@@ -657,10 +1403,16 @@
     "testFile": "app/lib/mapKinds.test.ts"
   },
   {
-    "description": "Type guard for the six phases of the loop. SQLite has no enums, so phase strings arrive from the database and from model tool calls unvalidated; this is what keeps an unknown value out of the phase nav.",
+    "description": "Type guard for the five phases of the loop. SQLite has no enums, so phase strings arrive from the database and from model tool calls unvalidated; this is what keeps an unknown value out of the phase nav. It deliberately answers a NARROWER question than normalizePhase: whether a value is literally one of the five current phases, which is what the tool schema validates against. A stored phase from before deconstruct and map merged is not one of them, and goes through normalizePhase instead.",
     "filePath": "app/lib/mapKinds.ts",
     "name": "isPhase",
     "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Whether a round is mostly research, finding or gap — the rule that decides which row gets its own banded territory rather than just its own card colour. Strictly more than half, so an even split does not band: a round with no majority has nothing to name it after. 'Mostly' rather than 'all' because a research round that picked up one stray question is still a research round, and demanding purity would mean the band never appeared on a real map. The root round never bands, since enclosing the map's subject as 'what already exists' would misdescribe it.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "isResearchRound",
+    "testFile": "app/lib/mapRounds.test.ts"
   },
   {
     "description": "Guard for the three kinds a browser is allowed to write. This is a trust boundary rather than a convenience: the page posts these directly, so accepting an agent-side kind here would let a page forge the other half of the conversation.",
@@ -673,12 +1425,6 @@
     "filePath": "app/lib/webmcp.ts",
     "name": "isWebMcpAvailable",
     "testFile": "app/lib/webmcp.test.ts"
-  },
-  {
-    "description": "Tidy-tree layout for the thinking map. Rebuilds the tree from flat nodes joined only by parentId, sizes each pill to its label, centres every parent over its children, and returns absolute pixel positions plus overall bounds. Treats an orphaned node as a root and terminates on a parent cycle rather than hanging the render.",
-    "filePath": "app/lib/mapLayout.ts",
-    "name": "layoutMap",
-    "testFile": "app/lib/mapLayout.test.ts"
   },
   {
     "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",
@@ -723,10 +1469,10 @@
     }
   },
   {
-    "description": "Sizes a node pill to its label so text stays on two lines at most, capped so an unbounded label cannot stretch a pill into a paragraph. The root gets a fixed wider box.",
-    "filePath": "app/lib/mapLayout.ts",
-    "name": "measureWidth",
-    "testFile": "app/lib/mapLayout.test.ts"
+    "description": "Gets a message string out of an unknown thrown value: an Error, an object carrying a string message, or the value stringified. Exists because what reaches the classifier is genuinely unknown - a throw is not obliged to throw an Error - and the screen must render something rather than crash on the way to explaining a crash.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "messageOf",
+    "testFile": "app/lib/loadError.test.ts"
   },
   {
     "description": "Reads navigator.modelContext, or null where there is none. The single place the WebMCP global is touched, so the draft spec moving again is one edit rather than a sweep.",
@@ -738,16 +1484,79 @@
     }
   },
   {
+    "description": "Digs the column the driver actually named out of meta.driverAdapterError.cause.column, or returns null. Preferred over parsing the message because it is a field rather than prose and does not move when Prisma rewords itself; the message stays as the fallback, since this nesting is adapter-specific and an unfamiliar adapter may not fill it.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "namedColumn",
+    "testFile": "app/lib/loadError.test.ts"
+  },
+  {
     "description": "Whether a guarded write warrants reading the log at all. An unguarded write is the agent saying it does not care, and a map that has not moved cannot have a conflict, so neither case costs a read.",
     "filePath": "app/lib/conflict.ts",
     "name": "needsConflictCheck",
     "testFile": "app/lib/conflict.test.ts"
   },
   {
-    "description": "Picks the shell classes for a map node, encoding the design system's status-precedence rule: root beats updated beats open beats accent kind beats plain answered. Gaps deliberately fall through to plain, because a gap is the research phase's most valuable finding rather than a warning.",
+    "description": "The node a question is about, if it is genuinely on this map. The same ownership check mapExists makes, pushed down to the payload so a caller cannot ask about a node belonging to someone else's map; returns the label too, because the rail names the node.",
+    "filePath": "app/api/maps/[id]/exchange/route.ts",
+    "name": "nodeOnMap",
+    "testFile": "app/api/maps/[id]/exchange/route.integration.test.ts"
+  },
+  {
+    "description": "Picks the shell classes for a map card, encoding the design system rule that must not break: status beats kind. The precedence is root, then updated, then open, then kind colour, then answered — so an unanswered question is dashed and unfilled whatever family it belongs to, and exactly one card wears the lime. Kind colour slots in at the accent tier and nowhere above it: pro and risk keep their own two colours because the pair points opposite ways, and every other kind takes its family line and near-white tint. The root gave up its ink FILL when the pill became a card — inverting 240px reads as a hole in the page and would take the eye before the lime card that should have it — and carries its weight with a doubled ink border instead.",
     "filePath": "app/lib/nodeAppearance.ts",
     "name": "nodeShellClasses",
     "testFile": "app/lib/nodeAppearance.test.ts"
+  },
+  {
+    "description": "Normalises a freshly extracted brief: CRLF and bare CR become newlines, trailing spaces and tabs are stripped from every line, runs of three or more newlines collapse to one paragraph break, and the document's own outer whitespace is trimmed. Everything downstream assumes this has run, so a .docx and a paste split into the same sections.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "normalizeBriefText",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "The phase a stored string means, following the legacy aliases. Distinct from isPhase, which answers whether a value is literally one of the five current phases: the tool schema validates against the current vocabulary, while every path that READS a stored phase has to cope with what earlier versions wrote — chiefly 'deconstruct', which resolves to 'map'. Returns null for an unrecognised string so the caller picks its own fallback rather than being handed a wrong phase.",
+    "filePath": "app/lib/mapKinds.ts",
+    "name": "normalizePhase",
+    "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Tells a subscribed agent the log moved. Reads the hook at call time rather than capturing it at module load, so a browser that gains the capability mid-session is picked up without a reload. Purely an optimisation that removes polling latency; a notification is not a turn and nothing depends on it.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "notifyExchangeUpdated",
+    "untestabilityReason": {
+      "justification": "branches entirely on navigator.modelContext.notifyResourceUpdated, an unshipped W3C proposal no browser implements; the only reachable path today is the no-op",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Reads a brief off an untrusted request body. A brief with no text in it is not a brief, and every way of expressing that - missing, empty, whitespace, wrongly typed, not an object - reduces to undefined so the caller has one case rather than five. The text is kept verbatim; a missing source name or media type falls back to the pasted defaults.",
+    "filePath": "app/lib/briefInput.ts",
+    "name": "parseBriefInput",
+    "testFile": "app/lib/briefInput.test.ts"
+  },
+  {
+    "description": "Reads a nudge batch off a request body, returning the parsed batch or the message to send back — the caller picks the status code, this decides what is acceptable. Offsets must be FINITE, not merely numeric: NaN and Infinity are both typeof number and either would put a node nowhere. One bad entry rejects the whole batch, since a partial arrangement is harder to explain than a refused one. Vestigial along with its route: nothing produces a nudge now that the map is a scrolling column of cards.",
+    "filePath": "app/lib/nudges.ts",
+    "name": "parseNudges",
+    "testFile": "app/lib/nudges.test.ts"
+  },
+  {
+    "description": "Reads a question's suggested answers out of the JSON array the column stores — SQLite has no array type. A missing, malformed, or wrongly-shaped value yields no chips at all, because a question with no shortlist is the ordinary case rather than a degraded one; blank and non-string entries are dropped so no unlabelled chip is ever rendered.",
+    "filePath": "app/lib/mapAnswers.ts",
+    "name": "parseOptions",
+    "testFile": "app/lib/mapAnswers.test.ts"
+  },
+  {
+    "description": "Reads a node id out of an event payload, returning null for anything that is not a non-empty string. Keeps a malformed event from contributing a phantom id to a round.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "payloadId",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Reads a phase name out of a phase.set payload, returning null for anything that is not a non-empty string. Lets a round be named after the phase it opened without a malformed payload blanking the row's eyebrow.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "payloadPhase",
+    "testFile": "app/lib/mapRounds.test.ts"
   },
   {
     "description": "The questions a pending ask_user is waiting on. The server writes them onto the map and returns this pending shape; only the page can perform the middle step of asking a person. Returns empty for an errored call or a result carrying none, which is the signal to hand the server's response straight back - putting a prompt on screen off the back of a failure would be worse than showing nothing.",
@@ -756,13 +1565,19 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "What the page may honestly claim while it waits for the next round. The shimmering placeholder row is a promise, and WebMCP is pull-only — the page cannot start an agent's turn or know one is coming — so the shimmer is bounded and resolves into one of three genuinely different sentences: an agent is working and has the answers, an agent is attached but not in a turn, or nothing can reach the page and the answers are simply on the log. Hidden while the newest round still has open questions, and at next-steps where the loop arrives. Modelled on askPresence, which does the same job for the ask composer.",
+    "filePath": "app/lib/pendingRow.ts",
+    "name": "pendingRow",
+    "testFile": "app/lib/pendingRow.test.ts"
+  },
+  {
     "description": "A phase's name for use in a sentence. The phase nav numbers its labels; the rail strips the number, so a row reads 'moved to Explore' rather than 'moved to 05 Explore'.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "phaseName",
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
-    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase.",
+    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase. A slice's tests field is carried through as testsRef and deliberately NOT validated here: like parentRef it may name a node created earlier in the same call, so resolving it belongs to applyToolCalls, which can see the ids the database just handed back.",
     "filePath": "app/lib/nodePlan.ts",
     "name": "planMapMutations",
     "testFile": "app/lib/nodePlan.test.ts"
@@ -775,6 +1590,12 @@
       "justification": "A single POST with no branching. The event kinds it may carry are enforced server-side by isUserEventKind, covered by app/lib/exchange.test.ts, and the answered path it serves is covered by answeredResponse in app/lib/toolInvocation.test.ts.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Recognises a Prisma known-request error structurally - a string code beside a string clientVersion - and returns the code, or null. Deliberately not instanceof: the thrown value has usually crossed a server component boundary by the time it is classified, and may come from a different copy of the client than this module imports, so class identity is not something to bet the error screen on. Requiring clientVersion as well as code is what stops a Node system error (ENOENT, which also has a code) being dressed up as a Prisma diagnosis.",
+    "filePath": "app/lib/loadError.ts",
+    "name": "prismaCode",
+    "testFile": "app/lib/loadError.test.ts"
   },
   {
     "description": "Publishes a headless driver on window over the same bound catalog. Not a debug convenience: WebMCP is top-level-secure-context only and codeyam renders the app inside a capture iframe, so navigator.modelContext is genuinely absent in every preview and captured scenario, and this driver is what makes the tools exercisable there at all. It calls the exact catalog entries a real agent would.",
@@ -793,6 +1614,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "railEntries",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Reads a fetch response whose body might not be JSON, and never lets JSON.parse throw at a person. Consumes the body as text once, then returns the data on success, the route's own stated error on a failing JSON body, and '<fallback> (HTTP <status>)' for an empty, truncated, or HTML body. Reports ok only when the caller actually got usable data, so a 200 carrying a truncated body reads as the failure it is. Pure over a Response, so it is testable with a constructed one and no network.",
+    "filePath": "app/lib/readJson.ts",
+    "name": "readJson",
+    "testFile": "app/lib/readJson.test.ts"
   },
   {
     "description": "Everything that happened after a cursor. An omitted cursor means the whole log, which is what a fresh agent wants; a cursor means just the delta, which is what a returning one wants. Both return the map's current revision, so a caller always leaves holding a cursor it can resume from even when the delta is empty.",
@@ -825,6 +1652,18 @@
     "testFile": "app/lib/agentDemo.test.ts"
   },
   {
+    "description": "The line above a row, naming what the round was. A round that is entirely questions says so, because the question count is what the person is being asked to deal with; a mixed round counts nodes instead, since naming the majority kind would misdescribe it. The opening round is named for the idea rather than numbered. A research round is the exception that says what it IS rather than how many of anything it holds - what already exists is the thing somebody scanning the column is looking for, and a node count is not.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "roundEyebrow",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "How far through a round the person is — the definition the whole feature gates on: the footer's count, whether the next row is reached for, and whether the phase's action appears. Counts only ANSWERABLE cards: a goal or assumption the agent has not filled in carries status 'open' and shows in the map caption, but has no answer box, so counting it would leave the loop permanently one short and the next row never reached for.",
+    "filePath": "app/lib/roundProgress.ts",
+    "name": "roundProgress",
+    "testFile": "app/lib/roundProgress.test.ts"
+  },
+  {
     "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "runLength",
@@ -839,10 +1678,58 @@
     ]
   },
   {
+    "description": "Cuts the log's node-adds into runs, starting a new one whenever the writing side changes or the revisions stop being contiguous. A non-add event between two adds breaks contiguity, which is exactly right: ask_user writes its questions and then a question.asked, so a later add_nodes is genuinely a later turn.",
+    "filePath": "app/lib/mapRounds.ts",
+    "name": "runsFromLog",
+    "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Builds one BriefSection from an index, a heading and a body - trimming the body and deriving its character count so the outline can be trusted without any passage being read.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "section",
+    "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "Renders a brief section id as a person reads it - s7 becomes the section mark for 7. The id is the address the splitter derives, a node stores in sourceRef, and read_brief takes; the mark is only ever its display. Extracted from four inline copies across three components, which was three chances for the brief panel and a node pill to call the same section two different things.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "sectionLabel",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "Turns a model's suggested answers into the JSON array the column stores, dropping the field entirely unless at least one usable string survives — so an agent sending an empty list or a list of blanks produces a plain question rather than a node carrying an array nothing can render. Non-strings are filtered rather than coerced, because a numeric option is a mistake and stringifying it would hide one.",
+    "filePath": "app/lib/nodePlan.ts",
+    "name": "serialiseOptions",
+    "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
+    "description": "The sentence the bounded shimmer resolves into, for each of the three things that can be true about who can hear the log: an agent mid-turn has what was added, an agent is attached but not in a turn, or nothing can reach the page at all. The three are deliberately distinct claims — collapsing them would make the page sound more attended-to than it is. Says what you have added rather than your answers, because the same row appears on a day-one map that has only a seed idea. Exported so the isolated-component fixtures cite the real sentence instead of a hand-copy that can drift.",
+    "filePath": "app/lib/pendingRow.ts",
+    "name": "settledNote",
+    "testFile": "app/lib/pendingRow.test.ts"
+  },
+  {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
     "filePath": "app/lib/messageLines.ts",
     "name": "splitAssistantLines",
     "testFile": "app/lib/messageLines.test.ts"
+  },
+  {
+    "description": "Cuts a brief into stable, addressable sections - s1..sN with a heading, body and character count each. Splits on markdown headings where the document has them and groups paragraphs to a target size where it does not. Pure, so the same immutable text always yields the same ids without a table to keep in sync; an empty document returns no sections rather than one empty one.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "splitIntoSections",
+    "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "Splits a document on its markdown headings, one section per heading. Prose before the first heading becomes its own section rather than being dropped - it is usually the summary - and a heading with nothing under it is kept, because a section the client left empty is part of the document's shape.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "splitOnHeadings",
+    "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "Groups paragraphs up to a target size when a document has no headings, so plain prose still comes back as a readable handful of passages. A single paragraph over the maximum is left whole: an oversized passage beats one severed mid-argument.",
+    "filePath": "app/lib/briefSections.ts",
+    "name": "splitOnParagraphs",
+    "testFile": "app/lib/briefSections.test.ts"
   },
   {
     "description": "Picks the one readable field worth showing for an event, in preference order - label, then text, then phase, then answer. Each event kind carries its human-readable part under a different name, and an agent reading a wall of bare kinds learns nothing about what changed.",
@@ -857,6 +1744,12 @@
     "testFile": "app/lib/summarizeMap.test.ts"
   },
   {
+    "description": "Holds text selection off for the duration of a drag and returns the restore function. Scoped to the gesture rather than the map, because selecting a node's label is worth keeping — it is how you copy one out.",
+    "filePath": "app/lib/textSelection.ts",
+    "name": "suppressTextSelection",
+    "testFile": "app/lib/textSelection.test.ts"
+  },
+  {
     "description": "Wraps a string in the content envelope every MCP tool response takes. A one-line shape adapter with no branches; the strings it wraps are built by mcpFormat.",
     "filePath": "app/lib/mcpServer.ts",
     "name": "textResult",
@@ -864,6 +1757,12 @@
       "justification": "A single return statement building the SDK's response literal - no branches, no transformation. The text it wraps comes from formatMapList and formatMapDetail, both covered by app/lib/mcpFormat.test.ts, and the envelope shape itself was verified against a live MCP client over both transports.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "How deep a thread bends, given the vertical gap between two rows: two thirds of the gap, clamped at both ends. The floor exists because a straight line between two rows reads as a table rule rather than a thread; the ceiling exists because past it the control points overshoot their own endpoints and the curve loops back on itself. Between the clamps the bend tracks the gap, so a taller gap gets a lazier curve rather than the same one stretched.",
+    "filePath": "app/lib/threadGeometry.ts",
+    "name": "threadPull",
+    "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
     "description": "Clamps an agent's requested wait into milliseconds: a default when none is given, a ceiling so a confused agent cannot pin a connection open indefinitely, and a one-second floor so a wait never degrades into a busy loop.",
@@ -878,10 +1777,28 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "The sentence a person sends the agent when they notice a brief section nobody has dealt with. It rides the existing user.note channel, so the wording IS the whole message - nothing else carries the intent. It names the section twice over, by mark and by heading, so the agent can go straight to it rather than re-reading the outline, and it asks a question rather than only reporting an absence, because the point is to get the section dealt with on the next turn.",
+    "filePath": "app/lib/briefFormat.ts",
+    "name": "untouchedNoteText",
+    "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "Moving the map to its next phase, from the page — the first page-side caller of set_phase, which until now only ever moved because an agent moved it. The ORDER is the point: the note saying what was decided goes on the log BEFORE the phase moves, so an agent reading the log finds a sentence rather than a phase that silently changed under it. A failed phase write therefore leaves the decision recorded, and says so rather than claiming the note was lost.",
+    "filePath": "app/hooks/useAdvancePhase.ts",
+    "name": "useAdvancePhase",
+    "testFile": "app/hooks/useAdvancePhase.test.ts"
+  },
+  {
     "description": "The ask_user promise lifecycle: park an agent's turn on a set of questions, and release it when they are answered or the clock runs out. Separate from the log because it is a different clock — the log is durable and outlives everyone, this is one turn held in memory. A second ask releases the first as unanswered rather than stranding its promise.",
     "filePath": "app/hooks/useAskUser.ts",
     "name": "useAskUser",
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
+  },
+  {
+    "description": "How long something has been true, reported once it has been true long enough — the only input the pending row needs that a pure function cannot compute. Reports a STEP rather than a ticking clock, 0 until the limit then the limit, because a value changing every frame would re-render the whole map column to move a decision that flips exactly once. Restarts on its reset key, so a new round means the page is reaching for something new rather than still waiting on the old.",
+    "filePath": "app/hooks/useBoundedWait.ts",
+    "name": "useBoundedWait",
+    "testFile": "app/hooks/useBoundedWait.test.ts"
   },
   {
     "description": "The page's own copy of the exchange log, kept current. Polls the log forward from the cursor it holds — the same way an agent reads it, because WebMCP is pull-only and there is no push channel — and re-renders the server component when the log moves past what was rendered, so the server-rendered map does not sit out of step with its own log.",
@@ -890,14 +1807,25 @@
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
-    "description": "Scales a fixed-size plane to fit its frame down to a legibility floor, and opens an oversized map centred on its root. Seeing the whole shape at once is the point of the map, so fitting beats scrolling - but a map that would need shrinking past the floor scrolls instead.",
-    "filePath": "app/hooks/useFitToFrame.ts",
-    "name": "useFitToFrame",
-    "scenarios": [
-      "thinkingmapview-default",
-      "thinkingmapview-seeded",
-      "sprawling-a-deep-wide-map"
-    ]
+    "description": "Keeping the bottom of a growing column in view, for a reader who is already at the bottom and nobody else. Two subtleties: it must not fire on first paint, because a page that jumps to its own bottom before the person has read the top is not reacting to anything; and 'have I run before' is the wrong way to express that, since StrictMode invokes effects twice on mount and would consume such a flag — so the refs are seeded with mount-time values during render and the effect compares against a transition instead.",
+    "filePath": "app/hooks/useFollowColumn.ts",
+    "name": "useFollowColumn",
+    "testFile": "app/hooks/useFollowColumn.test.ts"
+  },
+  {
+    "description": "What every question on the map has been answered, and how to answer one. Merges the log's answers with an optimistic layer for answers written in this tab: the answer takes the card's body the moment it is sent, because one still sitting in the input after you pressed send reads as the answer having been lost, and it is rolled back only if the write actually failed. The pending entry is never cleared on success — the log catches up on its own, and clearing early would flicker the question back to unanswered.",
+    "filePath": "app/hooks/useMapAnswers.ts",
+    "name": "useMapAnswers",
+    "testFile": "app/hooks/useMapAnswers.test.ts"
+  },
+  {
+    "description": "The bridge if there is one, null if there is not. For a component that renders in both the app and an isolated scenario, where the throwing accessor would make the second case a crash rather than a state. Anything that genuinely needs the exchange still uses useWebMcpBridge and says so by throwing.",
+    "filePath": "app/components/WebMcpBridge.tsx",
+    "name": "useOptionalWebMcpBridge",
+    "untestabilityReason": {
+      "justification": "a single useContext read with no branching logic; the state it returns is exercised through the components that consume it",
+      "kind": "trivial-wrapper"
+    }
   },
   {
     "description": "Reads the bridge state - connection status, the questions an agent is waiting on, the current revision, and the two writers - from context. Throws outside a provider rather than returning a null the caller would have to guard at every use site.",
@@ -921,6 +1849,12 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
+    "description": "Blocks until somebody starts a thinking map, or until the caller's timeout expires. The server-door half of the answer to a page not being able to wake an agent: nothing here pushes, but an agent with nothing to do can park, so a submitted idea is picked up rather than sitting on an empty page. A near-copy of waitForUserActivity - check first, then race the in-process emitter against a poll, on a bounded deadline - so the two read as one pattern. Cursored by createdAt rather than revision, because revision is per-map and a map that does not exist yet has none a waiter could have read. The comparison is exclusive, which is what stops a re-park from re-delivering the map just handed over. A timeout is a normal result carrying the cursor, never an error.",
+    "filePath": "app/lib/exchange.ts",
+    "name": "waitForNewMap",
+    "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
     "description": "Blocks until the person contributes, or until the caller's timeout expires. Re-reads the log first because an event may already be waiting and a waiter that subscribed before checking would sleep through it; then races an in-process emitter against a ~500ms poll. The poll is what lets a write from the separate stdio process wake a waiter living in the web process - an emitter alone would be silently correct in dev and silently wrong across front doors. Always resolves: a timeout is a normal result carrying the cursor, never a hang.",
     "filePath": "app/lib/exchange.ts",
     "name": "waitForUserActivity",
@@ -937,5 +1871,11 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "who",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Wraps a Next route handler so an unanticipated throw becomes a JSON 500 rather than an unparseable body. Logs the original error to the terminal, runs it through classifyLoadError, and answers { error, command?, hint?, detail? } with the fix and the internals present only in development. A handler's own response passes through untouched, so a deliberate 400 or 404 keeps its status and body. Variadic so it composes with both (request) and (request, { params }) handlers without casting.",
+    "filePath": "app/lib/apiFailure.ts",
+    "name": "withFailure",
+    "testFile": "app/lib/apiFailure.test.ts"
   }
 ]

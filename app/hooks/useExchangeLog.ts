@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { notifyExchangeUpdated } from '../lib/webmcp';
 import type { ExchangeEvent } from '../lib/exchange';
 
 /** How often the page re-reads the log. Fast enough that an agent's write
@@ -90,6 +91,20 @@ export function useExchangeLog(
       clearInterval(timer);
     };
   }, [mapId, absorb, serverRevision]);
+
+  // In an effect rather than inside `absorb`, because a notification is a side
+  // effect and a state updater must stay pure — React may run one twice, which
+  // would announce the same movement twice. Keyed on the revision, so it fires
+  // once per position the log actually reaches.
+  //
+  // This hook already owns the cursor and sees every write, local or polled, so
+  // it is the natural site for the announcement: no second piece of
+  // subscription bookkeeping to keep in sync. It is a no-op on every browser
+  // shipping today — see `notifyExchangeUpdated`.
+  useEffect(() => {
+    if (revision === null) return;
+    notifyExchangeUpdated(mapId);
+  }, [mapId, revision]);
 
   useEffect(() => {
     if (revision !== null && (serverRevision === null || revision > serverRevision)) {

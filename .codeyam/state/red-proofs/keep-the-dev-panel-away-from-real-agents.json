@@ -1,0 +1,35 @@
+{
+  "provenAt": "2026-09-02T13:53:31Z",
+  "slug": "keep-the-dev-panel-away-from-real-agents",
+  "paths": [
+    "app/components/AgentHandoff.tsx",
+    "app/components/AgentSimulator.tsx"
+  ],
+  "runScope": [
+    "app/components/AgentHandoff.tsx",
+    "app/components/AgentSimulator.tsx"
+  ],
+  "tests": {
+    "declines the demo sequence on a map with real work, writing nothing": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "still offers a way back in on a map an agent has already worked": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "still offers a way back in on a map an agent has already worked",
+      "declines the demo sequence on a map with real work, writing nothing"
+    ]
+  }
+}

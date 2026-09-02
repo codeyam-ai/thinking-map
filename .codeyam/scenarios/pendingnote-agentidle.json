@@ -1,0 +1,12 @@
+{
+  "name": "PendingNote - AgentIdle",
+  "id": "046b0613-ed81-4650-93d1-55d4f9e795be",
+  "url": "/isolated-components/PendingNote?s=AgentIdle",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PendingNote",
+  "scenarioType": "component",
+  "description": "Attached and idle: what was added is waiting for a turn that has not started."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AgentHandoff - LongIdea",
+  "id": "79090011-f6ac-4105-8617-40adbf4de38e",
+  "url": "/isolated-components/AgentHandoff?s=LongIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentHandoff",
+  "scenarioType": "component",
+  "description": "The ordinary shape of a real idea, which is longer than a demo one. At desktop width the italic quote still holds one line while the monospace prompt wraps to two - the prompt is the part that has to stay readable when it runs long, because it is the part someone copies."
+}

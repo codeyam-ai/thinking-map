@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - Everything",
+ "id": "fb973074-eef5-44cf-b33c-3507a666f025",
+ "url": "/isolated-components/MapCardEyebrow?s=Everything",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "Every fact at once in the fixed order, which is the longest the line ever gets and where it still has to read as one row."
+}

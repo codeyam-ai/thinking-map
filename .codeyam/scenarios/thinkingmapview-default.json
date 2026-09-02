@@ -1,12 +1,12 @@
 {
-  "name": "ThinkingMapView - Default",
-  "id": "a19f364c-144d-4903-87b6-ae297b390a55",
-  "url": "/isolated-components/ThinkingMapView?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ThinkingMapView",
-  "scenarioType": "component",
-  "description": "The map at the research phase, scaled to fit its panel."
+ "name": "ThinkingMapView - Default",
+ "id": "e8b70636-5a61-4d88-b992-d62ae25bbbfb",
+ "url": "/isolated-components/ThinkingMapView?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ThinkingMapView",
+ "scenarioType": "component",
+ "description": "The map at the research phase, rendered with no bridge \u2014 the isolated case. Every round is readable and every question shows its answer box; without an exchange to write to, an answer simply cannot be recorded."
 }

@@ -1,0 +1,12 @@
+{
+  "name": "BriefSectionRow - EmptySection",
+  "id": "cbcf8069-6d6d-4575-8da6-9622d4d8abf4",
+  "url": "/isolated-components/BriefSectionRow?s=EmptySection",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefSectionRow",
+  "scenarioType": "component",
+  "description": "A heading with nothing under it. Part of the document's shape, so it is listed, but there is nothing in it to have accounted for - neither ink nor grey, and no ask button, because there is no passage to ask about."
+}

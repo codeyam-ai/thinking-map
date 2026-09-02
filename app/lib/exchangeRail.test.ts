@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   answeredIds,
+  askedNodeIds,
   describeEvent,
   describeRun,
   questionIds,
@@ -174,6 +175,35 @@ describe('describeRun', () => {
 });
 
 describe('describeEvent', () => {
+  // Naming the node is the entire difference between a question and a note. A
+  // row reading "You asked a question" would put the reader back to guessing
+  // which of twenty pills it was about.
+  it('names the node a question was about', () => {
+    const entry = describeEvent(
+      event({
+        kind: 'user.question',
+        origin: 'user',
+        payload: {
+          nodeId: 'n1',
+          label: 'Capture the thought, not the book',
+          text: 'Does this replace the log?',
+        },
+      }),
+    );
+    expect(entry.text).toBe('You asked about “Capture the thought, not the book”');
+    expect(entry.note).toBe('Does this replace the log?');
+  });
+
+  // The label is denormalised at write time, so a question whose node was since
+  // deleted still reads as something rather than falling through to the raw
+  // kind name.
+  it('falls back to naming no node when the label is gone', () => {
+    const entry = describeEvent(
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: 'n1' } }),
+    );
+    expect(entry.text).toBe('You asked about a node');
+  });
+
   // The phase nav numbers its labels; a sentence should not.
   it('drops the phase number when reporting a phase change', () => {
     const entry = describeEvent(
@@ -315,5 +345,75 @@ describe('railEntries', () => {
     ];
     const ids = railEntries(events).map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+// The marks on the map that say "you have already asked about this one". They
+// are derived from the log rather than tracked alongside it, so they survive a
+// reload and count a question asked from any front door.
+describe('askedNodeIds', () => {
+  // The ordinary case: the id travels in the payload, which is the whole reason
+  // this is its own kind rather than a note with a name in the prose.
+  it('collects the node a question names', () => {
+    const ids = askedNodeIds([
+      event({
+        kind: 'user.question',
+        origin: 'user',
+        payload: { nodeId: 'n1', label: 'Capture the thought', text: 'Why?' },
+      }),
+    ]);
+    expect(ids.has('n1')).toBe(true);
+  });
+
+  // A node asked about twice is still one marked node — the mark says whether,
+  // not how many.
+  it('counts a node asked about twice only once', () => {
+    const ids = askedNodeIds([
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: 'n1' } }),
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: 'n1' } }),
+    ]);
+    expect(ids.size).toBe(1);
+  });
+
+  // Every other kind in the log must leave the marks alone — notes and answers
+  // carry node ids too, and marking those would badge half the map.
+  it('ignores every other kind of event', () => {
+    const ids = askedNodeIds([
+      event({ kind: 'user.note', origin: 'user', payload: { text: 'a note' } }),
+      event({ kind: 'user.node', origin: 'user', payload: { id: 'n2' } }),
+      event({ kind: 'node.added', origin: 'agent', payload: { id: 'n3' } }),
+      event({
+        kind: 'user.answer',
+        origin: 'user',
+        payload: { answers: [{ id: 'n4', answer: 'yes' }] },
+      }),
+    ]);
+    expect(ids.size).toBe(0);
+  });
+
+  // Several nodes asked about across a session all keep their marks.
+  it('collects every distinct node across the log', () => {
+    const ids = askedNodeIds([
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: 'n1' } }),
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: 'n2' } }),
+    ]);
+    expect([...ids].sort()).toEqual(['n1', 'n2']);
+  });
+
+  // A payload that lost its id must not throw and must not mark anything — one
+  // unattributable question should not take the marks off the rest.
+  it('skips a question with a missing or non-string nodeId', () => {
+    const ids = askedNodeIds([
+      event({ kind: 'user.question', origin: 'user', payload: {} }),
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: 42 } }),
+      event({ kind: 'user.question', origin: 'user', payload: { nodeId: '' } }),
+      event({ kind: 'user.question', origin: 'user', payload: null }),
+    ]);
+    expect(ids.size).toBe(0);
+  });
+
+  // A map nobody has asked about has no marks.
+  it('is empty for an empty log', () => {
+    expect(askedNodeIds([]).size).toBe(0);
   });
 });

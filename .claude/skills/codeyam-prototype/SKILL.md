@@ -41,8 +41,9 @@ Then end your turn. The user replies with a freeform description.
   edge-case variants) until the user has confirmed the scenario currently
   on screen looks right. Use `codeyam-editor editor register` for the
   scenarios you do create.
-- Use `AskUserQuestion` to confirm direction when there are multiple
-  reasonable approaches; otherwise iterate freely.
+- Confirm direction when there are multiple reasonable approaches — with
+  your harness's structured-question tool (on Claude, `AskUserQuestion`) or
+  as plain text listing the options; otherwise iterate freely.
 - Do **NOT** run `codeyam-editor editor advance` or `codeyam-editor editor
   step`. Those belong to the formalized Build workflow. While the
   Prototype sub-tab is active there is no advance gate.
@@ -146,10 +147,15 @@ When you receive that message:
 
 ## Allowed tools
 
-- `Read`, `Edit`, `Write` — for any file the prototype needs.
-- `Bash` — for dev-server commands, scenario CLI calls, file ops.
-- `AskUserQuestion` — for direction-confirming choices.
-- `WebSearch` / `WebFetch` — for researching APIs or libraries.
+- Reading, editing, and creating files — for any file the prototype needs.
+  (On Claude: `Read`, `Edit`, `Write`.)
+- Running shell commands — for dev-server commands, scenario CLI calls, file
+  ops. (On Claude: `Bash`.)
+- Asking the user a structured question — for direction-confirming choices.
+  (On Claude: `AskUserQuestion`; plain text listing the options works too.)
+- Web search / fetch, **if your harness has them** — for researching APIs or
+  libraries. Optional; skip this if it does not. (On Claude: `WebSearch` /
+  `WebFetch`.)
 
 ## Disallowed during the prototype phase
 

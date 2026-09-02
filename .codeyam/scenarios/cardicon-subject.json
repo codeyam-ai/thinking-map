@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Subject",
+  "id": "b8fa6571-a035-44fa-bddd-8ae3c5b97551",
+  "url": "/isolated-components/CardIcon?s=Subject",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "The map's subject: the one filled mark in the set, because the root is the node everything else hangs from. Ink, which is the subject family's colour."
+}

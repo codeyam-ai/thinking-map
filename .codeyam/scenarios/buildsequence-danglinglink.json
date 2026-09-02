@@ -1,0 +1,12 @@
+{
+  "name": "BuildSequence - DanglingLink",
+  "id": "da824a03-0124-4adc-987d-17a9406de6c4",
+  "url": "/isolated-components/BuildSequence?s=DanglingLink",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BuildSequence",
+  "scenarioType": "component",
+  "description": "A slice testing a node that has since been deleted. Reported in its own words - it was going to settle something no longer on the map - rather than rendered as a blank line."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "HandoffReattach - Dense",
+  "id": "a17402aa-056e-42e7-9a4f-893164d04388",
+  "url": "/isolated-components/HandoffReattach?s=Dense",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffReattach",
+  "scenarioType": "component",
+  "description": "The one-row form, used on the finished-plan screen. MapScreen is an h-screen flex column and this strip is shrink-0, so every row it takes is a row the summary loses - and the summary is the whole reason someone opens a finished map. The heading goes, both commands truncate onto one row, and the two copy buttons survive: a shorter strip that dropped a command would be smaller and no longer do its job. Compare against Default to see exactly what the screen buys back."
+}

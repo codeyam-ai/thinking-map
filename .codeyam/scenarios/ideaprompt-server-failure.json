@@ -1,0 +1,24 @@
+{
+  "name": "IdeaPrompt - Server Failure",
+  "id": "ef4f65e4-21db-4ae4-a0a6-1d4bb3ce06de",
+  "url": "/isolated-components/IdeaPrompt?s=ServerFailureEmptyBody",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "IdeaPrompt",
+  "scenarioType": "component",
+  "description": "The reported bug, fixed. An idea typed and sent while the server answers 500 with nothing in it - the exact shape that has no JSON to read. The screen says 'Could not start a map. (HTTP 500)' where it used to say 'Failed to execute json on Response: Unexpected end of JSON input'. No body means no fix to offer, so there is no command pill here. The typed idea survives, so the person can try again without retyping.",
+  "interactions": [
+    {
+      "action": "fill",
+      "selector": "#idea",
+      "value": "a subscription box for hot sauce"
+    },
+    {
+      "action": "press",
+      "selector": "#idea",
+      "value": "Enter"
+    }
+  ]
+}

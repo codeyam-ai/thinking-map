@@ -58,6 +58,7 @@ model ThinkingMap {
   nodes    MapNode[]
   themes   Theme[]
   events   MapEvent[]
+  brief    MapBrief?
 }
 
 // ──────────────────────────────────────────────
@@ -121,7 +122,7 @@ model MapNode {
   /// What this node represents. One of:
   /// idea | user | problem | goal | constraint | assumption | open-question
   /// | research | finding | gap | approach | pro | risk
-  /// | known | unknown | direction | next-step
+  /// | known | unknown | direction | next-step | slice
   kind      String
   /// The short text shown inside the node pill.
   label     String
@@ -149,6 +150,39 @@ model MapNode {
   /// A small diagram the partner drew, as JSON: { steps: [...], note? }.
   /// Declarative rather than markup on purpose — see app/lib/diagram.ts.
   diagram   String?
+  /// The id of the node this slice would settle — the assumption, risk, or
+  /// open question that building it would answer. A slice that names nothing
+  /// is not a validating increment, just work scheduled early, and the summary
+  /// screen says so rather than letting it pass as progress.
+  ///
+  /// Deliberately NOT a Prisma relation. `parentId` is the map's only edge, and
+  /// a second self-relation would either collide with NodeChildren's semantics
+  /// or drag every tested assumption out of where it belongs in the tree and
+  /// into a branch under the plan. This is a pointer that is resolved in code
+  /// and never drawn. A dangling id is tolerated and reported: the node it
+  /// names may since have been deleted.
+  testsNodeId String?
+  /// The brief section id this node was derived from (e.g. `s7`), when the map
+  /// has a brief and this claim came from one identifiable part of it.
+  ///
+  /// The deliberate contrast with `sourceUrl` directly above: `sourceUrl` points
+  /// OUT of the map at the web, `sourceRef` points INTO the client's own
+  /// document. Overloading one column for both would make the research card's
+  /// link rendering wrong for half of its values.
+  ///
+  /// It is also the contrast with `testsNodeId` directly above: that points at
+  /// another NODE on this map, while this points at a passage in the document
+  /// the map came from. Both are pointers resolved in code rather than drawn.
+  ///
+  /// Stores the section id, never the quoted passage. Sections are derived on
+  /// demand by `app/lib/briefSections.ts` from brief text that is written once
+  /// and never updated, so the reference cannot drift from what it points at —
+  /// whereas a copy of the passage kept here could.
+  ///
+  /// Optional, and always will be: a node the person typed, or one the agent
+  /// inferred across the whole document, has no single source section. Forcing
+  /// one would produce fabricated citations, which is worse than none.
+  sourceRef String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
   /// The galaxy this node belongs to. Null for the root idea, which belongs to
@@ -159,6 +193,40 @@ model MapNode {
   /// own writes from the person's, and will re-ingest its own output as new
   /// information. It is also what lets the UI mark what the person contributed.
   origin    String  @default("agent")
+  /// A few likely answers to offer alongside an open question, as a JSON array
+  /// of strings — the chips on the question's card. Held as a String because
+  /// SQLite has no array type, in the manner this schema already uses for
+  /// enum-less values.
+  ///
+  /// Meaningful only on an `open-question`. Optional and always will be: an
+  /// agent that never learned the field, and a question with no obvious
+  /// shortlist, both produce a card that is simply an input — which is the
+  /// ordinary case, not a degraded one.
+  ///
+  /// The chips fill the input rather than submitting it, so these are
+  /// suggestions the person edits, never a closed set of choices. Storing them
+  /// does not make the question multiple-choice.
+  options   String?
+  /// A nudge away from the node's computed tidy position, in layout pixels —
+  /// not a position. The tidy tree stays authoritative: siblings still never
+  /// overlap by default, parents still centre over their children, and a node
+  /// added tomorrow still places itself sensibly instead of landing on top of
+  /// something moved last week. Drop these and the map is exactly what it was.
+  ///
+  /// Deliberately absent from the agent's rendering of the map. `read_map`
+  /// describes the thinking; pixel offsets are arrangement, and feeding an
+  /// agent coordinates it cannot act on is noise in a context window better
+  /// spent on the map's content.
+  ///
+  /// Defaulted rather than nullable so every existing row is already valid and
+  /// no backfill is needed.
+  ///
+  /// VESTIGIAL as of the "The Map Builds Downward" plan: the map is now a
+  /// scrolling column of card rows with no plane to nudge a node around on, so
+  /// nothing reads these. Kept rather than dropped because dropping a column is
+  /// a migration and that plan deliberately is not one.
+  offsetX   Float   @default(0)
+  offsetY   Float   @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -216,4 +284,48 @@ model MapEvent {
   @@unique([mapId, requestId, revision])
   @@index([mapId, revision])
   @@index([mapId, requestId])
+}
+
+// ──────────────────────────────────────────────
+// The client's brief
+//
+// Some maps do not start from a sentence. They start from a twenty-page spec,
+// and the whole point of this model is that the document arrives WHOLE rather
+// than squeezed through a one-line input.
+//
+// Write-once, exactly like `seedIdea`: a brief is attached when the map is
+// created and never overwritten. A revised brief is a NEW map, because a v2
+// spec is a different conversation — not an edit to this one. That immutability
+// is load-bearing: it is what lets section ids be derived from the text by a
+// pure splitter (app/lib/briefSections.ts) instead of stored as rows that would
+// have to be kept in sync.
+//
+// Its own model rather than columns on ThinkingMap so that `listMaps` and every
+// `getMap` do not drag tens of thousands of characters into memory on every
+// page render. The text has exactly one reader — the agent's `read_brief` tool.
+//
+// Only the extracted TEXT is persisted. The .pdf or .docx it arrived in is
+// packaging, and is thrown away once the words are out of it.
+// ──────────────────────────────────────────────
+
+model MapBrief {
+  id    String      @id @default(cuid())
+  /// Unique: one brief per map. Attaching or replacing a brief on a running
+  /// map is deliberately not possible — it would need a document-version model
+  /// and a story for references pointing into a passage that no longer exists.
+  mapId String      @unique
+  map   ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+
+  /// The uploaded filename, or "pasted" when the client pasted the text in.
+  sourceName String
+  /// The media type it arrived as, kept so a reader can say what kind of
+  /// document this was without re-sniffing the text.
+  mediaType  String
+  /// The extracted text, verbatim beyond line-ending normalisation.
+  text       String
+  /// Denormalised length, so the brief can announce its own size without the
+  /// text being read. This is what keeps `read_map` cheap.
+  charCount  Int
+
+  createdAt DateTime @default(now())
 }

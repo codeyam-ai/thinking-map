@@ -1,0 +1,13 @@
+{
+ "name": "Disclosure - WithCount",
+ "id": "0977d85a-98c4-4e80-97b1-6bf0f4e936df",
+ "url": "/isolated-components/Disclosure?s=WithCount",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "Disclosure",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/Disclosure.tsx",
+ "description": "The activity fold, whose label carries a running count. Pins that the summary stays legible with a number appended rather than assuming a bare phrase."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BuildSequence - FirstSliceOnly",
+  "id": "5c279ef1-c048-473c-a405-d37ceabda3f2",
+  "url": "/isolated-components/BuildSequence?s=FirstSliceOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BuildSequence",
+  "scenarioType": "component",
+  "description": "The day-one plan: one increment and nothing after it, which is the honest ending for a map that has only earned one."
+}

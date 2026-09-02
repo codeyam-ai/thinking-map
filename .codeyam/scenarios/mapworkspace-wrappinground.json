@@ -1,0 +1,12 @@
+{
+  "name": "MapWorkspace - WrappingRound",
+  "id": "80b3a241-79fb-4b18-bb22-e0b83cbed76a",
+  "url": "/isolated-components/MapWorkspace?s=WrappingRound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapWorkspace",
+  "scenarioType": "component",
+  "description": "Six questions in one round, so the band wraps. Threads reach the first line only — a wrapped card sits a full card-height further down and the only lane to it runs straight through the cards above, which is what an earlier build drew and what made the map look like it had sprung a leak."
+}

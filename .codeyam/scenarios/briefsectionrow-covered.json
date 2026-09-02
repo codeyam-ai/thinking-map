@@ -1,0 +1,12 @@
+{
+  "name": "BriefSectionRow - Covered",
+  "id": "4d0d3f78-68ee-461b-907a-dc1ff7e51a28",
+  "url": "/isolated-components/BriefSectionRow?s=Covered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefSectionRow",
+  "scenarioType": "component",
+  "description": "A section the map has already dealt with. It recedes to muted grey with a thin solid count - the map beside the panel is its evidence, so the row's only job here is to stay countable."
+}

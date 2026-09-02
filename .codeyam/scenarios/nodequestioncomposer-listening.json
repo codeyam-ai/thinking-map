@@ -1,0 +1,12 @@
+{
+ "name": "NodeQuestionComposer - Listening",
+ "id": "d5a5b2ba-1e15-4151-b9ad-0cd2f7f623f1",
+ "url": "/isolated-components/NodeQuestionComposer?s=Listening",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "NodeQuestionComposer",
+ "scenarioType": "component",
+ "description": "An agent bound and idle. The send control says 'Ask the agent' and the note says asking wakes it - which is the real mechanism, and the whole difference between this and leaving a note."
+}

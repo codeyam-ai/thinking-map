@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brief panel — document spine (off-catalog)</title>
+<style>
+  :root{
+    --paper:#f1efea; --surface:#ffffff; --ink:#0f0f0f; --ink-soft:#4a4a45;
+    --muted:#8a8a85; --line:#e2e0d9; --lime:#d5f560; --thread:#8b8bc8;
+    /* bespoke: one extra register for "measured but empty" — a void, not a warning */
+    --void:#c9c5bb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; padding:36px; min-height:100vh;
+  }
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta{font-size:12.5px;color:var(--muted)}
+  .workspace{display:flex;gap:24px;align-items:stretch;height:1010px}
+
+  /* ── the new third pane: the document measured, to scale ── */
+  .brief{flex:0 0 336px;background:var(--surface);border-radius:16px;padding:26px 24px;overflow:hidden}
+  .brief-head{display:flex;align-items:baseline;gap:10px}
+  .brief-src{font-size:13px;font-weight:600;color:var(--ink-soft);margin:5px 0 20px}
+
+  .claim{font-size:26px;font-weight:800;letter-spacing:-.022em;line-height:1.18;margin-bottom:8px}
+  .claim .void-t{color:var(--void)}
+  .claim-sub{font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:24px}
+
+  /* the spine: one block per section, height proportional to its length.
+     an untouched stretch of document is a literal gap you can see. */
+  .spine-wrap{display:flex;gap:14px}
+  .spine{flex:0 0 42px;display:flex;flex-direction:column;gap:3px}
+  .blk{position:relative;border-radius:3px;background:var(--ink)}
+  .blk.none{
+    background:repeating-linear-gradient(
+      135deg,var(--void) 0 2px,transparent 2px 6px);
+    border:1px dashed var(--void);
+  }
+  /* one tick per citing node, laid inside the block */
+  .ticks{position:absolute;right:5px;top:5px;bottom:5px;display:flex;flex-direction:column;
+    justify-content:flex-start;gap:3px}
+  .ticks i{display:block;width:5px;height:5px;border-radius:50%;background:var(--paper)}
+
+  .names{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .nm{display:flex;align-items:center;gap:8px;padding-left:2px;min-width:0}
+  .nm .lbl{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nm .num{font-size:10.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 22px}
+  .nm .ct{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:auto;flex:0 0 auto}
+  .nm.none .lbl{color:var(--void);font-weight:500}
+  .nm.none .ct{color:var(--void)}
+
+  .legend{display:flex;gap:18px;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+  .lg{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+  .sw{width:13px;height:13px;border-radius:2px;background:var(--ink)}
+  .sw.none{background:repeating-linear-gradient(135deg,var(--void) 0 2px,transparent 2px 6px);
+    border:1px dashed var(--void)}
+  .ask{margin-top:18px;width:100%;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink);background:none;border:1px dashed var(--muted);border-radius:999px;padding:10px;cursor:pointer}
+
+  /* ── map + rail, the product as it is ─────────────── */
+  .map{flex:1;background:var(--surface);border-radius:16px;padding:26px 30px;position:relative;min-width:0}
+  .map-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .tree{position:relative;height:640px}
+  .node{position:absolute;transform:translateX(-50%);text-align:center}
+  .node .eyebrow{margin-bottom:7px;white-space:nowrap}
+  .pill{display:inline-block;padding:15px 26px;border-radius:999px;background:var(--surface);
+    border:1.5px solid var(--ink);font-size:14.5px;font-weight:600;white-space:nowrap}
+  .pill.root{background:var(--ink);color:#fff;padding:19px 30px;font-size:16px}
+  .pill.open{border:1.5px dashed var(--line);color:var(--muted);font-weight:500}
+  /* the marker on the pill: a filled chip, matching the spine's ink blocks */
+  .chip{display:inline-block;background:var(--ink);color:var(--paper);border-radius:3px;
+    padding:1px 4px;font-size:9.5px;letter-spacing:.04em;margin-left:2px;vertical-align:1px}
+  .link{position:absolute}
+  .v{border-left:1.5px dashed var(--thread)}
+  .h{border-top:1.5px dashed var(--thread)}
+  .dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--thread)}
+  .zoom{position:absolute;right:26px;bottom:22px;display:flex;align-items:center;gap:14px;
+    border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:12.5px;color:var(--muted)}
+  .zoom b{color:var(--ink);font-weight:600}
+  .rail{flex:0 0 286px;background:var(--surface);border-radius:16px;padding:26px 22px;overflow:hidden}
+  .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;
+    padding:9px 8px 9px 16px;margin:8px 0 16px;font-size:13.5px;color:var(--muted)}
+  .field span{flex:1}
+  .send{width:30px;height:30px;border-radius:50%;background:var(--lime);
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .q{font-size:13.5px;font-weight:500}
+  .toggle{display:flex;align-items:center;gap:14px;margin:18px 0 4px}
+  .toggle .on{background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.1em;
+    padding:6px 13px;border-radius:999px}
+  .ev{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .av{flex:0 0 20px;height:20px;border-radius:50%;border:1.5px solid var(--line);margin-top:1px}
+  .av.agent{background:var(--ink);border-color:var(--ink)}
+  .ev p{font-size:13px;font-weight:600;line-height:1.4}
+  .ev small{display:block;font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px;line-height:1.45}
+</style>
+</head>
+<body>
+<div class="workspace">
+
+  <!-- NEW: the brief drawn to scale — a gap in the spine IS an unread page -->
+  <aside class="brief">
+    <div class="brief-head"><span class="eyebrow">Brief</span><span class="meta">drawn to scale</span></div>
+    <div class="brief-src">Northwind Learning — platform brief</div>
+
+    <div class="claim">7 sections read.<br><span class="void-t">4 untouched.</span></div>
+    <div class="claim-sub">Each block is a section, sized by how much document it is.
+      The hatched ones have nothing on the map pointing at them — 2,810 characters, a fifth of the brief.</div>
+
+    <div class="spine-wrap">
+      <div class="spine">
+        <div class="blk" style="height:60px"><div class="ticks"><i></i><i></i><i></i></div></div>
+        <div class="blk" style="height:43px"><div class="ticks"><i></i><i></i></div></div>
+        <div class="blk" style="height:73px"><div class="ticks"><i></i><i></i><i></i><i></i></div></div>
+        <div class="blk" style="height:54px"><div class="ticks"><i></i><i></i></div></div>
+        <div class="blk none" style="height:31px"></div>
+        <div class="blk" style="height:67px"><div class="ticks"><i></i></div></div>
+        <div class="blk none" style="height:47px"></div>
+        <div class="blk" style="height:80px"><div class="ticks"><i></i></div></div>
+        <div class="blk none" style="height:35px"></div>
+        <div class="blk none" style="height:23px"></div>
+        <div class="blk" style="height:53px"><div class="ticks"><i></i><i></i></div></div>
+      </div>
+
+      <div class="names">
+        <div class="nm" style="height:60px"><span class="num">§1</span><span class="lbl">Overview</span><span class="ct">3 nodes</span></div>
+        <div class="nm" style="height:43px"><span class="num">§2</span><span class="lbl">Who this is for</span><span class="ct">2 nodes</span></div>
+        <div class="nm" style="height:73px"><span class="num">§3</span><span class="lbl">The problem today</span><span class="ct">4 nodes</span></div>
+        <div class="nm" style="height:54px"><span class="num">§4</span><span class="lbl">Goals for year one</span><span class="ct">2 nodes</span></div>
+        <div class="nm none" style="height:31px"><span class="num">§5</span><span class="lbl">Out of scope</span><span class="ct">none</span></div>
+        <div class="nm" style="height:67px"><span class="num">§6</span><span class="lbl">Existing systems</span><span class="ct">1 node</span></div>
+        <div class="nm none" style="height:47px"><span class="num">§7</span><span class="lbl">Accessibility requirements</span><span class="ct">none</span></div>
+        <div class="nm" style="height:80px"><span class="num">§8</span><span class="lbl">Data and privacy</span><span class="ct">1 node</span></div>
+        <div class="nm none" style="height:35px"><span class="num">§9</span><span class="lbl">Timeline</span><span class="ct">none</span></div>
+        <div class="nm none" style="height:23px"><span class="num">§10</span><span class="lbl">Budget envelope</span><span class="ct">none</span></div>
+        <div class="nm" style="height:53px"><span class="num">§11</span><span class="lbl">Measuring success</span><span class="ct">2 nodes</span></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="lg"><span class="sw"></span>cited on the map</div>
+      <div class="lg"><span class="sw none"></span>nothing points here</div>
+    </div>
+    <button class="ask">Ask about the four untouched</button>
+  </aside>
+
+  <main class="map">
+    <div class="map-head"><span class="eyebrow">Live map</span><span class="meta">5 answered, 2 still open</span></div>
+    <div class="tree">
+      <div class="node" style="left:50%;top:0"><div class="eyebrow">Idea · Yours</div>
+        <div class="pill root">Northwind learning platform</div></div>
+      <div class="link v" style="left:50%;top:88px;height:26px"></div>
+      <div class="link h" style="left:22%;top:114px;width:56%"></div>
+      <div class="dot" style="left:calc(22% - 3px);top:111px"></div>
+      <div class="dot" style="left:calc(78% - 3px);top:111px"></div>
+      <div class="link v" style="left:22%;top:114px;height:52px"></div>
+      <div class="link v" style="left:78%;top:114px;height:52px"></div>
+      <div class="node" style="left:22%;top:172px"><div class="eyebrow">Problem <span class="chip">§3</span></div>
+        <div class="pill">Teachers rebuild the same lesson</div></div>
+      <div class="node" style="left:78%;top:172px"><div class="eyebrow">Goal · Yours <span class="chip">§4</span></div>
+        <div class="pill">One place to plan a term</div></div>
+      <div class="link v" style="left:22%;top:250px;height:76px"></div>
+      <div class="link v" style="left:78%;top:250px;height:76px"></div>
+      <div class="dot" style="left:calc(22% - 3px);top:323px"></div>
+      <div class="dot" style="left:calc(78% - 3px);top:323px"></div>
+      <div class="node" style="left:22%;top:334px"><div class="eyebrow">Finding <span class="chip">§6</span></div>
+        <div class="pill">Three systems already hold rosters</div></div>
+      <div class="node" style="left:78%;top:334px"><div class="eyebrow">Approach</div>
+        <div class="pill">Start from the teacher's week</div></div>
+      <div class="link v" style="left:78%;top:412px;height:26px"></div>
+      <div class="link h" style="left:50%;top:438px;width:54%"></div>
+      <div class="dot" style="left:calc(50% - 3px);top:435px"></div>
+      <div class="dot" style="left:calc(104% - 3px);top:435px"></div>
+      <div class="link v" style="left:50%;top:438px;height:52px"></div>
+      <div class="node" style="left:50%;top:496px"><div class="eyebrow">Open</div>
+        <div class="pill open">Who owns accessibility sign-off?</div></div>
+      <div class="node" style="left:20%;top:496px"><div class="eyebrow">Open</div>
+        <div class="pill open">Is the March date fixed?</div></div>
+    </div>
+    <div class="zoom">− <b>100%</b> + <span>Fit</span></div>
+  </main>
+
+  <aside class="rail">
+    <div class="eyebrow">Waiting on you · 2</div>
+    <div class="q" style="margin-top:14px">Who owns accessibility sign-off?</div>
+    <div class="field"><span>Answer…</span><div class="send">↗</div></div>
+    <div class="q">Is the March date fixed?</div>
+    <div class="field"><span>Answer…</span><div class="send">↗</div></div>
+    <div class="toggle"><span class="on">NOTE</span><span class="eyebrow">Add node</span></div>
+    <div class="field"><span>Leave a note for the agent…</span><div class="send">↗</div></div>
+    <div class="eyebrow" style="margin-top:20px">Activity</div>
+    <div style="margin-top:8px">
+      <div class="ev"><div class="av agent"></div><p>Agent read the brief<small>Eleven sections, 12,690 characters.</small></p></div>
+      <div class="ev"><div class="av"></div><p>You added "One place to plan a term"</p></div>
+      <div class="ev"><div class="av agent"></div><p>Agent left a note<small>§3 is where the real problem is — the rest of page one is context.</small></p></div>
+      <div class="ev"><div class="av agent"></div><p>Agent asked 2 questions</p></div>
+    </div>
+  </aside>
+
+</div>
+</body>
+</html>

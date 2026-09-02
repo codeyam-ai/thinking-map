@@ -1,12 +1,12 @@
 {
-  "name": "SavedMapRow - Default",
-  "id": "3b132baa-002d-424d-8a06-05f86d8927e5",
-  "url": "/isolated-components/SavedMapRow?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "SavedMapRow",
-  "scenarioType": "component",
-  "description": "One saved map with its phase and node count."
+ "name": "SavedMapRow - Default",
+ "id": "3b132baa-002d-424d-8a06-05f86d8927e5",
+ "url": "/isolated-components/SavedMapRow?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SavedMapRow",
+ "scenarioType": "component",
+ "description": "One saved map with its phase and node count."
 }

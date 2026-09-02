@@ -1,0 +1,12 @@
+{
+  "name": "BuildSequence - ProvesNothing",
+  "id": "2cd6f8c2-30a7-4fe9-bcbf-e63744986b72",
+  "url": "/isolated-components/BuildSequence?s=ProvesNothing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BuildSequence",
+  "scenarioType": "component",
+  "description": "The state this whole feature exists to make visible: a slice that settles nothing, dashed and marked in place between two validated ones rather than hidden, so the client sees the gap and asks about it."
+}

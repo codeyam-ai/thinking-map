@@ -1,0 +1,12 @@
+{
+  "name": "RowThreads - SomeUnattached",
+  "id": "6996145d-d9f0-48e4-ac8b-8d7d0a014e35",
+  "url": "/isolated-components/RowThreads?s=SomeUnattached",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowThreads",
+  "scenarioType": "component",
+  "description": "A round where some cards came out of the one above and some did not, drawn and undrawn side by side. The unattached card draws nothing rather than reaching for something to connect to — silence is the honest picture for 'nothing prompted this here'."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "MapRow - BelowResearchThreshold",
+  "id": "90ac22ac-a43c-4236-a6fd-c62a6436ff53",
+  "url": "/isolated-components/MapRow?s=BelowResearchThreshold",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapRow",
+  "scenarioType": "component",
+  "description": "The boundary case, and the one most likely to be got wrong: one finding among three, so no band. The finding keeps its ochre, but the row gets no territory — otherwise the band would stop meaning 'this round is about what already exists' and start meaning 'somebody looked something up once'."
+}

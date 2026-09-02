@@ -1,0 +1,7 @@
+{
+  "previewOrigin": "/__codeyam_preview",
+  "provider": "claude",
+  "workflow": {
+    "audience": "technical"
+  }
+}

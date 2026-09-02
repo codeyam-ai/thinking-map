@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Question",
+  "id": "4a19c20f-5027-45fc-afb7-bf26907b0b7c",
+  "url": "/isolated-components/CardIcon?s=Question",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "The question mark, in the violet the retired tree connectors used. Worn by every kind that records that nobody has answered something."
+}

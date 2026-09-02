@@ -1,0 +1,12 @@
+{
+  "name": "MapCardHeader - Root",
+  "id": "39d4e35a-4e41-4695-8068-48b8a13fc67f",
+  "url": "/isolated-components/MapCardHeader?s=Root",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapCardHeader",
+  "scenarioType": "component",
+  "description": "The root's marker stays neutral grey while its icon takes the subject family's ink. The exception exists because ink on '1/4' would read as emphasis on a number nobody needs emphasised, rather than as a category."
+}

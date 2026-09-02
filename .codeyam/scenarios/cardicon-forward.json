@@ -1,0 +1,12 @@
+{
+  "name": "CardIcon - Forward",
+  "id": "b8e7d834-25a6-4502-a4c8-e0c3c3c1a5dd",
+  "url": "/isolated-components/CardIcon?s=Forward",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardIcon",
+  "scenarioType": "component",
+  "description": "The arrow, in mauve, pointing the way the map grows. Worn by approach, direction, next-step and slice — everything about what to do next."
+}

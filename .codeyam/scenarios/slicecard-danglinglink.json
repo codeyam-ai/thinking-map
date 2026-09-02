@@ -1,0 +1,12 @@
+{
+ "name": "SliceCard - DanglingLink",
+ "id": "9627db1b-5532-4bb4-9201-72649f462e46",
+ "url": "/isolated-components/SliceCard?s=DanglingLink",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "SliceCard",
+ "scenarioType": "component",
+ "description": "The same dashed treatment for a different cause - the slice did name a node, and that node has since been deleted, which is worth saying differently from never having named one."
+}

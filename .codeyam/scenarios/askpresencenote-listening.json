@@ -1,0 +1,12 @@
+{
+  "name": "AskPresenceNote - Listening",
+  "id": "81479b57-35b5-47e9-9bb5-188ed1cfde54",
+  "url": "/isolated-components/AskPresenceNote?s=Listening",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AskPresenceNote",
+  "scenarioType": "component",
+  "description": "One line, saying an agent is listening and asking wakes it."
+}

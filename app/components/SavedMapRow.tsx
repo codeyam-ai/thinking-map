@@ -1,4 +1,4 @@
-import { PHASE_LABELS, isPhase } from '../lib/mapKinds';
+import { PHASE_LABELS, normalizePhase } from '../lib/mapKinds';
 
 export interface SavedMap {
   id: string;
@@ -28,7 +28,14 @@ export default function SavedMapRow({ map }: { map: SavedMap }) {
           {map.title}
         </span>
         <span className="shrink-0 text-[11px] text-white/25">
-          {isPhase(map.phase) ? PHASE_LABELS[map.phase] : map.phase}
+          {/* Through main's resolver rather than a bare guard: a map saved
+              before the phases merged still carries `deconstruct`, and it
+              should read as the phase it now is rather than falling through to
+              the raw stored string. */}
+          {(() => {
+            const phase = normalizePhase(map.phase);
+            return phase ? PHASE_LABELS[phase] : map.phase;
+          })()}
           {' · '}
           {map._count.nodes} node{map._count.nodes === 1 ? '' : 's'}
         </span>

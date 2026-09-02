@@ -12,13 +12,18 @@ export default function SuggestionChips({
   onPick: (text: string) => void;
 }) {
   return (
-    <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
-      {SUGGESTIONS.map((suggestion) => (
+    // One row, always. Four chips wrapped to a second row at half width, which
+    // was the single biggest source of crowding on this screen — so three show
+    // under `lg`, all four above it, and the row scrolls rather than wraps.
+    <div className="no-scrollbar mt-7 flex flex-nowrap items-center justify-start gap-2 overflow-x-auto lg:justify-center lg:gap-2.5">
+      {SUGGESTIONS.map((suggestion, index) => (
         <button
           key={suggestion}
           type="button"
           onClick={() => onPick(suggestion.replace(/…$/, ' '))}
-          className="rounded-full border border-line bg-surface px-4 py-2.5 text-[13.5px] text-ink-soft transition hover:border-ink hover:text-ink"
+          className={`shrink-0 rounded-full border border-line bg-surface px-4 py-2.5 text-[13.5px] whitespace-nowrap text-ink-soft transition hover:border-ink hover:text-ink ${
+            index >= 3 ? 'hidden lg:inline-block' : ''
+          }`}
         >
           {suggestion}
         </button>

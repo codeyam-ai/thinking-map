@@ -1,0 +1,12 @@
+{
+  "name": "InlineError - Diagnosis In Production",
+  "id": "eedbf00d-e01d-4a81-96de-8f55bde1565f",
+  "url": "/isolated-components/InlineError?s=DiagnosisInProduction",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InlineError",
+  "scenarioType": "component",
+  "description": "The identical failure deployed. Same sentence, no pill - the classifier withholds the command outside development, so the absence here is structural rather than a styling choice. Compare directly with Diagnosis."
+}

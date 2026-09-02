@@ -1,0 +1,12 @@
+{
+  "name": "RowProgress - SingleQuestion",
+  "id": "02672fe7-68ee-4212-abee-86778ac50b5e",
+  "url": "/isolated-components/RowProgress?s=SingleQuestion",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RowProgress",
+  "scenarioType": "component",
+  "description": "One question is a legitimate round, and the line has to read properly for it rather than assuming a plural."
+}

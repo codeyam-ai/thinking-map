@@ -1,0 +1,13 @@
+{
+ "name": "MapCardEyebrow - Finding",
+ "id": "037add4a-12cb-49f2-a47e-a23e3c88c57d",
+ "url": "/isolated-components/MapCardEyebrow?s=Finding",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapCardEyebrow",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/MapCardEyebrow.tsx",
+ "description": "A statement node names its kind and stops there."
+}

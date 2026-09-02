@@ -1,0 +1,13 @@
+{
+ "name": "Disclosure - Default",
+ "id": "d59d491c-899e-4aa2-92d1-dcdd687f426b",
+ "url": "/isolated-components/Disclosure?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "Disclosure",
+ "scenarioType": "component",
+ "pageFilePath": "app/components/Disclosure.tsx",
+ "description": "Closed, which is how both folds sit under the map. One line of eyebrow and nothing else, because neither of the two things it holds is what you came to the page to look at."
+}

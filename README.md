@@ -9,8 +9,16 @@ partner names what it doesn't know and asks the two or three questions that woul
 change what you should build. Every answer becomes a node on a map. When it helps, it
 searches the web for what already exists and hangs the findings, and the gaps in them,
 off the map. Change direction and nothing is lost: the map updates and tells you what
-changed. You leave with what you know, what you don't, the strongest directions, and
-where to start tomorrow.
+changed. You leave with what you know, what you don't, the strongest directions, the
+smallest thing worth building first, and where to start tomorrow.
+
+**A plan is a build sequence, not a to-do list.** A numbered list of everything is
+indistinguishable from a plan to build all of it in order, which is the outcome this
+tool exists to prevent. So the map ends on the smallest increment worth building, and
+each one names the assumption, risk, or open question that building it would settle. An
+increment that settles nothing is marked as proving nothing rather than sitting in the
+sequence looking like progress — making that gap visible is what stops the plan
+degenerating into a Gantt chart with rounded corners.
 
 **The agent is your browser's agent, and the page is the shared artifact.** There is no
 chat in this app. The thinking partner runs wherever you already talk to it and reaches
@@ -19,6 +27,13 @@ deliberate consequence of how WebMCP works rather than a missing feature — the
 no access to the agent's conversation and under WebMCP never will, so it shows the half
 it genuinely owns instead of faking the other.
 
+**A brief is read, not swallowed.** When the thing you arrive with is a twenty-page
+spec rather than a sentence, the document is stored whole as the map's source and the
+partner reads it the way anyone reads a long document — an outline first, then the
+passages that matter — through a `read_brief` tool that hands back a section list by
+default and one passage on request. It never rides along inside a map read, so a long
+brief cannot quietly fill the context window that ought to be spent thinking about it.
+
 The central principle: **don't just give me an answer — help me understand the problem
 well enough to find a better answer.**
 
@@ -26,12 +41,11 @@ well enough to find a better answer.**
 
 | Phase | What happens |
 | --- | --- |
-| 01 Idea | You type something vague into one free-text input. No structured fields. |
-| 02 Deconstruct | The partner asks a small number of high-value questions instead of answering. |
-| 03 Map | Your answers become nodes: users, problems, goals, assumptions, open questions. |
-| 04 Research | A live web search grounds the map in what already exists, and in the gaps. |
-| 05 Explore | You change direction; the map adds and updates, and explains what changed. |
-| 06 Next steps | What we know, what we don't, three directions, five concrete steps. |
+| 01 Idea | You type something vague into one free-text input. No structured fields. Or you arrive with a client's brief — paste it, or drop the `.pdf` / `.docx` / `.md` / `.txt` — and the document comes in whole. |
+| 02 Map | The partner asks a small number of high-value questions instead of answering, and your answers become the map: users, problems, goals, assumptions, open questions. Asking and mapping were once two phases; they are one activity, and the cards make that literal — a question and the node it becomes are the same card. `deconstruct` is still accepted everywhere a phase is read or set, and resolves to this one. |
+| 03 Research | A live web search grounds the map in what already exists, and in the gaps. |
+| 04 Explore | You change direction; the map adds and updates, and explains what changed. |
+| 05 Next steps | What we know, what we don't, three directions, five concrete steps. |
 
 ## Setup
 
@@ -61,6 +75,44 @@ The page's half of the exchange is a narrow column beside the map:
   agent re-ingesting its own writes.
 - **Activity** — what has happened to the map, from both sides, oldest first.
 
+There is also one affordance on the map itself rather than in the column:
+
+- **Ask about a node** — click any pill to ask a question about *that* node. The question
+  carries the node's id, so the agent is not left working out from prose which of twenty
+  pills you meant, and a node you have asked about is marked *asked* in its eyebrow. The
+  composer says which case you are in: with an agent attached, asking wakes it; with none
+  attached, it says so plainly and the question waits in the log. It never implies a reply
+  is coming when nobody is listening — WebMCP is pull-only, so you can wake an agent that
+  is waiting on you and you cannot start a turn in one that is not attached.
+
+### Handling the map
+
+The map is a single column of **rows built out of cards**, growing downward. Each round
+of thinking is one row: everything the agent added in one write arrives together, and the
+next round appears as the next row down.
+
+- **Scroll it** — that is the whole of the navigation. There is no zoom, no pan and no
+  fit-to-frame, because a column that grows downward does not need any of them.
+- **Answer inside the map** — a question is a card, and the card holds the question, a
+  few suggested answers, and the box you answer it in. You are no longer reading the
+  question in one place and answering it in another.
+- **Take a suggestion, or don't** — clicking a suggested answer *fills* the box rather
+  than sending it, so the words that get recorded are always yours. A question with no
+  suggestions is just a card with a box, which is the ordinary case.
+- **Edit an answer** — press **Edit** and the box comes back pre-filled. Saving records a
+  second answer rather than overwriting the first, so how your thinking changed is
+  itself part of the log.
+
+One row is a **round, not a tree depth**, and the difference is load-bearing: an agent
+usually asks its second batch of questions as further children of the same parent, so by
+depth both batches would collapse into one row and the map would stop showing that the
+conversation had two turns. The rounds are read off the exchange log instead — nodes
+written together share a contiguous run of revisions. A map with no log at all (an older
+map, or a seeded scenario) falls back to grouping by depth rather than refusing to draw.
+
+The tree is still there in the data. `parentId` and `order` are untouched and no agent
+had to change what it sends; only the drawing changed.
+
 ### Driving it without an agent
 
 WebMCP binds only in a top-level secure page in a browser with an agent (Chrome 146+),
@@ -77,13 +129,18 @@ three run the same tool catalog (`app/lib/toolCatalog.ts` declares the tools;
 `app/lib/toolRuntime.ts` implements them once), so no door can drift from the others.
 
 The shared tools are `read_map`, `add_nodes`, `update_node`, `set_phase`, `post_note`,
-`ask_user`, and `await_user_activity`. `list_thinking_maps` and `create_thinking_map`
-are server-door-only — a page is already on one map.
+`ask_user`, and `await_user_activity`. `list_thinking_maps`, `create_thinking_map` and
+`await_new_map` are server-door-only — a page is already on one map, so none of the
+three has anything to offer it.
 
 **In the page (WebMCP).** The agent lives in the browser and the page publishes its
 tools to it. This needs Chrome 146+ (`navigator.modelContext`), HTTPS or localhost, and
 the top-level frame — WebMCP is unavailable inside an iframe, deliberately. When any of
 that is missing the page says so rather than pretending to be connected.
+
+The page is designed to sit beside the agent that drives it — most often as half a
+screen next to ChatGPT, rather than filling a monitor on its own. The chrome is built
+to hold from about 640px wide upward, and degrades rather than reflows below that.
 
 **Over HTTP** — `POST /api/mcp` (streamable HTTP; send
 `Accept: application/json, text/event-stream`).
@@ -123,16 +180,37 @@ Three habits follow from that, and the tools are shaped to make them easy:
   carrying the same value returns the original revision instead of writing twice.
 - **Wait with `await_user_activity`,** not a polling loop. It blocks until the person
   actually does something.
+- **Park on `await_new_map` when you have no map yet.** Same idiom one level up: it
+  blocks until somebody starts a map anywhere, then hands you each new one with its seed
+  idea and whether it came from a brief. A page still cannot wake you — but if you are
+  already waiting at the server door when someone submits an idea, the map is picked up
+  the moment it exists rather than sitting there.
 
 Two more things worth knowing:
 
 - **Conflicts come back as results, not errors.** Pass `expectedRevision` to
   `update_node`; if the person changed that node since you read it, the write is declined
   and both versions are described back to you. Nothing is overwritten.
-- **Every wait is bounded and resumable.** `ask_user` and `await_user_activity` take a
-  timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
+- **Every wait is bounded and resumable.** `ask_user`, `await_user_activity` and
+  `await_new_map` take a timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
   nothing: the question stays on the map and the answer lands in the log for your next
   read.
+- **The page advances its own phase, and says so on the log.** When a round's questions
+  are all answered and nothing more arrives, the map offers the one action that ends the
+  phase — "Ready to research", and so on. Pressing it posts a `user.note` naming the
+  transition and *then* calls `set_phase`, so a phase that moved is something you read
+  rather than something you infer from a value that changed under you. The person is no
+  longer required to go and prod you in the other window to make the loop advance.
+- **The pending row is a statement about the log, not about you.** Once a round is
+  answered the page immediately draws the next row as shimmering placeholders — but since
+  it cannot start your turn, that shimmer is bounded. After about twenty seconds it
+  resolves into whichever of three sentences is actually true: an agent is working and has
+  what was added, an agent is attached but not in a turn, or nothing can reach the page and
+  what was added is simply on the log. A row that shimmered indefinitely would be claiming
+  you were writing, which is exactly the claim this contract says a page can never make.
+  (The sentences say "what you have added" rather than "your answers" on purpose: the same
+  row appears on a day-one map that has a seed idea and no answers at all, and naming
+  answers there would name something that does not exist.)
 
 ### Driving the tools without a browser agent
 
@@ -221,35 +299,35 @@ codeyam-editor start
 
 States captured as runnable scenarios with codeyam-editor:
 
+### A brief, and nobody has picked it up yet
+
+<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png" alt="A brief, and nobody has picked it up yet" width="280">
+
+### A plan with a gap - one slice proves nothing
+
+<img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
+
+### An older question, three rounds up, still open
+
+<img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
+
 ### Complete - what to do next
 
 <img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
 
+### Brief attached, nothing cited yet
+
+<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
+
+### Brief fully accounted for
+
+<img src=".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png" alt="Brief fully accounted for" width="280">
+
 ### Conflict declined - the person rewording survived
 
-<img src=".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--desktop.png" alt="Conflict declined - the person rewording survived" width="280">
+<img src=".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png" alt="Conflict declined - the person rewording survived" width="280">
 
 ### Day one - nothing yet
 
-<img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--desktop.png" alt="Day one - nothing yet" width="280">
-
-### Grounded - research and its gaps
-
-<img src=".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--desktop.png" alt="Grounded - research and its gaps" width="280">
-
-### Just started
-
-<img src=".codeyam/scenarios/screenshots/just-started--desktop.png" alt="Just started" width="280">
-
-### Many saved maps
-
-<img src=".codeyam/scenarios/screenshots/many-saved-maps--desktop.png" alt="Many saved maps" width="280">
-
-### Mid-exchange - agent and human on one map
-
-<img src=".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--desktop.png" alt="Mid-exchange - agent and human on one map" width="280">
-
-### One saved map
-
-<img src=".codeyam/scenarios/screenshots/one-saved-map--desktop.png" alt="One saved map" width="280">
+<img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png" alt="Day one - nothing yet" width="280">
 <!-- codeyam:scenario-gallery:end -->

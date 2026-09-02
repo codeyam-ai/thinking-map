@@ -1,0 +1,12 @@
+{
+  "name": "PhaseNav - NarrowScrolled",
+  "id": "a69e369a-8885-414e-9530-701d263a9830",
+  "url": "/isolated-components/PhaseNav?s=NarrowScrolled",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseNav",
+  "scenarioType": "component",
+  "description": "Scrolled to the middle of an overflowing track, which is the one state where both fades are correct: phases are cut off in both directions and each edge says so. None of the full-width scenarios can show this, because at Tablet the track fits."
+}

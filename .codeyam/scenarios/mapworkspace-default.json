@@ -1,12 +1,12 @@
 {
-  "name": "MapWorkspace - Default",
-  "id": "3da8fed2-9060-4d6d-a620-b012003ac823",
-  "url": "/isolated-components/MapWorkspace?s=Default",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "MapWorkspace",
-  "scenarioType": "component",
-  "description": "Both panels side by side - the conversation and the map as two views of the same thinking."
+ "name": "MapWorkspace - Default",
+ "id": "50c1109d-7f6c-4ec0-bb89-1f512e5500f6",
+ "url": "/isolated-components/MapWorkspace?s=Default",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "MapWorkspace",
+ "scenarioType": "component",
+ "description": "The working view as one column: the map with its rounds, and beneath it the two things that are not questions, both folded shut. There is no second panel \u2014 a question is answered on its own card, so the column of questions that used to sit beside the map has nothing left to hold."
 }

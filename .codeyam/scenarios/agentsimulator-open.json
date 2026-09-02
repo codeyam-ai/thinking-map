@@ -1,18 +1,12 @@
 {
   "name": "AgentSimulator - Open",
-  "id": "ce15abea-6966-403d-9942-ddf9bb0d1b70",
+  "id": "bb57a446-bcf6-4646-ac3e-35ec014c513d",
   "url": "/isolated-components/AgentSimulator?s=Default",
   "dimensions": [
-    "Desktop"
+    "Tablet"
   ],
   "mocks": {},
   "componentName": "AgentSimulator",
   "scenarioType": "component",
-  "description": "The dev panel open: the demo-sequence button, the by-hand tool runner, and the call log. It drives the same bound catalog a real agent calls, which is how the exchange is demonstrated where no agent can attach.",
-  "interactions": [
-    {
-      "action": "click",
-      "text": "Agent panel"
-    }
-  ]
+  "description": "The dev panel open: the demo-sequence button, the by-hand tool runner, and the call log. It drives the same bound catalog a real agent calls, which is how the exchange is demonstrated where no agent can attach - and is also why the demo button now reads the map before it writes, refusing to replay its fixture nodes over a map that already holds real work. The tool runner beside it is unguarded on purpose: a person typing one tool name has said what they want."
 }

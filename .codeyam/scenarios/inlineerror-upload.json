@@ -1,0 +1,12 @@
+{
+  "name": "InlineError - Upload",
+  "id": "c99d3adf-6ed6-48f8-b975-fda78c1f483a",
+  "url": "/isolated-components/InlineError?s=Upload",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InlineError",
+  "scenarioType": "component",
+  "description": "The upload half, where the route stated its own sentence and named the file, so the fallback was never needed and there is no command that would help."
+}

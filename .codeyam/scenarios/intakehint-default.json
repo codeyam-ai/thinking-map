@@ -1,0 +1,12 @@
+{
+  "name": "IntakeHint - Default",
+  "id": "13fad94b-1606-4513-bcd5-3ddc1629f84a",
+  "url": "/isolated-components/IntakeHint?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "IntakeHint",
+  "scenarioType": "component",
+  "description": "At rest: what can be dropped on the input, stated once and quietly. One muted line where a three-line dashed panel used to advertise the same thing."
+}

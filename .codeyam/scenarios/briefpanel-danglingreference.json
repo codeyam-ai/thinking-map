@@ -1,0 +1,12 @@
+{
+  "name": "BriefPanel - DanglingReference",
+  "id": "0e0bc0b7-fb0e-4564-8d99-b83e00a9d234",
+  "url": "/isolated-components/BriefPanel?s=DanglingReference",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BriefPanel",
+  "scenarioType": "component",
+  "description": "A node citing a section the brief does not have, reported under the list rather than silently dropped. A dropped citation would let the accounted-for count quietly overstate itself, which is the one failure this panel exists to prevent."
+}

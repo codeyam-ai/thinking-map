@@ -1,12 +1,12 @@
 {
-  "name": "ThinkingMapView - Seeded",
-  "id": "0f6c266f-34b1-4c1f-8b2f-501b92bfca8f",
-  "url": "/isolated-components/ThinkingMapView?s=Seeded",
-  "dimensions": [
-    "Desktop"
-  ],
-  "mocks": {},
-  "componentName": "ThinkingMapView",
-  "scenarioType": "component",
-  "description": "One idea and the three questions the partner asked, all dashed."
+ "name": "ThinkingMapView - Seeded",
+ "id": "14512d0d-1bcd-4320-9f5d-8349f5eead98",
+ "url": "/isolated-components/ThinkingMapView?s=Seeded",
+ "dimensions": [
+  "Tablet"
+ ],
+ "mocks": {},
+ "componentName": "ThinkingMapView",
+ "scenarioType": "component",
+ "description": "One idea and the three questions the partner asked, none answered. No event log at all, so the rounds come from the depth fallback \u2014 which is exactly what an older map, or a seeded scenario, renders as."
 }

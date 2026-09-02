@@ -1,0 +1,12 @@
+{
+  "name": "PhaseAdvance - EndOfResearch",
+  "id": "492ecece-368a-419c-8802-26162649fb18",
+  "url": "/isolated-components/PhaseAdvance?s=EndOfResearch",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseAdvance",
+  "scenarioType": "component",
+  "description": "The end of 03 Research: enough on the map now to pick a direction and weigh it against the others."
+}
