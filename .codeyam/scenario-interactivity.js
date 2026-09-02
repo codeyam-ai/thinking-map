@@ -1,5 +1,5 @@
 // codeyam-generated — DO NOT EDIT.
-// codeyam-editor: 0.1.7  build: 407033bd6731c87a0f16f396f2fb0241a14b4c84  source-sha256: aad4d5797d0e88c1569a23d54a722536e368908d2127e0bb7cbe4d4d99120615
+// codeyam-editor: 0.1.7  build: 93463d02c2106dade496718a19a6711c3c626c9a  source-sha256: db17e0e042d05ebcc4c4e11fd55447876e7bad7aa6121dcb70ec6c42f6b9e62b
 const fs = require("fs");
 const path = require("path");
 const { createIssue } = require("./scenario-issues");
@@ -35,7 +35,41 @@ const KNOWN_FRAMEWORKS = ["react", "vue"];
 // the hydration message's "are we under the prefix?" test — and they must never
 // disagree about the spelling, since a message that fails to recognise the
 // mount is exactly the misdiagnosis this constant supports fixing.
+//
+// Agreeing on the spelling is necessary and NOT sufficient: the consumers must
+// also agree on the TEST. Both gates once asked `url.includes(PREVIEW_SUBPATH)`,
+// which is a scan of the whole URL rather than of the route, and that is what
+// `isUnderPreviewSubpath` below exists to replace.
 const PREVIEW_SUBPATH = "/__codeyam_preview";
+
+// Is this URL under the preview mount? Judged on the PATHNAME, never as a
+// substring of the whole URL.
+//
+// A substring scan finds the mount wherever it appears — including
+// percent-encoded inside a query parameter — and that silently disabled this
+// entire escalation path for every isolated-component capture. Those load
+// through the iframe harness, whose document URL is
+// `/__codeyam_harness?src=…%2F__codeyam_preview%2F…`: the literal prefix is
+// absent, so both gates below answered "no" and the answer was decided by
+// encoding rather than by the route. Testing the pathname makes the harness
+// document correctly not-under-the-mount and the decoded preview URL correctly
+// under it, in both directions.
+//
+// Fails CLOSED on a non-string, empty, or unparseable (e.g. relative) URL: this
+// runs inside a capture whose finding is already recorded, so it must never
+// throw.
+function isUnderPreviewSubpath(url) {
+  if (typeof url !== "string" || !url) return false;
+  let pathname;
+  try {
+    pathname = new URL(url).pathname;
+  } catch (_) {
+    return false;
+  }
+  return (
+    pathname === PREVIEW_SUBPATH || pathname.startsWith(`${PREVIEW_SUBPATH}/`)
+  );
+}
 
 // Meta-frameworks mapped to the underlying runtime whose hydration detector
 // applies. These do not carry their runtime's name in their stack identity: a
@@ -456,7 +490,7 @@ function hydrationMessage({
   // the generic "check the browser console" steer below sent a real session
   // hunting a module error on a page whose client JS was executing perfectly,
   // and which hydrated on the first try at the app's own origin.
-  if (typeof url === "string" && url.includes(PREVIEW_SUBPATH)) {
+  if (isUnderPreviewSubpath(url)) {
     return (
       `${rendered} — the page is not interactive (hydration did not run), and it was ` +
       `loaded under the \`${PREVIEW_SUBPATH}\` preview mount. That prefix is the prime ` +
@@ -495,7 +529,7 @@ function hydrationMessage({
 // Pure, so every branch is asserted without a browser or a server.
 function subpathHydrationEscalation({ crossOrigin, url, counterpartUrl }) {
   if (crossOrigin !== "counterpart-hydrates") return null;
-  if (typeof url !== "string" || !url.includes(PREVIEW_SUBPATH)) return null;
+  if (!isUnderPreviewSubpath(url)) return null;
   return { failedUrl: url, counterpartUrl: counterpartUrl ?? null };
 }
 
@@ -780,6 +814,7 @@ async function waitForHydration(
 module.exports = {
   KNOWN_FRAMEWORKS,
   PREVIEW_SUBPATH,
+  isUnderPreviewSubpath,
   subpathHydrationEscalation,
   readStackJson,
   inferFramework,

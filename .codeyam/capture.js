@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // codeyam-generated — DO NOT EDIT.
-// codeyam-editor: 0.1.7  build: 407033bd6731c87a0f16f396f2fb0241a14b4c84  source-sha256: 084034fd44d8dc85a977553c6130bf0792b3979c01d5c30a74c0a338cfe278fd
+// codeyam-editor: 0.1.7  build: 93463d02c2106dade496718a19a6711c3c626c9a  source-sha256: d1c7caa069d4ffe4246f50a21f2f909b9d1227914580c2c0281bdcbeeb1de922
 
 // Render environment (colorScheme, deviceScaleFactor, userAgent, locale,
 // timezoneId, reduceMotion, forcedColors) is read from config when present
@@ -305,6 +305,30 @@ const {
   waitForHydration,
 } = require("./scenario-interactivity");
 
+// The content frame's own URL, or `null` when it cannot answer.
+//
+// `frame.url()` is the only correct source for the URL a hydration verdict is
+// ABOUT. `page.url()` is the top-level document, which under the iframe harness
+// is the wrapper — carrying the real route only percent-encoded inside its
+// `?src=` parameter. `loadScenarioTopLevel` / `loadScenarioInIframe` both
+// document the returned frame as uniformly usable, and its URL is right in every
+// load shape: a top-level navigation (redirects followed, which is why
+// `page.url()` was preferred originally), the harness iframe, the degraded
+// `setContent` harness whose ancestor is `about:blank`, and a frame re-pointed
+// by a `navigate` step — where a decoded `?src=` would be stale.
+//
+// A frame detached by a navigation mid-capture throws or returns `""`, and a
+// reporting detail must never cost the capture, so every caller falls back to
+// exactly the behavior that shipped before this existed.
+function safeFrameUrl(frame) {
+  try {
+    const value = frame && frame.url();
+    return typeof value === "string" && value ? value : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 // Resolve where the subpath-hydration verdict is POSTed and what headers carry
 // it, or `null` when there is no reachable control port to report to. Pure.
 //
@@ -368,6 +392,40 @@ async function reportSubpathHydrationFailure(
   } catch (_) {
     return false;
   }
+}
+
+// Decide-and-report the subpath-hydration escalation for one hydration verdict.
+//
+// Two call sites now run this exact sequence — the top-level wait in
+// `runScenarioCheck` and the per-`navigate` wait in `runFlowSteps` — and both
+// must read the verdict the same way, since a difference between them would be
+// a route that escalates at the top level and silently does not one navigation
+// deep. Hoisted once the second call site made the duplication real.
+//
+// Returns the escalation payload (or `null`) rather than a boolean, so the
+// decision is assertable without a control port or a browser; `reportSubpath
+// HydrationFailure` is already fail-soft on every leg, so a reporting failure
+// costs the escalation and never the capture.
+//
+// Deliberately does NOT touch the caller's issue list: whether the finding is
+// reported as an issue is the CALLER's concern and the two sites differ on it.
+//
+// `report` is injectable for the same reason `reportSubpathHydrationFailure`
+// takes its own readers: the real one POSTs to the live control port, which a
+// unit test must never do.
+async function escalateSubpathHydration(
+  hydration,
+  { report = reportSubpathHydrationFailure } = {},
+) {
+  const escalation = subpathHydrationEscalation({
+    crossOrigin: hydration.crossOrigin,
+    url: hydration.issue && hydration.issue.url,
+    counterpartUrl: hydration.counterpartUrl,
+  });
+  if (escalation) {
+    await report(escalation);
+  }
+  return escalation;
 }
 
 // Read project-specific loading markers from `.codeyam/stack.json`
@@ -1217,6 +1275,7 @@ async function runFlowSteps(page, initialFrame, steps, ctx) {
     harnessOrigin,
     hydrationTimeoutMs = 10000,
     settleMs,
+    probeCounterpart,
   } = ctx;
   // Honor a caller-supplied `settleMs` for the in-flow stability windows,
   // falling back to today's hardcoded defaults (5s for interaction steps, 10s
@@ -1249,10 +1308,24 @@ async function runFlowSteps(page, initialFrame, steps, ctx) {
           // fill/click, or the interaction lands on inert SSR markup (the same
           // bug the top-level wait fixes, one route deeper). Bounded and
           // stack-gated exactly like the top-level wait.
-          await waitForHydration(frame, {
-            url: target,
+          const navHydration = await waitForHydration(frame, {
+            // `target` is only where we aimed; the frame's own URL is where we
+            // landed, so a redirect during the step is followed. Falls back to
+            // `target` when a detached frame cannot answer.
+            url: safeFrameUrl(frame) || target,
             timeoutMs: hydrationTimeoutMs,
+            probeCounterpart,
           });
+          // The mount that breaks a top-level load breaks it here too, and
+          // before this a route that died one navigation deep got no
+          // attribution at all. Report it so the editor can escalate the
+          // preview off the subpath for the rest of the session.
+          //
+          // The returned issue is deliberately NOT pushed: this wait exists to
+          // gate the next interaction, and adding an issue here would give a
+          // flow that passes today a new way to fail. Computing a verdict and
+          // not raising it reads as a bug otherwise — it is the point.
+          await escalateSubpathHydration(navHydration);
           break;
         }
         case "click":
@@ -1707,8 +1780,18 @@ async function runScenarioCheck(
     // attaching. Stack-gated and fail-safe: a timed-out wait yields
     // `hydrated: false` (so a truly dead page still classifies `unhydrated`),
     // and a non-interactive stack returns instantly.
+    // The hydration verdict is about the CONTENT document, and under the iframe
+    // harness `page.url()` is the harness — with the preview mount present only
+    // percent-encoded, so every `/__codeyam_preview` test on it is false and the
+    // whole escalation path silently never fires. `frame` is the content frame
+    // in every load shape, so its own URL is the one both the message and the
+    // counterpart probe must see.
+    const contentUrl = safeFrameUrl(frame) || page.url() || url;
+    // Built once and shared with `runFlowSteps` below, so a route that dies one
+    // navigation deep gets the same two-origin experiment this wait runs.
+    const probeCounterpart = buildCounterpartProbe(page);
     const hydration = await waitForHydration(frame, {
-      url: page.url() || url,
+      url: contentUrl,
       timeoutMs: hydrationTimeoutMs,
       // `undefined` in production → waitForHydration reads .codeyam/stack.json;
       // a test injects a stack to force the interactive path without a real file.
@@ -1716,7 +1799,7 @@ async function runScenarioCheck(
       // Fires ONLY on a proven-dead verdict, so a healthy capture pays nothing.
       // Answers "is it my page or is it this origin?" before the failure is
       // reported, instead of leaving every session to establish it by hand.
-      probeCounterpart: buildCounterpartProbe(page),
+      probeCounterpart,
     });
     if (hydration.issue) {
       pushIssue(issues, hydration.issue);
@@ -1728,14 +1811,7 @@ async function runScenarioCheck(
     // origin that works. Gated on the exact shape (see
     // `subpathHydrationEscalation`); every other verdict, including
     // `dead-on-both`, reports nothing and the hydration veto stands.
-    const escalation = subpathHydrationEscalation({
-      crossOrigin: hydration.crossOrigin,
-      url: hydration.issue && hydration.issue.url,
-      counterpartUrl: hydration.counterpartUrl,
-    });
-    if (escalation) {
-      await reportSubpathHydrationFailure(escalation);
-    }
+    await escalateSubpathHydration(hydration);
 
     // Assert the injected seed actually landed in the capture browser, at rest
     // and BEFORE any interaction can legitimately mutate storage. A non-empty
@@ -1765,6 +1841,7 @@ async function runScenarioCheck(
         warnings: interactionWarnings,
         hydrationTimeoutMs,
         settleMs: config.settleMs,
+        probeCounterpart,
       });
     } else if (config.interaction) {
       // Record fingerprint before interaction
@@ -1965,6 +2042,8 @@ module.exports = {
   readSessionToken,
   subpathHydrationReportTarget,
   reportSubpathHydrationFailure,
+  escalateSubpathHydration,
+  safeFrameUrl,
   captureAuthSkewDetected,
   SESSION_COOKIE,
   isCrossOriginRequest,
