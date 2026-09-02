@@ -1,0 +1,967 @@
+{
+  "timestamp": "2026-09-02T23:04:00Z",
+  "title": "The Conversation Gets Out of the Way",
+  "type": "feature",
+  "userRequest": "## Summary\n\nEverything the board puts on screen piles up along its bottom edge and covers\nthe map it is about. The conversation panel is 720px wide, centred, and grows a\ntall stack of identical lime bubbles; the zoom controls sit in the opposite\nbottom corner it is about to move into; and an answer to a specific card looks\nexactly like a general remark, so the transcript reads as one undifferentiated\ncolumn. Move the conversation to a small panel in the bottom-right that can be\ncollapsed and closed, move the zoom controls to the bottom-left so the two stop\ncompeting, and colour each answer with the card it answered — which is also\nwhat finally makes \"answering a card\" and \"saying something general\" look like\nthe two different things they already are.\n\n![The answer stack covering the board](assets/the-conversation-gets-out-of-the-way/answer-stack.png)\n\n![Zoom controls and the conversation both at the bottom](assets/the-conversation-gets-out-of-the-way/board-chrome.png)\n\n## What already exists — do not rebuild it\n\n- **The general chat is already there and already general.** `BoardChat`'s\n  input calls `onSay` in `app/components/BoardWorkspace.tsx`, which contributes\n  a `user.note` — its own comment reads *\"A note, like a choice: nothing on the\n  map is being closed. This is the slot for everything the partner did not\n  think to ask about.\"* `BoardChat`'s header comment says the same: what you\n  type \"applies to all of it rather than to whichever card is nearest.\" The\n  capability is complete. What is missing is that nothing on screen SAYS so —\n  the placeholder is a sentence, not a label. This plan adds the affordance,\n  not the feature.\n- **Collapsing is already there.** `BoardChat` holds an `open` state and a\n  chevron that toggles the transcript. What is missing is closing it outright\n  and getting it back, and having that survive a re-render.\n- **One place already decides what a theme looks like.** `themeColor(hue, …)`\n  in `app/lib/themeHue.ts` exists precisely \"so a card, its connector and its\n  cluster label cannot drift apart\". A bubble is the fourth thing that must not\n  drift, and it should call the same function rather than grow its own palette.\n\n## Key Decisions\n\n- **An answer is coloured by the card it answered; a general note is not.**\n  This is the whole rule, and it does double duty. `user.answer` payloads carry\n  `answers: [{ id, text, answer }]` where `id` is the node id, so the bubble can\n  be traced to its node, to its theme, to its hue. `user.note` has no node —\n  correctly, because it is about the whole map — so it stays neutral. The\n  colour is therefore not decoration: it is the visible difference between\n  answering something specific and saying something general, which is exactly\n  the distinction this plan was asked to make legible.\n\n- **Colour comes from `themeColor`, never a new hex.** The bubbles currently\n  hardcode `#e4ec4b` inline — not even the `--lime` token. Replacing one\n  hardcoded hex with several would be the same mistake at greater cost.\n  `themeColor(hue, lightness, saturation)` already has the lightness/saturation\n  seam this needs to keep dark-panel text readable.\n\n- **A node whose theme cannot be resolved falls back to neutral, silently.** An\n  answer to a node since deleted, or one on a map with no themes, must render\n  as an ordinary bubble rather than as an error or a default colour that lies\n  about which theme it belongs to.\n\n- **Bottom-right for the conversation, bottom-left for zoom.** They are moving\n  for one reason — they were about to be in the same corner — which is why this\n  is one plan rather than two. The zoom controls are already marked `data-no-pan`\n  and positioned against the viewport rather than the board plane; only the side\n  changes.\n\n- **Three states, not two: open, collapsed, closed.** Collapsed keeps the input\n  row with the transcript hidden — what the chevron does today. Closed leaves\n  only a small reopen affordance, so the board is genuinely uncovered. The\n  input row is what \"the chat is always here\" means, so closed must still be one\n  click from typing.\n\n- **The beige frame is an invariant this plan must not break, not a bug it\n  fixes.** `MapScreen`'s `main` is `h-screen … px-10 py-8` on the paper\n  background, and `BoardWorkspace`'s root is\n  `overflow-hidden rounded-[26px] border border-white/10`. Together those\n  already guarantee that the board's zoom transform is clipped inside the black\n  and the beige border survives — the plane is transformed inside a clipping\n  parent, so it cannot escape. No frame-escape was reproducible while planning.\n  It is written here as a constraint and given its own scenario so that moving\n  the chrome cannot quietly break it.\n\n- **The remaining lime in this panel is out of scope pending a separate\n  decision.** The send button and the \"Next round\" control are lime, and a\n  broader \"lose the lime for black\" direction is open. Answer bubbles are\n  settled here because they become theme-coloured either way; the rest of the\n  panel's palette should not be churned twice.\n\n## Implementation\n\n### 1. Give an answer its card's colour\n\n**File**: `app/components/BoardChat.tsx`\n\n`line()` currently reduces every event to `{ who, text }`, discarding the node\nids in a `user.answer` payload. Widen its return with an optional node id, and\nlet the component resolve id → node → `themeId` → hue → `themeColor(...)`.\nReplace the inline `background: '#e4ec4b'` with that colour, keeping the\nneutral treatment for `who === 'partner'` and for any `you` line with no\nresolvable node.\n\n`BoardChat` does not currently receive the nodes. Pass them from\n`BoardWorkspace`, which already holds `themes` and `nodes` — a lookup map built\nonce, not a per-bubble scan.\n\nNote for execution: a `user.answer` can carry several answers and is currently\njoined into ONE bubble with ` · `. Answers to different cards would then want\ntwo colours in one bubble. Splitting one event into one bubble per answer is\nthe cleaner result and changes what the transcript looks like — confirm against\nthe capture before committing to it.\n\n### 2. Shrink it and move it to the corner\n\n**File**: `app/components/BoardChat.tsx`\n\nThe root is `absolute bottom-6 left-1/2 z-30 w-[min(720px,90%)] -translate-x-1/2`.\nMove it to the bottom-right and make it substantially narrower — the transcript\nis short bubbles, not prose, and its job is to stay out of the way. Keep\n`data-no-pan`, keep the `pointer-events-auto`, and keep the scroller pinned to\nthe newest line.\n\nThe bubbles are `justify-end` for you and `justify-start` for the partner\ninside a 720px panel. In a narrow panel that distinction has much less room —\ncheck that a partner line still reads as theirs, since the colour rule now\ncarries meaning the alignment used to carry alone.\n\n### 3. Let it be closed, and say what it is\n\n**File**: `app/components/BoardChat.tsx`\n\nAdd a closed state beside the existing `open`, with a reopen affordance that\nsurvives closing. Label the input as the general channel — a short \"Chat\" (or\nsimilar) heading on the input row — so the thing the code already documents as\n\"everything the partner did not think to ask about\" says so on screen. Keep the\nplaceholder; the label answers a different question than the placeholder does.\n\n### 4. Move the zoom controls\n\n**File**: `app/components/GalaxyBoard.tsx`\n\nThe `+` / `−` / `All` stack is `absolute bottom-6 right-6 flex flex-col gap-2`.\nMove it to the bottom-left. Nothing else about it changes — it stays fixed to\nthe viewport rather than the board plane, and keeps `data-no-pan` so dragging\non it does not pan the board.\n\n### 5. Hold the frame\n\n**File**: `app/components/BoardWorkspace.tsx`\n\nNo change expected — the root's `overflow-hidden rounded-[26px]` is what keeps\nthe zoomed plane inside the black and the beige border intact. It is listed\nhere so the constraint is checked rather than assumed: after the moves above,\nconfirm the board still clips at the rounded edge at both extremes of zoom and\nthat `MapScreen`'s `px-10 py-8` paper margin is unbroken.\n\n## Reused existing code\n\n- `themeColor` and `hueForIndex` from `app/lib/themeHue.ts` (glossary entry:\n  `themeColor`) — the single source of a theme's appearance.\n- `BoardChat` from `app/components/BoardChat.tsx` (glossary entry: `BoardChat`)\n  — its `line()` reducer, its `open` state, its scroll-pinning effect and its\n  `data-no-pan` are all kept.\n- `BoardWorkspace` from `app/components/BoardWorkspace.tsx` — already holds\n  `themes` and `nodes` and already owns `onSay`; it gains no new state.\n- `GalaxyBoard` from `app/components/GalaxyBoard.tsx` (glossary entry:\n  `GalaxyBoard`) — only the control stack's corner changes.\n- `MapScreen` from `app/components/MapScreen.tsx` — the paper margin that makes\n  the beige frame; unchanged and asserted.\n- `ExchangeEvent` from `app/lib/exchange.ts` — the answer-kind and note-kind\n  payload shapes the colour rule keys off.\n- `RoundControl` from `app/components/RoundControl.tsx` — rides in `trailing`\n  and must keep fitting once the panel is narrower.\n\n**Existing-implementation survey.** The general-chat channel, the collapse\ntoggle, and the theme-colour helper all exist and are reused rather than\nrebuilt — see the section above. What does not exist: any link from a bubble\nback to the node it answered, any closed state, any label on the input, and any\npersistence of the panel's open/closed state.\n\n## Scenarios to Demonstrate\n\n- A transcript mixing answers to three differently-themed cards with a general\n  note — three hues and one neutral bubble, which is the whole rule in one\n  picture.\n- The same transcript collapsed: input row only, board visible.\n- Closed: the board uncovered, with the reopen affordance the only thing left.\n- An answer to a card whose theme is gone — neutral, not broken.\n- A long answer in the narrow panel, wrapping rather than overflowing.\n- The board at maximum zoom with the beige frame intact — the invariant, made\n  visible.\n- The bottom-left zoom stack and the bottom-right conversation on one screen,\n  not touching.\n- A narrow viewport, where the panel and the zoom controls have the least room\n  to coexist.",
+  "description": "The conversation moved from a 720px panel across the middle of the board into a 360px panel in its bottom-right that collapses to its input row and closes to a single pill, and the zoom controls moved to the bottom-left so the two stop competing for one corner. The substantive change is colour: an answer bubble now wears the theme colour of the card it answered, resolved through the existing themeColor helper rather than a new hex, while a general note stays neutral — which is what finally makes 'answering a card' and 'saying something general' look like the two different things they already were. One user.answer event closing several cards used to be joined into a single lime bubble with a middot; it now splits into one bubble per answer, because three subjects cannot share one background. An answer whose node cannot be resolved falls back to neutral silently, so a deleted card costs its colour rather than the transcript.\n\nExtracted chatLines and hueByNodeId (app/lib/chatLines.ts, 16 tests) plus BoardChatBubble, BoardChatTranscript, BoardChatHeader, BoardChatComposer, BoardChatPill and BoardZoomControls, leaving BoardChat as state plus composition. 59 tests passing, audit clean, 20 new scenarios.\n\nSCOPE VERDICT: this cycle delivered its full plan and deferred none of it. The project's deliverables were all already resolved before it began — 9 delivered, 1 deferred by the user (an assist-track item about registering the MCP server in a client, outside this build flow). No agent-decided deferrals were added.\n\nTwo findings surfaced at the approval gate rather than acted on. First, the panel is labelled CHAT while the README states 'There is no chat in this app' — the user reviewed the contradiction and chose to keep CHAT, since the codebase has always called this component BoardChat and described it as the conversation. Second, at mobile width the panel covers the board and the bottom-left zoom controls, so the two do not coexist there; that was deliberately NOT registered as a scenario, because every one of the project's other scenarios is Tablet or Desktop and registering it would assert a supported mobile state that looks like this. It is out of this plan's scope and left as a known limitation.\n\nOne execution decision beyond the plan text: the round control moved to its own row inside the panel. At 360px, 'Next round' and a text field cannot share a line without one of them becoming unusable.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/the-conversation-gets-out-of-the-way/answer-stack.png\t.codeyam/plans/completed/assets/the-conversation-gets-out-of-the-way/answer-stack.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/the-conversation-gets-out-of-the-way/board-chrome.png\t.codeyam/plans/completed/assets/the-conversation-gets-out-of-the-way/board-chrome.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/the-conversation-gets-out-of-the-way.md\t.codeyam/plans/completed/the-conversation-gets-out-of-the-way.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchat-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/boardworkspace-working.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/the-round-is-answered-and-the-map-reaches-on.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/19a3651bde0b4875adaea4a77962f1037ab0158a49cb6d506527646410ff44e0.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/95746d110335980b07f105ce8daa473ec0673bcfcaf8b18fe96c6f9d05e636c4.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardChat.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardChat.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChat/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchat-deletedtheme.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchat-longanswer.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchat-threethemes.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-deletedtheme.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-generalnote.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-longanswer.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-partner.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-secondtheme.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatbubble-thirdtheme.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatcomposer-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatheader-collapsed.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatheader-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchatpill-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchattranscript-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchattranscript-deletedtheme.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchattranscript-longanswer.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchattranscript-nothemesyet.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardchattranscript-overflowing.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardzoomcontrols-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-deletedtheme--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-deletedtheme--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-generalnote--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-generalnote--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-longanswer--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-longanswer--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-partner--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-partner--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-secondtheme--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-secondtheme--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-thirdtheme--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatbubble-thirdtheme--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatcomposer-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatcomposer-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatheader-collapsed--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatheader-collapsed--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatheader-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatheader-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatpill-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchatpill-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-deletedtheme--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-deletedtheme--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-longanswer--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-longanswer--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-nothemesyet--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-nothemesyet--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-overflowing--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-overflowing--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardzoomcontrols-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardzoomcontrols-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/798a16201e76734d8ae2ee89dd3d5a80743ee85cc46c62ca5087b0d54c9f1af8.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e0fecd92ad8db2db1214e58a83c2f774b0654564c56194e6acbebe4890f030e5.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardChatBubble.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardChatBubble.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardChatComposer.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardChatHeader.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardChatPill.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardChatTranscript.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardZoomControls.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardZoomControls.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardChatBubble/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardChatComposer/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardChatHeader/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardChatPill/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardChatTranscript/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardZoomControls/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/chatLines.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/chatLines.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly",
+      "screenshotPath": "boardchat-boardvisibleonly--tablet.png"
+    },
+    {
+      "name": "BoardChat - Default",
+      "screenshotPath": "boardchat-default--tablet.png"
+    },
+    {
+      "name": "BoardChat - DeletedTheme",
+      "screenshotPath": "boardchat-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChat - Empty",
+      "screenshotPath": "boardchat-empty--tablet.png"
+    },
+    {
+      "name": "BoardChat - JustOpened",
+      "screenshotPath": "boardchat-justopened--tablet.png"
+    },
+    {
+      "name": "BoardChat - LongAnswer",
+      "screenshotPath": "boardchat-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChat - ThreeThemes",
+      "screenshotPath": "boardchat-threethemes--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - Default",
+      "screenshotPath": "boardchatbubble-default--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - DeletedTheme",
+      "screenshotPath": "boardchatbubble-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - GeneralNote",
+      "screenshotPath": "boardchatbubble-generalnote--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - LongAnswer",
+      "screenshotPath": "boardchatbubble-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - Partner",
+      "screenshotPath": "boardchatbubble-partner--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - SecondTheme",
+      "screenshotPath": "boardchatbubble-secondtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatBubble - ThirdTheme",
+      "screenshotPath": "boardchatbubble-thirdtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatComposer - Default",
+      "screenshotPath": "boardchatcomposer-default--tablet.png"
+    },
+    {
+      "name": "BoardChatHeader - Collapsed",
+      "screenshotPath": "boardchatheader-collapsed--tablet.png"
+    },
+    {
+      "name": "BoardChatHeader - Default",
+      "screenshotPath": "boardchatheader-default--tablet.png"
+    },
+    {
+      "name": "BoardChatPill - Default",
+      "screenshotPath": "boardchatpill-default--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Default",
+      "screenshotPath": "boardchattranscript-default--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - DeletedTheme",
+      "screenshotPath": "boardchattranscript-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - LongAnswer",
+      "screenshotPath": "boardchattranscript-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - NoThemesYet",
+      "screenshotPath": "boardchattranscript-nothemesyet--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Overflowing",
+      "screenshotPath": "boardchattranscript-overflowing--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BoardZoomControls - Default",
+      "screenshotPath": "boardzoomcontrols-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 59,
+    "passed": 59,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 59,
+        "passed": 59
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatPill - Default",
+  "id": "c97d2c2f-0076-43a3-8c1e-7247d2a5f37d",
+  "url": "/isolated-components/BoardChatPill?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatPill",
+  "scenarioType": "component",
+  "description": "All that is left once the conversation is closed. It has to be two things at once: small enough that the board is genuinely uncovered, and obviously still there — closing must not be a one-way door."
+}

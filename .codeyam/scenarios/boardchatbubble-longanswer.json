@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - LongAnswer",
+  "id": "e5d04a85-80df-42b9-86a7-6829c3ed7db8",
+  "url": "/isolated-components/BoardChatBubble?s=LongAnswer",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "A real answer with its reasoning attached — the length people actually write — wrapping inside the narrow panel rather than overflowing it."
+}

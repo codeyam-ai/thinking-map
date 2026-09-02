@@ -158,6 +158,8 @@ export default function BoardWorkspace({
       <BoardChat
         events={bridge.events}
         onSend={onSay}
+        themes={themes}
+        nodes={nodes}
         trailing={
           showRound ? (
             <RoundControl

@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatComposer - Default",
+  "id": "c7b4aaa5-ea17-4bcb-9876-e0e925d44145",
+  "url": "/isolated-components/BoardChatComposer?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatComposer",
+  "scenarioType": "component",
+  "description": "The input row: the thing that stays when the transcript is put away, because it is what makes the claim that the chat is always here. Send is disabled until there are words, so an empty turn cannot be posted."
+}

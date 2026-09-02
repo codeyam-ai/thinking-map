@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatTranscript - DeletedTheme",
+  "id": "b5f104ec-b16c-4d78-b974-a0dcfbcd2fb7",
+  "url": "/isolated-components/BoardChatTranscript?s=DeletedTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatTranscript",
+  "scenarioType": "component",
+  "description": "An answer whose card has gone, sitting above a general note and indistinguishable from it — correct, because with no theme left to name there is nothing to say about it."
+}

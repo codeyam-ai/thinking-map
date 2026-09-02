@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - ThirdTheme",
+  "id": "f706b2a4-6a5a-47a3-84a1-e89b56172482",
+  "url": "/isolated-components/BoardChatBubble?s=ThirdTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "The third hue, because two colours could be a coincidence of the palette and three is a sequence — the golden angle keeping them apart is what the bubbles inherit."
+}

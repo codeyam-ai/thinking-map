@@ -1,0 +1,12 @@
+{
+  "name": "BoardChat - LongAnswer",
+  "id": "3ad27167-11fa-4447-917f-a04f7a5ff755",
+  "url": "/isolated-components/BoardChat?s=LongAnswer",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "A long answer and a long reply in the narrow panel, in the corner they now occupy. This is the frame that shows the panel is out of the map's way without being too small to hold a real exchange."
+}

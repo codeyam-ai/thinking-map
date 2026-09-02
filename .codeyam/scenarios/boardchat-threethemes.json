@@ -1,0 +1,12 @@
+{
+  "name": "BoardChat - ThreeThemes",
+  "id": "55d57c3e-f432-4c09-bcb5-9d810bb79c7e",
+  "url": "/isolated-components/BoardChat?s=ThreeThemes",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "The whole panel doing the whole rule: one answer event closing three differently-themed cards splits into three coloured bubbles, with a general note neutral beneath them. The old reducer joined those three into one lime bubble with a middot, which asked a single background to be three colours."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - SecondTheme",
+  "id": "41cc1aea-20d5-4051-9754-6e6099bee5b0",
+  "url": "/isolated-components/BoardChatBubble?s=SecondTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "The same act against a different theme. Read beside Default this is the argument for the rule: same shape, same side of the panel, different subject."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardZoomControls - Default",
+  "id": "e105fed5-6c92-4a80-b9f8-4381d0effeaa",
+  "url": "/isolated-components/BoardZoomControls?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardZoomControls",
+  "scenarioType": "component",
+  "description": "The stack in the bottom-LEFT corner it moved to, so it and the conversation stop competing for one corner. All is the way back when someone has zoomed or dragged off the edge of their own map."
+}

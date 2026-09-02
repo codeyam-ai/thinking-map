@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatHeader - Collapsed",
+  "id": "4f34fc8e-7cd6-482e-bd3b-b6dbcffae9d8",
+  "url": "/isolated-components/BoardChatHeader?s=Collapsed",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatHeader",
+  "scenarioType": "component",
+  "description": "Collapsed: the same row with the chevron flipped. This is the collapsed state's whole visible difference — the transcript is gone and the input row below is not, which is what separates collapsing from closing."
+}

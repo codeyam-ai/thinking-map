@@ -199,12 +199,39 @@
       "runner": "tests"
     },
     {
+      "description": "Closing must not be a one-way door: nobody closes a thing they cannot get back, so the pill has to restore the conversation intact.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › brings the conversation back from closed",
+      "line": 318,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer wears the colour of the card it answered. The panel is what wires the log to the map: without the nodes and themes reaching it, every answer would render neutral and the rule would silently not exist.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › colours an answer with the theme of the card it answered",
+      "line": 215,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
       "description": "An empty send would post a blank turn into the transcript, which reads as the person having said nothing on purpose.",
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › does not send an empty message",
-      "line": 182,
+      "line": 202,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Collapsing hides the transcript and KEEPS the input row — that is what makes it different from closing. \"The chat is always here\" is a claim the input row makes, so collapsing must not withdraw it.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › hides the transcript but keeps the input when collapsed",
+      "line": 285,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {
@@ -212,7 +239,7 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › is present and usable with nothing said yet",
-      "line": 147,
+      "line": 167,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -221,8 +248,26 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › keeps the conversation when board events are mixed into the log",
-      "line": 127,
+      "line": 147,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Closing has to genuinely uncover the board — that is the whole reason the state exists — so the input row goes too.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › leaves only a way back in when closed",
+      "line": 301,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The channel says what it is. The code has always documented this input as the slot for everything the partner did not think to ask about; until the label arrived, nothing on screen said so.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › names itself as the general channel",
+      "line": 356,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {
@@ -230,7 +275,7 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › reads as empty when the log holds only board-visible events",
-      "line": 155,
+      "line": 175,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -239,8 +284,17 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › renders an answer as the words that were said",
-      "line": 53,
+      "line": 73,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer to a card since deleted must render as an ordinary bubble, not as an error and not in a colour that lies about which theme it belongs to.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › renders an answer whose card is gone without breaking",
+      "line": 264,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {
@@ -248,7 +302,7 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › renders an asked question as its words, not as its object",
-      "line": 72,
+      "line": 92,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -257,8 +311,17 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › renders what each side said",
-      "line": 36,
+      "line": 56,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A turn that lands behind a collapsed panel is indistinguishable from one that did not land at all.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › reopens itself when you say something while collapsed",
+      "line": 335,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {
@@ -266,7 +329,7 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › reports what was typed into it",
-      "line": 169,
+      "line": 189,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -275,8 +338,17 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › says nothing about the events you can already see on the board",
-      "line": 108,
+      "line": 128,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case the old reducer could not express: one event closing two cards was joined into a single bubble with \" · \", which would need one background to be two colours.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › splits one answer event across two cards into two coloured bubbles",
+      "line": 236,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {
@@ -284,8 +356,62 @@
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
       "key": "BoardChat › still reads a question recorded as a bare string",
-      "line": 93,
+      "line": 113,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Two answers to differently-themed cards must not look alike, or the transcript is back to one undifferentiated column.",
+      "file": "app/components/BoardChatBubble.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChatBubble › gives two themes two different colours",
+      "line": 36,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Colour now carries meaning that alignment used to carry alone, and the panel is narrow — so the partner's turn still has to read as theirs.",
+      "file": "app/components/BoardChatBubble.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChatBubble › keeps the partner's turn visually distinct from yours",
+      "line": 74,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A general note is about the whole map, so it has no theme to wear. It must not borrow one — a default colour would claim a theme the remark does not belong to.",
+      "file": "app/components/BoardChatBubble.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChatBubble › leaves a general note uncoloured",
+      "line": 51,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer wears its card's colour. This is the rule in one assertion.",
+      "file": "app/components/BoardChatBubble.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChatBubble › paints an answer in the hue of the theme it belongs to",
+      "line": 27,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Sides, kept: the partner on the left, you on the right.",
+      "file": "app/components/BoardChatBubble.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChatBubble › puts the two sides on opposite sides of the panel",
+      "line": 87,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The deleted-card case: an answer to a node that is gone renders as an ordinary bubble rather than as an error or as a colour that lies.",
+      "file": "app/components/BoardChatBubble.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChatBubble › renders an answer with no resolvable theme exactly like a note",
+      "line": 60,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {
@@ -349,6 +475,42 @@
       "key": "BoardWorkspace live refresh › treats the first real revision after an unbound start as a seed",
       "line": 136,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Without this, dragging on the buttons pans the map underneath them — the control moves the thing it is supposed to be fixed against.",
+      "file": "app/components/BoardZoomControls.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardZoomControls › does not let a drag on the controls pan the board",
+      "line": 66,
+      "registeredAt": "2026-09-02T22:37:57.957174204+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The glyphs are +, − and All, so the accessible names are the only thing a screen reader or a test can address them by.",
+      "file": "app/components/BoardZoomControls.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardZoomControls › names every control for anyone not looking at it",
+      "line": 46,
+      "registeredAt": "2026-09-02T22:37:57.957174204+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Each control has to reach its own handler. Two buttons wired to one callback is a bug you only notice when zooming out zooms in.",
+      "file": "app/components/BoardZoomControls.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardZoomControls › reports each control separately",
+      "line": 29,
+      "registeredAt": "2026-09-02T22:37:57.957174204+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Bottom-LEFT. The conversation sits in the bottom-right, and the two sharing one corner is exactly what this arrangement exists to undo.",
+      "file": "app/components/BoardZoomControls.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardZoomControls › sits in the corner opposite the conversation",
+      "line": 56,
+      "registeredAt": "2026-09-02T22:37:57.957174204+00:00",
       "runner": "tests"
     },
     {
@@ -2098,6 +2260,114 @@
       "runner": "tests"
     },
     {
+      "description": "The point of the whole change: an answer is traceable to its card, which is what lets it be coloured by that card's theme.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › carries the node id of the card an answer closed",
+      "line": 76,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty answer is a recording artefact, not something anyone said; a blank bubble would read as a message that failed to render.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › drops an answer with no words in it",
+      "line": 110,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The kinds this drops are all things you can SEE on the board. Narrating them would make the panel a changelog of a picture you are looking at.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › drops the events the board already shows",
+      "line": 47,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A new board has said nothing yet, and that must read as not-yet rather than as a panel that failed to load.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › is empty for an empty log",
+      "line": 41,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Order IS the content of a transcript: a reply that precedes its question says something different from one that follows it.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › keeps the log in order across kinds",
+      "line": 164,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer recorded without an id is still something the person said; it simply cannot be traced to a card, so it renders as a general remark.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › omits the node id when an answer carries none",
+      "line": 122,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The general channel: no node is attached because nothing on the map is being closed, and that absence is what keeps the bubble neutral.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › reads a general note as yours, with no node attached",
+      "line": 58,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The recorded shape is `{ id, text }`; stringifying it gave every agent-asked question the bubble \"[object Object]\".",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › reads asked questions from their text, not their object",
+      "line": 131,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Both sides of the exchange appear, or the transcript is a monologue and a person answering cards cannot see what was said back.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › reads the partner's note as theirs",
+      "line": 65,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The old reducer joined these into ONE bubble with \" · \". Two answers to two differently-themed cards would then want one background to be two colours.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › splits one event answering several cards into one line each",
+      "line": 90,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A log written by an older or hand-rolled caller should degrade to its words rather than to noise — it costs nothing to accept.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › still reads a question recorded as a bare string",
+      "line": 153,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Total over anything the log can hold. A malformed row must cost its own bubble, never the whole conversation.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "chatLines › survives an event whose payload is missing entirely",
+      "line": 175,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
       "description": "A response with no content-type at all is the web's most common omission. HTML is the overwhelmingly likely truth, and the extractor's own body fallback handles it safely when it is not.",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
@@ -3742,6 +4012,42 @@
       "key": "handoffCopy › tells the person to paste the prompt into an agent chat window",
       "line": 81,
       "registeredAt": "2026-09-02T11:13:46Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The lookup the colour rule rests on — an answer can only wear its card's colour if the card can be traced to a theme.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "hueByNodeId › gives a node the hue of its theme",
+      "line": 184,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every answer on a themeless map renders neutral — the ordinary early state of a board, not a failure.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "hueByNodeId › is empty for a map with no themes at all",
+      "line": 209,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The root idea belongs to no theme. It has no colour to claim, so it must not borrow one.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "hueByNodeId › leaves out a node that belongs to no theme",
+      "line": 202,
+      "registeredAt": "2026-09-02T22:36:38Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Neutral, not broken: a default hue would claim a theme the answer does not belong to.",
+      "file": "app/lib/chatLines.test.ts",
+      "format": "vitest",
+      "key": "hueByNodeId › leaves out a node whose theme is gone",
+      "line": 195,
+      "registeredAt": "2026-09-02T22:36:38Z",
       "runner": "tests"
     },
     {

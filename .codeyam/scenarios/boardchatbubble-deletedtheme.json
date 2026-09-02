@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - DeletedTheme",
+  "id": "a07bf6e5-6de4-4b97-94f4-44b84ecd93e1",
+  "url": "/isolated-components/BoardChatBubble?s=DeletedTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "An answer to a card deleted since. It renders exactly like a general note: neutral, not broken, and not in a colour that would lie about a theme it no longer belongs to."
+}

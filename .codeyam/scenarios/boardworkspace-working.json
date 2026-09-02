@@ -1,6 +1,6 @@
 {
   "name": "BoardWorkspace - Working",
-  "id": "ca0051d9-865f-4d10-852e-7446f0f50d91",
+  "id": "f365366a-bb14-45fd-baf3-1378e447a9bf",
   "url": "/isolated-components/BoardWorkspace?s=Working",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "BoardWorkspace",
   "scenarioType": "component",
-  "description": "The surface a person actually uses: the board underneath and the conversation over all of it, with an agent attached and a round in progress. The chat sits above the map rather than beside one card because that is the true relationship — the map is what the conversation has produced so far."
+  "description": "The surface a person actually uses: the board, and the conversation in the corner of it, with an agent attached and a round in progress. The chat belongs to the whole map rather than to one card — that is the true relationship, the map being what the conversation has produced so far — but it says so by sitting OVER the board in one corner rather than across the middle of it, because a panel that covers the subject has stopped being a conversation about anything you can see."
 }

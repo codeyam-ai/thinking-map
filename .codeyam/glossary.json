@@ -174,7 +174,7 @@
     ]
   },
   {
-    "description": "The conversation, sitting over the whole map rather than in a bar beside it — a bar reads as one more widget by the zoom buttons and what you typed into it vanished with no trace that anyone had heard you. Its line mapper deliberately drops node.added, theme.added and phase.set: those are things you can SEE on the board, and repeating them here would make the panel a changelog of a picture the person is already looking at.",
+    "description": "The conversation, in a corner of the map rather than across the middle of it. A bar reads as one more widget by the zoom buttons and what you typed into it vanished with no trace anyone had heard you; a panel says the true thing, that the map is what the conversation has produced so far. What is left in this file is the ARRANGEMENT — which of three states the panel is in (open, collapsed to the input row, closed to a pill) and what that state composes. The reading of the log moved to chatLines, the colour of a bubble to BoardChatBubble, and the draft to BoardChatComposer, because a transcript that grows until it covers the thing it is about has stopped being a conversation about anything you can see.",
     "filePath": "app/components/BoardChat.tsx",
     "name": "BoardChat",
     "scenarios": [
@@ -183,6 +183,36 @@
       "boardchat-boardvisibleonly",
       "boardchat-justopened"
     ]
+  },
+  {
+    "description": "One turn in the conversation, and the whole colour rule. Three treatments whose difference is meaning rather than decoration: the partner translucent and left; an answer solid, right, in the colour of the CARD it answered; a general note solid neutral and right, because it is about the whole map and has no theme to borrow. The colour comes from themeColor and never from a hex written here, so a card, its connector, its cluster label and its answers cannot drift apart.",
+    "filePath": "app/components/BoardChatBubble.tsx",
+    "name": "BoardChatBubble",
+    "testFile": "app/components/BoardChatBubble.render.test.tsx"
+  },
+  {
+    "description": "Where you say something about the whole map. It owns the draft rather than lifting it, because nothing above needs to know what is half-typed and a draft held higher would be one more thing to preserve across the panel's three states. Enter and the button are one path, not two, so an empty message cannot be rejected by one route and accepted by the other.",
+    "filePath": "app/components/BoardChatComposer.tsx",
+    "name": "BoardChatComposer",
+    "testFile": "app/components/BoardChat.render.test.tsx"
+  },
+  {
+    "description": "The panel's chrome: what this channel is, and the two ways to get it out of the way. The label earns its place — the code always documented this input as the slot for everything the partner did not think to ask about, but the only thing on screen saying so was a placeholder, and a sentence is not a label. Collapse and close are different promises so they are different controls: collapse keeps the input row, close leaves the board genuinely uncovered.",
+    "filePath": "app/components/BoardChatHeader.tsx",
+    "name": "BoardChatHeader",
+    "testFile": "app/components/BoardChat.render.test.tsx"
+  },
+  {
+    "description": "All that is left of the conversation when it is closed. Closing has to genuinely uncover the board — that is the whole reason the state exists — so this is the smallest thing that can still be found. Not a decoration: without it closing would be a one-way door, and nobody closes a thing they cannot get back.",
+    "filePath": "app/components/BoardChatPill.tsx",
+    "name": "BoardChatPill",
+    "testFile": "app/components/BoardChat.render.test.tsx"
+  },
+  {
+    "description": "Every turn in order, pinned to the newest. The pinning is not a nicety: a transcript that keeps its scroll position while new turns arrive below the fold is one you have to chase. Bounded rather than growing, because this sits over the map and a conversation that grows until it covers the thing it is about has stopped being a conversation about anything you can see.",
+    "filePath": "app/components/BoardChatTranscript.tsx",
+    "name": "BoardChatTranscript",
+    "testFile": "app/components/BoardChat.render.test.tsx"
   },
   {
     "description": "The way back to your other boards, collapsed into the header — the boards you are not looking at should cost no space on the one you are. It closes on an outside click and on Escape, because a menu that can only be closed by the button that opened it is a trap on a surface where every other click means something.",
@@ -206,6 +236,12 @@
       "boardworkspace-working_agent",
       "boardworkspace-justarrived"
     ]
+  },
+  {
+    "description": "Zoom, fixed to the viewport rather than to the board plane. That distinction is why this is not just three buttons: everything else on the board is inside the transform being zoomed, so a control that rode along would shrink exactly when you most needed it. Carries data-no-pan, or dragging the buttons would pan the map underneath. Bottom-LEFT, because the conversation lives in the opposite corner — the two used to share one, which made the board's own controls feel like part of the chat rather than part of the map.",
+    "filePath": "app/components/BoardZoomControls.tsx",
+    "name": "BoardZoomControls",
+    "testFile": "app/components/BoardZoomControls.render.test.tsx"
   },
   {
     "description": "Renders what the bridge knows - whether an agent is attached, why not when it is not, the tools the page exposes, the questions an agent is waiting on, and the pending count. Exists so the bridge has something to show: WebMcpBridge renders only a context provider, so an isolated capture of it alone would be a blank frame. Its two buttons drive the REAL ask_user path through the headless driver and the real answer path back, so the AwaitingAnswer scenario captures the state the code actually produces rather than one staged to look like it.",
@@ -637,7 +673,7 @@
     ]
   },
   {
-    "description": "The board itself: one plane holding every card under a single CSS transform, so zoomed out it is the shape of someone's thinking and zoomed in it is the one question in front of you — the same surface at two scales rather than two screens, which is what stops a person losing the thread by navigating. Reads its geometry from layOutGalaxy and its curves from boardConnectors, and frames itself from the layout's own bounds rather than a tuned constant, because a map with two clusters and one with nine cannot share a magic number.",
+    "description": "The board itself: one plane holding every card under a single CSS transform, so zoomed out it is the shape of someone's thinking and zoomed in it is the one question in front of you — the same surface at two scales rather than two screens, which is what stops a person losing the thread by navigating. Reads its geometry from layOutGalaxy and its curves from boardConnectors, and frames itself from the layout's own bounds rather than a tuned constant, because a map with two clusters and one with nine cannot share a magic number. Its viewport-fixed controls live in BoardZoomControls, in the corner opposite the conversation.",
     "filePath": "app/components/GalaxyBoard.tsx",
     "name": "GalaxyBoard",
     "scenarios": [
@@ -1391,6 +1427,12 @@
     "testFile": "app/lib/cardThreads.test.ts"
   },
   {
+    "description": "The exchange log read as a conversation for a PERSON — the sibling of renderEvents, which reads the same log for an agent. Deliberately not one function: an agent needs every event with its revision so it can pass a cursor back, and a person needs the kinds that describe the board dropped, because the board is right there. One event can yield several lines, because a user.answer closing three cards is three things said about three different subjects and joining them would ask one bubble's background to be three colours.",
+    "filePath": "app/lib/chatLines.ts",
+    "name": "chatLines",
+    "testFile": "app/lib/chatLines.test.ts"
+  },
+  {
     "description": "The full verdict on whether a URL may be fetched: the syntax and scheme rules, then where the hostname actually resolves to, refusing if ANY of its addresses is private rather than only the first. Deliberately says the same sentence whatever it resolved to, because telling a stranger which guess hit something turns a refusal into a port scanner. Its residual limit is documented in the source: the name is resolved here and again by fetch, so a DNS answer that changes between the two can still slip past.",
     "filePath": "app/lib/briefUrl.ts",
     "name": "checkBriefUrl",
@@ -1757,6 +1799,12 @@
     "testFile": "app/lib/handoffCopy.test.ts"
   },
   {
+    "description": "Node id to the hue of the theme it belongs to. Deliberately PARTIAL: a node with no theme, a node whose theme is gone, and a node that no longer exists all simply have no entry, and the caller renders those neutrally. That is the honest treatment — a default colour would claim a theme the answer does not belong to, and an error would break a whole transcript over a card somebody deleted.",
+    "filePath": "app/lib/chatLines.ts",
+    "name": "hueByNodeId",
+    "testFile": "app/lib/chatLines.test.ts"
+  },
+  {
     "description": "The colour of the nth theme, handed out along the golden angle from a magenta start. Colour is the board's navigation affordance — it is how you know which galaxy you are looking at once the labels are too small to read — so the promise is that the hues stay mutually distinguishable however many themes an idea turns out to need, which is what an irrational step round the wheel gives and a fixed palette cannot. Pure and total, so a theme's colour survives a reload without being stored twice.",
     "filePath": "app/lib/themeHue.ts",
     "name": "hueForIndex",
@@ -1847,10 +1895,10 @@
     "testFile": "app/lib/galaxyLayout.test.ts"
   },
   {
-    "description": "Reads one event from the exchange log as a line of conversation, or as nothing. The nothing is the editorial decision worth knowing about: node.added, theme.added and phase.set deliberately produce no bubble, because they are things you can SEE on the board and narrating them would make the panel a changelog of a picture the person is already looking at. It also unwraps the recorded question shape — stringifying it gave every agent-asked question the bubble '[object Object]'.",
-    "filePath": "app/components/BoardChat.tsx",
-    "name": "line",
-    "testFile": "app/components/BoardChat.render.test.tsx"
+    "description": "One event's worth of conversation: the per-kind switch behind chatLines. Returns a LIST because the mapping is genuinely one-to-many in both directions — a user.answer closing three cards yields three lines (three subjects cannot share one bubble's background), and node.added, theme.added or phase.set yield none, because those are things you can see on the board and narrating them would make the panel a changelog of a picture the person is already looking at. Total over anything the log can hold: a malformed payload costs its own bubble, never the whole transcript.",
+    "filePath": "app/lib/chatLines.ts",
+    "name": "lineFor",
+    "testFile": "app/lib/chatLines.test.ts"
   },
   {
     "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",

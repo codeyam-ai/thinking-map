@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatHeader - Default",
+  "id": "95f2d19c-0def-4261-9ed7-93a8975fa9f5",
+  "url": "/isolated-components/BoardChatHeader?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatHeader",
+  "scenarioType": "component",
+  "description": "Open: the label naming the channel, and the chevron pointing up because pressing it puts the transcript away. The label is the affordance the code always documented and the screen never said."
+}

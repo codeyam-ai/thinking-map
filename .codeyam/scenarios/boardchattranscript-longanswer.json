@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatTranscript - LongAnswer",
+  "id": "82ed7b30-0709-4ce5-bbbe-de422a074101",
+  "url": "/isolated-components/BoardChatTranscript?s=LongAnswer",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatTranscript",
+  "scenarioType": "component",
+  "description": "The length people actually write, at the width it now has to wrap in. A 720px bar made this question invisible; a 360px panel is where it gets asked."
+}

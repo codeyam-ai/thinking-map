@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatTranscript - NoThemesYet",
+  "id": "d2ee393b-9c04-4d01-911e-900011d925b9",
+  "url": "/isolated-components/BoardChatTranscript?s=NoThemesYet",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatTranscript",
+  "scenarioType": "component",
+  "description": "A map with no themes yet, which is the ordinary early state. Every answer renders neutral, and that has to look deliberate rather than like colour failing to arrive."
+}

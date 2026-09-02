@@ -25,6 +25,7 @@ import ThemeParticles from './ThemeParticles';
 import GalaxyBackdrop from './GalaxyBackdrop';
 import ThinkingIndicator from './ThinkingIndicator';
 import ConvergenceNode, { type ConvergenceState } from './ConvergenceNode';
+import BoardZoomControls from './BoardZoomControls';
 
 /** Below this scale the cards give way to the cluster labels alone.
  *
@@ -314,33 +315,11 @@ export default function GalaxyBoard({
         ))}
       </div>
 
-      {/* Zoom controls. Fixed to the viewport, not to the board. */}
-      <div
-        className="absolute bottom-6 right-6 flex flex-col gap-2"
-        data-no-pan
-      >
-        <button
-          onClick={() => zoomBy(1.35)}
-          className="h-10 w-10 rounded-lg border border-white/15 bg-black/70 text-lg text-white/80 hover:text-white"
-          aria-label="Zoom in"
-        >
-          +
-        </button>
-        <button
-          onClick={() => zoomBy(1 / 1.35)}
-          className="h-10 w-10 rounded-lg border border-white/15 bg-black/70 text-lg text-white/80 hover:text-white"
-          aria-label="Zoom out"
-        >
-          −
-        </button>
-        <button
-          onClick={frameAll}
-          className="h-10 w-10 rounded-lg border border-white/15 bg-black/70 text-[10px] uppercase tracking-wide text-white/70 hover:text-white"
-          aria-label="Frame the whole board"
-        >
-          All
-        </button>
-      </div>
+      <BoardZoomControls
+        onZoomIn={() => zoomBy(1.35)}
+        onZoomOut={() => zoomBy(1 / 1.35)}
+        onFrameAll={frameAll}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Component from "../../components/BoardChat";
 import type { ExchangeEvent } from "../../lib/exchange";
+import type { GalaxyNodeInput, GalaxyTheme } from "../../lib/galaxyLayout";
 
 // A client harness rather than a server page, because the panel takes an
 // `onSend` callback and a function cannot cross the server/client boundary as
@@ -62,10 +63,98 @@ const EXCHANGE: ExchangeEvent[] = [
   }),
 ];
 
-const scenarios: Record<string, { events: ExchangeEvent[] }> = {
+/** Hues as `hueForIndex` hands them out for themes 0, 1 and 2, written as
+ *  literals so a scenario cannot drift if the sequence is ever re-anchored. */
+const THREE_THEMES: GalaxyTheme[] = [
+  { id: "th-who", label: "Who turns up", hue: 318, order: 0 },
+  { id: "th-broken", label: "When a repair fails", hue: 96, order: 1 },
+  { id: "th-money", label: "Money", hue: 233, order: 2 },
+];
+
+/** Only the fields the panel reads — it resolves an answer's node id to a
+ *  theme and stops there. */
+const card = (id: string, themeId: string): GalaxyNodeInput => ({
+  id,
+  themeId,
+  kind: "open-question",
+  label: "A question",
+  detail: null,
+  status: "answered",
+});
+
+const scenarios: Record<
+  string,
+  { events: ExchangeEvent[]; themes?: GalaxyTheme[]; nodes?: GalaxyNodeInput[] }
+> = {
   // The ordinary case: a worked exchange, both sides, with the three
   // board-visible kinds present in the log and absent from the panel.
   Default: { events: EXCHANGE },
+
+  // The headline frame: three answers to three differently-themed cards and one
+  // general note, so three hues and one neutral bubble appear together. Read as
+  // a picture, this is the entire rule — colour is not decoration here, it is
+  // the visible difference between answering something specific and saying
+  // something about the whole map.
+  // The lines are deliberately SHORT. The transcript is bounded and pins to the
+  // newest turn, so a fixture with realistic-length answers pushes the first
+  // hue above the fold — and a frame whose whole job is showing three hues at
+  // once cannot afford to show two. Length is exercised by LongAnswer instead.
+  ThreeThemes: {
+    events: [
+      // ONE event closing three cards. The old reducer joined these with " · "
+      // into a single lime bubble; three subjects cannot share one background,
+      // which is why the reducer splits them.
+      at(1, "user.answer", "user", {
+        answers: [
+          { id: "c-who", answer: "A rota of two or three" },
+          { id: "c-broken", answer: "Only if it covers breakage" },
+          { id: "c-money", answer: "A shared fund" },
+        ],
+      }),
+      at(2, "user.note", "user", {
+        text: "Change direction — who shows up, not what breaks",
+      }),
+    ],
+    themes: THREE_THEMES,
+    nodes: [card("c-who", "th-who"), card("c-broken", "th-broken"), card("c-money", "th-money")],
+  },
+
+  // An answer to a card that has since been taken off the board. It renders
+  // neutral — not broken, and not in a colour that lies about a theme it no
+  // longer belongs to.
+  DeletedTheme: {
+    events: [
+      at(1, "user.answer", "user", {
+        answers: [
+          { id: "c-who", answer: "A rota of two or three" },
+          { id: "c-gone", answer: "Said before that card came off the board" },
+        ],
+      }),
+    ],
+    themes: THREE_THEMES,
+    nodes: [card("c-who", "th-who")],
+  },
+
+  // The length people actually write, at the width it now has to wrap in. A
+  // 720px bar made this question invisible; a 360px panel is where it is asked.
+  LongAnswer: {
+    events: [
+      at(1, "user.answer", "user", {
+        answers: [
+          {
+            id: "c-who",
+            answer:
+              "A rota of two or three, plus whoever turns up curious — but the honest answer is that it has been me every Saturday since March, and that is exactly the fragile bit nobody has said out loud yet.",
+          },
+        ],
+      }),
+      at(2, "agent.note", "agent", {
+        text: "Then the question is not who turns up, it is what happens the first Saturday you cannot.",
+      }),
+    ],
+    themes: THREE_THEMES,
+    nodes: [card("c-who", "th-who")],
+  },
 
   // Nothing said yet. The panel has to be present and inviting rather than a
   // blank box — an empty conversation is the state every new board starts in,
@@ -99,22 +188,28 @@ function Harness() {
   // a box the size it would occupy there. On white it would read as a different
   // object entirely.
   //
-  // The width is explicit rather than `100%`: the panel's root is absolutely
+  // The size is explicit rather than `100%`: the panel's root is absolutely
   // positioned, so it contributes nothing to its parent's intrinsic size, and a
-  // shrink-to-fit capture element collapses to a hairline around it. 860 leaves
-  // the `min(720px, 90%)` panel at its full 720 with the board's margin either
-  // side.
+  // shrink-to-fit capture element collapses to a hairline around it. This box is
+  // a corner of the board — enough ground around the 360px panel to show that
+  // it is IN a corner, which is the arrangement worth looking at, and enough
+  // height that a long transcript reaches its bound rather than running off.
   return (
     <div
       id="codeyam-capture"
       style={{
         background: "#0a0a0b",
-        height: 720,
-        width: 860,
+        height: 560,
+        width: 720,
         position: "relative",
       }}
     >
-      <Component events={scenario.events} onSend={setSent} />
+      <Component
+        events={scenario.events}
+        onSend={setSent}
+        themes={scenario.themes}
+        nodes={scenario.nodes}
+      />
       {sent ? (
         <div className="absolute left-3 top-3 text-[12px] text-white/40">
           sent: {sent}

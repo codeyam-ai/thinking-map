@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - Partner",
+  "id": "fd29bd4e-ec4f-421c-aad0-3b6aa3982a32",
+  "url": "/isolated-components/BoardChatBubble?s=Partner",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "The partner's turn. Colour now carries meaning that alignment used to carry alone, and the panel is much narrower than it was, so this still has to read as someone else speaking."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatTranscript - Overflowing",
+  "id": "45d43bf6-5f2e-436b-86aa-5a766b18a18f",
+  "url": "/isolated-components/BoardChatTranscript?s=Overflowing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatTranscript",
+  "scenarioType": "component",
+  "description": "More turns than the panel can hold. The bound and the pin-to-newest exist for exactly this: the newest turn must be the one you are looking at, not one you have to scroll to find."
+}

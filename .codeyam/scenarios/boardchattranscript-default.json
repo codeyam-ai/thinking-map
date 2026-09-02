@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatTranscript - Default",
+  "id": "4fcb1d5c-b067-4f99-8cfa-7768c49440f0",
+  "url": "/isolated-components/BoardChatTranscript?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatTranscript",
+  "scenarioType": "component",
+  "description": "Three answers to three differently-themed cards, the partner among them, and a general note last: three hues and one neutral bubble. Every rule the panel has, in one frame."
+}

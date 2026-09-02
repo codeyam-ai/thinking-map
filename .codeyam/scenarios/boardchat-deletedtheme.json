@@ -1,0 +1,12 @@
+{
+  "name": "BoardChat - DeletedTheme",
+  "id": "beff4cc1-4c4f-402c-8c01-9588fa9c3698",
+  "url": "/isolated-components/BoardChat?s=DeletedTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "A transcript where one answer's card has been taken off the board. The panel keeps working and the bubble goes neutral — a colour resolved from a missing node would be a claim about a theme that is not there."
+}

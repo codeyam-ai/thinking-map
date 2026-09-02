@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - Default",
+  "id": "3d9b8398-bfab-4243-ab56-9bb2e65ba557",
+  "url": "/isolated-components/BoardChatBubble?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "An answer wearing the colour of the card it answered. The ordinary case, and the whole rule in one bubble — the colour is not decoration, it is which question this was an answer to."
+}

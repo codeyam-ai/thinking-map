@@ -1,0 +1,12 @@
+{
+  "name": "BoardChatBubble - GeneralNote",
+  "id": "0d5d4151-d23a-4c85-9eae-2691aba2ad39",
+  "url": "/isolated-components/BoardChatBubble?s=GeneralNote",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatBubble",
+  "scenarioType": "component",
+  "description": "Said about the whole map, so it belongs to no theme and must not borrow one. Solid rather than dim, because it still has to read as YOURS — the neutrality is about subject, not authorship."
+}

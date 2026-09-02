@@ -1,6 +1,6 @@
 {
   "name": "BoardChat - Default",
-  "id": "27e20a31-c8a4-43e0-9e10-2acb9f32d35d",
+  "id": "40f58714-5abb-43e9-9e47-22b36b0c186f",
   "url": "/isolated-components/BoardChat?s=Default",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "BoardChat",
   "scenarioType": "component",
-  "description": "The conversation over the map, both sides in order. The log behind it also holds a theme.added, a node.added and a phase.set and none of them appears — those are things you can see on the board, and narrating them here would make the panel a changelog of a picture you are already looking at."
+  "description": "The conversation in its corner of the map, both sides in order. The log behind it also holds a theme.added, a node.added and a phase.set and none of them appears — those are things you can see on the board, and narrating them here would make the panel a changelog of a picture you are already looking at."
 }
