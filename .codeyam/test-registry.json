@@ -1,11 +1,56 @@
 {
   "tests": [
     {
+      "description": "The demoted band is a SUBTRACTION, and presence-only assertions cannot see a subtraction come undone. The steps and the seed quote are written for a first meeting; putting them back here is the drift this pins.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › drops the first-meeting steps and quote from the reattach strip",
+      "line": 97,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The finished-plan screen. `MapScreen` is an `h-screen` flex column and this strip is `shrink-0`, so every row it takes comes out of the summary the person came back to read — the dense variant drops the heading line and puts both commands on one row. Both commands must SURVIVE the shrink: dropping one would be a smaller strip that no longer does its job.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › drops the heading but keeps both commands when dense",
+      "line": 131,
+      "registeredAt": "2026-09-02T14:31:49Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The default is the full strip — a component that silently rendered its compact form everywhere would pass the dense test above and still be wrong on every working map.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › keeps the heading on the reattach strip by default",
+      "line": 146,
+      "registeredAt": "2026-09-02T14:31:49Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The MCP command is the half of the reattach strip an AGENT can act on — the start prompt is for the person. Losing it would leave the strip naming a door without opening it, which is the state the whole change is a fix for.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › offers the MCP command alongside the prompt when reattaching",
+      "line": 113,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The full band gained the same command, at the foot rather than beside the prompt. An agent reading a first-meeting map needs the door as much as one reading a worked map does.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › offers the MCP command on the full band too",
+      "line": 158,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
       "description": "The ORDER is the change, so asserting only presence would let the old arrangement back in unnoticed — the panel used to open with the explanation and reach the prompt third, which is exactly the layout that still passes a presence-only check.",
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › puts the instruction before the explanation in document order",
-      "line": 131,
+      "line": 205,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -28,20 +73,11 @@
       "runner": "tests"
     },
     {
-      "description": "Reopening a map an agent has already contributed to, in a browser with no agent. Bridge status alone would wrongly show the panel here.",
-      "file": "app/components/AgentHandoff.render.test.tsx",
-      "format": "vitest",
-      "key": "AgentHandoff › renders nothing when the log already carries an agent-origin event",
-      "line": 80,
-      "registeredAt": "2026-09-01T17:36:57Z",
-      "runner": "tests"
-    },
-    {
       "description": "The instruction has to be ON the panel at all — it is the sentence the panel existed without, and the one someone arriving actually needs.",
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders the instruction and both steps",
-      "line": 120,
+      "line": 194,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -50,7 +86,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders the steps as an ordered list",
-      "line": 147,
+      "line": 221,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -68,7 +104,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders without a bridge provider at all",
-      "line": 91,
+      "line": 165,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -77,7 +113,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › shows a start prompt naming this map",
-      "line": 97,
+      "line": 171,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -86,8 +122,44 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › shows no quoted idea for a map started from a brief",
-      "line": 108,
+      "line": 182,
       "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Reopening a map an agent has already contributed to, in a browser with no agent. The full pitch would be wrong — but so is showing nothing: this is exactly the state where someone needs the way back in, and rendering null left them with a header saying \"No agent attached\" and no route to change that.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › still offers a way back in on a map an agent has already worked",
+      "line": 83,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported failure, pinned: on a map that already holds real work, the sequence must say why it declined and must NOT write. Asserting the log line alone would pass even if the writes went out anyway, so the assertion that matters is the one about `callTool`.",
+      "file": "app/components/AgentSimulator.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentSimulator › declines the demo sequence on a map with real work, writing nothing",
+      "line": 69,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The panel opens collapsed. Rendering it at all is now an opt-in the map page makes deliberately, so once it IS rendered the launcher must be there — otherwise the opt-in leads nowhere.",
+      "file": "app/components/AgentSimulator.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentSimulator › renders the launcher collapsed",
+      "line": 58,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The guard has to REFUSE the wrong map without refusing every map — a demo that never runs is as broken as one that always does, and it is the failure mode a fail-safe default invites.",
+      "file": "app/components/AgentSimulator.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentSimulator › runs the sequence on a map holding only its seed",
+      "line": 88,
+      "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
     {
@@ -610,6 +682,60 @@
       "key": "WebMcpBridge - pending states › renders every question when an agent asks several at once",
       "line": 143,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Other query params are none of its business — a map opened with a filter or a tracking param on the URL must not accidentally summon the panel.",
+      "file": "app/lib/agentPanel.test.ts",
+      "format": "vitest",
+      "key": "agentPanelRequested › ignores unrelated query params",
+      "line": 42,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported case, and the default: an ordinary dev session with no opt-in. This is the one that was previously true for every map in development.",
+      "file": "app/lib/agentPanel.test.ts",
+      "format": "vitest",
+      "key": "agentPanelRequested › is false for a plain map URL in development",
+      "line": 11,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A bare `?agentPanel` with no value. Next hands this over as an empty string, which is not the opt-in.",
+      "file": "app/lib/agentPanel.test.ts",
+      "format": "vitest",
+      "key": "agentPanelRequested › is false for a valueless agentPanel param",
+      "line": 29,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`=1` exactly, not any truthy string. Someone turning the panel OFF by editing the URL to 0 would be badly served by a truthiness check, which would read \"0\" as present-and-therefore-on.",
+      "file": "app/lib/agentPanel.test.ts",
+      "format": "vitest",
+      "key": "agentPanelRequested › is false for agentPanel=0",
+      "line": 23,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The gesture itself. A person types it; nothing stumbles onto it.",
+      "file": "app/lib/agentPanel.test.ts",
+      "format": "vitest",
+      "key": "agentPanelRequested › is true when agentPanel=1 is present",
+      "line": 16,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A repeated param arrives as an array. Reading the first entry keeps a doubled `?agentPanel=1&agentPanel=1` working the way it plainly means, rather than failing a strict string comparison against an array.",
+      "file": "app/lib/agentPanel.test.ts",
+      "format": "vitest",
+      "key": "agentPanelRequested › reads the first entry when the param is repeated",
+      "line": 36,
+      "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
     {
@@ -1486,6 +1612,69 @@
       "runner": "tests"
     },
     {
+      "description": "A person's own note or answer is work too, even though it adds no node. Counting only nodes would let the demo run over a conversation.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › counts a person’s own contribution as work",
+      "line": 118,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Several view changes and nothing else is still an untouched map — phase is where you are LOOKING, not something on the map.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › does not count repeated phase changes as work",
+      "line": 124,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state the sequence is FOR. `createMap` writes one root `node.added`, and the first view change adds a `phase.set` — so a map nobody has touched already carries two events, and a naive count would refuse every map.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › is false for a map holding only its root seed node",
+      "line": 87,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported case: a map with a research round already on it. This is the map the sequence was replayed over.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › is true for a map with a full research round on it",
+      "line": 99,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The narrowest true case: one node beyond the seed. The demo would sit its two fixture assumptions next to something a person actually wrote.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › is true once anything else is on the map",
+      "line": 93,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty log means the map read back as having nothing at all — not even the root node `createMap` guarantees. That is a reply we do not understand, and the safe reading is the same as an unreadable one.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › permits an empty log rather than treating absence as work",
+      "line": 147,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Fail SAFE, and this is the direction that matters: an unreadable reply costs a sentence in the call log if we refuse wrongly, and somebody's thinking with two invented nodes in it if we run wrongly.",
+      "file": "app/lib/agentDemo.test.ts",
+      "format": "vitest",
+      "key": "demoWouldOverwrite › refuses when the reply cannot be read",
+      "line": 133,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
       "description": "Any heading level, and any leading blank space before it.",
       "file": "app/lib/deriveTitle.test.ts",
       "format": "vitest",
@@ -2260,12 +2449,48 @@
       "runner": "tests"
     },
     {
+      "description": "An agent reading this page needs a command it can RUN. The prose hint names the door; this is the door, and it has to name the origin the page is actually being served from or it points at the wrong machine.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › builds an MCP command naming the given origin",
+      "line": 115,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reason the `worked` flag exists. \"No one is on this yet\" is simply false on a map carrying an agent's work, and a person who reads a false sentence about their own map stops trusting the true ones beside it.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › does not claim nobody is on a map an agent has already worked",
+      "line": 135,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The server render has no origin yet. `npm run mcp` is correct only for someone in this checkout, but it is the one of the two that cannot be WRONG — a guessed origin would send an agent somewhere that is not this app.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › falls back to npm run mcp when no origin is known",
+      "line": 127,
+      "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
       "description": "Both cases render the same instruction block, so a brief-only map must not arrive with the steps missing.",
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › gives the same instruction and steps for a brief-only map",
       "line": 106,
       "registeredAt": "2026-09-02T11:13:46Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The full band's wording is unchanged for a map nothing has touched — the demoted variant must not leak into the first-meeting case.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › keeps the original wording for an untouched map",
+      "line": 143,
+      "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
     {
@@ -2345,7 +2570,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › returns non-empty copy for every field in both cases",
-      "line": 116,
+      "line": 160,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -2365,6 +2590,15 @@
       "key": "handoffCopy › states copying before pasting",
       "line": 88,
       "registeredAt": "2026-09-02T11:13:46Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The prompt is the useful half in BOTH states, so demoting the band must not have quietly dropped the id an agent needs to find the map.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › still names the map in the worked variant’s prompt",
+      "line": 151,
+      "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
     {

@@ -1,0 +1,12 @@
+{
+  "name": "CopyablePrompt - Inline",
+  "id": "6f6a110e-589e-4c34-ae27-03f0d4df6b4d",
+  "url": "/isolated-components/CopyablePrompt?s=Inline",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CopyablePrompt",
+  "scenarioType": "component",
+  "description": "The one-row tone, and the only one that truncates. It exists for the finished-plan screen, where the reattach strip has to fit on a single row or it takes a quarter of the summary someone came back to read. The text here is the longest of any CopyablePrompt scenario on purpose - the truncation IS the behaviour, so a short string would capture as an ordinary untruncated pill and prove nothing. The full text stays selectable and is still what the button copies; only the sight of it is clipped."
+}

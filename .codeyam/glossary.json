@@ -456,6 +456,16 @@
     ]
   },
   {
+    "description": "The way back in, for a map an agent has already worked and then left. Its own component because of the decision it owns — what to DROP: the full band's numbered steps, seed quote and explanatory paragraphs are written for a first meeting, and on a map carrying an agent's work they are either false or condescending. What survives is the pair still useful to someone reattaching — the prompt naming this map, and the MCP command — side by side from `sm` up, because this strip sits above the map and every row it costs is a row of the person's own thinking pushed off screen. Replaces the earlier behaviour of rendering nothing at all, which left a detached agent's map saying 'No agent attached' with no route to change that.",
+    "filePath": "app/components/HandoffReattach.tsx",
+    "name": "HandoffReattach",
+    "scenarios": [
+      "handoffreattach-default",
+      "handoffreattach-serverrender",
+      "handoffreattach-frombrief"
+    ]
+  },
+  {
     "description": "The landing route. Reads every saved map and composes the header with the landing screen - imports and composition only, no markup of its own.",
     "filePath": "app/page.tsx",
     "name": "Home",
@@ -739,6 +749,12 @@
     "testFile": "app/components/PhaseNav.render.test.tsx"
   },
   {
+    "description": "Next's parsed query object as `agentPanelRequested` reads it: a record of string, string array, or undefined, since a repeated param arrives as an array. Named here so the map page can type its `searchParams` promise against the same shape the predicate consumes rather than restating it.",
+    "filePath": "app/lib/agentPanel.ts",
+    "name": "QueryParams",
+    "testFile": "app/lib/agentPanel.test.ts"
+  },
+  {
     "description": "What the person said, shown back in the card's body. The Edit affordance is deliberately quiet — the eyebrow's weight rather than a button's — because an answered question is settled and reopening it should be available without being an invitation.",
     "filePath": "app/components/RecordedAnswer.tsx",
     "name": "RecordedAnswer",
@@ -951,6 +967,12 @@
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
+    "description": "Whether the dev agent panel has been deliberately asked for on this page, via `?agentPanel=1`. Replaces the old `NODE_ENV !== 'production'` render gate, which answered 'is this a dev build' when the question that matters is 'can a real agent reach this page' — every `npm run dev` session is a dev build, including the ones where a genuine agent is driving the browser. Keeps `NODE_ENV` as a floor underneath the opt-in so no query string can summon the panel into production, matches `=1` exactly rather than any truthy value, and reads the first entry of a repeated param.",
+    "filePath": "app/lib/agentPanel.ts",
+    "name": "agentPanelRequested",
+    "testFile": "app/lib/agentPanel.test.ts"
+  },
+  {
     "description": "The node ids a user.answer event closed. Same payload tolerance as questionIds, and the input to both the suppression rule and the answered-question count.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "answeredIds",
@@ -1099,6 +1121,12 @@
     "filePath": "app/lib/exchange.ts",
     "name": "decodeEvent",
     "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Whether replaying the demo sequence would write fixture content over something real. Reads the event log from `read_map`'s structured reply rather than the prose rendering, and discounts `phase.set` because a brand-new map already carries one root `node.added` plus a view change. Fails safe: an unreadable reply refuses, since the cost of a wrong refusal is a line in the call log and the cost of a wrong run is somebody's thinking with two invented nodes in it.",
+    "filePath": "app/lib/agentDemo.ts",
+    "name": "demoWouldOverwrite",
+    "testFile": "app/lib/agentDemo.test.ts"
   },
   {
     "description": "How deep a node sits in the tree, following parentId upward. Used only by the round grouping's fallback, for a map whose history was never recorded. Stops rather than hanging on a cycle or a missing parent, so a half-written map still groups.",
@@ -1315,7 +1343,7 @@
     }
   },
   {
-    "description": "What a map with nobody working on it says for itself, in words. WebMCP is pull-only, so submitting an idea writes a map but does not summon anyone to think about it, and the tempting thing to show - a spinner, 'getting started' - would be a lie about work that will never begin on its own. The wording lives here rather than as strings inside a component because the wording IS the interface and a regression here is a person being told something is happening when nothing is. It carries the instruction the panel leads with and the two steps it breaks down into - copy the prompt, paste it into your agent's chat window - alongside the eyebrow, the honest explanation, the attach hint, and the start prompt itself. hasBrief is an argument rather than a branch in the component because a brief-only map has no sentence to quote and pointing that agent at read_map would send it to the emptier of the two things it could read.",
+    "description": "What a map with nobody working on it says for itself, in words — pure, and pinned by tests rather than left as strings inside a component. `hasBrief` decides which tool the start prompt names. `worked` selects the demoted wording for a map an agent has already left, because 'No one is on this yet' is false there. `origin` builds `mcpCommand`, the MCP door as something an agent can RUN rather than prose about it — the HTTP form when the origin is known, `npm run mcp` on the server render where it is not.",
     "filePath": "app/lib/handoffCopy.ts",
     "name": "handoffCopy",
     "testFile": "app/lib/handoffCopy.test.ts"

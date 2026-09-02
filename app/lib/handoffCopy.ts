@@ -29,6 +29,16 @@ export interface HandoffCopy {
   startPrompt: string;
   /** The two ways to attach an agent so this stops being manual. */
   attachHint: string;
+  /**
+   * The MCP door as something an agent can RUN, not prose about it.
+   *
+   * `attachHint` names both doors and explains why there are two, which is the
+   * right thing for a person to read. It is the wrong thing to hand an agent:
+   * one that has just been told where the door is still has to guess the
+   * command. This is that command, and it goes through the same copyable block
+   * as the start prompt because it has the same job — to end up somewhere else.
+   */
+  mcpCommand: string;
 }
 
 export interface HandoffCopyInput {
@@ -36,6 +46,20 @@ export interface HandoffCopyInput {
   /** Absent or blank for a map started from a document rather than a sentence. */
   seedIdea?: string;
   hasBrief: boolean;
+  /**
+   * True when an agent has already worked this map and nothing is attached now.
+   *
+   * Not decoration: "No one is on this yet" is simply false on a map carrying
+   * six agent-written nodes, and someone who reads a false sentence about their
+   * own map stops trusting the true ones next to it.
+   */
+  worked?: boolean;
+  /**
+   * The page's own origin, e.g. `https://example.com` — passed in rather than
+   * read off `window` here, which is what keeps this module pure and testable.
+   * Absent on the server, where the browser's address is not knowable yet.
+   */
+  origin?: string;
 }
 
 /**
@@ -48,17 +72,23 @@ export function handoffCopy({
   mapId,
   seedIdea,
   hasBrief,
+  worked = false,
+  origin,
 }: HandoffCopyInput): HandoffCopy {
   const firstTool = hasBrief ? 'read_brief' : 'read_map';
   const idea = seedIdea?.trim();
 
   return {
-    eyebrow: 'No one is on this yet',
+    // A map an agent has already worked is not waiting to be discovered, so the
+    // eyebrow that opens the full band would be false on it. Both variants say
+    // the same true thing about the present moment — nothing is attached — and
+    // differ only on whether anything ever was.
+    eyebrow: worked ? 'The agent that was here has gone' : 'No one is on this yet',
     // The one sentence the panel previously never said. Copy-and-paste is named
     // as the path that WORKS, not as a fallback: await_new_map only helps an
     // agent already connected and already parked in that call, so for the
     // person reading this, pasting the prompt is the thing that starts the map.
-    instruction: 'Hand this to your agent',
+    instruction: worked ? 'Pick this back up' : 'Hand this to your agent',
     steps: [
       'Copy the prompt below.',
       'Paste it into your agent’s chat window.',
@@ -75,5 +105,14 @@ export function handoffCopy({
         }. Start with ${firstTool}, then deconstruct the idea.`,
     attachHint:
       'Attach one two ways: a browser agent (Chrome 146+, top-level, secure context), or the MCP server (npm run mcp, or /api/mcp) — where an agent parked on await_new_map picks up the next idea the moment it is submitted, with nothing to copy.',
+    // The HTTP form is preferred wherever the origin is known, because it is
+    // the door that works from a machine other than this one. `npm run mcp` is
+    // the fallback rather than the default: it is correct only for someone
+    // sitting in this checkout, and on the server render — where the browser's
+    // address has not reached us — it is the one of the two that cannot be
+    // wrong.
+    mcpCommand: origin
+      ? `claude mcp add --transport http thinking-map ${origin}/api/mcp`
+      : 'npm run mcp',
   };
 }

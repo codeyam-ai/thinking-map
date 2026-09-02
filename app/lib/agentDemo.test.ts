@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEMO_SEQUENCE, resultText } from './agentDemo';
+import { DEMO_SEQUENCE, demoWouldOverwrite, resultText } from './agentDemo';
 
 // The dev panel is the only way the exchange can be demonstrated at all — no
 // real agent can attach inside a capture iframe — so what it shows has to be
@@ -68,5 +68,83 @@ describe('DEMO_SEQUENCE', () => {
     for (const step of DEMO_SEQUENCE) {
       expect(step.note.length).toBeGreaterThan(0);
     }
+  });
+});
+
+/** A `read_map` reply carrying the whole log, as `sinceRevision: 0` returns it. */
+const log = (...kinds: string[]) => ({
+  structuredContent: {
+    delta: true,
+    revision: kinds.length,
+    events: kinds.map((kind, i) => ({ kind, revision: i + 1 })),
+  },
+});
+
+describe('demoWouldOverwrite', () => {
+  // The state the sequence is FOR. `createMap` writes one root `node.added`,
+  // and the first view change adds a `phase.set` — so a map nobody has touched
+  // already carries two events, and a naive count would refuse every map.
+  it('is false for a map holding only its root seed node', () => {
+    expect(demoWouldOverwrite(log('node.added', 'phase.set'))).toBe(false);
+  });
+
+  // The narrowest true case: one node beyond the seed. The demo would sit its
+  // two fixture assumptions next to something a person actually wrote.
+  it('is true once anything else is on the map', () => {
+    expect(demoWouldOverwrite(log('node.added', 'node.added'))).toBe(true);
+  });
+
+  // The reported case: a map with a research round already on it. This is the
+  // map the sequence was replayed over.
+  it('is true for a map with a full research round on it', () => {
+    expect(
+      demoWouldOverwrite(
+        log(
+          'node.added',
+          'node.added',
+          'node.added',
+          'node.added',
+          'node.added',
+          'node.added',
+          'node.added',
+          'phase.set',
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  // A person's own note or answer is work too, even though it adds no node.
+  // Counting only nodes would let the demo run over a conversation.
+  it('counts a person’s own contribution as work', () => {
+    expect(demoWouldOverwrite(log('node.added', 'user.note'))).toBe(true);
+  });
+
+  // Several view changes and nothing else is still an untouched map — phase is
+  // where you are LOOKING, not something on the map.
+  it('does not count repeated phase changes as work', () => {
+    expect(
+      demoWouldOverwrite(log('node.added', 'phase.set', 'phase.set', 'phase.set')),
+    ).toBe(false);
+  });
+
+  // Fail SAFE, and this is the direction that matters: an unreadable reply
+  // costs a sentence in the call log if we refuse wrongly, and somebody's
+  // thinking with two invented nodes in it if we run wrongly.
+  it('refuses when the reply cannot be read', () => {
+    expect(demoWouldOverwrite(undefined)).toBe(true);
+    expect(demoWouldOverwrite(null)).toBe(true);
+    expect(demoWouldOverwrite({})).toBe(true);
+    expect(demoWouldOverwrite({ structuredContent: {} })).toBe(true);
+    expect(demoWouldOverwrite({ structuredContent: { events: 'nope' } })).toBe(true);
+  });
+
+  // An empty log is the one absence that is NOT treated like an unreadable
+  // reply, and the difference is what "fail safe" actually means here. Safe is
+  // not "always refuse" — it is "never write over something". An empty log is a
+  // readable answer saying there is nothing here, so there is nothing to
+  // protect; an unreadable one is us not knowing, which is the case that
+  // refuses.
+  it('permits an empty log rather than treating absence as work', () => {
+    expect(demoWouldOverwrite(log())).toBe(false);
   });
 });

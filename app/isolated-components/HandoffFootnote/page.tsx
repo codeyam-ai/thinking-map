@@ -18,6 +18,21 @@ const scenarios: Record<string, Props> = {
       "Your idea is saved. Nothing is working on it yet — a map cannot summon a thinking partner, so an agent has to come to it.",
     attachHint:
       "Attach one two ways: a browser agent (Chrome 146+, top-level, secure context), or the MCP server (npm run mcp, or /api/mcp) — where an agent parked on await_new_map picks up the next idea the moment it is submitted, with nothing to copy.",
+    // The origin-bearing form, because it is the one a person on another
+    // machine can act on and the one whose length has to stay readable here.
+    mcpCommand:
+      "claude mcp add --transport http thinking-map https://thinking-map.example.com/api/mcp",
+  },
+  // The server render's fallback. Worth its own frame because the copyable
+  // block is a fraction of the width here and sits under two long grey
+  // paragraphs — the arrangement where a small mono box is most at risk of
+  // reading as a stray fragment rather than the third thing in a group.
+  ServerRender: {
+    explanation:
+      "Your idea is saved. Nothing is working on it yet — a map cannot summon a thinking partner, so an agent has to come to it.",
+    attachHint:
+      "Attach one two ways: a browser agent (Chrome 146+, top-level, secure context), or the MCP server (npm run mcp, or /api/mcp) — where an agent parked on await_new_map picks up the next idea the moment it is submitted, with nothing to copy.",
+    mcpCommand: "npm run mcp",
   },
 };
 

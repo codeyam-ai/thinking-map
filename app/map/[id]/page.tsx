@@ -4,6 +4,7 @@ import AppHeader from '@/app/components/AppHeader';
 import ErrorScreen from '@/app/components/ErrorScreen';
 import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
+import { agentPanelRequested, type QueryParams } from '@/app/lib/agentPanel';
 import { getBriefCoverage, getMap } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
 import { classifyLoadError } from '@/app/lib/loadError';
@@ -45,12 +46,14 @@ export async function generateMetadata({
   return { title: open > 0 ? `(${open}) ${map.title}` : map.title };
 }
 
-export default async function MapPage({
-  params,
-}: {
+interface MapPageProps {
   params: Promise<{ id: string }>;
-}) {
+  searchParams: Promise<QueryParams>;
+}
+
+export default async function MapPage({ params, searchParams }: MapPageProps) {
   const { id } = await params;
+  const query = await searchParams;
 
   // The load is caught HERE rather than left to `app/error.tsx`. A Next error
   // boundary is a client component, and in production React replaces
@@ -104,7 +107,7 @@ export default async function MapPage({
         brief={brief ?? undefined}
         seedIdea={map.seedIdea}
       />
-      {process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}
+      {agentPanelRequested(query) ? <AgentSimulator /> : null}
     </WebMcpBridge>
   );
 }

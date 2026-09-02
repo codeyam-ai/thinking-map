@@ -1,0 +1,651 @@
+{
+  "timestamp": "2026-09-02T14:33:03Z",
+  "title": "Keep the Dev Panel Away From Real Agents",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe dev-only agent panel appears on every real map in development and is the most clickable thing on the screen, so an agent driving the browser presses it — and \"Run the demo sequence\" drives `window.__thinkingMapAgent`, the *real* bound catalog, against the person's *real* map. That is where the two unrelated nodes and the open question in this report came from. Worse, those calls run with `origin: 'agent'`, and `AgentHandoff` hides itself the moment any agent-origin event exists — so running the demo removed the one panel that names the doors an agent can actually come in through (`npm run mcp`, `/api/mcp`). The agent then reported, correctly, that it had no way to attach: the instructions had just been hidden from it. This plan gates the panel behind a deliberate opt-in instead of `NODE_ENV`, keeps the demo sequence off maps that hold real work, stops the handoff band vanishing on the first agent event, and makes the MCP endpoint copyable rather than merely mentioned.\n\n## Key Decisions\n\n- **`NODE_ENV !== 'production'` is the wrong gate.** It answers \"is this a dev build\", when the question is \"can a real agent reach this page\". Every `npm run dev` session is a dev build, including the ones where a genuine agent is working. The panel moves to an explicit per-tab opt-in — `?agentPanel=1` on the map URL — which no agent stumbles onto and which needs no server restart to toggle.\n- **The scenario captures are unaffected**, which is what makes the gate safe. `agentsimulator-default`, `agentsimulator-open` and `agentpanellauncher-default` all render through `app/isolated-components/AgentSimulator/page.tsx`, not through the map page. Removing the map page's unconditional render costs no capture.\n- **The demo sequence refuses a map that holds real work.** Even opted in, replaying fixture nodes over a map someone is actually thinking on is destructive, and the content is not obviously fake — \"People reread their own notes\" reads exactly like a real assumption. The panel checks the map first and says why it declined rather than writing.\n- **`workedByAgent` becomes \"demote\", not \"hide\".** The original intent is right — a map an agent has already worked is not waiting for one, so it should not be pitched a big lime handoff band. But hiding it *entirely* means a person whose agent has detached has no on-screen route back, which is precisely the state this report describes. So: attached → render nothing (unchanged); not attached but previously worked → a compact reattach strip carrying the prompt and the MCP line; not attached and never worked → the full band (unchanged).\n- **The MCP door becomes copyable, not described.** `attachHint` today is one sentence naming `npm run mcp` and `/api/mcp` in prose. An agent reading the page needs a command it can act on, so `handoffCopy` gains an `mcpCommand` rendered through the existing `CopyablePrompt`. `handoffCopy` stays pure, so the page's origin arrives as an argument rather than being read from `window` inside it.\n- **No change to the tools, the catalog, or `agentDemo`'s content.** The sequence is still the best written description of one agent turn in the repo, and `app/isolated-components/AgentSimulator/page.tsx` is still where it is demonstrated. What changes is *where it can run*.\n\n## Implementation\n\n### 1. The map page stops rendering the panel unconditionally\n\n**File**: `app/map/[id]/page.tsx`\n\nReplace the `process.env.NODE_ENV === 'production' ? null : <AgentSimulator />` line with a render gated on an opt-in read from `searchParams` (`agentPanel=1`). The page already takes `params`; it gains `searchParams` alongside it, both `Promise`-typed as this Next version requires. The `NODE_ENV` check stays as an additional floor — the opt-in cannot summon the panel in a production build — but it is no longer sufficient on its own.\n\n### 2. The demo sequence declines a map with real work on it\n\n**File**: `app/components/AgentSimulator.tsx`\n\nBefore `runSequence` runs its first step, call `read_map` through the driver and count what is there. If the map holds more than the root seed node, or the log carries any event beyond the seed, do not run: append a line to the call log saying the sequence writes fixture content and this map already has real work on it, and stop. `runOne` is unaffected — a deliberate single call is the panel's other purpose and the person typing a tool name knows what they are doing.\n\n**File**: `app/lib/agentDemo.ts`\n\nAdd the predicate as a pure function next to the sequence it guards — `demoWouldOverwrite(readMapResult): boolean` — so the rule is unit-testable rather than living inside a component callback, matching why `resultText` is already in this file.\n\n### 3. The handoff band demotes instead of disappearing\n\n**File**: `app/components/AgentHandoff.tsx`\n\n`listening` keeps its current meaning and still returns `null`. `workedByAgent` stops being a second early return and instead selects a compact presentation: the eyebrow, the copyable start prompt, and the MCP command, without `HandoffInstruction`'s steps or `SeedIdeaQuote`. The full band is unchanged for a map nothing has touched.\n\n**File**: `app/lib/handoffCopy.ts`\n\n- Take an optional `origin` (the page's own origin) and a new `worked` flag.\n- Add `mcpCommand: string` — the `claude mcp add --transport http thinking-map <origin>/api/mcp` form when an origin is given, falling back to `npm run mcp` when it is not (server render, before the client knows its origin).\n- Add a `reattach` eyebrow/instruction pair for the demoted state — wording that says the map has been worked and how to pick it back up, not \"no one is on this yet\", which would be false.\n- `attachHint` keeps its prose, which is still the honest explanation of *why* two doors exist.\n\n**File**: `app/components/HandoffFootnote.tsx`\n\nRender the `mcpCommand` through `CopyablePrompt` with `tone` left at its secondary default, beneath the existing explanation — the start prompt stays the primary action.\n\n### 4. Tests\n\n**File**: `app/components/AgentHandoff.render.test.tsx`\n\nThe existing agent-origin case flips from \"renders nothing\" to \"renders the reattach strip\" (see Reproduction Test). The connected and working cases still assert empty output and are untouched.\n\n**File**: `app/lib/handoffCopy.test.ts`\n\nNew cases: `mcpCommand` names the given origin; with no origin it falls back to `npm run mcp`; the `worked` variant does not claim nobody is on it.\n\n**New file**: `app/lib/agentDemo.test.ts` additions — `demoWouldOverwrite` is false for a map holding only its root seed node and true once anything else is on it.\n\n**New file**: `app/components/AgentSimulator.render.test.tsx`\n\nOpting in renders the launcher; the demo button on a map with real work logs the refusal and calls no write tool.\n\n## Reused existing code\n\n- `AgentSimulator` from `app/components/AgentSimulator.tsx` (glossary entry: `AgentSimulator`) — the panel being gated; its body is unchanged apart from the sequence guard.\n- `AgentHandoff` from `app/components/AgentHandoff.tsx` (glossary entry: `AgentHandoff`) — the band whose disappearance hid the door.\n- `handoffCopy` from `app/lib/handoffCopy.ts` (glossary entry: `handoffCopy`) — every string stays here, where the tests pin it; the new `mcpCommand` follows the same rule.\n- `CopyablePrompt` from `app/components/CopyablePrompt.tsx` (glossary entry: `CopyablePrompt`) — already handles a clipboard refusal and keeps the text selectable, which is exactly what the MCP command needs; its `tone` prop means adding a second caller cannot restyle the primary one.\n- `BridgeFixture` from `app/isolated-components/BridgeFixture.tsx` — how the render tests give a bridge state an isolated render cannot produce.\n- `resultText` and `DEMO_SEQUENCE` from `app/lib/agentDemo.ts` — the guard joins them rather than being inlined into the component.\n- **Existing-implementation survey**: there is no opt-in mechanism for dev-only UI anywhere in the repo today — `grep -rn \"searchParams\" app/map` returns nothing and no component reads a query flag, so the `?agentPanel=1` gate is genuinely new. `isWebMcpAvailable` / `webMcpUnavailableReason` in `app/lib/webmcp.ts` are the nearest existing gates and are deliberately NOT reused: they answer whether WebMCP can bind in this frame, which is false in captures *and* in an ordinary Chrome tab, so gating the panel on them would either hide it where it is needed or show it where it is not.\n\n## Reproduction Test\n\nPins the trap: after any agent-origin event, a map with nothing attached shows no route back to an agent at all.\n\n**Target**: `app/components/AgentHandoff.render.test.tsx` — run with `codeyam-editor editor refresh-tests --test AgentHandoff`.\n\nChange to the existing case `renders nothing when the log already carries an agent-origin event`:\n\n```diff\n-  // Reopening a map an agent has already contributed to, in a browser with no\n-  // agent. Bridge status alone would wrongly show the panel here.\n-  it('renders nothing when the log already carries an agent-origin event', () => {\n-    const { container } = render(\n-      <BridgeFixture status=\"unavailable\" events={[userEvent(), agentEvent()]}>\n-        <AgentHandoff mapId={MAP_ID} seedIdea=\"A chore app\" hasBrief={false} />\n-      </BridgeFixture>,\n-    );\n-    expect(container.textContent).toBe('');\n-  });\n+  // Reopening a map an agent has already contributed to, in a browser with no\n+  // agent. The full pitch would be wrong — but so is showing nothing: this is\n+  // exactly the state where someone needs the way back in.\n+  it('still offers a way back in on a map an agent has already worked', () => {\n+    const { container } = render(\n+      <BridgeFixture status=\"unavailable\" events={[userEvent(), agentEvent()]}>\n+        <AgentHandoff mapId={MAP_ID} seedIdea=\"A chore app\" hasBrief={false} />\n+      </BridgeFixture>,\n+    );\n+    expect(container.textContent).not.toBe('');\n+    expect(screen.getByText(new RegExp(MAP_ID))).toBeTruthy();\n+    expect(container.textContent).not.toMatch(/No one is on this yet/i);\n+  });\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: `AgentHandoff` returns `null` on the `workedByAgent` branch today, so `container.textContent` is `''` and the `not.toBe('')` assertion fails first, with `getByText` then unable to find the map id.\n\n## Scenarios to Demonstrate\n\n- **A real map in dev, no opt-in** — the map with no agent panel anywhere on it, which is the whole point.\n- **The same map with `?agentPanel=1`** — the collapsed launcher back in its corner.\n- **The demo sequence declining** — the panel open on a map with real work, the call log carrying the refusal and no nodes added.\n- **The demo sequence running** — the panel open on a fresh map holding only its seed, the sequence proceeding as it does today.\n- **Reattach strip** — an unattached map an agent has already worked: the compact strip with the start prompt and the MCP command, and no \"No one is on this yet\".\n- **Full handoff band, unchanged** — a brand-new map nothing has touched.\n- **Attached agent** — nothing from this plan on screen at all.",
+  "description": "The dev agent panel is no longer rendered just because this is a dev build. `NODE_ENV !== 'production'` answered \"is this a dev build\" when the question that matters is \"can a real agent reach this page\" — so every `npm run dev` session showed the panel, including the ones where a genuine agent was driving the browser, and an agent that found it pressed the most clickable thing on it. \"Run the demo sequence\" drives `window.__thinkingMapAgent`, the real bound catalog, so that click wrote two invented nodes and an open question onto somebody's real map. The panel now takes a deliberate `?agentPanel=1` (extracted as `agentPanelRequested`, with the production check kept as a floor underneath), and even opted in the sequence calls `read_map` first and refuses when the map holds more than its root seed (`demoWouldOverwrite`, reading the structured event log and discounting `phase.set`, failing safe on an unreadable reply). `runOne` is deliberately unguarded: someone typing a tool name has said what they want.\n\nThe second half of the same bug: `AgentHandoff` hid itself entirely once any agent-origin event existed, so running the demo removed the one panel naming the doors an agent can come in through — and the agent then reported, correctly, that it had no way to attach. `workedByAgent` now demotes rather than hides, rendering a new `HandoffReattach` strip carrying the start prompt and a copyable `mcpCommand` (the `claude mcp add --transport http` form when the page's origin is known, `npm run mcp` on the server render where it is not). The full band is unchanged for a map nothing has touched, and gained the same copyable command at its foot.\n\nTwo things surfaced by the checks rather than the plan. The reattach strip is `shrink-0` inside `MapScreen`'s `h-screen` flex column, so on the finished-plan screen it was taking about a quarter of the summary someone had come back to read; on the user's decision it collapses to a single row there (`dense`, via a new `inline` tone on `CopyablePrompt`). And it exposed two pre-existing scenarios — \"A plan with a gap\" and \"Complete — what to do next\" — whose only difference was a clipped line at the very top of the frame, fragile enough that any height change made them byte-identical; the gap moved onto a build card that is actually visible, so the scenario now demonstrates its own point.\n\nSCOPE VERDICT: this cycle delivered no new project deliverable — it is a bug fix against `an-mcp-server-exposing-the-same-planning-tools` and the agent-handoff surface, both already delivered. Nothing was deferred by this cycle. For the record, the project's deliverables board carries one standing deferral, `assist-track-not-this-build-flow-registering`, marked `decidedBy: user`; the other nine are delivered. Nine of those ten carry `decidedBy: agent`, which is worth noting as an accuracy caveat on the board rather than a claim about this cycle: they record the agent's own judgement that the deliverable was met, not a user confirmation.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/keep-the-dev-panel-away-from-real-agents.md\t.codeyam/plans/completed/keep-the-dev-panel-away-from-real-agents.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/a-plan-with-a-gap-one-slice-proves-nothing.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/agentsimulator-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/agentsimulator-open.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/complete-what-to-do-next.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-defaultlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-primary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-shortprompt--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6f6f70fc8935de26cc2a87488ac140e5a0638fdd9fc461c7d84c56f624463d2c.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c8a209e94ffeb3d31740b2aaee1d354100f1363a84b69dbf270ada788537ba04.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentHandoff.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentHandoff.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentSimulator.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CopyablePrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/HandoffFootnote.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/CopyablePrompt/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/HandoffFootnote/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/agentDemo.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/agentDemo.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/handoffCopy.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/handoffCopy.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "core",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/copyableprompt-inline.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handofffootnote-serverrender.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffreattach-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffreattach-dense.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffreattach-frombrief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/handoffreattach-serverrender.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-inline--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copyableprompt-inline--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-serverrender--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handofffootnote-serverrender--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-dense--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-dense--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-frombrief--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-frombrief--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-serverrender--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/handoffreattach-serverrender--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/the-dev-panel-deliberately-opted-into.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/keep-the-dev-panel-away-from-real-agents.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3d588439a0eb07641d316f46131901a9025fd79761deadfecf6f70f8dafcf7c1.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/49427d4da71d1e8dc2c74b69d15c3f87a5fde378e56a019fd4c51c57b69dcbf3.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AgentSimulator.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/HandoffReattach.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/HandoffReattach/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/agentPanel.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/agentPanel.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentSimulator - Default",
+      "screenshotPath": "agentsimulator-default--tablet.png"
+    },
+    {
+      "name": "AgentSimulator - Open",
+      "screenshotPath": "agentsimulator-open--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - Default",
+      "screenshotPath": "copyableprompt-default--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - DefaultLabel",
+      "screenshotPath": "copyableprompt-defaultlabel--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - Inline",
+      "screenshotPath": "copyableprompt-inline--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - Primary",
+      "screenshotPath": "copyableprompt-primary--tablet.png"
+    },
+    {
+      "name": "CopyablePrompt - ShortPrompt",
+      "screenshotPath": "copyableprompt-shortprompt--tablet.png"
+    },
+    {
+      "name": "HandoffFootnote - Default",
+      "screenshotPath": "handofffootnote-default--tablet.png"
+    },
+    {
+      "name": "HandoffFootnote - ServerRender",
+      "screenshotPath": "handofffootnote-serverrender--tablet.png"
+    },
+    {
+      "name": "HandoffReattach - Default",
+      "screenshotPath": "handoffreattach-default--tablet.png"
+    },
+    {
+      "name": "HandoffReattach - Dense",
+      "screenshotPath": "handoffreattach-dense--tablet.png"
+    },
+    {
+      "name": "HandoffReattach - FromBrief",
+      "screenshotPath": "handoffreattach-frombrief--tablet.png"
+    },
+    {
+      "name": "HandoffReattach - ServerRender",
+      "screenshotPath": "handoffreattach-serverrender--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 61,
+    "passed": 61,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 61,
+        "passed": 61
+      }
+    ]
+  }
+}

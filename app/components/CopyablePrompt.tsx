@@ -11,12 +11,25 @@ const PROMPT_CLASS = {
     'mt-4 rounded-2xl border border-line px-4 py-3 font-mono text-[12px] leading-[1.6]',
   primary:
     'mt-4 rounded-2xl border border-line bg-surface px-4 py-3 font-mono text-[13px] leading-[1.6] break-words',
+  // `truncate` rather than `break-words`: this tone exists to hold ONE row, and
+  // a wrapping command would defeat the only thing it is for. The full text is
+  // still selectable and still what the button copies, so nothing is lost but
+  // the sight of it.
+  // Sized as a FLEX CHILD, not a block: its caller lays the text and the button
+  // out as one row, so the text takes the leftover width (`flex-1`) and is
+  // allowed to shrink below its content (`min-w-0`) so `truncate` can act.
+  // Without `min-w-0` the long command wins the row and the button wraps under
+  // it, which is the two-line strip this tone exists to avoid.
+  inline:
+    'min-w-0 flex-1 truncate rounded-full border border-line px-3 py-1 font-mono text-[11px] leading-[1.6]',
 } as const;
 
 const BUTTON_CLASS = {
   default: 'mt-3 rounded-full border border-ink px-4 py-2 text-[13px] font-semibold',
   primary:
     'mt-3 rounded-full border border-ink bg-lime px-5 py-2.5 text-[14px] font-semibold hover:bg-lime-deep',
+  inline:
+    'shrink-0 rounded-full border border-ink px-3 py-1 text-[11px] font-semibold',
 } as const;
 
 /**
@@ -42,7 +55,8 @@ export default function CopyablePrompt({
   text: string;
   label?: string;
   copiedLabel?: string;
-  tone?: 'default' | 'primary';
+  /** `inline` keeps the block and its button on ONE row — see PROMPT_CLASS. */
+  tone?: 'default' | 'primary' | 'inline';
 }) {
   const [copied, setCopied] = useState(false);
 

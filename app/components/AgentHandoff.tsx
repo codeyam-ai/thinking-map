@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import CopyablePrompt from './CopyablePrompt';
 import HandoffFootnote from './HandoffFootnote';
 import HandoffInstruction from './HandoffInstruction';
+import HandoffReattach from './HandoffReattach';
 import SeedIdeaQuote from './SeedIdeaQuote';
 import { handoffCopy } from '../lib/handoffCopy';
 import { useOptionalWebMcpBridge } from './WebMcpBridge';
@@ -27,12 +29,28 @@ export default function AgentHandoff({
   mapId,
   seedIdea,
   hasBrief,
+  dense = false,
 }: {
   mapId: string;
   seedIdea?: string;
   hasBrief: boolean;
+  /**
+   * Render the reattach strip as one row. Passed by `MapScreen` on the
+   * finished-plan view, where the summary is what the person came back for and
+   * this main is an `h-screen` flex column — so every row this takes is a row
+   * the summary loses. Affects only the demoted strip; the full band already
+   * only appears on maps that have nothing else competing for the space.
+   */
+  dense?: boolean;
 }) {
   const bridge = useOptionalWebMcpBridge();
+
+  // Read after mount rather than during render: this component server-renders,
+  // and `window` is not there yet. Starting undefined means the first paint
+  // shows the `npm run mcp` fallback — correct, if less useful — and the HTTP
+  // form replaces it once the browser's own address is knowable.
+  const [origin, setOrigin] = useState<string>();
+  useEffect(() => setOrigin(window.location.origin), []);
 
   // The same predicate `NodeQuestionComposer` uses, deliberately: `working`
   // counts as listening, because a bridge mid-tool-call still sees this map
@@ -45,9 +63,34 @@ export default function AgentHandoff({
   // it in a browser with no agent should see their map, not a handoff pitch.
   const workedByAgent = (bridge?.events ?? []).some((e) => e.origin === 'agent');
 
-  if (listening || workedByAgent) return null;
+  if (listening) return null;
 
-  const copy = handoffCopy({ mapId, seedIdea, hasBrief });
+  const copy = handoffCopy({
+    mapId,
+    seedIdea,
+    hasBrief,
+    worked: workedByAgent,
+    origin,
+  });
+
+  // Demoted, not deleted.
+  //
+  // Hiding this outright was the right instinct applied one step too far: the
+  // full lime pitch IS wrong on a map with an agent's work already on it. But
+  // "an agent worked here and has since detached" is precisely the state where
+  // someone needs a route back in, and rendering nothing left them with a
+  // header that says "No agent attached" and no way to change that.
+  if (workedByAgent) {
+    return (
+      <HandoffReattach
+        eyebrow={copy.eyebrow}
+        instruction={copy.instruction}
+        startPrompt={copy.startPrompt}
+        mcpCommand={copy.mcpCommand}
+        dense={dense}
+      />
+    );
+  }
 
   return (
     // Lime, and a heavier border than the surrounding cards: on this screen it
@@ -73,6 +116,7 @@ export default function AgentHandoff({
       <HandoffFootnote
         explanation={copy.explanation}
         attachHint={copy.attachHint}
+        mcpCommand={copy.mcpCommand}
       />
     </section>
   );

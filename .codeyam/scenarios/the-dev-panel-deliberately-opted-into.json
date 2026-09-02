@@ -1,0 +1,62 @@
+{
+  "name": "The dev panel, deliberately opted into",
+  "id": "943af8ae-9f85-4025-a964-12f541baa720",
+  "url": "/map/map-panel?agentPanel=1",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-panel-1",
+        "kind": "node.added",
+        "mapId": "map-panel",
+        "origin": "user",
+        "payload": "{\"id\": \"j-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Weekly habit tracker\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-panel-2",
+        "kind": "phase.set",
+        "mapId": "map-panel",
+        "origin": "agent",
+        "payload": "{\"phase\": \"deconstruct\"}",
+        "revision": 2
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "p-idea",
+        "kind": "idea",
+        "label": "Weekly habit tracker",
+        "mapId": "map-panel",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "A weekly habit tracker my flatmates and I would all actually open.",
+        "id": "p1",
+        "mapId": "map-panel",
+        "origin": "user",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-panel",
+        "phase": "map",
+        "revision": 2,
+        "seedIdea": "A weekly habit tracker my flatmates and I would all actually open.",
+        "title": "Weekly habit tracker"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The only map in the set that shows the agent panel launcher, and it shows it because the URL asked: ?agentPanel=1. Every other map scenario is the same page without it, which is the comparison that matters - the panel is gated on a deliberate opt-in now, not on merely being a dev build, because an agent driving an ordinary dev session used to find that launcher on every real map and press it. The map underneath holds only its seed idea, which is also the one state where the demo sequence behind the launcher is still allowed to run."
+}

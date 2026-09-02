@@ -48,6 +48,11 @@ export default function MapScreen({
           mapId={mapId}
           seedIdea={seedIdea}
           hasBrief={brief !== undefined}
+          // The summary is what someone opens a finished map FOR, and this
+          // column is `h-screen`, so a full-height reattach strip here is taken
+          // straight out of the plan they came back to read. One row keeps the
+          // way back without charging the summary a quarter of the screen.
+          dense={phase === 'next-steps'}
         />
       ) : null}
       {phase === 'next-steps' ? (

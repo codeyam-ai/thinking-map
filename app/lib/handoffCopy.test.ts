@@ -109,6 +109,50 @@ describe('handoffCopy', () => {
     expect(copy.steps).toHaveLength(2);
   });
 
+  // An agent reading this page needs a command it can RUN. The prose hint names
+  // the door; this is the door, and it has to name the origin the page is
+  // actually being served from or it points at the wrong machine.
+  it('builds an MCP command naming the given origin', () => {
+    const copy = handoffCopy({
+      mapId: MAP_ID,
+      hasBrief: false,
+      origin: 'https://maps.example.com',
+    });
+    expect(copy.mcpCommand).toContain('https://maps.example.com/api/mcp');
+  });
+
+  // The server render has no origin yet. `npm run mcp` is correct only for
+  // someone in this checkout, but it is the one of the two that cannot be
+  // WRONG — a guessed origin would send an agent somewhere that is not this app.
+  it('falls back to npm run mcp when no origin is known', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false });
+    expect(copy.mcpCommand).toBe('npm run mcp');
+  });
+
+  // The reason the `worked` flag exists. "No one is on this yet" is simply
+  // false on a map carrying an agent's work, and a person who reads a false
+  // sentence about their own map stops trusting the true ones beside it.
+  it('does not claim nobody is on a map an agent has already worked', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false, worked: true });
+    expect(copy.eyebrow).not.toMatch(/No one is on this yet/i);
+    expect(copy.instruction).not.toMatch(/No one is on this yet/i);
+  });
+
+  // The full band's wording is unchanged for a map nothing has touched — the
+  // demoted variant must not leak into the first-meeting case.
+  it('keeps the original wording for an untouched map', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false });
+    expect(copy.eyebrow).toBe('No one is on this yet');
+    expect(copy.instruction).toBe('Hand this to your agent');
+  });
+
+  // The prompt is the useful half in BOTH states, so demoting the band must not
+  // have quietly dropped the id an agent needs to find the map.
+  it('still names the map in the worked variant’s prompt', () => {
+    const copy = handoffCopy({ mapId: MAP_ID, hasBrief: false, worked: true });
+    expect(copy.startPrompt).toContain(MAP_ID);
+  });
+
   // Every field renders directly; an empty one would be a blank row in the card.
   // `steps` is an array, so check the strings inside it rather than only its
   // length — two empty steps would pass a length check and render two blank

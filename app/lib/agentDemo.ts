@@ -79,6 +79,45 @@ export const DEMO_SEQUENCE: DemoStep[] = [
   },
 ];
 
+/** What the panel says instead of replaying the sequence over someone's work. */
+export const DEMO_REFUSAL =
+  'Not running: the sequence writes fixture nodes ("People reread their own notes"), and this map already has real work on it. Use the tool runner below to make a single deliberate call instead.';
+
+/**
+ * Whether replaying the demo sequence here would write fixture content over
+ * something real.
+ *
+ * The guard exists because the sequence's nodes do not LOOK like fixtures —
+ * "People reread their own notes" reads exactly like an assumption a person
+ * would have written — so a demo run on the wrong map leaves content nobody can
+ * identify as fake later. That is not a hypothetical: it is what this whole
+ * change is a response to.
+ *
+ * It reads the event log rather than the rendered map because the log is the
+ * structured half of `read_map`'s reply — counting lines of prose meant for an
+ * agent to read would break the first time that prose was reworded. `phase.set`
+ * is discounted deliberately: `createMap` writes one root `node.added` and the
+ * first view change adds a `phase.set`, so a map nobody has touched can already
+ * carry two events, and counting those as work would refuse every map.
+ *
+ * An unreadable reply refuses. The cost of a wrong refusal is a sentence in the
+ * call log; the cost of a wrong run is somebody's thinking with two invented
+ * nodes in the middle of it.
+ */
+export function demoWouldOverwrite(result: unknown): boolean {
+  const events = (
+    result as { structuredContent?: { events?: unknown } } | null | undefined
+  )?.structuredContent?.events;
+  if (!Array.isArray(events)) return true;
+
+  const substantive = events.filter((event) => {
+    const kind = (event as { kind?: unknown } | null)?.kind;
+    return typeof kind === 'string' && kind !== 'phase.set';
+  });
+
+  return substantive.length > 1;
+}
+
 /**
  * The readable part of an MCP tool response.
  *

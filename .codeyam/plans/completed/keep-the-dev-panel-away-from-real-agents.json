@@ -1,0 +1,42 @@
+{
+  "claimStartedAt": "2026-09-02T13:32:29Z",
+  "completedAt": "2026-09-02T14:33:03Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "ui-step22",
+    "machine": "codeyam-editor-codeyam-editor-11",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "keep-the-dev-panel-away-from-real-agents",
+    "sessionId": "60d8dcd3-f1ed-4121-9beb-55c19d88cdff",
+    "startedAt": "2026-09-02T13:32:29Z"
+  },
+  "createdAt": "2026-09-02T12:39:14Z",
+  "deliverables": [
+    "app/components/AgentHandoff.render.test.tsx",
+    "app/components/AgentHandoff.tsx",
+    "app/components/AgentSimulator.render.test.tsx",
+    "app/components/AgentSimulator.tsx",
+    "app/components/CopyablePrompt.tsx",
+    "app/components/HandoffFootnote.tsx",
+    "app/components/HandoffReattach.tsx",
+    "app/components/MapScreen.tsx",
+    "app/isolated-components/CopyablePrompt/page.tsx",
+    "app/isolated-components/HandoffFootnote/page.tsx",
+    "app/isolated-components/HandoffReattach/page.tsx",
+    "app/lib/agentDemo.test.ts",
+    "app/lib/agentDemo.ts",
+    "app/lib/agentPanel.test.ts",
+    "app/lib/agentPanel.ts",
+    "app/lib/handoffCopy.test.ts",
+    "app/lib/handoffCopy.ts",
+    "app/map/[id]/page.tsx",
+    "core"
+  ],
+  "journalTimestamp": "2026-09-02T14:33:03Z",
+  "mode": "ui",
+  "planFile": "completed/keep-the-dev-panel-away-from-real-agents.md",
+  "slug": "keep-the-dev-panel-away-from-real-agents",
+  "title": "Keep the Dev Panel Away From Real Agents"
+}

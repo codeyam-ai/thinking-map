@@ -1,3 +1,5 @@
+import CopyablePrompt from './CopyablePrompt';
+
 /**
  * The honest paragraph about why nobody is attached, and the two ways to fix
  * that for good — kept, and kept small.
@@ -16,14 +18,21 @@
 export default function HandoffFootnote({
   explanation,
   attachHint,
+  mcpCommand,
 }: {
   explanation: string;
   attachHint: string;
+  mcpCommand: string;
 }) {
   return (
     <>
       <p className="mt-4 text-[12px] leading-[1.6] text-muted">{explanation}</p>
       <p className="mt-2 text-[12px] leading-[1.6] text-muted">{attachHint}</p>
+      {/* The hint above names the MCP door; this is the door. It stays at the
+          default tone so the start prompt keeps being the one thing on the
+          screen asking to be pressed — the paragraph explains the choice, and
+          this is here for the reader who has already made it. */}
+      <CopyablePrompt text={mcpCommand} label="Copy MCP command" />
     </>
   );
 }

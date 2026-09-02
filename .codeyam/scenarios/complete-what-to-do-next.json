@@ -1,381 +1,381 @@
 {
- "name": "Complete - what to do next",
- "id": "4cbcf4f1-4621-416a-9923-b0e1e19b90a6",
- "url": "/map/map-game",
- "dimensions": [
-  "Desktop"
- ],
- "mocks": {},
- "seed": {
-  "mapEvent": [
-   {
-    "id": "ev-map-game-1",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "user",
-    "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}",
-    "revision": 1
-   },
-   {
-    "id": "ev-map-game-2",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-k1\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Vocabulary is the strongest fit for ages 6-8.\", \"status\": \"answered\"}",
-    "revision": 2
-   },
-   {
-    "id": "ev-map-game-3",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-k2\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Three existing apps miss parent involvement.\", \"status\": \"answered\"}",
-    "revision": 3
-   },
-   {
-    "id": "ev-map-game-4",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-k3\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Teachers are a viable second audience.\", \"status\": \"answered\"}",
-    "revision": 4
-   },
-   {
-    "id": "ev-map-game-5",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-u1\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"Whether teachers would pay for this.\", \"status\": \"open\"}",
-    "revision": 5
-   },
-   {
-    "id": "ev-map-game-6",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-u2\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"How much parent involvement really matters.\", \"status\": \"open\"}",
-    "revision": 6
-   },
-   {
-    "id": "ev-map-game-7",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-u3\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"Which age band responds best.\", \"status\": \"open\"}",
-    "revision": 7
-   },
-   {
-    "id": "ev-map-game-8",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-d1\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}",
-    "revision": 8
-   },
-   {
-    "id": "ev-map-game-9",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-d2\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Teacher assessment tool\", \"status\": \"answered\"}",
-    "revision": 9
-   },
-   {
-    "id": "ev-map-game-10",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-d3\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Shared parent-teacher app\", \"status\": \"answered\"}",
-    "revision": 10
-   },
-   {
-    "id": "ev-map-game-11",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-s1\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Interview 3 teachers\", \"status\": \"answered\"}",
-    "revision": 11
-   },
-   {
-    "id": "ev-map-game-12",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-s2\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Shortlist one approach to prototype\", \"status\": \"answered\"}",
-    "revision": 12
-   },
-   {
-    "id": "ev-map-game-13",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-s3\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Sketch the classroom vocabulary flow\", \"status\": \"answered\"}",
-    "revision": 13
-   },
-   {
-    "id": "ev-map-game-14",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-s4\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Test the flow with one teacher\", \"status\": \"answered\"}",
-    "revision": 14
-   },
-   {
-    "id": "ev-map-game-15",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-s5\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Check what district buy-in needs\", \"status\": \"answered\"}",
-    "revision": 15
-   },
-   {
-    "id": "ev-map-game-16",
-    "kind": "phase.set",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"phase\": \"next-steps\"}",
-    "revision": 16
-   },
-   {
-    "id": "ev-map-game-17",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-b1\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"Ten words on paper cards, one classroom\", \"status\": \"answered\", \"testsNodeId\": \"n-u3\"}",
-    "revision": 17
-   },
-   {
-    "id": "ev-map-game-18",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-b2\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"One teacher runs a round and sees the scores\", \"status\": \"answered\", \"testsNodeId\": \"n-u1\"}",
-    "revision": 18
-   },
-   {
-    "id": "ev-map-game-19",
-    "kind": "node.added",
-    "mapId": "map-game",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-b3\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"The round goes home for a parent to finish\", \"status\": \"answered\", \"testsNodeId\": \"n-u2\"}",
-    "revision": 19
-   }
+  "name": "Complete - what to do next",
+  "id": "8aa56d4f-62f0-44bd-bd41-083d9e7461b4",
+  "url": "/map/map-game",
+  "dimensions": [
+    "Desktop"
   ],
-  "mapNode": [
-   {
-    "id": "n-idea",
-    "kind": "idea",
-    "label": "Educational game",
-    "mapId": "map-game",
-    "order": 0,
-    "origin": "user",
-    "parentId": null,
-    "status": "answered"
-   },
-   {
-    "id": "n-k1",
-    "kind": "known",
-    "label": "Vocabulary is the strongest fit for ages 6-8.",
-    "mapId": "map-game",
-    "order": 0,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-k2",
-    "kind": "known",
-    "label": "Three existing apps miss parent involvement.",
-    "mapId": "map-game",
-    "order": 1,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-k3",
-    "kind": "known",
-    "label": "Teachers are a viable second audience.",
-    "mapId": "map-game",
-    "order": 2,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-u1",
-    "kind": "unknown",
-    "label": "Whether teachers would pay for this.",
-    "mapId": "map-game",
-    "order": 3,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "open"
-   },
-   {
-    "id": "n-u2",
-    "kind": "unknown",
-    "label": "How much parent involvement really matters.",
-    "mapId": "map-game",
-    "order": 4,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "open"
-   },
-   {
-    "id": "n-u3",
-    "kind": "unknown",
-    "label": "Which age band responds best.",
-    "mapId": "map-game",
-    "order": 5,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "open"
-   },
-   {
-    "id": "n-d1",
-    "kind": "direction",
-    "label": "Classroom vocabulary game",
-    "mapId": "map-game",
-    "order": 6,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-d2",
-    "kind": "direction",
-    "label": "Teacher assessment tool",
-    "mapId": "map-game",
-    "order": 7,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-d3",
-    "kind": "direction",
-    "label": "Shared parent-teacher app",
-    "mapId": "map-game",
-    "order": 8,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-s1",
-    "kind": "next-step",
-    "label": "Interview 3 teachers",
-    "mapId": "map-game",
-    "order": 9,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-s2",
-    "kind": "next-step",
-    "label": "Shortlist one approach to prototype",
-    "mapId": "map-game",
-    "order": 10,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-s3",
-    "kind": "next-step",
-    "label": "Sketch the classroom vocabulary flow",
-    "mapId": "map-game",
-    "order": 11,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-s4",
-    "kind": "next-step",
-    "label": "Test the flow with one teacher",
-    "mapId": "map-game",
-    "order": 12,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "id": "n-s5",
-    "kind": "next-step",
-    "label": "Check what district buy-in needs",
-    "mapId": "map-game",
-    "order": 13,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered"
-   },
-   {
-    "detail": "About two days. No app at all - printed cards and a tally sheet.",
-    "id": "n-b1",
-    "kind": "slice",
-    "label": "Ten words on paper cards, one classroom",
-    "mapId": "map-game",
-    "order": 14,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered",
-    "testsNodeId": "n-u3"
-   },
-   {
-    "detail": "About a week. A single screen, one class, no accounts.",
-    "id": "n-b2",
-    "kind": "slice",
-    "label": "One teacher runs a round and sees the scores",
-    "mapId": "map-game",
-    "order": 15,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered",
-    "testsNodeId": "n-u1"
-   },
-   {
-    "detail": "About two weeks, and only worth starting once the classroom round holds up.",
-    "id": "n-b3",
-    "kind": "slice",
-    "label": "The round goes home for a parent to finish",
-    "mapId": "map-game",
-    "order": 16,
-    "origin": "agent",
-    "parentId": "n-idea",
-    "status": "answered",
-    "testsNodeId": "n-u2"
-   }
-  ],
-  "message": [
-   {
-    "content": "So where would you start?",
-    "id": "msg-1",
-    "mapId": "map-game",
-    "origin": "user",
-    "role": "user"
-   },
-   {
-    "content": "Here's what we've learned, the three strongest directions, and where I'd start tomorrow. Nothing here is locked in \u2014 say the word and we can keep pulling on any of it.",
-    "id": "msg-2",
-    "mapId": "map-game",
-    "origin": "agent",
-    "role": "assistant"
-   }
-  ],
-  "thinkingMap": [
-   {
-    "id": "map-game",
-    "phase": "next-steps",
-    "revision": 19,
-    "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-    "title": "Educational game for kids"
-   }
-  ]
- },
- "scenarioType": "application",
- "pageFilePath": "app/map/[id]/page.tsx",
- "description": "The summary screen: what we know, what we do not, three directions, a build sequence that starts with paper and names what each increment would settle, and five concrete next steps - with somewhere to put the next thought beneath it, because the plan is a starting point rather than a dead end. Captured at Desktop rather than the project's Tablet default: at 768px the summary stacks taller, the frame lands on the page bottom, and the build slice that distinguishes this scenario from its pair falls above it \u2014 both would capture identically and prove nothing."
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "user",
+        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-game-2",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-k1\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Vocabulary is the strongest fit for ages 6-8.\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-game-3",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-k2\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Three existing apps miss parent involvement.\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-game-4",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-k3\", \"parentId\": \"n-idea\", \"kind\": \"known\", \"label\": \"Teachers are a viable second audience.\", \"status\": \"answered\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-game-5",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-u1\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"Whether teachers would pay for this.\", \"status\": \"open\"}",
+        "revision": 5
+      },
+      {
+        "id": "ev-map-game-6",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-u2\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"How much parent involvement really matters.\", \"status\": \"open\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-map-game-7",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-u3\", \"parentId\": \"n-idea\", \"kind\": \"unknown\", \"label\": \"Which age band responds best.\", \"status\": \"open\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-map-game-8",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-d1\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}",
+        "revision": 8
+      },
+      {
+        "id": "ev-map-game-9",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-d2\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Teacher assessment tool\", \"status\": \"answered\"}",
+        "revision": 9
+      },
+      {
+        "id": "ev-map-game-10",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-d3\", \"parentId\": \"n-idea\", \"kind\": \"direction\", \"label\": \"Shared parent-teacher app\", \"status\": \"answered\"}",
+        "revision": 10
+      },
+      {
+        "id": "ev-map-game-11",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s1\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Interview 3 teachers\", \"status\": \"answered\"}",
+        "revision": 11
+      },
+      {
+        "id": "ev-map-game-12",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s2\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Shortlist one approach to prototype\", \"status\": \"answered\"}",
+        "revision": 12
+      },
+      {
+        "id": "ev-map-game-13",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s3\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Sketch the classroom vocabulary flow\", \"status\": \"answered\"}",
+        "revision": 13
+      },
+      {
+        "id": "ev-map-game-14",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s4\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Test the flow with one teacher\", \"status\": \"answered\"}",
+        "revision": 14
+      },
+      {
+        "id": "ev-map-game-15",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-s5\", \"parentId\": \"n-idea\", \"kind\": \"next-step\", \"label\": \"Check what district buy-in needs\", \"status\": \"answered\"}",
+        "revision": 15
+      },
+      {
+        "id": "ev-map-game-16",
+        "kind": "phase.set",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"phase\": \"next-steps\"}",
+        "revision": 16
+      },
+      {
+        "id": "ev-map-game-17",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-b1\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"Ten words on paper cards, one classroom\", \"status\": \"answered\", \"testsNodeId\": \"n-u3\"}",
+        "revision": 17
+      },
+      {
+        "id": "ev-map-game-18",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-b2\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"One teacher runs a round and sees the scores\", \"status\": \"answered\", \"testsNodeId\": \"n-u1\"}",
+        "revision": 18
+      },
+      {
+        "id": "ev-map-game-19",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-b3\", \"parentId\": \"n-idea\", \"kind\": \"slice\", \"label\": \"The round goes home for a parent to finish\", \"status\": \"answered\", \"testsNodeId\": \"n-u2\"}",
+        "revision": 19
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "n-idea",
+        "kind": "idea",
+        "label": "Educational game",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "n-k1",
+        "kind": "known",
+        "label": "Vocabulary is the strongest fit for ages 6-8.",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-k2",
+        "kind": "known",
+        "label": "Three existing apps miss parent involvement.",
+        "mapId": "map-game",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-k3",
+        "kind": "known",
+        "label": "Teachers are a viable second audience.",
+        "mapId": "map-game",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-u1",
+        "kind": "unknown",
+        "label": "Whether teachers would pay for this.",
+        "mapId": "map-game",
+        "order": 3,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open"
+      },
+      {
+        "id": "n-u2",
+        "kind": "unknown",
+        "label": "How much parent involvement really matters.",
+        "mapId": "map-game",
+        "order": 4,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open"
+      },
+      {
+        "id": "n-u3",
+        "kind": "unknown",
+        "label": "Which age band responds best.",
+        "mapId": "map-game",
+        "order": 5,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open"
+      },
+      {
+        "id": "n-d1",
+        "kind": "direction",
+        "label": "Classroom vocabulary game",
+        "mapId": "map-game",
+        "order": 6,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-d2",
+        "kind": "direction",
+        "label": "Teacher assessment tool",
+        "mapId": "map-game",
+        "order": 7,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-d3",
+        "kind": "direction",
+        "label": "Shared parent-teacher app",
+        "mapId": "map-game",
+        "order": 8,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-s1",
+        "kind": "next-step",
+        "label": "Interview 3 teachers",
+        "mapId": "map-game",
+        "order": 9,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-s2",
+        "kind": "next-step",
+        "label": "Shortlist one approach to prototype",
+        "mapId": "map-game",
+        "order": 10,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-s3",
+        "kind": "next-step",
+        "label": "Sketch the classroom vocabulary flow",
+        "mapId": "map-game",
+        "order": 11,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-s4",
+        "kind": "next-step",
+        "label": "Test the flow with one teacher",
+        "mapId": "map-game",
+        "order": 12,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "id": "n-s5",
+        "kind": "next-step",
+        "label": "Check what district buy-in needs",
+        "mapId": "map-game",
+        "order": 13,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "About two days. No app at all - printed cards and a tally sheet.",
+        "id": "n-b1",
+        "kind": "slice",
+        "label": "Ten words on paper cards, one classroom",
+        "mapId": "map-game",
+        "order": 14,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered",
+        "testsNodeId": "n-u3"
+      },
+      {
+        "detail": "About a week. A single screen, one class, no accounts.",
+        "id": "n-b2",
+        "kind": "slice",
+        "label": "One teacher runs a round and sees the scores",
+        "mapId": "map-game",
+        "order": 15,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered",
+        "testsNodeId": "n-u1"
+      },
+      {
+        "detail": "About two weeks, and only worth starting once the classroom round holds up.",
+        "id": "n-b3",
+        "kind": "slice",
+        "label": "The round goes home for a parent to finish",
+        "mapId": "map-game",
+        "order": 16,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered",
+        "testsNodeId": "n-u2"
+      }
+    ],
+    "message": [
+      {
+        "content": "So where would you start?",
+        "id": "msg-1",
+        "mapId": "map-game",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Here's what we've learned, the three strongest directions, and where I'd start tomorrow. Nothing here is locked in — say the word and we can keep pulling on any of it.",
+        "id": "msg-2",
+        "mapId": "map-game",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-game",
+        "phase": "next-steps",
+        "revision": 19,
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The summary screen: what we know, what we do not, three directions, a build sequence that starts with paper and names what each increment would settle, and five concrete next steps - with somewhere to put the next thought beneath it, because the plan is a starting point rather than a dead end. Captured at Desktop rather than the project's Tablet default: at 768px the summary stacks taller, the frame lands on the page bottom, and the build slice that distinguishes this scenario from its pair falls above it — both would capture identically and prove nothing."
 }

@@ -1,0 +1,12 @@
+{
+  "name": "HandoffReattach - Default",
+  "id": "344b5492-b52f-4f2e-b807-95f7261848c7",
+  "url": "/isolated-components/HandoffReattach?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "HandoffReattach",
+  "scenarioType": "component",
+  "description": "A map an agent worked and then left, in a browser with no agent attached. Where this used to render nothing at all, it now says the agent has gone and hands back the two things still useful — the prompt naming this map, and an MCP command carrying the real origin, so an agent on another machine can act on it. No numbered steps and no quoted seed idea: those are for a first meeting, and this is not one."
+}

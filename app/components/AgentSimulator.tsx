@@ -4,7 +4,12 @@ import { useState } from 'react';
 import AgentCallLog, { type AgentCallLine } from './AgentCallLog';
 import AgentPanelLauncher from './AgentPanelLauncher';
 import AgentToolRunner from './AgentToolRunner';
-import { DEMO_SEQUENCE, resultText } from '../lib/agentDemo';
+import {
+  DEMO_REFUSAL,
+  DEMO_SEQUENCE,
+  demoWouldOverwrite,
+  resultText,
+} from '../lib/agentDemo';
 
 /**
  * A stand-in agent, for development and for captures.
@@ -17,7 +22,11 @@ import { DEMO_SEQUENCE, resultText } from '../lib/agentDemo';
  * agent calls, so a scripted give-and-take here exercises the real tool paths
  * rather than a simulation of them.
  *
- * Rendered outside production only.
+ * Rendered only where a person has deliberately asked for it — `?agentPanel=1`
+ * on the map page, with a production floor underneath. Being a dev build is NOT
+ * sufficient, and that is the point: an agent driving the browser in an
+ * ordinary `npm run dev` session used to find this panel on every real map and
+ * press the most clickable thing on it.
  */
 export default function AgentSimulator() {
   const [open, setOpen] = useState(false);
@@ -65,10 +74,39 @@ export default function AgentSimulator() {
     setBusy(false);
   };
 
+  // Only the SEQUENCE is guarded. `runOne` is untouched on purpose: a deliberate
+  // single call is the panel's other reason to exist, and someone who types a
+  // tool name and presses run has said what they want. The sequence is the one
+  // that writes seven steps of invented content off one click.
   const runSequence = async () => {
     if (busy) return;
+    const agent = driver();
+    if (!agent) {
+      say('read_map', 'No driver on window — is the bridge mounted?', true);
+      return;
+    }
     setBusy(true);
     setLines([]);
+
+    // `sinceRevision: 0` asks for the whole log, which is the one shape of this
+    // reply carrying structured events rather than prose meant to be read.
+    say('read_map', '→ checks there is nothing here worth overwriting');
+    let survey: unknown;
+    try {
+      survey = await agent.callTool('read_map', { sinceRevision: 0 });
+      say('read_map', resultText(survey));
+    } catch (error) {
+      say('read_map', error instanceof Error ? error.message : String(error), true);
+      setBusy(false);
+      return;
+    }
+
+    if (demoWouldOverwrite(survey)) {
+      say('run the demo sequence', DEMO_REFUSAL, true);
+      setBusy(false);
+      return;
+    }
+
     for (const step of DEMO_SEQUENCE) {
       say(step.name, `→ ${step.note}`);
       await run(step.name, step.input);

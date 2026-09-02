@@ -39,6 +39,17 @@ const scenarios: Record<string, Props> = {
     label: "Copy start prompt",
     tone: "primary",
   },
+  // The third tone, and the only one that truncates. It exists for the
+  // finished-plan screen, where the reattach strip has to fit on one row or it
+  // eats the summary someone came back to read. Deliberately given the LONGEST
+  // text of any scenario here: the truncation is the behaviour, and a short
+  // string would capture as an untruncated pill and prove nothing.
+  Inline: {
+    text:
+      'Work on thinking map cmtixt5tg000wymek3vbmllaj — "A weekend app for splitting chores fairly between housemates". Start with read_map, then deconstruct the idea.',
+    label: "Copy start prompt",
+    tone: "inline",
+  },
 };
 
 export default async function Page({
