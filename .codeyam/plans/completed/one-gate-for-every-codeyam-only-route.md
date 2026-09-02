@@ -16,7 +16,7 @@ Two routes exist only to serve codeyam, and both decide whether to appear by ask
 - **A request token was considered and rejected.** It would need the editor to send a header it does not send: `request_revalidation` posts `content-type` and a `{}` body and nothing else (codeyam-editor repo, crates/control-api/src/capture_revalidate.rs — external to this tree). Worse, that caller treats 404 as `RouteNotMounted` and *proceeds with the capture anyway* — so a route that started refusing untokened calls would silently produce screenshots of the previous scenario's cached HTML. A gate whose failure mode is silent wrong output is worse than the exposure it closes.
 - **`/api/codeyam-revalidate` is deliberately left on its current gate.** For the reason directly above: it is the one codeyam-only route whose refusal corrupts captures instead of merely hiding a page, and what it does when reached — `revalidatePath` on caller-supplied paths in a dev process — is a cache flush, not an exposure worth that risk. This is a decision to record, not an omission; the route's docstring should say so, so the next reader does not "fix" it.
 - **`/isolated-components/*` is where the gate pays.** 344 of the 370 registered scenarios capture from it, and all of them run on an editor-launched server, so keying on `CODEYAM_APP_PORT` costs no capture. What it removes is 344 URLs serving plausible-looking fake maps in a session where a person is trying to look at their own work.
-- **An escape hatch, matching the one the panel already has.** A developer who genuinely wants to open a component fixture on their own server appends `?isolated=1`, exactly as `?agentPanel=1` summons the panel. Same gesture, same reason: something no agent stumbles onto, needing no restart. Without it the gate would take a real tool away from the person it is meant to protect.
+- **An escape hatch, sized to the thing being gated.** A developer who genuinely wants to open a component fixture on their own server starts it with `CODEYAM_APP_PORT=1 npm run dev`. Without an escape hatch the gate would take a real tool away from the person it is meant to protect. A `?isolated=1` query opt-in — mirroring `?agentPanel=1` — was the first design and was dropped on a hard constraint: **this Next version does not pass `searchParams` to layouts** (`node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/layout.md`: "Layouts do not rerender on navigation, so they cannot access search params"), and the layout is the only single place covering all 104 `/isolated-components` pages — 26 of which are `'use client'` and cannot read server env at all. Pushing a per-tab opt-in down to the pages would mean editing 104 files; a `middleware.ts` could see the query but introduces a mechanism this repo uses nowhere. The env var is the honest fit: `codeyamLaunched()` is a per-process property, so a per-process opt-in matches its shape rather than fighting it. The cost is real and accepted — opting in needs a restart and covers the whole session rather than one tab.
 - **The database hazard is not here, because it does not exist.** `.codeyam/seed-adapter.ts`'s "wipes all tables" is real, but the editor sandboxes it: the codeyam-editor repo's crates/control-api/src/db_sandbox (external to this tree) derives a capture database, injects it last so it overrides any pin, and — for a file-shaped stack like this one — fingerprints and restores the production file if an adapter writes it anyway. `seed-adapter-doctor` confirms this project is on that path, serving `file:.codeyam/tmp/db-sandbox/capture.db`. Nothing about `dev.db` belongs in this plan.
 
 ## Implementation
@@ -39,7 +39,9 @@ An empty string counts as absent, following the reasoning already written into t
 
 **File**: `app/isolated-components/layout.tsx`
 
-Replace the bare `process.env.NODE_ENV === "production"` check with: render when `codeyamLaunched()`, or when the request carries the `?isolated=1` opt-in; otherwise `notFound()`. The layout gains a searchParams prop for the opt-in, `Promise`-typed as this Next version requires.
+Replace the bare `process.env.NODE_ENV === "production"` check with: render when `codeyamLaunched()`, otherwise `notFound()`. The layout's props are unchanged — it keeps taking only `children`. Do NOT add a `searchParams` prop: this Next version does not pass one to layouts (see the escape-hatch decision above), so it would silently arrive `undefined` and the gate would refuse an opt-in it appeared to honour.
+
+The developer opt-in needs no code in this file. `CODEYAM_APP_PORT=1 npm run dev` makes `codeyamLaunched()` return true for that server, which is the whole hatch.
 
 Add a `metadata` export with `robots: { index: false, follow: false }`. Do not add anything visible — this layout is the capture frame, and whatever it paints lands in 344 scenario screenshots.
 
@@ -58,8 +60,7 @@ See the Reproduction Test section below.
 ## Reused existing code
 
 - `agentPanelRequested` from `app/lib/agentPanel.ts` (glossary entry: `agentPanelRequested`) — the prior art for this exact decision, already covered by `app/lib/agentPanel.test.ts`. Its query-param semantics are unchanged; only its production floor moves to the shared helper.
-- `AGENT_PANEL_PARAM` from `app/lib/agentPanel.ts` — the pattern of exporting the magic string beside the predicate rather than repeating it in the route and the test; the new launch-variable constant follows it, and the `?isolated=1` param is read the same way (`=1` exactly, first entry of a repeated param).
-- `QueryParams` from `app/lib/agentPanel.ts` — the already-defined shape of Next's parsed query; the layout's new searchParams prop uses it rather than redeclaring the type.
+- `AGENT_PANEL_PARAM` from `app/lib/agentPanel.ts` — the pattern of exporting the magic string beside the predicate rather than repeating it in the route and the test; the new `CODEYAM_LAUNCH_ENV` constant follows it. Only the pattern is reused: the layout reads no query param at all, so `AGENT_PANEL_PARAM` and the `QueryParams` type stay where they are, used only by `agentPanelRequested`.
 - `app/isolated-components/layout.tsx` — the existing production guard, kept as the floor and re-expressed through the shared predicate.
 - `app/api/codeyam-revalidate/route.ts` — unchanged behaviour; only its docstring grows the reason it is exempt.
 
@@ -124,7 +125,7 @@ Note for execution: `vi.stubEnv` with `undefined` sets an empty string rather th
 
 - **An isolated-components URL on a hand-started server** — `/isolated-components/MapScreen?s=Working` in a direct `npm run dev` session, returning the app's 404. The change this plan is for.
 - **The same URL under capture** — rendering exactly as it does today on an editor-launched server, proving all 344 captures are unaffected.
-- **The developer escape hatch** — `/isolated-components/MapScreen?s=Working&isolated=1` on a hand-started server, rendering the fixture for someone who deliberately asked.
+- **The developer escape hatch** — `/isolated-components/MapScreen?s=Working` on a server started as `CODEYAM_APP_PORT=1 npm run dev`, rendering the fixture for someone who deliberately asked.
 - **The map page with no panel** — a real map in a direct dev session with no `?agentPanel=1`: no agent panel, no other dev affordance.
 - **The map page opted in** — the same map at `?agentPanel=1`, launcher back in its corner.
 - **A revalidate call, unchanged** — the `{ revalidated: [...] }` reply, showing the deliberately-exempt route still answers the editor.

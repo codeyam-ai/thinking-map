@@ -707,6 +707,15 @@
     ]
   },
   {
+    "description": "Scaffold-shipped layout for the component-fixture tree, providing the centred capture frame under all 344 component scenarios, a noindex robots directive, and the codeyam-only route gate. Its gate now delegates to `codeyamLaunched` instead of asking `NODE_ENV`, so the 104 fixture pages under it are served to codeyam and refused on a server a person started by hand. Deliberately carries no `?isolated=1` query opt-in: this Next version does not pass `searchParams` to layouts, so such a prop would arrive undefined and the gate would refuse an opt-in it appeared to honour.",
+    "filePath": "app/isolated-components/layout.tsx",
+    "name": "IsolatedComponentsLayout",
+    "untestabilityReason": {
+      "justification": "The codeyam capture frame — a centring wrapper plus a delegation to `codeyamLaunched`, which carries the whole decision and is covered by `app/lib/codeyamOnly.test.ts`. Asserting on the wrapper itself would test the tooling's frame rather than Thinking Map, and its visual output is already pinned by the 344 scenario screenshots it sits under.",
+      "kind": "scaffold"
+    }
+  },
+  {
     "description": "Somewhere to put the next thought, under the finished plan. The summary is the end of the loop and deliberately not a dead end. There are no open questions on this screen by definition, so it is the contribution bar and the record without the waiting-on-you panel.",
     "filePath": "app/components/KeepThinkingPanel.tsx",
     "name": "KeepThinkingPanel",
@@ -1222,7 +1231,7 @@
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
-    "description": "Whether the dev agent panel has been deliberately asked for on this page, via `?agentPanel=1`. Replaces the old `NODE_ENV !== 'production'` render gate, which answered 'is this a dev build' when the question that matters is 'can a real agent reach this page' — every `npm run dev` session is a dev build, including the ones where a genuine agent is driving the browser. Keeps `NODE_ENV` as a floor underneath the opt-in so no query string can summon the panel into production, matches `=1` exactly rather than any truthy value, and reads the first entry of a repeated param.",
+    "description": "Whether the dev agent panel has been deliberately asked for on this page, via `?agentPanel=1`. Replaces the old `NODE_ENV !== 'production'` render gate, which answered 'is this a dev build' when the question that matters is 'can a real agent reach this page' — every `npm run dev` session is a dev build, including the ones where a genuine agent is driving the browser. The production floor underneath the opt-in now comes from `devSurfacesPermitted` in `app/lib/codeyamOnly.ts` rather than an inline `NODE_ENV` check, so the rule that nothing dev-only reaches production is written once across every such surface; the query-param semantics are unchanged and stay here, because this predicate answers a different question from `codeyamLaunched` — whether a person asked for the panel in this tab, not whether codeyam started the server. Matches `=1` exactly rather than any truthy value, and reads the first entry of a repeated param.",
     "filePath": "app/lib/agentPanel.ts",
     "name": "agentPanelRequested",
     "testFile": "app/lib/agentPanel.test.ts"
@@ -1346,6 +1355,12 @@
     "testFile": "app/lib/loadError.test.ts"
   },
   {
+    "description": "Whether codeyam launched the server handling this request — the gate on every codeyam-only route. Replaces the old `NODE_ENV === 'production'` check, which answered 'is this a dev build' when the question that matters is 'did codeyam start this server': every ordinary `npm run dev` is a dev build too, so that gate served a person all 104 component-fixture pages, rendering invented maps indistinguishable from their real ones. Keys on `CODEYAM_APP_PORT` because the editor injects it on the way to launching a dev server rather than this project declaring it, so it cannot drift out of sync with what the editor actually does and is absent by construction on a hand-started server. Treats an empty string as absent, matching the producing side's `X || fallback` reads, and keeps a production floor no environment variable can lift. The developer escape hatch is the same variable: `CODEYAM_APP_PORT=1 npm run dev`.",
+    "filePath": "app/lib/codeyamOnly.ts",
+    "name": "codeyamLaunched",
+    "testFile": "app/lib/codeyamOnly.test.ts"
+  },
+  {
     "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
     "filePath": "app/lib/briefCoverage.ts",
     "name": "computeBriefCoverage",
@@ -1418,6 +1433,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "describeRun",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "The production floor under every dev-only surface in this app: nothing above it may appear in a production build, whatever else is asked for. Held separately from `codeyamLaunched` because the two dev-only surfaces need different amounts — the agent panel is summoned per tab by a person on their own server and needs only this floor, while the component fixtures must additionally know codeyam started the server. Sharing the floor and nothing else keeps the production rule written once without forcing either surface to adopt the other's gate; `agentPanelRequested` previously carried an inline copy of it.",
+    "filePath": "app/lib/codeyamOnly.ts",
+    "name": "devSurfacesPermitted",
+    "testFile": "app/lib/codeyamOnly.test.ts"
   },
   {
     "description": "Takes the LAST non-empty line of a Prisma message, which is the diagnosis - The column X does not exist in the current database. Deliberately not the first line: a Prisma message opens with its own framing (Invalid prisma.thinkingMap.findUnique() invocation:), so taking the first puts the call site on screen and leaves out the column, which is exactly backwards for someone working out what to fix.",

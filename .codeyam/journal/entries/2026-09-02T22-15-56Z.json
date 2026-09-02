@@ -1,0 +1,283 @@
+{
+  "timestamp": "2026-09-02T22:15:56Z",
+  "title": "One Gate for Every CodeYam-Only Route",
+  "type": "feature",
+  "userRequest": "## Summary\n\nTwo routes exist only to serve codeyam, and both decide whether to appear by asking `NODE_ENV`. That answers \"is this a dev build\" when the question that matters is \"did codeyam launch this server\" — so in a direct `npm run dev` session a person gets 344 fixture-rendering routes under `/isolated-components/*` showing invented maps that look exactly like real ones. It is the same wrong gate the agent panel was moved off in `e3673c1`, still in place on the rest of the codeyam-only surface, and the same wrong gate a merge was able to reintroduce because nothing named the rule in one place or tested for it. The editor already publishes the fact these routes need: it injects `CODEYAM_APP_PORT` into every dev server it launches, and a server a person started by hand has no such variable. This plan turns that into one shared predicate, applies it where it is safe to apply, and adds the test that fails when a new codeyam-only route appears without it.\n\n## Key Decisions\n\n- **`CODEYAM_APP_PORT` is the discriminator, and it already exists.** `build_env_for_proxied_dev_server` inserts it unconditionally on every editor-launched dev server (in the separate codeyam-editor repo, at crates/process-manager/src/env_builder.rs:410 — external to this tree), alongside `CODEYAM_PROXY_URL` and `CODEYAM_PROJECT_DIR`. A hand-started `npm run dev` has none of them — confirmed by reading the environment of the running server on this machine. So the app can already tell the two callers apart with no editor change, no new configuration, and nothing for a person to remember to set.\n- **A request token was considered and rejected.** It would need the editor to send a header it does not send: `request_revalidation` posts `content-type` and a `{}` body and nothing else (codeyam-editor repo, crates/control-api/src/capture_revalidate.rs — external to this tree). Worse, that caller treats 404 as `RouteNotMounted` and *proceeds with the capture anyway* — so a route that started refusing untokened calls would silently produce screenshots of the previous scenario's cached HTML. A gate whose failure mode is silent wrong output is worse than the exposure it closes.\n- **`/api/codeyam-revalidate` is deliberately left on its current gate.** For the reason directly above: it is the one codeyam-only route whose refusal corrupts captures instead of merely hiding a page, and what it does when reached — `revalidatePath` on caller-supplied paths in a dev process — is a cache flush, not an exposure worth that risk. This is a decision to record, not an omission; the route's docstring should say so, so the next reader does not \"fix\" it.\n- **`/isolated-components/*` is where the gate pays.** 344 of the 370 registered scenarios capture from it, and all of them run on an editor-launched server, so keying on `CODEYAM_APP_PORT` costs no capture. What it removes is 344 URLs serving plausible-looking fake maps in a session where a person is trying to look at their own work.\n- **An escape hatch, sized to the thing being gated.** A developer who genuinely wants to open a component fixture on their own server starts it with `CODEYAM_APP_PORT=1 npm run dev`. Without an escape hatch the gate would take a real tool away from the person it is meant to protect. A `?isolated=1` query opt-in — mirroring `?agentPanel=1` — was the first design and was dropped on a hard constraint: **this Next version does not pass `searchParams` to layouts** (`node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/layout.md`: \"Layouts do not rerender on navigation, so they cannot access search params\"), and the layout is the only single place covering all 104 `/isolated-components` pages — 26 of which are `'use client'` and cannot read server env at all. Pushing a per-tab opt-in down to the pages would mean editing 104 files; a `middleware.ts` could see the query but introduces a mechanism this repo uses nowhere. The env var is the honest fit: `codeyamLaunched()` is a per-process property, so a per-process opt-in matches its shape rather than fighting it. The cost is real and accepted — opting in needs a restart and covers the whole session rather than one tab.\n- **The database hazard is not here, because it does not exist.** `.codeyam/seed-adapter.ts`'s \"wipes all tables\" is real, but the editor sandboxes it: the codeyam-editor repo's crates/control-api/src/db_sandbox (external to this tree) derives a capture database, injects it last so it overrides any pin, and — for a file-shaped stack like this one — fingerprints and restores the production file if an adapter writes it anyway. `seed-adapter-doctor` confirms this project is on that path, serving `file:.codeyam/tmp/db-sandbox/capture.db`. Nothing about `dev.db` belongs in this plan.\n\n## Implementation\n\n### 1. The shared predicate\n\n**New file**: `app/lib/codeyamOnly.ts`\n\nExport `codeyamLaunched(): boolean` — false in production unconditionally (the floor, checked first, as `agentPanelRequested` does it), otherwise true only when `CODEYAM_APP_PORT` is present and non-empty in the environment. Export `CODEYAM_LAUNCH_ENV` as the variable name so the predicate and its tests never spell it twice.\n\nRecord in the docstring why this variable and not another: it is injected by the editor's own launch path rather than declared by this project, so it cannot drift out of sync with what the editor actually does, and it is absent by construction on a server a person started themselves. Name the codeyam-editor source file it comes from, since that is the thing this contract depends on.\n\nAn empty string counts as absent, following the reasoning already written into the editor's env_builder for CODEYAM_EDITOR_PORT: a config that reads `X || fallback` treats `\"\"` as missing, so treating it as present here would disagree with the producer.\n\n**File**: `app/lib/agentPanel.ts`\n\n`agentPanelRequested` keeps its query-param behaviour unchanged — it answers a different question (a person typed a URL) than the launch check does. Replace only its inline production floor with the shared helper, so the floor is written once.\n\n### 2. The isolated-components shell\n\n**File**: `app/isolated-components/layout.tsx`\n\nReplace the bare `process.env.NODE_ENV === \"production\"` check with: render when `codeyamLaunched()`, otherwise `notFound()`. The layout's props are unchanged — it keeps taking only `children`. Do NOT add a `searchParams` prop: this Next version does not pass one to layouts (see the escape-hatch decision above), so it would silently arrive `undefined` and the gate would refuse an opt-in it appeared to honour.\n\nThe developer opt-in needs no code in this file. `CODEYAM_APP_PORT=1 npm run dev` makes `codeyamLaunched()` return true for that server, which is the whole hatch.\n\nAdd a `metadata` export with `robots: { index: false, follow: false }`. Do not add anything visible — this layout is the capture frame, and whatever it paints lands in 344 scenario screenshots.\n\n### 3. Say why the revalidate route is different\n\n**File**: `app/api/codeyam-revalidate/route.ts`\n\nNo behaviour change. Extend the existing docstring to record that this route deliberately does *not* use `codeyamLaunched()`, and why: the editor's caller reads 404 as \"route not mounted\" and continues the capture, so a stricter gate here trades a harmless cache-flush endpoint for silently stale screenshots.\n\n### 4. The route-level test\n\n**New file**: `app/lib/codeyamOnly.test.ts`\n\nSee the Reproduction Test section below.\n\n## Reused existing code\n\n- `agentPanelRequested` from `app/lib/agentPanel.ts` (glossary entry: `agentPanelRequested`) — the prior art for this exact decision, already covered by `app/lib/agentPanel.test.ts`. Its query-param semantics are unchanged; only its production floor moves to the shared helper.\n- `AGENT_PANEL_PARAM` from `app/lib/agentPanel.ts` — the pattern of exporting the magic string beside the predicate rather than repeating it in the route and the test; the new `CODEYAM_LAUNCH_ENV` constant follows it. Only the pattern is reused: the layout reads no query param at all, so `AGENT_PANEL_PARAM` and the `QueryParams` type stay where they are, used only by `agentPanelRequested`.\n- `app/isolated-components/layout.tsx` — the existing production guard, kept as the floor and re-expressed through the shared predicate.\n- `app/api/codeyam-revalidate/route.ts` — unchanged behaviour; only its docstring grows the reason it is exempt.\n\n**Existing-implementation survey**: `agentPanelRequested` is the only route-gating predicate in this repo and it is reused rather than duplicated. Nothing here reads a process-level codeyam marker today — grepping the app for a CODEYAM-prefixed env read returns nothing — so `codeyamLaunched` is genuinely new *in this repo*, while the variable it reads is long-standing on the producing side. On that side the survey found the opposite of new: the editor already injects `CODEYAM_APP_PORT`, `CODEYAM_PROXY_URL`, `CODEYAM_PROJECT_DIR` and `CODEYAM_EDITOR_PORT`, and already owns capture-database isolation in its own db_sandbox module — which is why this plan reads an existing signal instead of adding configuration, and why it carries no database changes at all. `isWebMcpAvailable` and `webMcpUnavailableReason` in `app/lib/webmcp.ts` are deliberately not reused: they answer whether WebMCP can bind in this frame, which is false in an ordinary tab as well as in a capture, so they cannot tell these two callers apart.\n\n## Reproduction Test\n\nPins that a codeyam-only route refuses a server codeyam did not launch — the property whose absence leaves 344 pages of invented maps reachable in a person's own dev session.\n\n**Target**: `app/lib/codeyamOnly.test.ts` (new) — run with\n`codeyam-editor editor refresh-tests --test <name>`.\n\n```ts\nimport { afterEach, describe, expect, it, vi } from 'vitest';\n\nconst load = async (vars: Record<string, string | undefined>) => {\n  for (const [k, v] of Object.entries(vars)) vi.stubEnv(k, v ?? '');\n  vi.resetModules();\n  return import('./codeyamOnly');\n};\n\nafterEach(() => vi.unstubAllEnvs());\n\ndescribe('codeyamLaunched', () => {\n  // The regression this pins: the gate was NODE_ENV alone, so every ordinary\n  // `npm run dev` served the whole fixture surface — 344 URLs rendering maps\n  // that look exactly like a person's real ones.\n  it('is false on a dev server a person started by hand', async () => {\n    const { codeyamLaunched } = await load({\n      NODE_ENV: 'development',\n      CODEYAM_APP_PORT: undefined,\n    });\n    expect(codeyamLaunched()).toBe(false);\n  });\n\n  // The editor's own server, which must keep working — a gate that refuses\n  // everything would pass the case above and break all 344 captures.\n  it('is true on a server the editor launched', async () => {\n    const { codeyamLaunched } = await load({\n      NODE_ENV: 'development',\n      CODEYAM_APP_PORT: '3001',\n    });\n    expect(codeyamLaunched()).toBe(true);\n  });\n\n  // The floor, which no environment variable can lift.\n  it('is false in production however the server was launched', async () => {\n    const { codeyamLaunched } = await load({\n      NODE_ENV: 'production',\n      CODEYAM_APP_PORT: '3001',\n    });\n    expect(codeyamLaunched()).toBe(false);\n  });\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: `app/lib/codeyamOnly.ts` does not exist, so all three cases fail at the dynamic import — \"Failed to resolve import ./codeyamOnly\". Once the module exists, the first case is the one carrying the regression; the second and third pass against a naive implementation and are there to stop the gate being \"fixed\" by refusing everything.\n\nNote for execution: `vi.stubEnv` with `undefined` sets an empty string rather than deleting the key, which is why the predicate must treat `\"\"` as absent. If that proves not to hold in this vitest version, delete the key directly rather than weakening the assertion.\n\n## Scenarios to Demonstrate\n\n- **An isolated-components URL on a hand-started server** — `/isolated-components/MapScreen?s=Working` in a direct `npm run dev` session, returning the app's 404. The change this plan is for.\n- **The same URL under capture** — rendering exactly as it does today on an editor-launched server, proving all 344 captures are unaffected.\n- **The developer escape hatch** — `/isolated-components/MapScreen?s=Working` on a server started as `CODEYAM_APP_PORT=1 npm run dev`, rendering the fixture for someone who deliberately asked.\n- **The map page with no panel** — a real map in a direct dev session with no `?agentPanel=1`: no agent panel, no other dev affordance.\n- **The map page opted in** — the same map at `?agentPanel=1`, launcher back in its corner.\n- **A revalidate call, unchanged** — the `{ revalidated: [...] }` reply, showing the deliberately-exempt route still answers the editor.",
+  "description": "The component-fixture routes under /isolated-components/* now decide whether to appear by asking whether codeyam launched this server, not whether NODE_ENV says 'development'. A new predicate, codeyamLaunched in app/lib/codeyamOnly.ts, reads CODEYAM_APP_PORT — a variable the editor injects on its way to starting a dev server, so it cannot drift from what the editor actually does and is absent by construction on a server a person started themselves. The production floor those routes shared with the agent panel moved into devSurfacesPermitted in the same module, so the rule that nothing dev-only reaches production is written once; agentPanelRequested keeps its per-tab query semantics, which answer a different question. /api/codeyam-revalidate deliberately keeps its old gate, and its docstring now records why: the editor's caller reads a 404 as 'route not mounted' and proceeds with the capture anyway, so a stricter gate there would trade a harmless dev cache-flush for silently stale screenshots.\n\nPLAN REVISION: the approved plan gated the developer escape hatch on a ?isolated=1 query param read in the layout. That is not implementable on this Next version — layouts are not passed searchParams ('Layouts do not rerender on navigation, so they cannot access search params'), and the layout is the only single place covering all 104 fixture pages, 26 of which are client components that cannot read server env at all. The user chose the env-var hatch instead: CODEYAM_APP_PORT=1 npm run dev. The plan file was updated to record the constraint and the two rejected alternatives before any code was written.\n\nEVIDENCE: 8 new tests in app/lib/codeyamOnly.test.ts, all passing (730 registered in total). The regression case was confirmed to genuinely discriminate rather than assumed: the old NODE_ENV-only gate returns true for a hand-started dev server where the test asserts false. Captures are provably unaffected — probe-isolation-routes returned 200 on 103/103 component routes, and recapture-stale found 21 of 22 touched scenarios pixel-identical (the 22nd differs only in the capture-time origin baked into the handoff card's MCP URL by app/lib/handoffCopy.ts, a pre-existing environment sensitivity unrelated to this change). Audit passed with 0 findings; 386 scenarios fresh, 0 stale, 0 missing. README gained a section documenting that a plain npm run dev does not serve the fixture pages and how to opt in, and a stale sentence implying the agent panel always appears outside production was corrected to name ?agentPanel=1.\n\nSCOPE VERDICT: this cycle delivered no product deliverable and deferred none — it is infrastructure hygiene on the codeyam-only route surface. All 9 product deliverables were already delivered before this cycle; the single deferred row (registering the MCP server in a client, an assist-track task) was deferred by the user in an earlier cycle and is unchanged here. No agent-decided deferrals were introduced.\n\nKNOWN GAP, DECIDED BY THE USER: app/codeyam-isolate/layout.tsx is a third codeyam-only route surface and still carries the NODE_ENV === 'production' gate this feature exists to replace. The plan's survey counted two such routes and missed it. It was surfaced at the Present gate with an option to extend the gate to it; the user chose to save without doing so. It serves nothing today — the layout is the only file in that directory — and the glossary marks it scaffold-shipped, but a future page added under it would inherit the wrong gate, which is precisely the reintroduction path this feature was written against.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/one-gate-for-every-codeyam-only-route.md\t.codeyam/plans/completed/one-gate-for-every-codeyam-only-route.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1198f5b5ded0c31ee49882db26a576a48fc08ba217938fcfc4d6443f52bec87a.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5c1e2697cffe30def6d553fafb7005acd966f9de18a120c18762c64139089127.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/681055b2e4879cf3f028511581b97c5c0c3c0d41a8bb1c28b9e7649009b563ec.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/683c6ab7324100956cf1f05ac7fe8d44d4dad3ad2a231274ad505880db5d6292.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/71efea0751e3bfa9a3bee1ec0272a9474f41abde8a0ceeb676bed9c2e0adc92f.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ff6dfbe0c0a99992ae6e4c25a97df73ec31ef624e7ab23e1f503272b42b2853f.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "README.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/codeyam-revalidate/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/layout.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/agentPanel.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1d65b63418166e8646fbe7674194e7d4e68fe0bd1bf958d12a5edd410682e400.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/9823bf1abf1b8d2ec8fe6c367ceb741989691f31440c15c7f4adccb8e6271d6b.json",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/codeyamOnly.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/codeyamOnly.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 18,
+        "passed": 18
+      }
+    ]
+  }
+}

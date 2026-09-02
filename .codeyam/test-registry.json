@@ -1981,6 +1981,51 @@
       "runner": "tests"
     },
     {
+      "description": "The floor, which no environment variable can lift.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "codeyamLaunched › is false in production however the server was launched",
+      "line": 34,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The regression this pins. The gate used to be NODE_ENV alone, so every ordinary `npm run dev` served the whole fixture surface — 104 pages rendering invented maps that look exactly like a person's real ones. A hand-started server has no CODEYAM_APP_PORT, so this is the case the old gate got wrong and the only one that distinguishes the two callers.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "codeyamLaunched › is false on a dev server a person started by hand",
+      "line": 18,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty string counts as absent, matching the producing side: the editor's env_builder reads its ports as `X || fallback`, which treats '' as missing. Treating it as present here would put this predicate at odds with the thing it reads. This is also the shape `vi.stubEnv` produces for `undefined`.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "codeyamLaunched › is false when the variable is set but empty",
+      "line": 44,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Presence is the signal, not the value. The predicate must not start parsing the port — the editor is free to change what it injects there, and a gate that only accepted digits would silently close if it ever did.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "codeyamLaunched › is true for a non-numeric value",
+      "line": 53,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The editor's own server, which must keep working. A gate that refused everything would pass the case above and break all 344 captures, so this is here to stop the over-correction rather than to describe new behaviour.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "codeyamLaunched › is true on a server the editor launched",
+      "line": 27,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
       "description": "...unless something actually cites it, in which case the citation is real and the section is genuinely accounted for.",
       "file": "app/lib/briefCoverage.test.ts",
       "format": "vitest",
@@ -2464,6 +2509,33 @@
       "key": "describeRun › says \"You\" for the person and distinguishes an update",
       "line": 159,
       "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole reason the floor is shared rather than written per-surface: one place to be wrong, and it is not wrong here.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "devSurfacesPermitted › is false in production",
+      "line": 70,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary dev case: the floor is open, and whatever sits above it decides. This is the only state in which any dev-only surface can appear.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "devSurfacesPermitted › is true in development",
+      "line": 63,
+      "registeredAt": "2026-09-02T21:59:27Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything that is not production is permitted, rather than an allowlist of known environment names — a new NODE_ENV value must not silently close a developer's own surfaces.",
+      "file": "app/lib/codeyamOnly.test.ts",
+      "format": "vitest",
+      "key": "devSurfacesPermitted › is true under test",
+      "line": 78,
+      "registeredAt": "2026-09-02T21:59:27Z",
       "runner": "tests"
     },
     {

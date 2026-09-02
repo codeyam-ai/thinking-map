@@ -61,6 +61,24 @@ every screen can be viewed in every state without touching production data.
 No API key is needed. The app never calls a model itself — the agent is the one you
 already have, and it brings its own credentials.
 
+### Routes that only codeyam sees
+
+A plain `npm run dev` deliberately does **not** serve `/isolated-components/*`, the
+component-fixture pages the scenario captures render from. Those routes ask whether
+codeyam started this server rather than whether this is a dev build, so on a server
+you started yourself they return 404. That is the point: the fixtures render invented
+maps that look exactly like your real ones, and a hundred convincing fakes in your own
+dev session is a worse default than not having them at all.
+
+If you do want them, say so on the way in:
+
+```bash
+CODEYAM_APP_PORT=1 npm run dev   # serve the component fixtures too
+```
+
+The agent panel below follows the same principle with a different gesture — it is off
+unless you ask for it per tab with `?agentPanel=1`.
+
 ### What you can put into the map
 
 The page's half of the exchange is a narrow column beside the map:
@@ -117,8 +135,10 @@ had to change what it sends; only the drawing changed.
 
 WebMCP binds only in a top-level secure page in a browser with an agent (Chrome 146+),
 so no agent can attach inside an iframe — which is every preview and every captured
-scenario. Outside production the page therefore carries an **Agent panel** (bottom
-right). It calls `window.__thinkingMapAgent`, the same bound catalog a real agent uses,
+scenario. Outside production the page can therefore summon an **Agent panel** (bottom
+right), on request: add `?agentPanel=1` to the URL, since a panel that appeared on
+every dev page would be found and pressed by the very agents it is meant to stand in
+for. It calls `window.__thinkingMapAgent`, the same bound catalog a real agent uses,
 so its "run the demo sequence" button exercises the genuine tool paths rather than a
 mock of them.
 

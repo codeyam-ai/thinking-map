@@ -16,6 +16,8 @@
 // carries the production floor — the part most worth a test that runs in
 // milliseconds.
 
+import { devSurfacesPermitted } from './codeyamOnly';
+
 /** Next's parsed query object: a repeated param arrives as an array. */
 export type QueryParams = Record<string, string | string[] | undefined>;
 
@@ -26,7 +28,13 @@ export function agentPanelRequested(query: QueryParams): boolean {
   // The floor, checked first: no query string can summon the panel into a
   // production build. The opt-in narrows an already-permitted case; it never
   // widens a forbidden one.
-  if (process.env.NODE_ENV === 'production') return false;
+  //
+  // The floor itself now lives in `codeyamOnly.ts` so it is written once across
+  // every dev-only surface. Only the floor is shared: this predicate still
+  // answers a different question from `codeyamLaunched()` — "did a person ask
+  // for this panel in this tab", not "did codeyam start this server" — so the
+  // query-param check below stays here.
+  if (!devSurfacesPermitted()) return false;
 
   // A repeated `?agentPanel=1&agentPanel=1` arrives as an array. Reading the
   // first entry rather than rejecting the array keeps a doubled param working
