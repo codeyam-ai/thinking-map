@@ -245,3 +245,9 @@ blob-report/
 *.heartbeat
 docker-compose.cloud.yml
 # codeyam-editor:end
+
+# Crash dumps. A core dump from a next-server crash was committed here once by
+# accident and grew to 188MB, past GitHub's 100MB file limit, which blocked every
+# push until it was untracked. They are debris, never project state.
+core
+core.*
