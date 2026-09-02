@@ -2809,6 +2809,42 @@
       "runner": "tests"
     },
     {
+      "description": "A bad id renders the not-found body, and the tab above it should say the app's name rather than sit blank or repeat the id.",
+      "file": "app/map/[id]/generateMetadata.test.ts",
+      "format": "vitest",
+      "key": "generateMetadata › falls back to the app name when the map does not exist",
+      "line": 51,
+      "registeredAt": "2026-09-02T20:09:17.159521+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Metadata runs a frame before the body. A throw here 500s the route before the page can render the error it was going to explain, so a failed read takes the same branch as no map at all.",
+      "file": "app/map/[id]/generateMetadata.test.ts",
+      "format": "vitest",
+      "key": "generateMetadata › falls back to the app name when the read throws, rather than 500ing",
+      "line": 62,
+      "registeredAt": "2026-09-02T20:04:51.417832+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Only `open` nodes count. Answered ones are already dealt with, so folding them in would make the badge read as work that is still waiting.",
+      "file": "app/map/[id]/generateMetadata.test.ts",
+      "format": "vitest",
+      "key": "generateMetadata › prefixes the open-question count when questions are waiting",
+      "line": 29,
+      "registeredAt": "2026-09-02T20:09:17.159521+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A zero in parentheses reads like a notification badge that never clears, so a fully-answered map shows its bare name instead of `(0)`.",
+      "file": "app/map/[id]/generateMetadata.test.ts",
+      "format": "vitest",
+      "key": "generateMetadata › shows the bare title when nothing is open",
+      "line": 41,
+      "registeredAt": "2026-09-02T20:04:51.417832+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "The log may account for some of the map and not the rest — a seeded map that was then worked on. The explained part keeps its rounds and the remainder is appended by depth rather than dropped.",
       "file": "app/lib/mapRounds.test.ts",
       "format": "vitest",

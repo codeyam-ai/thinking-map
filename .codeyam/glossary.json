@@ -1524,6 +1524,12 @@
     }
   },
   {
+    "description": "The map route's browser-tab title. Counts the map's still-open questions into the title so a backgrounded board says how much is waiting, and falls back to the bare app name when the map is missing or the read throws — metadata runs a frame before the body, so a throw here would 500 the route before the page could explain itself.",
+    "filePath": "app/map/[id]/page.tsx",
+    "name": "generateMetadata",
+    "testFile": "app/map/[id]/generateMetadata.test.ts"
+  },
+  {
     "description": "Loads a map's brief including its text - the one reader allowed to want it. Everything else takes the metadata that getMap selects, so tens of thousands of characters never reach a page render or a full read_map.",
     "filePath": "app/lib/mapStore.ts",
     "name": "getBrief",

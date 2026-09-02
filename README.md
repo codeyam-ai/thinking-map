@@ -277,6 +277,10 @@ the local-first approach this stack expects and the upgrade path for each.
 
 Built with [CodeYam](https://codeyam.com) — `codeyam editor` to launch the editor.
 
+## License
+
+[MIT](LICENSE).
+
 <!-- codeyam:run-and-edit:start -->
 ## Develop this project with codeyam-editor
 
