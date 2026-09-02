@@ -480,3 +480,63 @@ describe('planMapMutations — a node carrying a diagram', () => {
     expect(plan.inserts[0]!.diagram).toBeNull();
   });
 });
+
+// The provenance an insight carries. Modelled on `testsRef` — carried through
+// as refs and resolved by `applyToolCalls`, which is the only place that can
+// see the ids the database just minted — so what these pin is the NORMALISING,
+// not the resolution.
+describe('planMapMutations — the sources an insight cites', () => {
+  const withRefs = (fromRefs: unknown) =>
+    planMapMutations([
+      addNodes([
+        { ref: 'i1', kind: 'suggestion', label: 'Start from the doc', fromRefs },
+      ]),
+    ]).inserts[0]!;
+
+  // Carried verbatim, refs and all. Resolving them here is impossible: a ref
+  // usually names a node created moments earlier in this same call, whose real
+  // id does not exist until the write.
+  it('carries the refs through untouched for applyToolCalls to resolve', () => {
+    expect(withRefs(['q1', 'q2']).fromRefs).toEqual(['q1', 'q2']);
+  });
+
+  // The `serialiseOptions` convention: a node that named nothing must be
+  // indistinguishable from one that never had the field, rather than carrying
+  // an empty array nobody can render.
+  it('normalises an empty or all-blank list to null', () => {
+    expect(withRefs([]).fromRefs).toBeNull();
+    expect(withRefs(['', '   ']).fromRefs).toBeNull();
+  });
+
+  // Non-strings are filtered rather than stringified. `[1, 2]` is a mistake,
+  // and turning it into `"1"` would store a citation pointing at nothing while
+  // looking like it had worked.
+  it('drops non-strings and blanks rather than coercing them', () => {
+    expect(withRefs(['q1', 42, null, '  ', 'q2']).fromRefs).toEqual(['q1', 'q2']);
+  });
+
+  // The ordinary case, and every node written before this field existed.
+  it('leaves a node that cited nothing carrying null', () => {
+    expect(withRefs(undefined).fromRefs).toBeNull();
+    expect(withRefs('q1').fromRefs).toBeNull();
+  });
+});
+
+// Two kinds joined the vocabulary so the partner has somewhere to put a move
+// worth making and an experiment small enough to run. They reach the tool
+// schema through NODE_KINDS, so what this pins is that the planner accepts
+// them rather than dropping them as a kind the map cannot draw.
+describe('planMapMutations — the forward-looking kinds', () => {
+  // An unknown kind is DROPPED here rather than stored, so a kind added to the
+  // vocabulary but not reaching this guard would vanish silently — the agent
+  // told the write succeeded, and nothing on the board to show for it.
+  it('accepts a suggestion and an experiment as real nodes', () => {
+    const plan = planMapMutations([
+      addNodes([
+        { ref: 's', kind: 'suggestion', label: 'Start from the doc' },
+        { ref: 'e', kind: 'experiment', label: 'Paste one real doc' },
+      ]),
+    ]);
+    expect(plan.inserts.map((i) => i.kind)).toEqual(['suggestion', 'experiment']);
+  });
+});

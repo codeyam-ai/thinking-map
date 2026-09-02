@@ -12,7 +12,12 @@ import type { z } from 'zod';
 import { applyToolCalls, getBrief, getMap } from './mapStore';
 import { splitIntoSections } from './briefSections';
 import { computeBriefCoverage } from './briefCoverage';
-import { formatMapDetail } from './mcpFormat';
+import { formatInsightStanding, formatMapDetail } from './mcpFormat';
+import {
+  TARGET_LIVE_INSIGHTS,
+  insightStream,
+  type InsightStream,
+} from './insightStream';
 import {
   currentRevision,
   readSince,
@@ -32,6 +37,20 @@ import {
 
 type Impl = (ctx: ToolContext, input: never) => Promise<ToolResult>;
 
+/** The standing ask as numbers, carried on `structured` so an agent reading
+ *  structured output does not have to parse the prose back into the figures it
+ *  is being asked to compare itself against. The insights themselves are NOT
+ *  here — they are already in the map the same call rendered, and repeating
+ *  them would double the size of every read. */
+function standing(stream: InsightStream) {
+  return {
+    live: stream.live,
+    stale: stream.stale,
+    answersSinceNewest: stream.answersSinceNewest,
+    target: TARGET_LIVE_INSIGHTS,
+  };
+}
+
 /** One question as `ask_user` accepts it: the bare string it has always taken,
  *  or that string with a few suggested answers attached. The union is what
  *  makes the field additive — nothing an existing agent sends stops working. */
@@ -41,16 +60,30 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
   async read_map(ctx, input: { sinceRevision?: number }) {
     if (typeof input.sinceRevision === 'number') {
       const { revision, events } = await readSince(ctx.mapId, input.sinceRevision);
+      // The delta branch is the one a working agent actually calls, so the
+      // standing ask has to appear here too — an ask only on the full read is
+      // an ask the agent sees once, at the start, and never again. The cost is
+      // this `getMap`, which the delta branch did not previously do. It is a
+      // deliberate, stated cost: it is the difference between a mechanism that
+      // works and one that reads well in a diff.
+      const map = await getMap(ctx.mapId);
+      const stream = insightStream(map?.nodes ?? []);
       return {
-        text: `revision: ${revision}\n\n## Changes since r${input.sinceRevision}\n${renderEvents(events)}`,
-        structured: { revision, events, delta: true },
+        text:
+          `revision: ${revision}\n\n## Changes since r${input.sinceRevision}\n${renderEvents(events)}` +
+          `\n\n${formatInsightStanding(stream)}`,
+        structured: { revision, events, delta: true, insights: standing(stream) },
       };
     }
     const map = await getMap(ctx.mapId);
     if (!map) return { text: `No map with id ${ctx.mapId}.` };
     return {
       text: `revision: ${map.revision}\n${formatMapDetail(map)}`,
-      structured: { revision: map.revision, delta: false },
+      structured: {
+        revision: map.revision,
+        delta: false,
+        insights: standing(insightStream(map.nodes)),
+      },
     };
   },
 

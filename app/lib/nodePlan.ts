@@ -25,6 +25,18 @@ export interface PlannedInsert {
    * has to survive the same resolution pass rather than being written raw.
    */
   testsRef: string | null;
+  /**
+   * What this insight was drawn out of. Resolved exactly as `testsRef` above
+   * is — refs from this same call or real ids of existing nodes — because an
+   * insight usually cites the very questions the agent answered moments before
+   * writing it.
+   *
+   * The difference from `testsRef` is arity: a slice settles ONE node, an
+   * insight comes out of several. Null rather than `[]` when the agent named
+   * nothing, so a node that cited no sources is indistinguishable from one
+   * written before the field existed.
+   */
+  fromRefs: string[] | null;
   /** The brief section this node came from, when it came from one. Dropped
    *  when absent, exactly as `sourceUrl` is. Unlike `testsRef` above it is
    *  NOT a node ref, so it needs no resolution pass — it points out of the
@@ -112,6 +124,22 @@ function serialiseOptions(raw: unknown): string | null {
  *  steps, or steps that are all blank — becomes null rather than an empty box,
  *  because a card announcing a diagram and showing nothing is worse than one
  *  that never claimed to have one. */
+/**
+ * The refs an insight cites, ready for the resolution pass.
+ *
+ * Strings only, blanks dropped, and an empty result normalised to null — the
+ * same shape `serialiseOptions` above uses, and for the same reason: a node
+ * that named nothing should be indistinguishable from one that never had the
+ * field, rather than carrying an empty array nobody can render.
+ */
+function readRefs(raw: unknown): string[] | null {
+  if (!Array.isArray(raw)) return null;
+  const refs = raw.filter(
+    (ref): ref is string => typeof ref === 'string' && ref.trim().length > 0,
+  );
+  return refs.length > 0 ? refs : null;
+}
+
 function readDiagram(raw: unknown): { steps: string[]; note?: string } | null {
   if (!raw || typeof raw !== 'object') return null;
   const d = raw as Record<string, unknown>;
@@ -174,6 +202,7 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           status: isNodeStatus(status) ? status : 'answered',
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
           testsRef: node.tests ? String(node.tests) : null,
+          fromRefs: readRefs(node.fromRefs),
           sourceRef: node.sourceRef ? String(node.sourceRef) : null,
           options: serialiseOptions(node.options),
           order: order++,

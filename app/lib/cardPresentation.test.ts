@@ -33,6 +33,8 @@ describe('isInsightCard', () => {
       'direction',
       'known',
       'unknown',
+      'suggestion',
+      'experiment',
     ]) {
       expect(isInsightCard(card({ kind }))).toBe(true);
     }

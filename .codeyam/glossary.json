@@ -1315,6 +1315,12 @@
     "testFile": "app/lib/agentPanel.test.ts"
   },
   {
+    "description": "When each of the person's answers landed, as milliseconds. Reads updatedAt rather than createdAt, and that is the whole rule: a question is CREATED open and UPDATED when it is answered, so its creation time says when it was ASKED. Reading createdAt here would date every answer to the moment the agent posed the question, which on a map where a batch of questions is asked at once and answered over an hour makes every insight look current no matter how far the thinking has moved past it. Unparseable timestamps sort as epoch rather than NaN, which would make every comparison against them false and silently drop the node from every count.",
+    "filePath": "app/lib/insightStream.ts",
+    "name": "answeredAt",
+    "testFile": "app/lib/insightStream.test.ts"
+  },
+  {
     "description": "The node ids a user.answer event closed. Same payload tolerance as questionIds, and the input to both the suppression rule and the answered-question count.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "answeredIds",
@@ -1440,6 +1446,12 @@
       "justification": "The uncovered half is the node:dns lookup itself, and this project has no DNS-stubbing harness — a test of it would be a test of the network. Both halves of the DECISION are pure and fully covered in app/lib/briefUrl.test.ts: parseBriefUrl for the syntax and scheme rules, isBlockedAddress for every range it refuses.",
       "kind": "no-isolation-harness"
     }
+  },
+  {
+    "description": "The node ids an insight cites, however they arrived - the JSON array the fromNodeIds column stores, or an already-parsed array, since the server has the string and the browser usually has the array. Malformed input yields an empty list rather than throwing: this runs on every read_map, so one bad row written by an older agent must not be able to take down the map's entire rendering.",
+    "filePath": "app/lib/insightStream.ts",
+    "name": "citedIds",
+    "testFile": "app/lib/insightStream.test.ts"
   },
   {
     "description": "Holds the board's zoom inside its limits. Past the floor the board is a few pixels of noise with no way back; past the ceiling one card fills the screen and the shape of the thinking — the whole point of the board — is gone. It also guarantees the scale can never reach zero or invert, which matters because every drag delta is divided by it.",
@@ -1636,7 +1648,7 @@
     "testFile": "app/lib/nodeAppearance.test.ts"
   },
   {
-    "description": "A node kind's colour family, via KIND_FAMILY. The eighteen kinds collapse into six families because one hue per kind would be a legend rather than a system, and the eyebrow above every card already names the exact kind for anyone who wants the precision. KIND_FAMILY is a total Record on purpose, so a nineteenth kind will not compile until it is given a family; this wrapper adds the runtime half of that safety, since kinds also arrive from the database and from the model unvalidated — an unrecognised one falls back to the neutral ground family rather than losing its colour entirely.",
+    "description": "A node kind's colour family, via KIND_FAMILY. The twenty kinds collapse into six families because one hue per kind would be a legend rather than a system, and the eyebrow above every card already names the exact kind for anyone who wants the precision. KIND_FAMILY is a total Record on purpose, so a twenty-first kind will not compile until it is given a family; this wrapper adds the runtime half of that safety, since kinds also arrive from the database and from the model unvalidated - an unrecognised one falls back to the neutral ground family rather than losing its colour entirely.",
     "filePath": "app/lib/mapKinds.ts",
     "name": "familyOf",
     "testFile": "app/lib/mapKinds.test.ts"
@@ -1714,7 +1726,13 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
-    "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, and the indented node tree - so a client sees both views of the thinking the way the UI shows them side by side.",
+    "description": "The standing ask, rendered as the Insights section of what read_map returns: what the board is carrying, and what is owed. This is the whole mechanism behind always-on insights. The page cannot summon an agent - that is the product's founding constraint - so the only place the ask can live is inside what the agent already reads on every turn. It states a BUDGET rather than a mood, because a number an agent can compare itself against is actionable in a way that 'consider adding insights' is not. The empty case reads as an invitation rather than a fault: a map on its first turn has no insights and has done nothing wrong, so telling it what an insight IS beats reporting a shortfall.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatInsightStanding",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
+    "description": "Renders one map in full for an MCP client - the verbatim seed idea, the conversation, the indented node tree, and the Insights section carrying the standing ask - so a client sees both views of the thinking the way the UI shows them side by side, plus how far behind the insight budget it currently is.",
     "filePath": "app/lib/mcpFormat.ts",
     "name": "formatMapDetail",
     "testFile": "app/lib/mcpFormat.test.ts"
@@ -1817,6 +1835,12 @@
     "testFile": "app/lib/briefSections.test.ts"
   },
   {
+    "description": "The board's insights and how far behind the thinking they are, computed from the nodes alone. An insight is a node whose kind is in INSIGHT_STREAM_KINDS AND which carries no theme: a finding hung inside a theme is a card in that row, a themeless one is a claim about the whole idea. That rule already existed informally as CORE_INSIGHT_KINDS plus !n.themeId in GalaxyBoard, and promoting it here is what stops the agent's read and the browser disagreeing about what is on the board - a disagreement that would draw the same node twice or count it never. Staleness is read off timestamps rather than the exchange log, which is the decision that lets this be pure: MapNode.updatedAt moves when an answer lands, so one function serves both the server-side read_map and the client without either holding the log. Deriving it from MapEvent revisions was the alternative and would have forced a second query into read_map's delta branch on every turn. Nothing is hidden by being stale - an insight the thinking has moved past is still worth reading, and dropping it would silently shrink the board. Returns all zeros for an empty map, which is the day-one state and the one every capture produces.",
+    "filePath": "app/lib/insightStream.ts",
+    "name": "insightStream",
+    "testFile": "app/lib/insightStream.test.ts"
+  },
+  {
     "description": "Whether a card should show your words as its content with the question demoted to their label. Only a question can reach this state: a settled insight carries an answered status all over the seed data and is still not something you answered, and drawing it with a pencil would invite editing the partner's own thinking as though it were your reply.",
     "filePath": "app/lib/cardPresentation.ts",
     "name": "isAnsweredCard",
@@ -1835,7 +1859,7 @@
     "testFile": "app/lib/exchange.test.ts"
   },
   {
-    "description": "Whether a board card is showing you something rather than asking you something. Two clauses: the node's kind is one of the partner's own thinking, OR the card carries a diagram or a picture — and the second clause is the one that was missing. The layout's widthFor already hands exactly those cards the wide column on that reasoning, so without the same rule here an approach with a diagram was laid out at the wide width, drawn as an answered question, and its diagram never rendered at all.",
+    "description": "Whether a board card is showing you something rather than asking you something. Two clauses: the node's kind is one of the partner's own thinking - which now includes suggestion and experiment, since both are the partner telling you what it would do rather than asking you anything - OR the card carries a diagram or a picture, and the second clause is the one that was missing. The layout's widthFor already hands exactly those cards the wide column on that reasoning, so without the same rule here an approach with a diagram was laid out at the wide width, drawn as an answered question, and its diagram never rendered at all.",
     "filePath": "app/lib/cardPresentation.ts",
     "name": "isInsightCard",
     "testFile": "app/lib/cardPresentation.test.ts"
@@ -1949,6 +1973,12 @@
     "testFile": "app/lib/loadError.test.ts"
   },
   {
+    "description": "A node timestamp as milliseconds, for a value that may arrive as a Date from Prisma or as the ISO string a JSON round trip leaves behind - which is exactly why this module can be read by the server and the browser alike. A value it cannot parse sorts as epoch rather than NaN: NaN would make every comparison against it false, so a single bad timestamp would silently drop its node out of every count while looking like it had been considered.",
+    "filePath": "app/lib/insightStream.ts",
+    "name": "millis",
+    "testFile": "app/lib/insightStream.test.ts"
+  },
+  {
     "description": "Reads navigator.modelContext, or null where there is none. The single place the WebMCP global is touched, so the draft spec moving again is one edit rather than a sweep.",
     "filePath": "app/lib/webmcp.ts",
     "name": "modelContext",
@@ -1970,7 +2000,7 @@
     "testFile": "app/lib/conflict.test.ts"
   },
   {
-    "description": "Shapes the node.added event payload from the row that was just inserted. A translation, not a write: the database's vocabulary in, the exchange contract's vocabulary out. options is stored as a JSON string because SQLite has no array type, and the log speaks the contract's language rather than the column's, so it comes back out as the array the tools take. The optional fields - testsNodeId, sourceRef, options - are OMITTED entirely when absent rather than sent as null, so a reader can treat presence as meaning and an ordinary node's event stays byte-for-byte what it has always been. Pure, so it is unit-testable without a database; inline it could only be reached through a live insert.",
+    "description": "Shapes the node.added event payload from the row that was just inserted. A translation, not a write: the database's vocabulary in, the exchange contract's vocabulary out. Both options and fromNodeIds are stored as JSON strings because SQLite has no array type, and the log speaks the contract's language rather than the column's, so they come back out as the arrays the tools take. The optional fields - testsNodeId, fromNodeIds, sourceRef, options - are OMITTED entirely when absent rather than sent as null, so a reader can treat presence as meaning and an ordinary node's event stays byte-for-byte what it has always been. fromNodeIds is omitted for an empty list too: an insight that cited nothing must be indistinguishable from one written before the field existed, where an empty array would instead read as 'this insight named its sources and they were none'. Pure, so it is unit-testable without a database; inline it could only be reached through a live insert.",
     "filePath": "app/lib/mapStore.ts",
     "name": "nodeAddedPayload",
     "testFile": "app/lib/mapStore.test.ts"
@@ -2081,7 +2111,7 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
-    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase. A slice's tests field is carried through as testsRef and deliberately NOT validated here: like parentRef it may name a node created earlier in the same call, so resolving it belongs to applyToolCalls, which can see the ids the database just handed back.",
+    "description": "Turns the model's tool calls into a validated plan of map changes without touching the database. Drops nodes whose kind the map cannot draw and nodes with blank labels, normalises an unknown status to answered, preserves insert order so a parent precedes the child that names it, and ignores an out-of-range phase. Two fields are deliberately NOT resolved here and are carried through as refs for applyToolCalls to resolve: a slice's tests field, as testsRef, and an insight's fromRefs, naming the questions it came out of. Like parentRef they may name nodes created earlier in the same call, so resolving them belongs to applyToolCalls, which can see the ids the database just handed back.",
     "filePath": "app/lib/nodePlan.ts",
     "name": "planMapMutations",
     "testFile": "app/lib/nodePlan.test.ts"
@@ -2138,6 +2168,12 @@
     "testFile": "app/lib/readJson.test.ts"
   },
   {
+    "description": "The refs an insight cites, normalised and ready for the resolution pass applyToolCalls performs. Strings only, blanks dropped, and an empty result turned to null - the same shape serialiseOptions uses and for the same reason: a node that named nothing should be indistinguishable from one that never had the field, rather than carrying an empty array nobody can render. Non-strings are filtered rather than stringified, because turning 42 into '42' would store a citation pointing at nothing while looking like it had worked.",
+    "filePath": "app/lib/nodePlan.ts",
+    "name": "readRefs",
+    "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
     "description": "Everything that happened after a cursor. An omitted cursor means the whole log, which is what a fresh agent wants; a cursor means just the delta, which is what a returning one wants. Both return the map's current revision, so a caller always leaves holding a cursor it can resume from even when the delta is empty.",
     "filePath": "app/lib/exchange.ts",
     "name": "readSince",
@@ -2160,6 +2196,12 @@
     "filePath": "app/lib/contributions.ts",
     "name": "resolveAnswered",
     "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
+    "description": "The cited nodes an insight can actually point at, resolved against the node set. Dangling ids are DROPPED rather than throwing or rendering as a blank - the same tolerance testsNodeId is documented to have, for the same reason: the node an insight named may since have been deleted, and an insight that stopped reading because one of its sources is gone would be a worse outcome than one citing fewer sources than it once did.",
+    "filePath": "app/lib/insightStream.ts",
+    "name": "resolveCitations",
+    "testFile": "app/lib/insightStream.test.ts"
   },
   {
     "description": "Turns a ref into the id it names. A ref is one of two things and the caller cannot tell which: a temporary name minted earlier in this same plan, or the real id of something already on the board - so resolution tries the plan first and falls through to the value itself. The load-bearing half is that an unresolvable value is returned UNCHANGED rather than dropped: a dangling link is reported on screen, whereas silently discarding it would hide that the node claimed a relationship at all. Hoisted out of four identical inline sites in applyToolCalls (parentRef, testsRef, themeRef, and the update id).",
@@ -2270,6 +2312,18 @@
     "filePath": "app/lib/briefSections.ts",
     "name": "splitOnParagraphs",
     "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "The standing ask as numbers, carried on read_map's structured output so an agent reading structured results does not have to parse the prose back into the figures it is being asked to compare itself against. The insights themselves are deliberately NOT included - they are already in the map the same call rendered, and repeating them would double the size of every read.",
+    "filePath": "app/lib/toolRuntime.ts",
+    "name": "standing",
+    "testFile": "app/lib/insightProvenance.integration.test.ts"
+  },
+  {
+    "description": "The instruction half of the standing ask - what the agent is being asked to do, as opposed to what the board currently holds. Separate from the counts because the two change for different reasons and at different rates: the numbers move every turn, this sentence moves when the product decides what an insight is for. Built by interpolating INSIGHT_STREAM_KINDS and TARGET_LIVE_INSIGHTS rather than typed out, so a kind added to the stream cannot end up described to the agent by a list that no longer matches the one the code counts.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "standingAskSentence",
+    "testFile": "app/lib/mcpFormat.test.ts"
   },
   {
     "description": "Picks the one readable field worth showing for an event, in preference order - label, then text, then phase, then answer. Each event kind carries its human-readable part under a different name, and an agent reading a wall of bare kinds learns nothing about what changed.",

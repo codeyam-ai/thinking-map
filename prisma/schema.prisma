@@ -123,6 +123,7 @@ model MapNode {
   /// idea | user | problem | goal | constraint | assumption | open-question
   /// | research | finding | gap | approach | pro | risk
   /// | known | unknown | direction | next-step | slice
+  /// | suggestion | experiment
   kind      String
   /// The short text shown inside the node pill.
   label     String
@@ -183,6 +184,29 @@ model MapNode {
   /// inferred across the whole document, has no single source section. Forcing
   /// one would produce fabricated citations, which is worse than none.
   sourceRef String?
+  /// The nodes this insight was drawn OUT of, as a JSON array of node ids —
+  /// the questions, answers and findings behind a claim. It is what lets the
+  /// person see the thinking behind an insight instead of taking it on trust.
+  ///
+  /// A pointer resolved in code, exactly as `testsNodeId` above is: not a
+  /// Prisma relation, never drawn on the map, and a dangling id is tolerated
+  /// because the node it names may since have been deleted.
+  ///
+  /// The contrast with `testsNodeId` is arity and direction. `testsNodeId`
+  /// names the ONE node a slice would settle, looking FORWARD at what building
+  /// would answer; this names the SEVERAL nodes an insight came out of, looking
+  /// BACK at what produced it. That plurality is also why it cannot be
+  /// `parentId`: the tree is the map's only edge, an insight has several
+  /// sources, and hanging it off a question would drag it into that question's
+  /// row when the whole point of an insight is that it belongs to none.
+  ///
+  /// Stored as a String because SQLite has no array type, in the manner
+  /// `options` and `choices` already are on this model.
+  ///
+  /// Optional, and absent rather than empty: an insight drawn from the whole
+  /// map genuinely has no single source, and a fabricated citation is worse
+  /// than none.
+  fromNodeIds String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
   /// The galaxy this node belongs to. Null for the root idea, which belongs to

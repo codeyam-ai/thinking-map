@@ -19,6 +19,12 @@ const INSIGHT_KINDS = new Set([
   'direction',
   'known',
   'unknown',
+  // Both are the partner telling you what it would do, not asking you
+  // anything. Without them here a suggestion renders as an unanswered
+  // question: a saturated card with a field asking the person to answer
+  // something nobody asked.
+  'suggestion',
+  'experiment',
 ]);
 
 export interface CardFace {

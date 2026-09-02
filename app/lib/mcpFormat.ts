@@ -1,4 +1,11 @@
 import { summarizeMap } from './mapStore';
+import {
+  INSIGHT_STREAM_KINDS,
+  TARGET_LIVE_INSIGHTS,
+  insightStream,
+  type InsightNode,
+  type InsightStream,
+} from './insightStream';
 
 export interface MapListRow {
   id: string;
@@ -12,13 +19,13 @@ export interface MapDetail {
   phase: string;
   seedIdea: string;
   messages: { role: string; content: string }[];
-  nodes: {
-    id: string;
+  /** Widened, not re-queried: `getMap` already selects whole node rows, so the
+   *  extra fields the standing ask needs were always there and this type was
+   *  simply narrower than the data. */
+  nodes: (InsightNode & {
     parentId: string | null;
-    kind: string;
-    label: string;
     status: string;
-  }[];
+  })[];
   /** Metadata only, never the text. `read_map` is called constantly; the brief
    *  is read deliberately, through its own tool. */
   brief?: { sourceName: string; charCount: number } | null;
@@ -82,6 +89,66 @@ export function formatNewMaps(rows: NewMapRow[], cursor: string): string {
 }
 
 /**
+ * The instruction half of the standing ask — what the agent is being asked to
+ * do, as opposed to what the board currently holds.
+ *
+ * Separate from the counts because the two change for different reasons and at
+ * different rates: the numbers move every turn, this sentence moves when the
+ * product decides what an insight is for. It is built from
+ * `INSIGHT_STREAM_KINDS` and `TARGET_LIVE_INSIGHTS` rather than typed out, so
+ * a kind added to the stream cannot end up described to the agent by a list
+ * that no longer matches the one the code counts.
+ */
+export function standingAskSentence(): string {
+  const kinds = [...INSIGHT_STREAM_KINDS].join(', ');
+  return (
+    `Standing ask: keep at least ${TARGET_LIVE_INSIGHTS} live insights on the board — themeless ` +
+    `nodes of kind ${kinds}. Each should name what it came out of (fromRefs), and ` +
+    `where you can, an experiment small enough to actually run.`
+  );
+}
+
+/**
+ * The standing ask: what the board is carrying, and what is owed.
+ *
+ * This is the whole mechanism behind "the partner keeps supplying insights".
+ * The page cannot summon an agent — that is the product's founding constraint —
+ * so the only place the ask can live is inside what the agent already reads on
+ * every turn. It states a BUDGET rather than a mood, because a number an agent
+ * can compare itself against is actionable in a way that "consider adding
+ * insights" is not.
+ *
+ * The empty case reads as an invitation rather than as a fault. A map on its
+ * first turn has no insights and has done nothing wrong; telling it what an
+ * insight is and what the target is, is more use than reporting a shortfall.
+ */
+export function formatInsightStanding(stream: InsightStream): string {
+  const ask = standingAskSentence();
+
+  if (stream.insights.length === 0) {
+    return [
+      '## Insights',
+      `none yet · target: ${TARGET_LIVE_INSIGHTS}`,
+      'An insight is a claim about the whole idea rather than a card inside one',
+      'theme — so it is written with no themeRef.',
+      ask,
+    ].join('\n');
+  }
+
+  const since =
+    stream.answersSinceNewest === 0
+      ? 'Nothing has been answered since the newest insight.'
+      : `${stream.answersSinceNewest} answer${stream.answersSinceNewest === 1 ? ' has' : 's have'} landed since the newest insight.`;
+
+  return [
+    '## Insights',
+    `live: ${stream.live} · stale: ${stream.stale} · target: ${TARGET_LIVE_INSIGHTS}`,
+    since,
+    ask,
+  ].join('\n');
+}
+
+/**
  * Render one map in full for an MCP client: the seed idea kept verbatim, the
  * conversation, and the node tree. The two views are shown together because
  * they are two renderings of the same thinking.
@@ -111,5 +178,7 @@ export function formatMapDetail(map: MapDetail): string {
     '',
     '## Map',
     summarizeMap(map.nodes),
+    '',
+    formatInsightStanding(insightStream(map.nodes)),
   ].join('\n');
 }

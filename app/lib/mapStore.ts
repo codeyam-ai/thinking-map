@@ -71,6 +71,7 @@ export function nodeAddedPayload(
   },
   parentId: string | null,
   testsNodeId: string | null,
+  fromNodeIds: string[] | null = null,
 ): Record<string, unknown> {
   return {
     id: created.id,
@@ -82,6 +83,12 @@ export function nodeAddedPayload(
     // Carried so an agent reading the log after the fact can see which
     // assumption a slice claimed to settle, not just that a slice appeared.
     ...(testsNodeId ? { testsNodeId } : {}),
+    // Carried for the same reason, in the other direction: a reader should be
+    // able to see what an insight came OUT of, not just that an insight
+    // appeared. The RESOLVED ids rather than the JSON string the column holds —
+    // the log speaks the contract's language, and a reader of the log should
+    // never have to know how the row happens to be stored.
+    ...(fromNodeIds && fromNodeIds.length > 0 ? { fromNodeIds } : {}),
     // Carried so a second front door reading the log learns where a claim came
     // from, rather than that provenance existing only in the database where the
     // log's readers cannot see it.
@@ -409,6 +416,16 @@ export async function applyToolCalls(
           ? resolveRef(refToId, node.testsRef)
           : null;
 
+        // And again, once per cited source. An insight typically names the
+        // questions the agent answered moments earlier in this same call, so
+        // every ref has to become a real id before it is stored. Unresolvable
+        // values are written through rather than dropped, for the reason
+        // `resolveRef` already gives: a ref that names nothing is a mistake
+        // worth being able to see in the row, not one to hide.
+        const fromNodeIds = node.fromRefs
+          ? node.fromRefs.map((ref) => resolveRef(refToId, ref))
+          : null;
+
         const created = await tx.mapNode.create({
           data: {
             mapId,
@@ -423,6 +440,7 @@ export async function applyToolCalls(
             imageUrl: node.imageUrl,
             imageAlt: node.imageAlt,
             testsNodeId,
+            fromNodeIds: fromNodeIds ? JSON.stringify(fromNodeIds) : null,
             sourceRef: node.sourceRef,
             options: node.options,
             order: node.order,
@@ -438,7 +456,7 @@ export async function applyToolCalls(
         events.push({
           kind: 'node.added',
           origin,
-          payload: nodeAddedPayload(created, parentId, testsNodeId),
+          payload: nodeAddedPayload(created, parentId, testsNodeId, fromNodeIds),
         });
       }
 

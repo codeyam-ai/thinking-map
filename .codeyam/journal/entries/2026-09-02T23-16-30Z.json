@@ -1,0 +1,1567 @@
+{
+  "timestamp": "2026-09-02T23:16:30Z",
+  "title": "Insights the Agent Keeps Supplying",
+  "type": "feature",
+  "userRequest": "## Summary\n\nToday the board can show exactly one insight, and only after every row is finished: `GalaxyBoard` picks the last themeless `direction | finding | assumption` node and hands it to the convergence point, gated behind at least one answered question (`app/components/GalaxyBoard.tsx:42-148`). Nothing else about the product produces insights on purpose. There is no `suggestion` or `experiment` in the eighteen node kinds, no way for an insight to say which question it came out of, and nothing in what the agent reads that ever asks it for more. So a person who has answered four questions gets an empty far end of the board and no reason to believe anything more is coming. This plan is the agent's half of fixing that: two new node kinds, a provenance pointer from an insight back to the questions that produced it, one pure module that decides what counts as a live insight, and a standing ask in what `read_map` returns so that every read the agent does tells it how far behind the insight budget it currently is. It ships no new screen — the surface that displays all this is the plan that depends on this one.\n\n## Key Decisions\n\n- **Two new kinds rather than a new model.** `suggestion` and `experiment` join `NODE_KINDS`. They are nodes because everything else on this map is a node: they inherit `add_nodes`, the exchange log, the round grouping, the origin badge and the person's own ability to write one from `NodeKindPicker` — none of which a second table would get for free. `KIND_FAMILY` is declared total precisely so that a nineteenth kind cannot ship colourless (`app/lib/mapKinds.ts:150-176`), which is what makes this a compile-checked change rather than a hopeful one.\n- **An insight is a THEMELESS node of an insight kind.** A `finding` the agent hangs inside a theme is a card in that row and stays one; a themeless one is a claim about the whole idea. That rule already exists informally as `CORE_INSIGHT_KINDS` plus `!n.themeId` in `GalaxyBoard`; this plan promotes it to a tested module and widens the kind set rather than inventing a second notion of \"insight\" beside `isInsightCard`. It is also the rule that stops the same node being drawn twice once the stack exists.\n- **`fromNodeIds`, modelled exactly on `testsNodeId`.** An insight names the question or questions it came out of, as a JSON array of node ids on a new nullable column — resolved in code, never drawn as an edge, dangling ids tolerated. That is the contract `testsNodeId` already documents at length in `prisma/schema.prisma`, and the ref-resolution it needs is the resolution `testsRef` already does in `applyToolCalls` (`app/lib/mapStore.ts:292-295`). Deliberately not `parentId`: the map's one real edge is the tree, an insight has several sources, and hanging insights off questions would drag them into a row when the whole point is that they belong to none.\n- **The standing ask lives in `read_map`'s rendering, not in a new tool.** The page cannot summon an agent — that is the product's founding constraint — so \"constantly providing insights\" can only mean the thing the agent already reads on every turn tells it what is owed. A dedicated `post_insights` tool was considered and rejected: it would be a second write path beside `add_nodes` with its own idempotency, ref-resolution and event shape, and none of that is what was missing. What was missing is the ask.\n- **The ask states the budget, not a mood.** The block reports live insights, stale insights, and how many answers have landed since the newest one, then names the target. A number the agent can compare against is actionable in a way that \"consider adding insights\" is not, and it costs a few lines on a read that already renders the whole map.\n- **Staleness is read off timestamps, not off the log.** An insight is stale when questions have been answered since it was written. `MapNode.updatedAt` moves when an answer lands, so `insightStream` can compute the whole picture from the nodes alone — which is what lets one pure module serve both the server-side `read_map` and the client-side board without either of them holding the event log. Deriving it from `MapEvent` revisions was the alternative and would have forced a second query into `read_map`'s delta branch on every turn.\n- **The block appends to BOTH `read_map` branches.** The delta branch is the one a working agent actually calls, and an ask that only appears on the full read would be an ask the agent sees once. That costs the delta branch one `getMap` it does not do today. This is a deliberate, stated cost: it is the difference between a mechanism that works and one that reads well in a diff.\n\n## Implementation\n\n### 1. An insight can say where it came from\n\n**File**: `prisma/schema.prisma`\n\nAdd `fromNodeIds String?` to `MapNode`, documented in the register the surrounding fields use. It holds a JSON array of node ids — the questions, answers or findings this insight was drawn from. Say explicitly, as `testsNodeId` does directly above it, that this is deliberately not a Prisma relation: the tree is the map's only edge, the pointer is resolved in code, it is never drawn, and a dangling id is tolerated because the node it names may have been deleted. Contrast it with `testsNodeId` (which points at the ONE node a slice would settle) and with `sourceRef` (which points into the brief).\n\nSQLite, `prisma db push`, nullable — no backfill, and every existing row is already valid.\n\n### 2. Two more kinds\n\n**File**: `app/lib/mapKinds.ts`\n\nAdd `suggestion` and `experiment` to `NODE_KINDS`, with eyebrows in `KIND_EYEBROW` (\"Suggestion\", \"Try this\" — the eyebrow is what the card prints, so it should read as an instruction rather than as a taxonomy label) and both in `KIND_FAMILY` under `forward`, alongside `approach`, `direction`, `next-step` and `slice`. They are things to do about the thinking, which is what that family means.\n\nLeave `ACCENT_KINDS` alone. Its comment records that exactly one card wears the lime, and giving two new kinds an accent would break the claim `nodeShellClasses` enforces.\n\n**File**: `app/lib/mapKinds.test.ts`\n\n`app/lib/mapKinds.test.ts:161` asserts `NODE_KINDS` has length 18. Move it to 20. The per-kind family and eyebrow loops above it (from line 153) already cover the new entries with no edit.\n\n### 3. The new kinds read as the partner's own thinking\n\n**File**: `app/lib/cardPresentation.ts`\n\nAdd `suggestion` and `experiment` to `INSIGHT_KINDS`. Without this a themed suggestion renders as an unanswered question — a saturated card with a text field asking the person to answer something nobody asked. The existing table-driven test at `app/lib/cardPresentation.test.ts:22-45` iterates the kinds, so extend its list rather than adding a case.\n\n### 4. What counts as a live insight\n\n**New file**: `app/lib/insightStream.ts`\n\nPure and dependency-free, in the manner of `mapRounds.ts` and `boardConnectors.ts`: the rules are the interesting part, so they are pinned by tests rather than inferred from a screenshot. No Prisma import — this module is read by the server door and by the browser.\n\n```ts\nexport const INSIGHT_STREAM_KINDS: ReadonlySet<string>;  // assumption, finding, gap, risk, direction, approach, suggestion, experiment\n\nexport interface InsightNode {\n  id: string; kind: string; label: string; detail: string | null;\n  themeId: string | null; choices?: string[] | null;\n  fromNodeIds?: string[] | null;\n  createdAt: Date | string; updatedAt: Date | string;\n}\n\nexport interface Insight extends InsightNode {\n  /** Answers that landed after this was written. Zero means nothing has\n   *  happened since; anything else means the insight predates what the\n   *  person has said, which is what \"stale\" is. */\n  answersSince: number;\n  stale: boolean;\n  /** The questions this came out of, resolved. Dangling ids are dropped —\n   *  the node may since have been deleted. */\n  from: { id: string; label: string }[];\n}\n\nexport interface InsightStream {\n  insights: Insight[];   // newest first\n  live: number;\n  stale: number;\n  /** Answers landed since the NEWEST insight. The number the standing ask\n   *  reports, and zero on a map with no insights at all. */\n  answersSinceNewest: number;\n}\n\nexport function insightStream(nodes: InsightNode[]): InsightStream;\n```\n\nRules to pin with tests:\n\n- An insight is a node whose `kind` is in `INSIGHT_STREAM_KINDS` **and** whose `themeId` is null. A themed node of the same kind is a card in its row and is absent here.\n- Newest first, by `createdAt`, ties broken by array order (`getMap` already orders `createdAt asc, order asc`).\n- `answersSince` counts nodes of kind `open-question` with status `answered` whose `updatedAt` is later than the insight's `createdAt`.\n- `stale` is `answersSince > 0`. Nothing is deleted or hidden by being stale — an insight the thinking has moved past is still worth reading, and hiding it would silently shrink the board.\n- `from` resolves each id in `fromNodeIds` against the node set and drops what it cannot find, exactly as a dangling `testsNodeId` is tolerated. A malformed or absent value yields `[]` rather than throwing.\n- An empty node set yields `{ insights: [], live: 0, stale: 0, answersSinceNewest: 0 }` — the day-one state, and the one every capture actually produces.\n\n`TARGET_LIVE_INSIGHTS = 3` is exported from here too, so the standing ask and any surface that wants to say \"one short\" read the same number.\n\n### 5. The agent can name what an insight came from\n\n**File**: `app/lib/toolCatalog.ts`\n\nAdd to `nodeShape`:\n\n```ts\nfromRefs: z.array(z.string()).optional().describe(\n  'Only for an insight — a suggestion, experiment, finding, risk or direction. The refs (from this same call) or real ids of the questions and answers this came OUT of. Naming them is what lets the person click the insight and see the thinking behind it instead of taking it on trust. Leave it off rather than guessing; an insight drawn from the whole map has no single source, and a wrong citation is worse than none.',\n)\n```\n\nThen extend the `add_nodes` description with the standing ask in the agent's own terms: an insight is a themeless node of one of those kinds; keep at least three live; each should name what it came out of and, where it can, an experiment small enough to actually run. Note that a themed node of the same kind stays in its row — that is the difference between a finding about one line of thinking and a claim about the whole idea.\n\n### 6. Refs become ids on the way in\n\n**File**: `app/lib/nodePlan.ts`\n\n`planMapMutations` carries `fromRefs: string[] | null` on the planned insert, beside `testsRef` (`app/lib/nodePlan.ts:27`) and read the same way it is read at line 176 — strings only, blanks dropped, an empty array normalised to null so a node that named nothing is indistinguishable from one that never had the field.\n\n**File**: `app/lib/mapStore.ts`\n\nIn `applyToolCalls`, resolve each ref through `refToId` exactly as `testsNodeId` is resolved at `app/lib/mapStore.ts:292-295` — a ref from this call, or a real id already on the map, with unresolvable values written through rather than dropped for the reason that comment already gives. Store as `JSON.stringify(ids)` in `fromNodeIds`, and carry the resolved ids on the `node.added` payload under `fromNodeIds`, omitted entirely when absent, in the manner `testsNodeId`, `sourceRef` and `options` are carried at `app/lib/mapStore.ts:335-341`. The log speaks the contract's language, so the payload gets the array and not the JSON string.\n\n`getMap` needs no change — it selects whole node rows.\n\n### 7. Every read says what is owed\n\n**File**: `app/lib/mcpFormat.ts`\n\nAdd an exported `formatInsightStanding(stream: InsightStream): string` and call it from `formatMapDetail`, as a `## Insights` section after `## Map`. Shape:\n\n```\n## Insights\nlive: 1 · stale: 2 · target: 3\n4 answers have landed since the newest insight.\nStanding ask: keep at least 3 live insights on the board — themeless nodes of\nkind suggestion, experiment, finding, risk, gap, assumption, direction or\napproach. Each should name what it came out of (fromRefs), and where you can,\nan experiment small enough to actually run.\n```\n\nThe empty case reads as an invitation rather than as a fault: no insights yet, here is what one is, here is the target. `MapDetail` grows the fields `insightStream` needs on its `nodes` (`kind`, `themeId`, `createdAt`, `updatedAt`, `fromNodeIds`, `choices`, `detail`) — it is a structural type over what `getMap` already returns, so this is a widening, not a query change.\n\n### 8. On the delta read too\n\n**File**: `app/lib/toolRuntime.ts`\n\n`read_map` (`app/lib/toolRuntime.ts:41-55`) appends the same block on both branches. The full branch already holds the map. The delta branch calls `getMap` for it — the deliberate extra query recorded in Key Decisions above — and appends after the changes. Carry `insights: { live, stale, answersSinceNewest, target }` on `structured` in both branches, so an agent reading structured output does not have to parse the prose.\n\n## Reused existing code\n\n- `testsNodeId` on `MapNode` in `prisma/schema.prisma` and its ref resolution in `applyToolCalls` (`app/lib/mapStore.ts:287-294`) — the exact pattern `fromNodeIds` copies: a pointer resolved in code, never drawn, dangling tolerated.\n- `INSIGHT_KINDS` / `isInsightCard` from `app/lib/cardPresentation.ts` (glossary entry: `isInsightCard`) — the existing rule for \"the partner's own thinking\", widened rather than duplicated.\n- `KIND_FAMILY`, `KIND_EYEBROW`, `NODE_KINDS`, `familyOf` from `app/lib/mapKinds.ts` (glossary entries: `familyOf`, `isNodeKind`) — the controlled vocabulary the tool schema binds to, so the two new kinds reach the agent's schema for free.\n- `serialiseOptions` and `readDiagram` in `app/lib/nodePlan.ts` — the normalise-or-null convention `fromRefs` follows.\n- `formatMapDetail` and `summarizeMap` (`app/lib/mcpFormat.ts`, `app/lib/mapStore.ts:207`) — the rendering the standing ask is appended to.\n- `app/lib/mapRounds.ts` and `app/lib/boardConnectors.ts` — the precedent for a pure, dependency-free, test-pinned rules module, which `insightStream.ts` follows.\n- **Existing-implementation survey:** nothing equivalent exists. `grep -n \"suggestion\\|experiment\" app/lib/mapKinds.ts app/lib/toolCatalog.ts` returns nothing; the only insight logic in the tree is `CORE_INSIGHT_KINDS` in `app/components/GalaxyBoard.tsx:42` and `INSIGHT_KINDS` in `app/lib/cardPresentation.ts:13`, and this plan widens both rather than adding a third. There is no `fromNodeIds`, no insight-count reporting, and no tool other than `add_nodes` that writes nodes.\n\n## Scenarios to Demonstrate\n\n- Day one: a map with a seed idea and no insights — the standing ask reads as an invitation, `insightStream` returns all zeros.\n- A map with one live insight and three answers landed since it — the ask reports `live: 1 · stale: 1` and names the four-answer gap.\n- Three live insights, nothing answered since — the ask says the target is met.\n- An insight citing two questions by `fromRefs` created in the same `add_nodes` call, with the refs resolved to real ids.\n- An insight whose `fromNodeIds` names a node that has since been deleted — the dangling id is dropped, the insight still reads.\n- A `suggestion` written into a theme rather than themeless — it stays a card in its row and is absent from the stream.",
+  "description": "Gives the agent a standing, numeric reason to keep putting insights on the board, and gives an insight a way to say where it came from.\n\nBefore this, the board could show exactly one insight and only after every row was finished: GalaxyBoard picked the last themeless direction/finding/assumption and handed it to the convergence point, gated behind at least one answered question. Nothing else in the product produced insights on purpose, and nothing the agent read ever asked it for more. A person who had answered four questions got an empty far end of the board and no reason to believe anything else was coming.\n\nWHAT SHIPPED, in four parts.\n\n1. app/lib/insightStream.ts — a new pure, dependency-free module holding the rule that had lived informally inside the board component: an insight is a THEMELESS node of an insight kind. A finding the agent hangs inside a theme is a card in that row; a themeless one is a claim about the whole idea. Promoting it to a shared module is what stops the agent's read and the browser disagreeing about what is on the board, which would draw the same node twice or count it never.\n\n2. MapNode.fromNodeIds — a nullable column holding a JSON array of the node ids an insight was drawn out of. Modelled exactly on testsNodeId: a pointer resolved in code, never a Prisma relation, never drawn on the map, dangling ids tolerated. The contrast with testsNodeId is arity and direction — that names the ONE node a slice would settle, looking forward; this names the SEVERAL an insight came out of, looking back. That plurality is also why it cannot be parentId: the tree is the map's only edge, and hanging an insight off a question would drag it into that question's row when the whole point is that it belongs to none.\n\n3. Two more node kinds, suggestion and experiment, taking the vocabulary from eighteen to twenty. Nodes rather than a second table because everything else on this map is a node: they inherit add_nodes, the exchange log, the round grouping, the origin badge and the person's own ability to write one. Both join the forward family; their eyebrows read as instructions ('Suggestion', 'Try this') rather than taxonomy labels, because the eyebrow is what the card prints.\n\n4. The standing ask in read_map. The page cannot summon an agent — the product's founding constraint — so a continuous supply of insights can only mean that what the agent already reads on every turn tells it how far behind it is. read_map now ends with an Insights section reporting live, stale, answers-since-newest, and the target. It appends to BOTH branches: the delta branch is the one a working agent actually calls, and an ask appearing only on the full read would be an ask seen once. That costs the delta branch one getMap it did not previously do — a deliberate, stated cost.\n\nDECISIONS WORTH RECORDING. Staleness is read off timestamps rather than the exchange log, because MapNode.updatedAt moves when an answer lands; that is what lets one pure function serve both the server's read_map and the browser without either holding the log. Deriving it from MapEvent revisions would have forced a second query into the delta branch on every turn. A dedicated post_insights tool was considered and rejected: it would have been a second write path beside add_nodes with its own idempotency, ref resolution and event shape, and none of that was what was missing — what was missing was the ask. The ask states a budget rather than a mood, because a number the agent can compare itself against is actionable where 'consider adding insights' is not. Both the kind list and the target are INTERPOLATED into the tool description from the same constants insightStream counts with, so the agent can never be told a target the code has stopped counting against. Nothing is hidden by being stale: an insight the thinking has moved past is still worth reading.\n\nTESTS. 23 new tests across 6 files (883 in the full suite once the rebase pulled three upstream commits in, all green), including a new database-backed integration test that exercises the write path through a real SQLite round trip. Four of them were MEASURED red-if-reverted with prove-red, all reporting fault-pinning: the two read_map branches (against toolRuntime.ts) and the ref resolution plus event payload (against mapStore.ts and nodePlan.ts). No test was deleted and none had its expectations weakened; one was renamed and its count updated ('collapses eighteen kinds' to 'collapses twenty kinds', toHaveLength(18) to (20)) because two kinds were genuinely added, and three existing lists were extended rather than relaxed.\n\nSCOPE VERDICT. This cycle DEFERRED nothing. All ten of the project's deliverables were already resolved before it began — nine delivered, one deferred to the assist track by explicit user decision in an earlier cycle (registering the MCP server in a client such as Claude Desktop). This feature closes no new deliverable row; it deepens two already-delivered ones, 'the AI deconstructs instead of answering it' and the MCP server, by making the deconstruction produce insights continuously rather than one at the very end. Every deliverable row's decidedBy is 'agent' except that single user-decided deferral, and no new agent-decided deferral was taken here.\n\nDELIBERATELY NOT SHIPPED. No new screen. This is the agent's half; the surface that displays the insight stack is the plan that depends on this one. Also left alone: a pre-existing bug found in app/lib/toolCatalog.ts, where 'tests', 'sourceRef' and 'options' are declared on themeShape instead of nodeShape, so add_nodes never advertises them to the agent even though the planner has always read them. It was surfaced at the demo gate and the user chose to leave it for its own change rather than fold it in here. It matters because Zod strips undeclared keys silently — which is exactly why 'fromRefs' was added to nodeShape and pinned by a test.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/insights-the-agent-keeps-supplying.md\t.codeyam/plans/completed/insights-the-agent-keeps-supplying.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-danglinglink--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-firstsliceonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-longsequence--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-provesnothing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-forward--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-found--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-gap--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-ground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-judgment--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-pro--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-question--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-subject--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardicon-unknownkind--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-bigturn--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentadded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentaddedmany--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentnote--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-youranswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-asked--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-everything--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardeyebrow-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-found--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-risk--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcardheader-root--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodekindpicker-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodekindpicker-risk--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pendingrow-settledagentidle--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pendingrow-settledagentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pendingrow-settlednoagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pendingrow-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-endofmap--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-endofresearch--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-nomaptoadvance--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowatend--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowatstart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-narrowscrolled--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-nextsteps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phasenav-research--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowfooter-readytoresearch--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowfooter-roundofstatements--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowfooter-stillanswering--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-nothingtodraw--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-parenttworoundsback--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-singlethread--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-someunattached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-wrappedrow--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaplist-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaprow-legacyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/savedmaprow-singlenode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-danglinglink--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-noeffortstated--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-provesnothing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-noslices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/4c33d58f79a4cdfc185e297d72d21e7f45a808829e3b224884c96feb86c89941.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a260552226ea884ae3a21e8693dd10a9ce5bc2fa800ad5990ea8d5e3b425ee03.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/cardPresentation.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/cardPresentation.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapKinds.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapKinds.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/nodePlan.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/nodePlan.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolRuntime.ts",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/insights-the-agent-keeps-supplying.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/48395d074f17cb4f25dc96b0bd88c0768f578cbe1f357919919dbb5371aff6fb.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c66fffaa7b69cc3a33bc67de4c7d819daa0b1b7e4c5e8ebef10b23a64b7db52d.json",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/insightProvenance.integration.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/insightStream.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/insightStream.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "BuildSequence - DanglingLink",
+      "screenshotPath": "buildsequence-danglinglink--tablet.png"
+    },
+    {
+      "name": "BuildSequence - Default",
+      "screenshotPath": "buildsequence-default--tablet.png"
+    },
+    {
+      "name": "BuildSequence - Empty",
+      "screenshotPath": "buildsequence-empty--tablet.png"
+    },
+    {
+      "name": "BuildSequence - FirstSliceOnly",
+      "screenshotPath": "buildsequence-firstsliceonly--tablet.png"
+    },
+    {
+      "name": "BuildSequence - LongSequence",
+      "screenshotPath": "buildsequence-longsequence--tablet.png"
+    },
+    {
+      "name": "BuildSequence - ProvesNothing",
+      "screenshotPath": "buildsequence-provesnothing--tablet.png"
+    },
+    {
+      "name": "CardIcon - Forward",
+      "screenshotPath": "cardicon-forward--tablet.png"
+    },
+    {
+      "name": "CardIcon - Found",
+      "screenshotPath": "cardicon-found--tablet.png"
+    },
+    {
+      "name": "CardIcon - Gap",
+      "screenshotPath": "cardicon-gap--tablet.png"
+    },
+    {
+      "name": "CardIcon - Ground",
+      "screenshotPath": "cardicon-ground--tablet.png"
+    },
+    {
+      "name": "CardIcon - Judgment",
+      "screenshotPath": "cardicon-judgment--tablet.png"
+    },
+    {
+      "name": "CardIcon - Pro",
+      "screenshotPath": "cardicon-pro--tablet.png"
+    },
+    {
+      "name": "CardIcon - Question",
+      "screenshotPath": "cardicon-question--tablet.png"
+    },
+    {
+      "name": "CardIcon - Subject",
+      "screenshotPath": "cardicon-subject--tablet.png"
+    },
+    {
+      "name": "CardIcon - UnknownKind",
+      "screenshotPath": "cardicon-unknownkind--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - BigTurn",
+      "screenshotPath": "exchangerail-bigturn--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Default",
+      "screenshotPath": "exchangerail-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Empty",
+      "screenshotPath": "exchangerail-empty--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered",
+      "screenshotPath": "exchangerail-justanswered--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded",
+      "screenshotPath": "exchangerow-agentadded--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany",
+      "screenshotPath": "exchangerow-agentaddedmany--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentNote",
+      "screenshotPath": "exchangerow-agentnote--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer",
+      "screenshotPath": "exchangerow-youranswer--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--tablet.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--tablet.png"
+    },
+    {
+      "name": "MapCard - Answered",
+      "screenshotPath": "mapcard-answered--tablet.png"
+    },
+    {
+      "name": "MapCard - Default",
+      "screenshotPath": "mapcard-default--tablet.png"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer",
+      "screenshotPath": "mapcard-editingananswer--tablet.png"
+    },
+    {
+      "name": "MapCard - Finding",
+      "screenshotPath": "mapcard-finding--tablet.png"
+    },
+    {
+      "name": "MapCard - LongLabel",
+      "screenshotPath": "mapcard-longlabel--tablet.png"
+    },
+    {
+      "name": "MapCard - NoOptions",
+      "screenshotPath": "mapcard-nooptions--tablet.png"
+    },
+    {
+      "name": "MapCard - RootIdea",
+      "screenshotPath": "mapcard-rootidea--tablet.png"
+    },
+    {
+      "name": "MapCard - Yours",
+      "screenshotPath": "mapcard-yours--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Answered",
+      "screenshotPath": "mapcardeyebrow-answered--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Asked",
+      "screenshotPath": "mapcardeyebrow-asked--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Default",
+      "screenshotPath": "mapcardeyebrow-default--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Everything",
+      "screenshotPath": "mapcardeyebrow-everything--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Finding",
+      "screenshotPath": "mapcardeyebrow-finding--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - FromBrief",
+      "screenshotPath": "mapcardeyebrow-frombrief--tablet.png"
+    },
+    {
+      "name": "MapCardEyebrow - Yours",
+      "screenshotPath": "mapcardeyebrow-yours--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Default",
+      "screenshotPath": "mapcardheader-default--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Found",
+      "screenshotPath": "mapcardheader-found--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - ManyRounds",
+      "screenshotPath": "mapcardheader-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Risk",
+      "screenshotPath": "mapcardheader-risk--tablet.png"
+    },
+    {
+      "name": "MapCardHeader - Root",
+      "screenshotPath": "mapcardheader-root--tablet.png"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold",
+      "screenshotPath": "maprow-belowresearchthreshold--tablet.png"
+    },
+    {
+      "name": "MapRow - Default",
+      "screenshotPath": "maprow-default--tablet.png"
+    },
+    {
+      "name": "MapRow - NamedByPhase",
+      "screenshotPath": "maprow-namedbyphase--tablet.png"
+    },
+    {
+      "name": "MapRow - PartlyAnswered",
+      "screenshotPath": "maprow-partlyanswered--tablet.png"
+    },
+    {
+      "name": "MapRow - Receded",
+      "screenshotPath": "maprow-receded--tablet.png"
+    },
+    {
+      "name": "MapRow - ResearchBand",
+      "screenshotPath": "maprow-researchband--tablet.png"
+    },
+    {
+      "name": "MapRow - TheIdea",
+      "screenshotPath": "maprow-theidea--tablet.png"
+    },
+    {
+      "name": "MapRow - Wrapping",
+      "screenshotPath": "maprow-wrapping--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeKindPicker - Default",
+      "screenshotPath": "nodekindpicker-default--tablet.png"
+    },
+    {
+      "name": "NodeKindPicker - Risk",
+      "screenshotPath": "nodekindpicker-risk--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "PendingRow - SettledAgentIdle",
+      "screenshotPath": "pendingrow-settledagentidle--tablet.png"
+    },
+    {
+      "name": "PendingRow - SettledAgentWorking",
+      "screenshotPath": "pendingrow-settledagentworking--tablet.png"
+    },
+    {
+      "name": "PendingRow - SettledNoAgent",
+      "screenshotPath": "pendingrow-settlednoagent--tablet.png"
+    },
+    {
+      "name": "PendingRow - Waiting",
+      "screenshotPath": "pendingrow-waiting--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - EndOfExplore",
+      "screenshotPath": "phaseadvance-endofexplore--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - EndOfMap",
+      "screenshotPath": "phaseadvance-endofmap--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - EndOfResearch",
+      "screenshotPath": "phaseadvance-endofresearch--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - NoMapToAdvance",
+      "screenshotPath": "phaseadvance-nomaptoadvance--tablet.png"
+    },
+    {
+      "name": "PhaseNav - Default",
+      "screenshotPath": "phasenav-default--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NarrowAtEnd",
+      "screenshotPath": "phasenav-narrowatend--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NarrowAtStart",
+      "screenshotPath": "phasenav-narrowatstart--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NarrowScrolled",
+      "screenshotPath": "phasenav-narrowscrolled--tablet.png"
+    },
+    {
+      "name": "PhaseNav - NextSteps",
+      "screenshotPath": "phasenav-nextsteps--tablet.png"
+    },
+    {
+      "name": "PhaseNav - Research",
+      "screenshotPath": "phasenav-research--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Answered",
+      "screenshotPath": "questioncard-answered--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Choices",
+      "screenshotPath": "questioncard-choices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Diagram",
+      "screenshotPath": "questioncard-diagram--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Focused",
+      "screenshotPath": "questioncard-focused--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Insight",
+      "screenshotPath": "questioncard-insight--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Open",
+      "screenshotPath": "questioncard-open--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Reference",
+      "screenshotPath": "questioncard-reference--tablet.png"
+    },
+    {
+      "name": "RowFooter - ReadyToResearch",
+      "screenshotPath": "rowfooter-readytoresearch--tablet.png"
+    },
+    {
+      "name": "RowFooter - RoundOfStatements",
+      "screenshotPath": "rowfooter-roundofstatements--tablet.png"
+    },
+    {
+      "name": "RowFooter - StillAnswering",
+      "screenshotPath": "rowfooter-stillanswering--tablet.png"
+    },
+    {
+      "name": "RowThreads - Default",
+      "screenshotPath": "rowthreads-default--tablet.png"
+    },
+    {
+      "name": "RowThreads - NothingToDraw",
+      "screenshotPath": "rowthreads-nothingtodraw--tablet.png"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack",
+      "screenshotPath": "rowthreads-parenttworoundsback--tablet.png"
+    },
+    {
+      "name": "RowThreads - SingleThread",
+      "screenshotPath": "rowthreads-singlethread--tablet.png"
+    },
+    {
+      "name": "RowThreads - SomeUnattached",
+      "screenshotPath": "rowthreads-someunattached--tablet.png"
+    },
+    {
+      "name": "RowThreads - WrappedRow",
+      "screenshotPath": "rowthreads-wrappedrow--tablet.png"
+    },
+    {
+      "name": "SavedMapList - Default",
+      "screenshotPath": "savedmaplist-default--tablet.png"
+    },
+    {
+      "name": "SavedMapRow - Default",
+      "screenshotPath": "savedmaprow-default--tablet.png"
+    },
+    {
+      "name": "SavedMapRow - LegacyPhase",
+      "screenshotPath": "savedmaprow-legacyphase--tablet.png"
+    },
+    {
+      "name": "SavedMapRow - SingleNode",
+      "screenshotPath": "savedmaprow-singlenode--tablet.png"
+    },
+    {
+      "name": "SliceCard - DanglingLink",
+      "screenshotPath": "slicecard-danglinglink--tablet.png"
+    },
+    {
+      "name": "SliceCard - Default",
+      "screenshotPath": "slicecard-default--tablet.png"
+    },
+    {
+      "name": "SliceCard - NoEffortStated",
+      "screenshotPath": "slicecard-noeffortstated--tablet.png"
+    },
+    {
+      "name": "SliceCard - ProvesNothing",
+      "screenshotPath": "slicecard-provesnothing--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "SummaryView - Default",
+      "screenshotPath": "summaryview-default--tablet.png"
+    },
+    {
+      "name": "SummaryView - Empty",
+      "screenshotPath": "summaryview-empty--tablet.png"
+    },
+    {
+      "name": "SummaryView - NoSlices",
+      "screenshotPath": "summaryview-noslices--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 416,
+    "passed": 416,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 416,
+        "passed": 416
+      }
+    ]
+  }
+}

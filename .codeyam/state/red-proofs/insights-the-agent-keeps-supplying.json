@@ -1,0 +1,51 @@
+{
+  "provenAt": "2026-09-02T22:51:08Z",
+  "slug": "insights-the-agent-keeps-supplying",
+  "paths": [
+    "app/lib/toolRuntime.ts",
+    "app/lib/mapStore.ts",
+    "app/lib/nodePlan.ts"
+  ],
+  "runScope": [
+    "app/lib/toolRuntime.ts",
+    "app/lib/mapStore.ts",
+    "app/lib/nodePlan.ts"
+  ],
+  "tests": {
+    "carries an insight’s citations as an array of ids": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "reports the budget on a full read": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "reports the same budget on a delta read": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "turns refs from the same call into the ids the database just minted": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "turns refs from the same call into the ids the database just minted",
+      "carries an insight’s citations as an array of ids"
+    ]
+  }
+}

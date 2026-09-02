@@ -14,6 +14,10 @@
 
 import { z } from 'zod';
 import { ACCEPTED_PHASE_NAMES, NODE_KINDS, NODE_STATUSES } from './mapKinds';
+// Safe to import here despite this module's isomorphic rule: `insightStream` is
+// pure and dependency-free by construction, so it drags no Prisma and no `fs`
+// into the page bundle.
+import { INSIGHT_STREAM_KINDS, TARGET_LIVE_INSIGHTS } from './insightStream';
 import type { Origin } from './exchange';
 
 /**
@@ -114,6 +118,12 @@ const nodeShape = z.object({
     .describe(
       'Which theme this node belongs to: the ref of a theme created earlier in this same call, or the real id of an existing one. Omit for the root idea, which belongs to no theme.',
     ),
+  fromRefs: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Only for an insight — a suggestion, experiment, finding, risk or direction. The refs (from this same call) or real ids of the questions and answers this came OUT of. Naming them is what lets the person click the insight and see the thinking behind it instead of taking it on trust. Leave it off rather than guessing; an insight drawn from the whole map has no single source, and a wrong citation is worse than none.',
+    ),
 });
 
 /** A theme carries a label and nothing else. The colour is the app's to assign
@@ -207,7 +217,13 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     name: 'add_nodes',
     title: 'Add nodes to the map',
     description:
-      'Add one or more nodes. Parents must appear before their children. Use status "open" for a question nobody has answered yet. Pass a requestId so a retry cannot duplicate the write.',
+      'Add one or more nodes. Parents must appear before their children. Use status "open" for a question nobody has answered yet. Pass a requestId so a retry cannot duplicate the write.\n\n' +
+      `Keep the board supplied with insights, not only questions. An INSIGHT is a node of kind ${[...INSIGHT_STREAM_KINDS].join(', ')} written with no themeRef — a claim about the whole idea rather than a card inside one row. A node of the same kind WITH a themeRef stays in its row, and that is the difference between a finding about one line of thinking and a claim about the idea itself.\n\n` +
+      // The kinds and the target are INTERPOLATED, never typed out: this
+      // sentence is the only thing telling the agent a target exists, and a
+      // hand-written copy of it would go on describing the old number long
+      // after `insightStream` started counting against a new one.
+      `Aim to keep at least ${TARGET_LIVE_INSIGHTS} live insights on the board. Every read_map tells you how many are live, how many the person has answered past, and how far behind you currently are — so you never have to guess. Each insight should name what it came out of via fromRefs, and where you can, offer an experiment small enough to actually run rather than another thing to consider.`,
     inputSchema: z.object({
       nodes: z.array(nodeShape),
       requestId: z

@@ -1369,6 +1369,15 @@
       "runner": "tests"
     },
     {
+      "description": "Exported so the ask and any surface that wants to say \"one short\" read the same number. A second copy of it somewhere else is the drift to prevent.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "TARGET_LIVE_INSIGHTS › is a positive target the ask can be measured against",
+      "line": 263,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "Muting is what keeps the dust from competing with a card being read. It changes only the opacity of the whole field — the particles themselves must not move, or focusing a card would make the galaxy reshuffle behind it.",
       "file": "app/components/ThemeParticles.render.test.tsx",
       "format": "vitest",
@@ -1477,6 +1486,42 @@
       "runner": "tests"
     },
     {
+      "description": "The failure this pins is silent and total: Zod STRIPS keys a schema does not declare, so a `fromRefs` missing from `nodeShape` would be dropped before the planner ever saw it — every citation lost, no error anywhere.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "add_nodes carries the ask for insights › accepts the sources an insight cites and passes them through",
+      "line": 116,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The vocabulary the schema binds to is NODE_KINDS, so the two new kinds reach the agent for free — but \"for free\" is exactly the kind of claim worth a test, since a hand-maintained enum here would silently reject them.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "add_nodes carries the ask for insights › accepts the two kinds an insight is usually written as",
+      "line": 132,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An insight drawn from the whole map has no single source, so the field has to be genuinely optional rather than a required empty list.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "add_nodes carries the ask for insights › leaves the field off entirely when the agent cites nothing",
+      "line": 125,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ask itself. It is prose, and prose is easy to delete by accident — but it is the only thing telling the agent there is a target at all, so these pin the three claims it has to keep making.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "add_nodes carries the ask for insights › states the target, what a themeless node means, and how to cite",
+      "line": 140,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "Other query params are none of its business — a map opened with a filter or a tracking param on the URL must not accidentally summon the panel.",
       "file": "app/lib/agentPanel.test.ts",
       "format": "vitest",
@@ -1528,6 +1573,33 @@
       "key": "agentPanelRequested › reads the first entry when the param is repeated",
       "line": 36,
       "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The rule this function exists to hold: a question is CREATED open and UPDATED when it is answered, so `createdAt` dates the ASKING. Reading it here would make every insight look current however far the thinking moved.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "answeredAt › dates an answer by when it was given, not when the question was asked",
+      "line": 210,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A question still open is not an answer, and an insight is not a question.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "answeredAt › ignores unanswered questions and everything that is not a question",
+      "line": 217,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Timestamps arrive as a Date from Prisma and as a string after a JSON round trip. An unparseable one sorts as epoch rather than NaN, which would make every comparison against it false and silently drop it from every count.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "answeredAt › reads a Date, an ISO string, and a value it cannot parse",
+      "line": 229,
+      "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
     {
@@ -3466,11 +3538,38 @@
       "runner": "tests"
     },
     {
+      "description": "How far behind the board is. The whole point of measuring it from the newest insight is that the agent is told a gap rather than left to feel one.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatInsightStanding › names how many answers have landed since the newest insight",
+      "line": 206,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Day one, and the state every fresh map produces. A map that has done nothing wrong must not be told it is short — it should be told what an insight IS, which is the more useful thing on turn one.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatInsightStanding › reads as an invitation rather than a shortfall when there are none",
+      "line": 221,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A number the agent can compare itself against is actionable in a way that \"consider adding insights\" is not. That is the design decision, and losing the figures would quietly turn the mechanism back into a mood.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatInsightStanding › states the budget as figures the agent can measure itself against",
+      "line": 194,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "The seed idea is preserved verbatim through the whole product; the MCP view must not be where it gets paraphrased away.",
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › includes the title, phase and verbatim seed idea",
-      "line": 59,
+      "line": 74,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3479,7 +3578,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › marks an empty conversation explicitly",
-      "line": 77,
+      "line": 92,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3488,7 +3587,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › renders a map with no nodes",
-      "line": 83,
+      "line": 98,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3497,7 +3596,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › renders the conversation and the node tree under their own headings",
-      "line": 67,
+      "line": 82,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3506,7 +3605,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › leads each row with the id in brackets",
-      "line": 21,
+      "line": 32,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3515,7 +3614,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › puts each map on its own line",
-      "line": 34,
+      "line": 45,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3524,7 +3623,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › reports the phase and the node and message counts",
-      "line": 26,
+      "line": 37,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3533,7 +3632,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › says so plainly when there are no maps",
-      "line": 16,
+      "line": 27,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3542,7 +3641,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › hands back the cursor to resume from",
-      "line": 148,
+      "line": 163,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3551,7 +3650,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › keeps the count singular for a single map",
-      "line": 142,
+      "line": 157,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3560,7 +3659,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › leads each row with the map id",
-      "line": 104,
+      "line": 119,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3569,7 +3668,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › renders every map when several arrive at once",
-      "line": 130,
+      "line": 145,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3578,7 +3677,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › reports an empty result as normal rather than as a failure",
-      "line": 154,
+      "line": 169,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3587,7 +3686,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › says so explicitly when a map has no seed idea",
-      "line": 124,
+      "line": 139,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3596,7 +3695,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › spells out read_brief as the next call for a brief-started map",
-      "line": 116,
+      "line": 131,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3605,8 +3704,44 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › spells out read_map as the next call for a sentence-started map",
-      "line": 109,
+      "line": 124,
       "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The log speaks the contract's language, not the column's. A reader of the exchange log should learn what an insight came out of without having to know that SQLite made it a string.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "fromRefs resolution › carries the resolved ids on the node.added event as an array",
+      "line": 138,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An insight drawn from the whole map genuinely has no single source, and a node that named nothing must be indistinguishable from one written before the field existed — not one carrying an empty array nobody can render.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "fromRefs resolution › leaves the column null when the agent named no sources",
+      "line": 104,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole reason this is a ref and not an id: an insight almost always cites questions created moments earlier in the very same call, so a ref written through raw would be a citation pointing at nothing.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "fromRefs resolution › turns refs from the same call into the ids the database just minted",
+      "line": 85,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An id that resolves to nothing is written through rather than dropped, the same call `resolveRef` already makes for parentRef: a citation naming nothing is a mistake worth being able to see in the row, and the read side drops it at render time so it never reaches the person.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "fromRefs resolution › writes an unresolvable ref through, and the read side drops it",
+      "line": 118,
+      "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
     {
@@ -4096,11 +4231,128 @@
       "runner": "tests"
     },
     {
+      "description": "The server has the JSON string the column stores; the browser usually has the array. Both have to work, or one of the two callers reads no provenance at all while looking like it succeeded.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › accepts the stored JSON string as well as a parsed array",
+      "line": 183,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The rule the whole module exists to hold in ONE place. A themed node of an insight kind is a card inside its row; only a themeless one is a claim about the whole idea. Getting this wrong draws the same node twice.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › counts a themeless insight and ignores the same kind inside a theme",
+      "line": 55,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A `problem` or a `goal` is a piece of the idea, not a claim about it. The kind set is a design decision, so moving a kind in or out of it should have to be done deliberately rather than by editing a filter.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › counts only the kinds that are a claim about the whole idea",
+      "line": 76,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The other half of the same rule: an answer given BEFORE the insight was written is what the insight was drawn from, not something it is behind.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › does not count answers that predate the insight",
+      "line": 103,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing is hidden by being stale. An insight the thinking has moved past is still worth reading, and dropping it would silently shrink the board.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › keeps a stale insight in the list rather than dropping it",
+      "line": 115,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A batch written in one transaction shares a timestamp to the millisecond. `getMap` already ordered them, so a tie must leave them alone rather than shuffling them by a tiebreak nobody chose.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › leaves insights written in the same instant in the order they arrived",
+      "line": 151,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Staleness is \"the thinking has moved on since this was written\", and it is read off timestamps rather than the event log — which is what lets this module stay pure and serve both the server and the browser.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › marks an insight stale once answers have landed after it",
+      "line": 89,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The number the standing ask reports. It is measured from the NEWEST insight, because that is what \"how far behind are you\" means — an old stale insight should not make a board that was just topped up read as behind.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › measures answersSinceNewest from the newest insight only",
+      "line": 126,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Newest first, which is the order both the ask and the board read.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › orders insights newest first",
+      "line": 139,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The point of the provenance pointer: the person can see the thinking behind a claim instead of taking it on trust.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › resolves the questions an insight came out of",
+      "line": 163,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Day one, and the state every capture actually produces. All zeros rather than a thrown error or a partly-filled object, because the surface that renders this has to read a brand-new map without a special case.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › returns all zeros for a map with nothing on it",
+      "line": 43,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A node arriving over JSON carries `undefined` where the database row carried null. An insight that silently stopped counting for that reason would be the precise drift this module exists to prevent.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › treats an absent themeId the same as a null one",
+      "line": 67,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Read on every `read_map`. One bad row written by an older agent must not be able to take down the map's entire rendering.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "insightStream › yields no citations for a malformed or absent value rather than throwing",
+      "line": 198,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "What makes a card show your words as its content, with the question demoted to a label above them. Only a question can reach this state — it is the presence of an answer that earns it, not the status string alone.",
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "isAnsweredCard › is an answered question and nothing else",
-      "line": 87,
+      "line": 89,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4109,7 +4361,7 @@
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "isAnsweredCard › never treats a settled insight as your answer",
-      "line": 100,
+      "line": 102,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4235,7 +4487,7 @@
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "isInsightCard › counts a card carrying a diagram, whatever its kind",
-      "line": 52,
+      "line": 54,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4244,7 +4496,7 @@
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "isInsightCard › counts a card carrying a picture, whatever its kind",
-      "line": 64,
+      "line": 66,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4253,7 +4505,7 @@
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "isInsightCard › is not tripped by null or empty carried content",
-      "line": 73,
+      "line": 75,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4271,7 +4523,7 @@
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "isInsightCard › treats a plain question as a question",
-      "line": 44,
+      "line": 46,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4735,12 +4987,12 @@
       "runner": "tests"
     },
     {
-      "description": "Six is the claim — enough to be a system, few enough to hold without a legend. Eighteen hues would be a legend.",
+      "description": "Six is the claim — enough to be a system, few enough to hold without a legend. Twenty hues would be a legend.",
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
-      "key": "node families › collapses eighteen kinds into six families",
+      "key": "node families › collapses twenty kinds into six families",
       "line": 160,
-      "registeredAt": "2026-09-01T21:31:13Z",
+      "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
     {
@@ -4748,7 +5000,7 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "node families › falls back to the neutral family for an unknown kind",
-      "line": 205,
+      "line": 212,
       "registeredAt": "2026-09-01T21:31:13Z",
       "runner": "tests"
     },
@@ -4775,8 +5027,17 @@
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
       "key": "node families › puts a gap with the questions rather than with the findings",
-      "line": 198,
+      "line": 205,
       "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The log speaks the contract's language, not the column's. The row stores a JSON string because SQLite has no array type; a reader of the log should never have to know that.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "nodeAddedPayload › carries an insight’s citations as an array of ids",
+      "line": 90,
+      "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
     {
@@ -4793,8 +5054,17 @@
       "file": "app/lib/mapStore.test.ts",
       "format": "vitest",
       "key": "nodeAddedPayload › includes provenance and the settled assumption when present",
-      "line": 81,
+      "line": 97,
       "registeredAt": "2026-09-02T21:34:40Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An insight that cited nothing must be indistinguishable from one written before the field existed — an empty array in the log would read as \"this insight named its sources and they were none\", which is a different claim.",
+      "file": "app/lib/mapStore.test.ts",
+      "format": "vitest",
+      "key": "nodeAddedPayload › omits the citations when the list is empty rather than sending []",
+      "line": 83,
+      "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
     {
@@ -5626,6 +5896,51 @@
       "runner": "tests"
     },
     {
+      "description": "An unknown kind is DROPPED here rather than stored, so a kind added to the vocabulary but not reaching this guard would vanish silently — the agent told the write succeeded, and nothing on the board to show for it.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — the forward-looking kinds › accepts a suggestion and an experiment as real nodes",
+      "line": 533,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Carried verbatim, refs and all. Resolving them here is impossible: a ref usually names a node created moments earlier in this same call, whose real id does not exist until the write.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — the sources an insight cites › carries the refs through untouched for applyToolCalls to resolve",
+      "line": 499,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Non-strings are filtered rather than stringified. `[1, 2]` is a mistake, and turning it into `\"1\"` would store a citation pointing at nothing while looking like it had worked.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — the sources an insight cites › drops non-strings and blanks rather than coercing them",
+      "line": 514,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, and every node written before this field existed.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — the sources an insight cites › leaves a node that cited nothing carrying null",
+      "line": 519,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The `serialiseOptions` convention: a node that named nothing must be indistinguishable from one that never had the field, rather than carrying an empty array nobody can render.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — the sources an insight cites › normalises an empty or all-blank list to null",
+      "line": 506,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "A slice carries the node it would settle. Like parentRef this stays a REF here — resolving it to a real id is applyToolCalls' job — so the plan must hand it through untouched rather than validating it against a map it cannot see.",
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
@@ -6040,6 +6355,33 @@
       "runner": "tests"
     },
     {
+      "description": "Day one. A map that has done nothing wrong should read an invitation, not a shortfall — and the empty case is the one every fresh map produces.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "read_map carries the standing ask › reads as an invitation on a map with no insights yet",
+      "line": 209,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The full read. Without this the agent is told the map's contents and left to invent its own sense of whether it owes anything.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "read_map carries the standing ask › reports the budget on a full read",
+      "line": 177,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The delta branch is the one a WORKING agent actually calls. An ask that appeared only on the full read would be an ask the agent saw once, on its first turn, and never again — which is the difference between a mechanism that works and one that reads well in a diff.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "read_map carries the standing ask › reports the same budget on a delta read",
+      "line": 194,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "The bump and the insert share a transaction, so the map's own revision must agree with the last event written.",
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
@@ -6154,6 +6496,24 @@
       "key": "renderEvents › still renders an event whose payload is null or empty",
       "line": 65,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The tolerance `testsNodeId` is documented to have: the node an insight named may since have been deleted, and an insight that stopped reading because one of its sources is gone would be worse than one citing fewer.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "resolveCitations › drops an id that names nothing and keeps the rest",
+      "line": 247,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: most nodes cite nothing, so the empty path is the one this runs down on nearly every read and must not throw or invent an entry.",
+      "file": "app/lib/insightStream.test.ts",
+      "format": "vitest",
+      "key": "resolveCitations › returns nothing for an empty list",
+      "line": 255,
+      "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
     {
@@ -6598,6 +6958,24 @@
       "runner": "tests"
     },
     {
+      "description": "The two instructions that make an insight worth more than an assertion: say where it came from, and make it small enough to act on.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "standingAskSentence › asks for provenance and for something small enough to run",
+      "line": 241,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Built from the same constants the code counts with, so a kind added to the stream cannot end up described to the agent by a list that no longer matches the one being measured.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "standingAskSentence › names every kind the stream actually counts",
+      "line": 233,
+      "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
       "description": "Without the id, the model cannot target a node with update_node.",
       "file": "app/lib/summarizeMap.test.ts",
       "format": "vitest",
@@ -6701,7 +7079,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › exposes exactly the tools every front door shares",
-      "line": 17,
+      "line": 19,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6710,7 +7088,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › finds a tool by name and reports nothing for an unknown one",
-      "line": 51,
+      "line": 53,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6719,7 +7097,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › gives every tool a title and a description",
-      "line": 58,
+      "line": 60,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6728,7 +7106,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › leaves the whole-collection tools out of the shared set",
-      "line": 33,
+      "line": 35,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6737,7 +7115,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › marks the three read-only tools as read-only",
-      "line": 42,
+      "line": 44,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -6746,7 +7124,7 @@
       "file": "app/lib/cardPresentation.test.ts",
       "format": "vitest",
       "key": "the three faces › are mutually exclusive and total",
-      "line": 115,
+      "line": 117,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -6809,7 +7187,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › caps a timeout longer than the ceiling",
-      "line": 79,
+      "line": 81,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6818,7 +7196,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › falls back to the default when the agent names no timeout",
-      "line": 69,
+      "line": 71,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6827,7 +7205,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › floors a zero or negative timeout at one second",
-      "line": 84,
+      "line": 86,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -6836,7 +7214,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
-      "line": 74,
+      "line": 76,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },

@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { formatMapDetail, formatMapList, formatNewMaps } from './mcpFormat';
+import {
+  formatInsightStanding,
+  formatMapDetail,
+  formatMapList,
+  formatNewMaps,
+  standingAskSentence,
+} from './mcpFormat';
+import {
+  INSIGHT_STREAM_KINDS,
+  TARGET_LIVE_INSIGHTS,
+  type InsightStream,
+} from './insightStream';
 
 const row = (id: string, title: string, phase: string, nodes = 0, messages = 0) => ({
   id,
@@ -50,6 +61,10 @@ describe('formatMapDetail', () => {
         kind: 'idea',
         label: 'Educational game',
         status: 'answered',
+        detail: null,
+        themeId: null,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
       },
     ],
   };
@@ -156,5 +171,76 @@ describe('formatNewMaps', () => {
     expect(out).toContain('No new maps yet');
     expect(out).toContain(CURSOR);
     expect(out).not.toMatch(/error|failed|unable/i);
+  });
+});
+
+// The standing ask is the whole mechanism behind "the partner keeps supplying
+// insights". The page cannot summon an agent, so the only place the ask can
+// live is inside what the agent already reads on every turn — which makes this
+// prose load-bearing rather than decorative.
+describe('formatInsightStanding', () => {
+  const stream = (over: Partial<InsightStream> = {}): InsightStream => ({
+    insights: [],
+    live: 0,
+    stale: 0,
+    answersSinceNewest: 0,
+    ...over,
+  });
+  const anInsight = { id: 'i1' } as InsightStream['insights'][number];
+
+  // A number the agent can compare itself against is actionable in a way that
+  // "consider adding insights" is not. That is the design decision, and losing
+  // the figures would quietly turn the mechanism back into a mood.
+  it('states the budget as figures the agent can measure itself against', () => {
+    const out = formatInsightStanding(
+      stream({ insights: [anInsight], live: 1, stale: 2 }),
+    );
+    expect(out).toContain('## Insights');
+    expect(out).toContain('live: 1');
+    expect(out).toContain('stale: 2');
+    expect(out).toContain(`target: ${TARGET_LIVE_INSIGHTS}`);
+  });
+
+  // How far behind the board is. The whole point of measuring it from the
+  // newest insight is that the agent is told a gap rather than left to feel one.
+  it('names how many answers have landed since the newest insight', () => {
+    expect(
+      formatInsightStanding(stream({ insights: [anInsight], answersSinceNewest: 4 })),
+    ).toContain('4 answers have landed');
+    expect(
+      formatInsightStanding(stream({ insights: [anInsight], answersSinceNewest: 1 })),
+    ).toContain('1 answer has landed');
+    expect(
+      formatInsightStanding(stream({ insights: [anInsight], answersSinceNewest: 0 })),
+    ).toContain('Nothing has been answered');
+  });
+
+  // Day one, and the state every fresh map produces. A map that has done
+  // nothing wrong must not be told it is short — it should be told what an
+  // insight IS, which is the more useful thing on turn one.
+  it('reads as an invitation rather than a shortfall when there are none', () => {
+    const out = formatInsightStanding(stream());
+    expect(out).toContain('none yet');
+    expect(out).toContain('no themeRef');
+    expect(out).not.toContain('live: 0');
+  });
+});
+
+describe('standingAskSentence', () => {
+  // Built from the same constants the code counts with, so a kind added to the
+  // stream cannot end up described to the agent by a list that no longer
+  // matches the one being measured.
+  it('names every kind the stream actually counts', () => {
+    const out = standingAskSentence();
+    for (const kind of INSIGHT_STREAM_KINDS) expect(out).toContain(kind);
+    expect(out).toContain(String(TARGET_LIVE_INSIGHTS));
+  });
+
+  // The two instructions that make an insight worth more than an assertion:
+  // say where it came from, and make it small enough to act on.
+  it('asks for provenance and for something small enough to run', () => {
+    const out = standingAskSentence();
+    expect(out).toContain('fromRefs');
+    expect(out).toContain('small enough to actually run');
   });
 });

@@ -74,6 +74,22 @@ describe('nodeAddedPayload', () => {
     expect('options' in payload).toBe(false);
     expect('sourceRef' in payload).toBe(false);
     expect('testsNodeId' in payload).toBe(false);
+    expect('fromNodeIds' in payload).toBe(false);
+  });
+
+  // An insight that cited nothing must be indistinguishable from one written
+  // before the field existed — an empty array in the log would read as "this
+  // insight named its sources and they were none", which is a different claim.
+  it('omits the citations when the list is empty rather than sending []', () => {
+    expect('fromNodeIds' in nodeAddedPayload(row, null, null, [])).toBe(false);
+  });
+
+  // The log speaks the contract's language, not the column's. The row stores a
+  // JSON string because SQLite has no array type; a reader of the log should
+  // never have to know that.
+  it('carries an insight’s citations as an array of ids', () => {
+    const payload = nodeAddedPayload(row, null, null, ['q1', 'q2']);
+    expect(payload.fromNodeIds).toEqual(['q1', 'q2']);
   });
 
   // Provenance and the assumption a slice claims to settle both belong in the

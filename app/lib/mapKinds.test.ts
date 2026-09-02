@@ -144,7 +144,7 @@ describe('map vocabulary guards', () => {
 });
 
 // Colour is how the map is read from across the room, and a kind with no
-// family has no colour at all. This is the test that stops a nineteenth kind
+// family has no colour at all. This is the test that stops a twenty-first kind
 // shipping colourless.
 describe('node families', () => {
   // The whole point of a total Record: every kind the map can draw has a
@@ -156,9 +156,9 @@ describe('node families', () => {
   });
 
   // Six is the claim — enough to be a system, few enough to hold without a
-  // legend. Eighteen hues would be a legend.
-  it('collapses eighteen kinds into six families', () => {
-    expect(NODE_KINDS).toHaveLength(18);
+  // legend. Twenty hues would be a legend.
+  it('collapses twenty kinds into six families', () => {
+    expect(NODE_KINDS).toHaveLength(20);
     expect(new Set(Object.values(KIND_FAMILY)).size).toBe(6);
   });
 
@@ -187,7 +187,14 @@ describe('node families', () => {
     for (const kind of ['pro', 'risk']) {
       expect(familyOf(kind)).toBe('judgment');
     }
-    for (const kind of ['approach', 'direction', 'next-step', 'slice']) {
+    for (const kind of [
+      'approach',
+      'direction',
+      'next-step',
+      'slice',
+      'suggestion',
+      'experiment',
+    ]) {
       expect(familyOf(kind)).toBe('forward');
     }
   });

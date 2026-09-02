@@ -109,6 +109,8 @@ export const NODE_KINDS = [
   'direction',
   'next-step',
   'slice',
+  'suggestion',
+  'experiment',
 ] as const;
 export type NodeKind = (typeof NODE_KINDS)[number];
 
@@ -132,12 +134,17 @@ export const KIND_EYEBROW: Record<NodeKind, string> = {
   direction: 'Direction',
   'next-step': 'Next step',
   slice: 'Build first',
+  // Both eyebrows read as instructions rather than as taxonomy labels, because
+  // the eyebrow is what the card actually prints: "Suggestion" is something you
+  // can act on, and "Try this" says what an experiment is for in two words.
+  suggestion: 'Suggestion',
+  experiment: 'Try this',
 };
 
 /**
- * The six colour families the eighteen kinds collapse into.
+ * The six colour families the twenty kinds collapse into.
  *
- * One hue per kind would be eighteen hues and no hierarchy at all — a legend,
+ * One hue per kind would be twenty hues and no hierarchy at all — a legend,
  * not a system. Six is what a person can hold without one, and `KIND_EYEBROW`
  * above already names the exact kind on every card for anyone who wants the
  * detail. So the family carries the glanceable category and the eyebrow carries
@@ -163,7 +170,7 @@ export type NodeFamily = (typeof NODE_FAMILIES)[number];
 /**
  * Every kind's family.
  *
- * Total rather than Partial-with-a-fallback on purpose: a nineteenth kind added
+ * Total rather than Partial-with-a-fallback on purpose: a twenty-first kind added
  * to `NODE_KINDS` will not compile until it is given a family, so a kind cannot
  * ship colourless.
  */
@@ -194,6 +201,11 @@ export const KIND_FAMILY: Record<NodeKind, NodeFamily> = {
   direction: 'forward',
   'next-step': 'forward',
   slice: 'forward',
+  // Things to do ABOUT the thinking, which is what `forward` means. A
+  // suggestion is a move worth making; an experiment is one small enough to
+  // actually run.
+  suggestion: 'forward',
+  experiment: 'forward',
 };
 
 /** A node's family, for the kinds outside the vocabulary too — anything the
