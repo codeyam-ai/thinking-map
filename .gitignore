@@ -223,6 +223,7 @@ blob-report/
 .codeyam/state/last-advance.txt
 .codeyam/state/provider-auth-verdict.json
 .codeyam/state/dependency-provision.json
+.codeyam/state/setup-provision.json
 .codeyam/state/session-results-snapshot.json
 .codeyam/state/step-highwater.json
 .codeyam/state/finalize-phase-fingerprints.json
@@ -240,5 +241,7 @@ blob-report/
 .codeyam/test-run-marker.json
 .claude/settings.local.json
 .claude/hooks/__pycache__/
+*.waits
+*.heartbeat
 docker-compose.cloud.yml
 # codeyam-editor:end

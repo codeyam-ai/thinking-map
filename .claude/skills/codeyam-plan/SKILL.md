@@ -37,7 +37,7 @@ The one read-only CLI call this skill makes is `codeyam-editor editor plan-prefi
 
 Only when the skill is invoked with NO argument does the rest of this step apply.
 
-**Do NOT use the AskUserQuestion tool for this step.** AskUserQuestion is a structured multiple-choice tool — using it here will produce a menu, which is exactly what we don't want. Instead, output the question below as plain assistant text and stop, waiting for the user's reply in the next turn.
+**Do NOT open a structured multiple-choice menu for this step** — on Claude that means the `AskUserQuestion` tool; on any harness it means whatever presents the user a fixed set of options to pick from. A menu is exactly what we don't want here. Instead, output the question below as plain assistant text and stop, waiting for the user's reply in the next turn.
 
 Output **exactly** this and nothing else (no preamble, no tool calls, no follow-up options):
 
@@ -51,7 +51,7 @@ Take the user's response as the plan basis and move to the prefix-derivation ste
 
 ### Step 2: Derive a name prefix — do NOT ask for one
 
-A prefix tags the plan's filename and title by author or work item — developer initials (`jc`), a feature code (`auth`), or a ticket number (`PROJ-123`). **Never open an `AskUserQuestion` menu for it.** The prefix is an organisational convention internal to `.codeyam/plans/`; nothing the user sees or does changes based on the answer, so the question asks them to adjudicate a filename with no stated consequence — the exact shape of an unanswerable gate. Choosing it is a routine judgment call, which is the standard for deciding and reporting rather than asking.
+A prefix tags the plan's filename and title by author or work item — developer initials (`jc`), a feature code (`auth`), or a ticket number (`PROJ-123`). **Never open a structured multiple-choice menu for it** (on Claude, `AskUserQuestion`). The prefix is an organisational convention internal to `.codeyam/plans/`; nothing the user sees or does changes based on the answer, so the question asks them to adjudicate a filename with no stated consequence — the exact shape of an unanswerable gate. Choosing it is a routine judgment call, which is the standard for deciding and reporting rather than asking.
 
 1. Run `codeyam-editor editor plan-prefixes` and capture its trimmed, newline-delimited stdout as `priorPrefixes` (an ordered list, most-recent-first). It prints every distinct prefix any plan has used (scanning both the queue and `.codeyam/plans/completed/`), de-duplicated, or nothing when no plan carries a prefix — or there are no plans yet. The first line equals the legacy `last-plan-prefix` output.
 
@@ -103,12 +103,13 @@ to re-research at the `explore` slug:
   call into the area you're touching, and what already exists nearby
   that you might reuse
 
-NEVER `Read` `.codeyam/glossary.json` directly — it exceeds the Read tool
-limit. Use the CLI / index sidecar.
+NEVER read `.codeyam/glossary.json` whole — the file is far too large to
+take into context (~71k tokens). Use the CLI / index sidecar.
 
-After the registry/glossary pass, use the Explore agent or direct
-Glob/Grep/Read tools to investigate code the indexes pointed you at. Be
-thorough — the plan quality depends on understanding the codebase.
+After the registry/glossary pass, use your harness's code-search and
+file-reading tools to investigate code the indexes pointed you at (on Claude:
+the Explore agent, or Glob / Grep / Read directly). Be thorough — the plan
+quality depends on understanding the codebase.
 
 **Existing-implementation survey (config field / gate dimension plans).** If
 the plan will add a config field, threshold, or gate dimension, grep the
@@ -188,11 +189,11 @@ Surfacing these at plan time avoids the costly discover-at-edit-time cycle —
 a full test run to reveal a lean-limit failure, plus a confusing self-mod
 denial mid-implementation.
 
-**Reminder: investigation means reading, not changing.** Use only Read, Grep, Glob, and Explore tools here. Do not edit any files during investigation.
+**Reminder: investigation means reading, not changing.** Use only your harness's read-only search and file-reading capabilities here (on Claude: Read, Grep, Glob, and the Explore agent). Do not edit any files during investigation.
 
 ### Step 4: Clarify scope
 
-Based on what you found in investigation, ask 1-2 targeted clarifying questions using AskUserQuestion. These should be **specific questions that emerged from reading the code**, not generic planning questions.
+Based on what you found in investigation, ask 1-2 targeted clarifying questions — with your harness's structured-question tool (on Claude, `AskUserQuestion`), or as plain text listing the options if it has none. These should be **specific questions that emerged from reading the code**, not generic planning questions.
 
 Good questions:
 - "I found that X and Y are tightly coupled — should both be in scope, or just X?"
@@ -254,7 +255,7 @@ for review or scheduling reasons.
 
 ### Step 5: Write the plan file
 
-**Do not create the plan file with the Write tool, and never hand-author its
+**Do not create the plan file by writing it directly, and never hand-author its
 YAML frontmatter.** Write the plan **body** to a scratch file, then hand it to
 `plan-create`, which derives the slug, writes the frontmatter, stamps
 `createdAt`, and validates the result:
@@ -270,7 +271,7 @@ codeyam-editor editor plan-create \
 Omit `--prefix` when Step 2 derived no prefix. The command prints the path it
 wrote, and refuses rather than clobbering an existing slug.
 
-**Why a command and not the Write tool:** `createdAt` has to be a real
+**Why a command and not a direct file write:** `createdAt` has to be a real
 timestamp, and you have no reliable clock — anything you type there is a guess
 that the Plan tab then renders as fact. `plan-create` stamps it from the system
 clock, so the field is not on your authoring surface at all. There is nothing to
@@ -451,6 +452,11 @@ editor workflow a red-first reproduction it can materialize verbatim. Shape:
   SKILL.md" for a lean file at its limit — name the step `.txt` file the
   guidance should live in instead, and call out any authorized agent-config
   edit explicitly so the editor workflow isn't surprised by the self-mod guard
+- Guidance written into a shipped skill body installs verbatim into **every**
+  harness's config tree, so name the capability and keep the tool name as a
+  parenthetical example ("your harness's structured-question tool — on Claude,
+  `AskUserQuestion`"). A bare tool name is an unfollowable instruction to an
+  agent that has no such tool.
 
 **Co-locating plan assets (screenshots, mockups, reference images):** when the
 user uploaded or provided an asset the plan should carry, write it into the
@@ -485,7 +491,9 @@ roster change") or that there is none. This is the decide-and-report half of
 not asking: the user still learns what was chosen and can say "call it
 something else", which loops through "I want changes" like any other revision.
 
-Then use AskUserQuestion with these options:
+Then ask with your harness's structured-question tool (on Claude,
+`AskUserQuestion`), or as plain text listing the options in this order if it
+has none — the first option is the recommended one either way:
 - **"Looks good, commit it" (Recommended)** — Commit the plan and finish
 - **"I want changes"** — User describes changes, you revise the plan, then re-present
 - **"Discard and start over"** — Delete the plan file and go back to Step 1
