@@ -1,0 +1,42 @@
+{
+  "surface": "AgentStatus",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "status",
+      "value": "unavailable",
+      "rationale": "source-derived state status=unavailable",
+      "status": "covered"
+    },
+    {
+      "dimension": "status",
+      "value": "working",
+      "rationale": "source-derived state status=working",
+      "status": "covered"
+    },
+    {
+      "dimension": "status",
+      "value": "connected",
+      "rationale": "source-derived state status=connected",
+      "status": "covered"
+    },
+    {
+      "dimension": "tools",
+      "value": "empty",
+      "rationale": "source-derived state tools=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "tools",
+      "value": "one",
+      "rationale": "source-derived state tools=one",
+      "status": "planned"
+    },
+    {
+      "dimension": "tools",
+      "value": "many",
+      "rationale": "source-derived state tools=many",
+      "status": "planned"
+    }
+  ]
+}

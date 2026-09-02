@@ -1,0 +1,30 @@
+{
+  "claimStartedAt": "2026-09-02T19:33:39Z",
+  "completedAt": "2026-09-02T20:18:00Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "ui-step22",
+    "machine": "codeyam-editor-codeyam-editor-12",
+    "originId": "955b5426-a400-4480-b26d-423a56ca66fa",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "restore-the-agent-handoff-surface-the-merge-dropped",
+    "sessionId": "112103b1-51d4-4cd8-8d15-c9e0e3d5d604",
+    "startedAt": "2026-09-02T19:33:39Z"
+  },
+  "createdAt": "2026-09-02T19:16:51Z",
+  "deliverables": [
+    "app/components/AgentStatus.render.test.tsx",
+    "app/components/AgentStatus.tsx",
+    "app/components/MapScreen.render.test.tsx",
+    "app/components/MapScreen.tsx",
+    "app/isolated-components/MapScreen/page.tsx",
+    "app/map/[id]/page.tsx"
+  ],
+  "journalTimestamp": "2026-09-02T20:18:00Z",
+  "mode": "ui",
+  "planFile": "completed/restore-the-agent-handoff-surface-the-merge-dropped.md",
+  "slug": "restore-the-agent-handoff-surface-the-merge-dropped",
+  "title": "Restore the Agent Handoff Surface the Merge Dropped"
+}

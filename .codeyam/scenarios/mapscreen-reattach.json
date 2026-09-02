@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - Reattach",
+  "id": "06c6866a-54e6-41ab-9f0a-0860c29e45e8",
+  "url": "/isolated-components/MapScreen?s=Reattach",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "An agent worked this map and then left. The band does not pitch a first meeting at someone whose board already carries an agent's work - it demotes to the one-row reattach strip, keeping only the prompt naming this map and the MCP command. AgentHandoff owns that decision and its own scenarios show the strip alone; what only a screen-level frame can show is the strip sitting above a board with that work visible on it, which is the comparison that makes the demotion look right rather than arbitrary."
+}

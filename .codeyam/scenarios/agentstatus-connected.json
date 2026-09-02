@@ -1,6 +1,6 @@
 {
   "name": "AgentStatus - Connected",
-  "id": "513b1426-4a2f-48ad-96d4-1a87d554699a",
+  "id": "43771d6d-76b5-4de0-86b5-0c698937de16",
   "url": "/isolated-components/AgentStatus?s=Connected",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "AgentStatus",
   "scenarioType": "component",
-  "description": "An agent attached with all seven catalog tools bound, and the map's revision beside it."
+  "description": "An agent attached with all seven catalog tools bound. The bridge is carrying a revision here and the header deliberately does not show it: r{revision} was a debugging aid that leaked into the product, and beside the unavailable state it read as a build tag on an error. What survives is the part a person can act on - whether an agent can reach this page, and how much it brought."
 }

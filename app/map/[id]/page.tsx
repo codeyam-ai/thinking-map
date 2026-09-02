@@ -4,6 +4,7 @@ import AppHeader from '@/app/components/AppHeader';
 import ErrorScreen from '@/app/components/ErrorScreen';
 import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
+import { agentPanelRequested, type QueryParams } from '@/app/lib/agentPanel';
 import { parseAttachments } from '@/app/lib/attachments';
 import { getMap, listMaps } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
@@ -38,7 +39,7 @@ export async function generateMetadata({
 
 interface MapPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<QueryParams>;
 }
 
 export default async function MapPage({ params, searchParams }: MapPageProps) {
@@ -99,8 +100,13 @@ export default async function MapPage({ params, searchParams }: MapPageProps) {
         attachments={parseAttachments(map.attachments)}
         themes={map.themes}
         nodes={map.nodes}
+        brief={brief}
       />
-      {process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}
+      {/* Opt-in only. The production floor lives inside `agentPanelRequested`,
+          so no NODE_ENV check belongs here: an agent driving the browser on a
+          dev session used to find this panel and press "Run the demo sequence",
+          writing invented nodes onto a real map. */}
+      {agentPanelRequested(query) ? <AgentSimulator /> : null}
     </WebMcpBridge>
   );
 }

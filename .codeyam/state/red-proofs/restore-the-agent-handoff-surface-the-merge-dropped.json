@@ -1,0 +1,70 @@
+{
+  "provenAt": "2026-09-02T19:54:56Z",
+  "slug": "restore-the-agent-handoff-surface-the-merge-dropped",
+  "paths": [
+    "app/components/MapScreen.tsx",
+    "app/components/AgentStatus.tsx"
+  ],
+  "runScope": [
+    "app/components/MapScreen.tsx",
+    "app/components/AgentStatus.tsx"
+  ],
+  "tests": {
+    "AgentStatus › keeps the badge off an attached agent too": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "AgentStatus › states presence without a revision badge beside it": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "MapScreen": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "MapScreen › leaves the band off when an agent is attached": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "MapScreen › mounts the handoff band when no agent is attached": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "MapScreen › names read_brief in the start prompt when the map has a brief": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "MapScreen › names read_map when there is no brief": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "AgentStatus › states presence without a revision badge beside it",
+      "AgentStatus › keeps the badge off an attached agent too"
+    ]
+  }
+}

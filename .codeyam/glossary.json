@@ -45,7 +45,7 @@
     ]
   },
   {
-    "description": "A stand-in agent for development and captures — not a mock. WebMCP is top-level-secure-context only and captures render in an iframe, so no real agent can ever attach where this product most needs demonstrating. It drives window.__thinkingMapAgent, the same bound catalog a real agent calls, so its scripted sequence exercises the genuine tool paths. Rendered outside production only.",
+    "description": "A stand-in agent for development and captures - not a mock. WebMCP is top-level-secure-context only and captures render in an iframe, so no real agent can ever attach where this product most needs demonstrating. It drives window.__thinkingMapAgent, the same bound catalog a real agent calls, so its scripted sequence exercises the genuine tool paths. Rendered only where a person has deliberately asked for it - the map route gates it on agentPanelRequested (?agentPanel=1), with a production floor underneath. The older 'outside production only' gate put its 'Run the demo sequence' button on every real map of every npm run dev session, where an agent driving the browser would find and press it.",
     "filePath": "app/components/AgentSimulator.tsx",
     "name": "AgentSimulator",
     "scenarios": [
@@ -54,7 +54,7 @@
     ]
   },
   {
-    "description": "Whether an agent can reach this page, stated plainly. Unavailable is the ordinary case rather than an error — WebMCP is top-level-secure-context only, so a preview iframe, Safari, and any page opened without a browser agent all land there. It sits in the header because presence is a fact about the whole page.",
+    "description": "Whether an agent can reach this page, stated plainly. Unavailable is the ordinary case rather than an error - WebMCP is top-level-secure-context only, so a preview iframe, Safari, and any page opened without a browser agent all land there. It sits in the header because presence is a fact about the whole page. It deliberately shows NO revision counter: r{revision} was a debugging aid that leaked into the product header, where beside 'No agent attached' it read as a build tag on an error. The log it counted is already visible in BoardChat, and BridgeReadout keeps its own display for the diagnostic case where a raw revision is the point.",
     "filePath": "app/components/AgentStatus.tsx",
     "name": "AgentStatus",
     "scenarios": [
@@ -789,7 +789,7 @@
     ]
   },
   {
-    "description": "The whole map surface: the header with agent presence, and whichever view the phase calls for. The working tree while the thinking is live, the plan once it has run out — the same map at two moments, which is why choosing between them lives here rather than in the route.",
+    "description": "The whole map surface: the header with agent presence, the handoff band when nobody is attached, and whichever view the phase calls for. The working tree while the thinking is live, the plan once it has run out - the same map at two moments, which is why choosing between them lives here rather than in the route. It also decides WHETHER the handoff band is on the page at all: the band is mounted unwrapped as a direct flex child, because it hides itself by returning null and a sizing wrapper would linger as a zero-height item collecting a gap on either side. The board redesign merge lost that mounting while keeping the import, which is what MapScreen.render.test.tsx now pins.",
     "filePath": "app/components/MapScreen.tsx",
     "name": "MapScreen",
     "scenarios": [

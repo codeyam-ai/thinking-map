@@ -18,7 +18,7 @@
       "dimension": "steps",
       "value": "many",
       "rationale": "source-derived state steps=many",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "cleaned",
@@ -36,7 +36,19 @@
       "dimension": "cleaned",
       "value": "many",
       "rationale": "source-derived state cleaned=many",
-      "status": "planned"
+      "status": "covered"
+    },
+    {
+      "dimension": "currentId",
+      "value": "true",
+      "rationale": "source-derived state currentId=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "currentId",
+      "value": "false",
+      "rationale": "source-derived state currentId=false",
+      "status": "covered"
     }
   ]
 }

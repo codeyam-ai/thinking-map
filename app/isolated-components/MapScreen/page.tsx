@@ -106,6 +106,9 @@ const scenarios: Record<
      *  it off because an agent has already been on those maps. */
     mapId?: string;
     seedIdea?: string;
+    /** Presence only — the screen reads it for `hasBrief`, which decides which
+     *  tool the start prompt names. Never read for its contents. */
+    brief?: Record<string, unknown> | null;
   }
 > = {
   // The working surface with an agent attached and two questions waiting.
@@ -141,6 +144,48 @@ const scenarios: Record<
     mapId: "cmtixt5tg000wymek3vbmllaj",
     seedIdea: "A tool for tracking what I read",
   },
+  // The same first meeting, for a map derived from a document rather than a
+  // typed sentence. The screen has to pass `brief` through for the band to know
+  // this at all — the merge kept the prop and dropped the read, which sent
+  // everyone a prompt naming read_map on a map whose fullest content is a brief.
+  FromBrief: {
+    phase: "idea",
+    nodes: [READING_MAP[0]] as FlatNode[] & SummaryNode[],
+    events: [],
+    status: "unavailable",
+    tools: [],
+    revision: 1,
+    mapId: "cmtixt5tg000wymek3vbmllaj",
+    seedIdea: "A tool for tracking what I read",
+    brief: { sourceName: "discovery-notes.pdf" },
+  },
+  // An agent worked this map and left. The band demotes itself to the one-row
+  // reattach strip rather than pitching a first meeting at someone whose map
+  // already carries an agent's work — a decision AgentHandoff owns, and one
+  // only a SCREEN scenario can show sitting above a board with that work on it.
+  Reattach: {
+    phase: "explore",
+    nodes: READING_MAP as FlatNode[] & SummaryNode[],
+    events: HISTORY,
+    status: "unavailable",
+    tools: [],
+    revision: 14,
+    mapId: "cmtixt5tg000wymek3vbmllaj",
+    seedIdea: "A tool for tracking what I read",
+  },
+  // The finished plan with nobody attached, which is where `dense` earns its
+  // keep: this main is an h-screen flex column, so every row the strip takes is
+  // a row of the summary the person came back to read.
+  SummaryReattach: {
+    phase: "next-steps",
+    nodes: PLAN as FlatNode[] & SummaryNode[],
+    events: HISTORY,
+    status: "unavailable",
+    tools: [],
+    revision: 24,
+    mapId: "cmtixt5tg000wymek3vbmllaj",
+    seedIdea: "A tool for tracking what I read",
+  },
   // The end of the loop: the plan, with somewhere to keep going underneath it.
   Summary: {
     phase: "next-steps",
@@ -173,7 +218,9 @@ export default async function Page({
       >
         <Component
           phase={fixture.phase}
-          seedIdea={SEED_IDEA}
+          seedIdea={fixture.seedIdea ?? SEED_IDEA}
+          currentId={fixture.mapId}
+          brief={fixture.brief}
           themes={THEMES}
           nodes={fixture.nodes}
         />

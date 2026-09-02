@@ -62,8 +62,13 @@ export default function MapScreen({
   maps?: { id: string; title: string }[];
   currentId?: string;
   attachments?: { name: string }[];
-  /** Main's brief: the document a map was derived from, when there is one. */
-  brief?: unknown;
+  /** Main's brief: the document a map was derived from, when there is one.
+   *  Only its PRESENCE is read, for `hasBrief` — the text has exactly one
+   *  reader and it is not this screen. Typed by what is asked of it rather
+   *  than by the store's current selection, so narrowing that select does not
+   *  break a screen that never looks inside. Optional so an isolated scenario
+   *  can mount the screen without inventing one. */
+  brief?: Record<string, unknown> | null;
   themes: GalaxyTheme[];
   nodes: (FlatNode &
     SummaryNode & {
@@ -80,6 +85,23 @@ export default function MapScreen({
     // appear to slide while you were zooming inside it.
     <main className="flex h-screen flex-col gap-6 overflow-hidden px-10 py-8">
       <AppHeader status={<AgentStatus />} maps={maps} currentId={currentId} />
+      {/* Deliberately NOT wrapped in a sizing div. This main is a flex column
+          with a gap, and AgentHandoff hides itself by returning null — a
+          wrapper would stay in the DOM as a zero-height flex item and collect
+          a gap on either side, pushing the board down on every map an agent has
+          already worked. The band carries its own `shrink-0` instead. */}
+      {currentId ? (
+        <AgentHandoff
+          mapId={currentId}
+          seedIdea={seedIdea}
+          hasBrief={Boolean(brief)}
+          // The summary is what someone opens a finished map FOR, and this
+          // column is `h-screen`, so a full-height reattach strip here is taken
+          // straight out of the plan they came back to read. One row keeps the
+          // way back without charging the summary a quarter of the screen.
+          dense={phase === 'next-steps'}
+        />
+      ) : null}
       {phase === 'next-steps' ? (
         <SummaryScreen nodes={nodes} />
       ) : (

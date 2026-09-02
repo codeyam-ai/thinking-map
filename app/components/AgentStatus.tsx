@@ -19,7 +19,7 @@ const UNAVAILABLE_HELP =
  * not about the exchange column it stands beside.
  */
 export default function AgentStatus() {
-  const { status, reason, tools, revision } = useWebMcpBridge();
+  const { status, reason, tools } = useWebMcpBridge();
 
   const headline =
     status === 'connected'
@@ -42,9 +42,10 @@ export default function AgentStatus() {
           — {reason}
         </span>
       ) : null}
-      {revision !== null ? (
-        <span className="text-[11px] text-muted">r{revision}</span>
-      ) : null}
+      {/* No revision counter here. It is a debugging aid, and beside "No agent
+          attached" it reads as a build tag on an error. The log it counts is
+          already visible in BoardChat; `BridgeReadout` keeps its own display,
+          where a raw revision is the point rather than an intrusion. */}
     </div>
   );
 }

@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - SummaryReattach",
+  "id": "215d1dbb-0b57-47a5-b1c9-c8d49f109a3a",
+  "url": "/isolated-components/MapScreen?s=SummaryReattach",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "The finished plan with nobody attached, which is where dense earns its keep. This main is an h-screen flex column, so every row the strip takes is a row of the summary the person came back to read - the screen passes dense on the next-steps phase for exactly that reason. Set beside Reattach it shows the same strip paying for itself in the one place the content below it is the whole point of the visit."
+}

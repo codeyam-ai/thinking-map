@@ -1,0 +1,535 @@
+{
+  "timestamp": "2026-09-02T20:18:00Z",
+  "title": "Restore the Agent Handoff Surface the Merge Dropped",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe merge in `e842ce6` took the redesigned branch's version of the map screen and the map route wholesale, and in doing so silently dropped two pieces of agent-handoff behaviour that main had shipped and reviewed. Today a person who opens a map with no agent attached sees \"No agent attached\" in the header, an unexplained `r14` badge beside it, and nothing else — no start prompt, no MCP command, no route to change the situation. Meanwhile the dev agent panel is back to rendering on every `npm run dev` session, which is the exact bug `e3673c1` fixed: an agent driving the browser finds the panel, presses \"Run the demo sequence\", and writes invented nodes onto a real map. This plan restores both, removes the cryptic revision badge, and adds the screen-level test whose absence let both regressions through a 586-test suite.\n\n## Key Decisions\n\n- **Restore the band above the board, not as an overlay.** The full lime `AgentHandoff` band goes back between `AppHeader` and the workspace as a `shrink-0` flex child, exactly as main had it, with `dense={phase === 'next-steps'}`. An overlay over the board was considered and rejected: this band is the one thing on the screen asking to be acted on, and it has to win that comparison against a whole board — floating it would make it competing chrome beside `BoardChat` rather than the page's instruction. Costing the board height on a map nobody is attached to is the correct trade, because a board nobody is working is not the thing the person needs right now.\n- **Delete the revision badge rather than labelling it.** `r{revision}` is a debugging aid that leaked into the product header, and next to \"No agent attached\" it reads as a build tag on an error. The log it counts is already visible in `BoardChat`, so the number buys the person nothing. `BridgeState.revision` itself stays — `BoardWorkspace` depends on it for the live-refresh trigger and the waiting-for-activity check — only the header's display of it goes.\n- **Reuse `agentPanelRequested` as-is.** The helper and its tests survived the merge intact and are currently imported by nothing; this is a two-line reconnection, not a re-implementation. No behavioural change to the gate itself.\n- **The new test asserts mounting, not appearance.** Every existing test renders `AgentHandoff` and `agentPanelRequested` in isolation, and all of them still pass against the broken screen — that is precisely why the regressions were invisible. The test this plan adds asserts that `MapScreen` puts the band on the page, which is the assertion that was missing.\n\n## Implementation\n\n### 1. Render the handoff band again\n\n**File**: `app/components/MapScreen.tsx`\n\n`AgentHandoff` is imported at the top of the file and never used; `brief` is declared as a prop and never read. The merge kept main's import list and prop signature but the branch's body, which is why both are dangling.\n\nRender the band between `<AppHeader>` and the phase branch, guarded on `currentId` being present, passing `seedIdea`, `hasBrief`, and `dense={phase === 'next-steps'}`. Do **not** wrap it in a sizing div: this main is a flex column with a `gap`, and `AgentHandoff` hides itself by returning `null` — a wrapper would remain a zero-height flex item collecting a gap on either side and push the board down on every map an agent has already worked. The band carries its own `shrink-0`. Main's original comment recording that reasoning was lost in the merge and should come back with the code.\n\nRetype the `brief` prop from `unknown` to something the screen can actually ask a question of. All this component needs from it is whether a brief exists, for `hasBrief`; keep the prop optional so an isolated scenario can mount the screen without inventing one.\n\n### 2. Pass the brief through from the route\n\n**File**: `app/map/[id]/page.tsx`\n\nThe route computes `const brief = map.brief ?? null` and passes it nowhere. Pass it to `MapScreen` so `hasBrief` is answerable — `handoffCopy` uses it to decide which tool the start prompt names, so getting it wrong hands the person a prompt naming the wrong entry point.\n\n### 3. Restore the `?agentPanel=1` gate\n\n**File**: `app/map/[id]/page.tsx`\n\nReplace `{process.env.NODE_ENV === 'production' ? null : <AgentSimulator />}` with the opt-in gate, importing `agentPanelRequested` and `QueryParams` from `app/lib/agentPanel.ts`. This also revives `const query = await searchParams`, which is currently dead — the gate was its only consumer.\n\nThe production floor lives inside `agentPanelRequested`, so no separate `NODE_ENV` check belongs at the call site. `AgentSimulator`'s docstring already describes this behaviour (\"Rendered only where a person has deliberately asked for it — `?agentPanel=1`, with a production floor underneath\"); after this change the docstring is true again.\n\n### 4. Remove the revision badge\n\n**File**: `app/components/AgentStatus.tsx`\n\nDrop the `r{revision}` span and `revision` from the `useWebMcpBridge()` destructure. Leave `status`, `reason` and `tools` alone — the headline and the `UNAVAILABLE_HELP` tooltip are doing their job.\n\n`BridgeReadout` in `app/isolated-components/WebMcpBridge/BridgeReadout.tsx` keeps its own revision display and is deliberately untouched: it is a diagnostic readout that exists to make bridge state visible, where a raw revision is the point rather than an intrusion.\n\n### 5. Reconnect the JustArrived scenario\n\n**File**: `app/isolated-components/MapScreen/page.tsx`\n\nThe scenario table still carries `mapId` and `seedIdea` fields on the `JustArrived` fixture, with a comment reading \"Passing one mounts the handoff band\" — but `<Component>` passes neither, using a module-level `SEED_IDEA` constant instead. Both fixture fields are dead, which means `mapscreen-justarrived` currently captures the same screen as `mapscreen-noagent` and demonstrates nothing about the feature it was written for.\n\nWire `mapId={fixture.mapId}` and the fixture's own `seedIdea` (falling back to `SEED_IDEA`) through to the component, so the JustArrived capture shows the band again and the two scenarios differ by what they mean to show.\n\n### 6. Add the screen-level test\n\n**New file**: `app/components/MapScreen.render.test.tsx`\n\nSee the Reproduction Test section below.\n\n## Reused existing code\n\n- `agentPanelRequested` from `app/lib/agentPanel.ts` (glossary entry: `agentPanelRequested`) — the query-param gate with the production floor, already covered by `app/lib/agentPanel.test.ts`. Currently orphaned; this plan reconnects it without changing it.\n- `AgentHandoff` from `app/components/AgentHandoff.tsx` (glossary entry: `AgentHandoff`) — the band itself, including its own decision about when to appear at all and when to demote to `HandoffReattach`. Fully intact and tested; only its mounting was lost.\n- `HandoffReattach` from `app/components/HandoffReattach.tsx` (glossary entry: `HandoffReattach`) — the one-row variant for a map an agent has already worked, reached through `AgentHandoff`'s own `workedByAgent` branch. Nothing in this plan calls it directly.\n- `handoffCopy` from `app/lib/handoffCopy.ts` (glossary entry: `handoffCopy`) — every string the band shows, including the `hasBrief`-dependent start prompt and the origin-dependent `mcpCommand`. Pinned by `app/lib/handoffCopy.test.ts`.\n- `BridgeFixture` from `app/isolated-components/BridgeFixture.tsx` — supplies a bridge state an isolated render cannot produce; the new test mounts through it exactly as `app/components/AgentHandoff.render.test.tsx` does.\n- `AgentSimulator` from `app/components/AgentSimulator.tsx` (glossary entry: `AgentSimulator`) — unchanged; only its render gate at the call site moves.\n\n**Existing-implementation survey:** no new config field, threshold, or gate dimension is introduced. `agentPanelRequested` is the already-implemented gate and is reused verbatim rather than reproduced.\n\n## Reproduction Test\n\nPins that `MapScreen` actually mounts the handoff band when no agent is attached — the assertion whose absence let the band become a dangling import that still type-checked and still passed every existing test.\n\n**Target**: `app/components/MapScreen.render.test.tsx` (new) — run with\n`codeyam-editor editor refresh-tests --test <name>`.\n\nThe board is stubbed out deliberately, following the pattern in `app/components/BoardWorkspace.render.test.tsx`: what is under test is whether the screen composes the band, not the canvas, and rendering the real board drags in a router, a layout and a camera to assert nothing about any of them.\n\n```tsx\n// @vitest-environment jsdom\n\nimport { afterEach, describe, expect, it, vi } from 'vitest';\nimport { cleanup, render, screen } from '@testing-library/react';\nimport BridgeFixture from '../isolated-components/BridgeFixture';\n\nvi.mock('./BoardWorkspace', () => ({\n  default: () => <div data-testid=\"board\" />,\n}));\nvi.mock('./SummaryScreen', () => ({\n  default: () => <div data-testid=\"summary\" />,\n}));\n\nconst { default: MapScreen } = await import('./MapScreen');\n\nconst props = {\n  phase: 'idea' as const,\n  seedIdea: 'A tool for tracking what I read',\n  currentId: 'map-under-test',\n  themes: [],\n  nodes: [],\n};\n\nafterEach(cleanup);\n\ndescribe('MapScreen', () => {\n  // The regression this pins: the band was a dangling import for the whole of\n  // the board redesign. It type-checked, and every AgentHandoff test kept\n  // passing, because they all render the band directly. Nothing asserted the\n  // screen put it on the page — so a person on a map with no agent got the\n  // header's \"No agent attached\" and no route to change that.\n  it('mounts the handoff band when no agent is attached', () => {\n    render(\n      <BridgeFixture status=\"unavailable\" events={[]}>\n        <MapScreen {...props} />\n      </BridgeFixture>,\n    );\n    expect(screen.getByText(/No one is on this yet/i)).toBeTruthy();\n  });\n\n  // The other half of the same contract: an attached agent means the band must\n  // NOT be there, and a screen that never mounts it also passes that. Asserting\n  // both is what makes the pair meaningful.\n  it('leaves the band off when an agent is attached', () => {\n    render(\n      <BridgeFixture status=\"connected\" events={[]}>\n        <MapScreen {...props} />\n      </BridgeFixture>,\n    );\n    expect(screen.queryByText(/No one is on this yet/i)).toBeNull();\n  });\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: the first case fails at `getByText`, because `MapScreen` imports `AgentHandoff` but never renders it, so the band's copy is absent from the tree — testing-library reports \"Unable to find an element with the text: /No one is on this yet/i\". The second case passes before the fix as well as after, which is exactly why it cannot stand alone.\n\nThe wording matched here comes from `handoffCopy` and is pinned there; if that copy changes, this test should follow it rather than duplicate the assertion about wording.\n\n## Scenarios to Demonstrate\n\n- **Just arrived, nobody attached** — a map one node old, no agent, the full lime band leading the page with the copyable start prompt and the board visible underneath it. The moment the whole feature exists for, and the scenario `mapscreen-justarrived` was written for before it went dead.\n- **Started from a brief, nobody attached** — same state with `hasBrief` true, so the start prompt names the brief-reading entry point rather than the seed-idea one.\n- **Agent has worked this map and left** — the log carries agent-origin events and no agent is attached, so the band demotes to the one-row `HandoffReattach` strip: the prompt naming this map and the MCP command, and none of the first-meeting steps.\n- **Finished plan, nobody attached** — `phase: 'next-steps'`, where `dense` collapses the strip to a single row so the summary the person came back to read keeps the screen.\n- **Agent attached** — the band absent entirely, the header saying so without a revision badge beside it, the board holding the full height.\n- **Dev panel, opted in vs not** — the map route at `?agentPanel=1` showing the collapsed launcher, and the same map without the param showing nothing at all.",
+  "description": "The board-redesign merge (e842ce6) took the redesigned branch's MapScreen and map route wholesale and silently dropped two behaviours main had shipped and reviewed. AgentHandoff stayed imported and stopped being rendered, so a person opening a map with nobody attached saw only 'No agent attached' and an unexplained r14 badge - no start prompt, no MCP command, no route out; and the dev agent panel went back to rendering on every npm run dev session, the exact bug e3673c1 fixed, where an agent driving the browser finds 'Run the demo sequence' and writes invented nodes onto a real map. Both are restored: the band mounts unwrapped between the header and the workspace with dense on the finished-plan phase, the route passes brief through so hasBrief picks the right entry point, the panel is gated on the already-tested agentPanelRequested (?agentPanel=1, production floor underneath), the r{revision} badge is deleted from the header, and the JustArrived fixture's dead mapId/seedIdea fields are wired through so that scenario stops capturing the same frame as NoAgent.\n\nWhy it was invisible: every existing test rendered AgentHandoff and agentPanelRequested in ISOLATION, and all of them passed against the broken screen. This cycle adds the missing composition-level assertions - MapScreen.render.test.tsx (band mounted / absent / read_brief / read_map) and AgentStatus.render.test.tsx (the badge stays gone in both bridge states) - and prove-red confirms 5 of the 6 go red with the fix reverted, the sixth being a deliberate survival guard. Three screen-level scenarios were added for the same reason (mapscreen-frombrief, mapscreen-reattach, mapscreen-summaryreattach), and 28 stale captures were recaptured; the scenario literally named 'Nobody has picked this up yet' had been capturing a bare board and now shows the band saying so.\n\nSCOPE VERDICT. Delivered: the full plan - band restored, brief passed through, ?agentPanel=1 gate reconnected, revision badge removed, JustArrived fixture rewired, and the reproduction test the plan specified. All 10 project deliverables were already resolved before this cycle (9 delivered; 1, the assist-track registering work, deferred earlier by the user) and this cycle deferred none of them. No extractions were made because none were warranted - the change composes an existing component and moves logic INTO an already-extracted predicate.\n\nDEFERRED FINDINGS (both pre-existing, both surfaced rather than fixed here, neither introduced by this change): (1) HandoffReattach's dense strip overflows at Tablet width - the MCP command truncates and its copy button lands off-frame; the committed handoffreattach-dense screenshot taken before this session shows the identical clipping, and mapscreen-summaryreattach is simply the first frame to show it in composition. Fixing it means reworking that component's dense layout and recapturing its four scenarios. (2) AgentStatus renders '1 tools' - the headline interpolates tools.length with no pluralisation, and the coverage plan flags tools=one as planned-but-uncovered. Both were reported to the user at the final gate and left as follow-up rather than widening this cycle.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/restore-the-agent-handoff-surface-the-merge-dropped.md\t.codeyam/plans/completed/restore-the-agent-handoff-surface-the-merge-dropped.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/agentstatus-connected.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/mapscreen.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/01574308f3422e2b27ddbff6abdbe448e83117dab61ad8c4a60addfa9bccafeb.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/25853a12558465fadca7c282e9a84998d188d69bdb4c301f1acbafccd675ede9.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/d11071b2b40a6cded1124f667f6e5edc542cd7446e3fd04ad109f1650fb94e37.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentStatus.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/MapScreen/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/agentstatus.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapscreen-frombrief.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapscreen-reattach.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/mapscreen-summaryreattach.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/restore-the-agent-handoff-surface-the-merge-dropped.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/05d74b6ec073ab409e1ffd48cd9998e5cc5dd07550cdc7b592d1b90730f07a01.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/0a068b88d96b9256ccf3407ef61f659c8ac346627b5ad4f2b8ac1bcc82d7199f.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1df14828660cd8da2aa18613f330068b371c93f4353493b42973db93c7addc3c.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2a14dc7a13f266e772e7e5a4a407c9252db7e0bdd9625668a091f815b667309a.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3a43a51ae3e8bade204a4b3b36608aafb7b77be7c988041be0462ae40924448f.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/57058e0d44cc11f48b4620f01fc483231cdf75415dfe6579aeaef5ae40d4a205.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ce3238a05072d308145a154f516a0b9645aef2ba8c71c9ba3bc4e7586976a4e3.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/d8e1992b9cdd82f455fc03a7e2cddd26af8043279c6e731e8c8855caccbcbbb5.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e01513540dddcb1d69ab7e2bdd4a7d69d0edde6329bb8b11d7cec9d6b9936e82.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e7ba936b1093376093335fa761c580978097e6cc4a32239bda07c994973f3b24.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AgentStatus.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/MapScreen.render.test.tsx",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 709,
+    "passed": 1,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 709,
+        "passed": 1
+      }
+    ]
+  }
+}

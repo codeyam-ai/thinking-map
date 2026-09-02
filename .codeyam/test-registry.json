@@ -163,6 +163,24 @@
       "runner": "tests"
     },
     {
+      "description": "The removal was unconditional, not a fix scoped to the unavailable state — a header that showed the counter only once an agent attached would pass the test above and still put debugging output in front of a person.",
+      "file": "app/components/AgentStatus.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentStatus › keeps the badge off an attached agent too",
+      "line": 37,
+      "registeredAt": "2026-09-02T19:55:20Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state the badge was worst in: \"No agent attached\" reads as a failure, and an unexplained `r14` beside it reads as the build that failed. The bridge is handed a revision here specifically so the header has one to leak.",
+      "file": "app/components/AgentStatus.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentStatus › states presence without a revision badge beside it",
+      "line": 22,
+      "registeredAt": "2026-09-02T19:55:20Z",
+      "runner": "tests"
+    },
+    {
       "description": "An empty send would post a blank turn into the transcript, which reads as the person having said nothing on purpose.",
       "file": "app/components/BoardChat.render.test.tsx",
       "format": "vitest",
@@ -583,6 +601,42 @@
       "key": "IdeaPrompt › surfaces a server failure without leaking a parse error",
       "line": 51,
       "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The other half of the same contract: an attached agent means the band must NOT be there, and a screen that never mounts it also passes that. Asserting both is what makes the pair meaningful.",
+      "file": "app/components/MapScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "MapScreen › leaves the band off when an agent is attached",
+      "line": 48,
+      "registeredAt": "2026-09-02T19:55:20Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The regression this pins: the band was a dangling import for the whole of the board redesign. It type-checked, and every AgentHandoff test kept passing, because they all render the band directly. Nothing asserted the screen put it on the page — so a person on a map with no agent got the header's \"No agent attached\" and no route to change that.",
+      "file": "app/components/MapScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "MapScreen › mounts the handoff band when no agent is attached",
+      "line": 36,
+      "registeredAt": "2026-09-02T19:55:20Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The brief travelled from the route to the band through this screen, and the merge dropped the middle leg: `brief` was declared as a prop and never read. `handoffCopy` is already pinned on both sides of `hasBrief`, so what is untested without this is the WIRING — and the cost of getting it wrong is handing someone a start prompt naming the wrong entry point.",
+      "file": "app/components/MapScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "MapScreen › names read_brief in the start prompt when the map has a brief",
+      "line": 62,
+      "registeredAt": "2026-09-02T19:55:20Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The control for the case above. Without it, a screen that hardcoded `hasBrief` true would pass the brief assertion while getting every brief-less map — most of them — wrong.",
+      "file": "app/components/MapScreen.render.test.tsx",
+      "format": "vitest",
+      "key": "MapScreen › names read_map when there is no brief",
+      "line": 74,
+      "registeredAt": "2026-09-02T19:55:20Z",
       "runner": "tests"
     },
     {

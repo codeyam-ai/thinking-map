@@ -1,0 +1,12 @@
+{
+  "name": "MapScreen - FromBrief",
+  "id": "e4f1d121-907b-47f3-93d7-d5f2306884fc",
+  "url": "/isolated-components/MapScreen?s=FromBrief",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "The first meeting on a map derived from a document rather than a typed sentence. The band's start prompt names read_brief, not read_map - and it can only know that because the SCREEN passed the brief down to it. That leg is what the board-redesign merge dropped: brief stayed a declared prop and stopped being read, so every brief-started map handed its agent a prompt pointing at the emptier of the two things it could open. Compare against JustArrived, which is the same screen with no brief."
+}
