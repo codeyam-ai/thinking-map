@@ -27,29 +27,62 @@ function parseChoices(raw: string | null | undefined): string[] | null {
   }
 }
 
+/** Read the stored diagram. Same contract as parseChoices: anything that will
+ *  not draw becomes null, so a card degrades to its text rather than throwing. */
+function parseDiagram(raw: string | null | undefined) {
+  if (!raw) return null;
+  try {
+    const d = JSON.parse(raw) as { steps?: unknown; note?: unknown };
+    const steps = Array.isArray(d.steps)
+      ? d.steps.map((x) => String(x ?? '').trim()).filter(Boolean)
+      : [];
+    if (steps.length < 2) return null;
+    return typeof d.note === 'string' && d.note.trim()
+      ? { steps, note: d.note.trim() }
+      : { steps };
+  } catch {
+    return null;
+  }
+}
+
 export default function MapScreen({
   phase,
   seedIdea,
+  maps,
+  currentId,
+  attachments,
   themes,
   nodes,
 }: {
   phase: Phase;
   seedIdea: string;
+  /** Every board, for the menu. */
+  maps?: { id: string; title: string }[];
+  currentId?: string;
+  attachments?: { name: string }[];
   themes: GalaxyTheme[];
   nodes: (FlatNode &
-    SummaryNode & { themeId?: string | null; choices?: string | null })[];
+    SummaryNode & {
+      themeId?: string | null;
+      choices?: string | null;
+      imageUrl?: string | null;
+      imageAlt?: string | null;
+      diagram?: string | null;
+    })[];
 }) {
   return (
     // overflow-hidden so the page itself never scrolls. The board is the only
     // thing that moves; a page that could also scroll would make the frame
     // appear to slide while you were zooming inside it.
     <main className="flex h-screen flex-col gap-6 overflow-hidden px-10 py-8">
-      <AppHeader phase={phase} status={<AgentStatus />} />
+      <AppHeader status={<AgentStatus />} maps={maps} currentId={currentId} />
       {phase === 'next-steps' ? (
         <SummaryScreen nodes={nodes} />
       ) : (
         <BoardWorkspace
           seedIdea={seedIdea}
+          mapId={currentId ?? ''}
+          attachments={attachments}
           themes={themes}
           nodes={nodes.map((n) => ({
             id: n.id,
@@ -63,6 +96,9 @@ export default function MapScreen({
             // throwing — a card that cannot render its options is still a
             // question worth asking.
             choices: parseChoices(n.choices),
+            diagram: parseDiagram(n.diagram),
+            imageUrl: n.imageUrl ?? null,
+            imageAlt: n.imageAlt ?? null,
           }))}
         />
       )}

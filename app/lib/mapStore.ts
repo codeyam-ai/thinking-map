@@ -36,7 +36,10 @@ export async function getMap(id: string) {
 /** Start a new map from an unstructured idea. The seed idea becomes both the
  *  root node and the person's first message — the conversation and the map are
  *  two views of the same thing from the very first turn. */
-export async function createMap(seedIdea: string) {
+export async function createMap(
+  seedIdea: string,
+  attachments: { name: string }[] = [],
+) {
   const trimmed = seedIdea.trim();
   const title = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
 
@@ -47,6 +50,7 @@ export async function createMap(seedIdea: string) {
     data: {
       title,
       seedIdea: trimmed,
+      attachments: attachments.length ? JSON.stringify(attachments) : null,
       phase: 'deconstruct',
       messages: { create: [{ role: 'user', origin: 'user', content: trimmed }] },
       nodes: {
@@ -170,6 +174,9 @@ export async function applyToolCalls(
         status: node.status,
         sourceUrl: node.sourceUrl,
         choices: node.choices ? JSON.stringify(node.choices) : null,
+        diagram: node.diagram ? JSON.stringify(node.diagram) : null,
+        imageUrl: node.imageUrl,
+        imageAlt: node.imageAlt,
         order: node.order,
         // Same two-source resolution as parentRef: a ref from this call, or an
         // id of a theme already on the board.

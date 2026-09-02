@@ -33,14 +33,26 @@ const WORDS = [
 export type ConvergenceState =
   | { kind: 'waiting' }
   | { kind: 'composing' }
-  | { kind: 'ready'; label: string; detail: string | null };
+  | {
+      kind: 'ready';
+      label: string;
+      detail: string | null;
+      /** Ways forward the partner is offering. Null when it named a direction
+       *  but no options — the thinking can still continue by other means. */
+      choices?: string[] | null;
+    };
 
 export default function ConvergenceNode({
   state,
   hue = 62,
+  onChoose,
 }: {
   state: ConvergenceState;
   hue?: number;
+  /** Picking a way forward. Not an answer: nothing on the map is being closed,
+   *  a direction is being taken, and what the partner does next depends on
+   *  which one. */
+  onChoose?: (choice: string) => void;
 }) {
   const [i, setI] = useState(0);
 
@@ -118,6 +130,30 @@ export default function ConvergenceNode({
         <p className="mt-3 text-[14px] leading-relaxed text-white/60">
           {state.detail}
         </p>
+      ) : null}
+
+      {/* Where to go from here. The conclusion is not the end of the board —
+          it is the widest point of it — so the reward for finishing a pass is
+          a set of next moves rather than a full stop. Picking one is a
+          contribution like any other: it lands on the log, and the partner
+          finds it. */}
+      {state.choices?.length ? (
+        <div className="mt-6 flex flex-col gap-2" data-no-pan>
+          <span className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/35">
+            Where next
+          </span>
+          {state.choices.map((choice) => (
+            <button
+              key={choice}
+              type="button"
+              onClick={() => onChoose?.(choice)}
+              className="rounded-full px-4 py-2.5 text-left text-[14px] font-semibold text-black transition-transform hover:scale-[1.02]"
+              style={{ background: `hsl(${hue} 82% 66%)` }}
+            >
+              {choice}
+            </button>
+          ))}
+        </div>
       ) : null}
     </div>
   );

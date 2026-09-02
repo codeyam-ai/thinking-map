@@ -1,27 +1,28 @@
-import PhaseNav from './PhaseNav';
 import Wordmark from './Wordmark';
-import type { Phase } from '../lib/mapKinds';
+import BoardMenu, { type BoardMenuMap } from './BoardMenu';
 
 /**
- * Wordmark left, phase track right. Shared by the landing and map screens.
+ * Wordmark left, agent presence and the board menu right.
  *
- * `status` is the map screen's slot for agent presence, which belongs beside
- * the phase nav rather than buried in the exchange column. The landing screen
- * passes nothing — there is no map for an agent to be attached to yet.
+ * The phase track that used to live here is gone: it named six stages the
+ * board no longer walks through, and the board draws its own progress. See
+ * BoardMenu for the longer version.
  */
 export default function AppHeader({
-  phase,
   status,
+  maps = [],
+  currentId,
 }: {
-  phase: Phase;
   status?: React.ReactNode;
+  maps?: BoardMenuMap[];
+  currentId?: string;
 }) {
   return (
     <header className="flex shrink-0 items-center justify-between gap-8">
       <Wordmark />
       <div className="flex items-center gap-6">
         {status}
-        <PhaseNav active={phase} />
+        <BoardMenu maps={maps} currentId={currentId} />
       </div>
     </header>
   );

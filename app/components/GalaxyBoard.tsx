@@ -50,17 +50,26 @@ function rowDone(c: PlacedCluster): boolean {
 
 export default function GalaxyBoard({
   seedIdea,
+  mapId,
+  attachments,
   themes,
   nodes,
   onAnswer,
+  onChoose,
 }: {
   seedIdea: string;
+  mapId?: string;
+  attachments?: { name: string }[];
   themes: GalaxyTheme[];
   nodes: GalaxyNodeInput[];
   /** Takes the whole card, not just its id: the exchange log records what was
    *  asked alongside what was said, so an agent reading it later does not have
    *  to re-resolve a bare id against a map that may have moved on. */
   onAnswer?: (card: { id: string; label: string }, answer: string) => void;
+  /** Picking one of the ways forward the conclusion offers. Distinct from
+   *  answering: nothing on the map is being closed, a direction is being
+   *  chosen, and what the partner does next depends on which. */
+  onChoose?: (choice: string) => void;
 }) {
   const layout = useMemo(() => layOutGalaxy(themes, nodes), [themes, nodes]);
   const { camera, zoomBy, focusOn, handlers } = useBoardCamera({
@@ -118,7 +127,12 @@ export default function GalaxyBoard({
     );
     const last = loose[loose.length - 1];
     return last
-      ? { id: last.id, label: last.label, detail: last.detail }
+      ? {
+          id: last.id,
+          label: last.label,
+          detail: last.detail,
+          choices: last.choices ?? null,
+        }
       : null;
   }, [nodes]);
 
@@ -131,7 +145,12 @@ export default function GalaxyBoard({
     const allDone = rows.length > 0 && rows.every(rowDone);
     if (!allDone) return { kind: 'waiting' };
     return coreInsight
-      ? { kind: 'ready', label: coreInsight.label, detail: coreInsight.detail }
+      ? {
+          kind: 'ready',
+          label: coreInsight.label,
+          detail: coreInsight.detail,
+          choices: coreInsight.choices,
+        }
       : { kind: 'composing' };
   }, [layout.clusters, coreInsight]);
 
@@ -186,10 +205,10 @@ export default function GalaxyBoard({
             const fan = `M ${CORE_SIZE.radius} 0 C ${midX} 0, ${midX} ${c.y}, ${c.x - HUB_SIZE.radius} ${c.y}`;
             // …and the mirror of it, coming back together.
             const backMid = last
-              ? (last.x + CARD_SIZE.width + layout.convergence.x) / 2
+              ? (last.x + last.w + layout.convergence.x) / 2
               : 0;
             const join = last
-              ? `M ${last.x + CARD_SIZE.width} ${c.y} C ${backMid} ${c.y}, ${backMid} 0, ${layout.convergence.x - 90} 0`
+              ? `M ${last.x + last.w} ${c.y} C ${backMid} ${c.y}, ${backMid} 0, ${layout.convergence.x - 90} 0`
               : null;
             return (
               <g key={c.theme.id}>
@@ -199,7 +218,7 @@ export default function GalaxyBoard({
                   <line
                     x1={c.x + HUB_SIZE.radius}
                     y1={c.y}
-                    x2={last.x + CARD_SIZE.width}
+                    x2={last.x + last.w}
                     y2={c.y}
                     stroke={stroke}
                     strokeWidth={w}
@@ -216,7 +235,12 @@ export default function GalaxyBoard({
           })}
         </svg>
 
-        <CoreIdeaCard seedIdea={seedIdea} insight={coreInsight} />
+        <CoreIdeaCard
+          seedIdea={seedIdea}
+          insight={coreInsight}
+          mapId={mapId}
+          attachments={attachments}
+        />
 
         {/* Nothing has branched yet, so the partner is still reading. Keyed on
             themes rather than on a request being in flight, because the page
@@ -232,7 +256,7 @@ export default function GalaxyBoard({
             className="absolute"
             style={{ left: layout.convergence.x, top: layout.convergence.y }}
           >
-            <ConvergenceNode state={convergenceState} />
+            <ConvergenceNode state={convergenceState} onChoose={onChoose} />
           </div>
         ) : null}
 
@@ -278,7 +302,7 @@ export default function GalaxyBoard({
                   style={{
                     left: card.x,
                     top: card.y,
-                    width: CARD_SIZE.width,
+                    width: card.w,
                     height: CARD_SIZE.height,
                     // Staggered so a round lands as a sequence rather than as
                     // one block appearing — the delay is what makes it read as
@@ -292,7 +316,7 @@ export default function GalaxyBoard({
                     onFocus={() => {
                       setFocusedId(card.id);
                       focusOn(
-                        card.x + CARD_SIZE.width / 2,
+                        card.x + card.w / 2,
                         card.y + CARD_SIZE.height / 2,
                         0.92,
                       );

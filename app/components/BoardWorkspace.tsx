@@ -12,21 +12,28 @@
 // the map, exactly as the person finds the agent's questions here.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import GalaxyBoard from './GalaxyBoard';
 import RoundControl, { type RoundPhase } from './RoundControl';
+import BoardChat from './BoardChat';
 import { useWebMcpBridge } from './WebMcpBridge';
 import type { GalaxyNodeInput, GalaxyTheme } from '@/app/lib/galaxyLayout';
 
 export default function BoardWorkspace({
   seedIdea,
+  mapId,
+  attachments,
   themes,
   nodes,
 }: {
   seedIdea: string;
+  mapId: string;
+  attachments?: { name: string }[];
   themes: GalaxyTheme[];
   nodes: GalaxyNodeInput[];
 }) {
   const bridge = useWebMcpBridge();
+  const router = useRouter();
   const [phase, setPhase] = useState<RoundPhase>('idle');
   const [answeredThisRound, setAnsweredThisRound] = useState(0);
 
@@ -48,6 +55,28 @@ export default function BoardWorkspace({
     [bridge],
   );
 
+  const onChoose = useCallback(
+    (choice: string) => {
+      setPhase('waiting');
+      // A choice is a note, not an answer: no question on the map is being
+      // closed. It says which way the thinking should go, and the partner
+      // picks it up on its next read like everything else the person writes.
+      void bridge.contribute('user.note', {
+        text: `Take it this way: ${choice}`,
+      });
+    },
+    [bridge],
+  );
+
+  const onSay = useCallback(
+    (text: string) => {
+      // A note, like a choice: nothing on the map is being closed. This is the
+      // slot for everything the partner did not think to ask about.
+      void bridge.contribute('user.note', { text });
+    },
+    [bridge],
+  );
+
   const onNext = useCallback(() => {
     setPhase('waiting');
     // One more entry on the log. The agent is blocked in `await_user_activity`
@@ -58,6 +87,29 @@ export default function BoardWorkspace({
       text: 'Ready for the next round — bring what you have made of this.',
     });
   }, [bridge]);
+
+  // Pull the board forward whenever the map moves.
+  //
+  // The nodes are rendered on the server, so without this the board is a
+  // photograph: an answer the person just gave, and every question the partner
+  // writes, sit in the database while the screen keeps showing the state it was
+  // built with. The bridge already polls the log and knows the revision, so the
+  // revision is the trigger — `router.refresh()` re-runs the server component
+  // and swaps in fresh nodes without losing client state, which is what keeps
+  // the camera, the focus and any half-typed draft where they were.
+  const lastSeen = useRef<number | null>(null);
+  useEffect(() => {
+    const rev = bridge.revision;
+    if (rev === null || rev === undefined) return;
+    if (lastSeen.current === null) {
+      lastSeen.current = rev;
+      return;
+    }
+    if (rev > lastSeen.current) {
+      lastSeen.current = rev;
+      router.refresh();
+    }
+  }, [bridge.revision, router]);
 
   // The wait ends when the map actually moves, not on a timer: the agent has
   // written something when the revision rises past where it stood at the ask.
@@ -91,24 +143,32 @@ export default function BoardWorkspace({
     <div className="relative min-h-0 flex-1 overflow-hidden rounded-[26px] border border-white/10">
       <GalaxyBoard
         seedIdea={seedIdea}
+        mapId={mapId}
+        attachments={attachments}
         themes={themes}
         nodes={nodes}
         onAnswer={onAnswer}
+        onChoose={onChoose}
       />
-      {/* The control only appears once there is a round to end.
-          The FIRST set of questions arrives on its own — creating the map is
-          already a contribution, so an agent waiting on the log wakes and
-          answers it without being asked to. Showing "Next round" before anyone
-          has answered anything would put a button in front of someone whose
-          only job right now is to read what just landed. */}
-      {showRound ? (
-        <RoundControl
-          open={openCount}
-          answered={answeredThisRound}
-          phase={phase}
-          onNext={onNext}
-        />
-      ) : null}
+      {/* The chat is ALWAYS here; the round control rides along inside it
+          only once there is a round to end. The first set of questions arrives
+          on its own — creating the map is already a contribution — so showing
+          "Next round" before anyone has answered anything would put a button in
+          front of someone whose only job right now is to read what landed. */}
+      <BoardChat
+        events={bridge.events}
+        onSend={onSay}
+        trailing={
+          showRound ? (
+            <RoundControl
+              open={openCount}
+              answered={answeredThisRound}
+              phase={phase}
+              onNext={onNext}
+            />
+          ) : null
+        }
+      />
     </div>
   );
 }

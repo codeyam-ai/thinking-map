@@ -15,6 +15,7 @@
 // a board that is alive and one that is animated at you.
 
 import { CARD_SIZE } from '@/app/lib/galaxyLayout';
+import CoreAttachments, { type Attachment } from './CoreAttachments';
 
 const CORE_FILL = '#ffffff';
 const RING = '#333336';
@@ -32,8 +33,12 @@ export interface CoreInsight {
 export default function CoreIdeaCard({
   seedIdea,
   insight,
+  mapId,
+  attachments = [],
 }: {
   seedIdea: string;
+  mapId?: string;
+  attachments?: Attachment[];
   /** The partner's current answer to the idea itself, as opposed to its
    *  answer to any one line of thinking. Null until a round has produced one. */
   insight?: CoreInsight | null;
@@ -97,13 +102,25 @@ export default function CoreIdeaCard({
         </div>
       </div>
 
+      {/* What came in with the idea, directly under the circle and above the
+          partner's reading of it: it is the person's own material, and it
+          belongs nearer to their words than to the answer. */}
+      {mapId ? (
+        <div
+          className="absolute left-1/2 -translate-x-1/2"
+          style={{ top: CORE_RADIUS * 2 + 26 }}
+        >
+          <CoreAttachments mapId={mapId} attachments={attachments} />
+        </div>
+      ) : null}
+
       {/* Each round's answer to the idea, hung under the circle rather than
           crammed inside it — the circle holds the person's words, and nothing
           the partner writes should be set in the same frame as them. */}
       {insight ? (
         <div
           className="absolute left-1/2 w-[430px] -translate-x-1/2 rounded-[20px] border border-white/12 bg-[#0b0b0c] p-6"
-          style={{ top: CORE_RADIUS * 2 + 40 }}
+          style={{ top: CORE_RADIUS * 2 + (mapId ? 110 : 40) }}
         >
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#e4ec4b]">
             What that tells us

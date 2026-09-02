@@ -20,6 +20,7 @@
 import { useEffect, useState } from 'react';
 import type { PlacedCard } from '@/app/lib/galaxyLayout';
 import { themeColor } from '@/app/lib/themeHue';
+import CardDiagram from './CardDiagram';
 
 /** Kinds that are the partner's own thinking rather than a question for you. */
 const INSIGHT_KINDS = new Set([
@@ -69,8 +70,21 @@ export default function QuestionCard({
   }
 
   return (
-    <button
-      type="button"
+    // A plain div, and deliberately NOT role="button".
+    //
+    // It was a <button> first, which is invalid — a button may not contain the
+    // choice pills and the pencil, and the parser hoists them out, leaving them
+    // unclickable. Giving the div role="button" instead fixed the markup but
+    // not the meaning: an element's accessible name is computed from its
+    // contents, so the card announced itself as a button called "How much time
+    // did you have… Under 20 minutes About an hour…", swallowing its own
+    // controls into one label.
+    //
+    // The card is a container. Clicking it to bring it into focus is a
+    // convenience on top of the real controls inside it, so it takes the click
+    // and no role: the pills, the pencil and the field are what a keyboard or a
+    // screen reader should find here.
+    <div
       onClick={onFocus}
       data-no-pan={focused ? '' : undefined}
       className="relative flex h-full w-full flex-col rounded-[22px] p-7 text-left transition-all duration-300"
@@ -90,13 +104,39 @@ export default function QuestionCard({
             className="text-[11px] font-semibold uppercase tracking-[0.14em]"
             style={{ color: accent }}
           >
-            Insight
+            {card.diagram ? 'Shape' : card.imageUrl ? 'Reference' : 'Insight'}
           </span>
-          <p className="mt-4 text-[19px] font-semibold leading-snug">
+
+          {/* The picture, above the words. A reference card exists so someone
+              can LOOK at the thing — a competitor's screen, a sketch, a diagram
+              — and a caption printed above the evidence makes them read a
+              description of what they are about to see. */}
+          {card.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={card.imageUrl}
+              alt={card.imageAlt ?? card.label}
+              className="mt-3 w-full rounded-[12px] object-cover"
+              style={{ maxHeight: 150, background: 'rgba(255,255,255,0.05)' }}
+              // A reference that 404s should leave the card readable rather
+              // than a broken-image glyph where the evidence was.
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : null}
+          <p className="mt-3 text-[16px] font-semibold leading-snug">
             {card.label}
           </p>
-          {card.detail ? (
-            <p className="mt-3 text-[13px] leading-relaxed text-white/60">
+
+          {card.diagram ? (
+            <CardDiagram
+              steps={card.diagram.steps}
+              note={card.diagram.note}
+              accent={accent}
+            />
+          ) : card.detail ? (
+            <p className="mt-2.5 text-[13px] leading-relaxed text-white/60">
               {card.detail}
             </p>
           ) : null}
@@ -108,12 +148,12 @@ export default function QuestionCard({
               of the fields missing. */}
           <span className="flex-1" />
           <p
-            className="text-[15px] font-semibold leading-snug"
+            className="text-[13px] font-semibold leading-snug"
             style={{ color: accent }}
           >
             {card.label}
           </p>
-          <p className="mt-2 text-[19px] font-semibold leading-snug text-white">
+          <p className="mt-2 text-[16px] font-semibold leading-snug text-white">
             {card.detail}
           </p>
           <span className="flex-1" />
@@ -157,7 +197,10 @@ export default function QuestionCard({
           >
             {editing ? 'Editing your answer' : 'Open question'}
           </span>
-          <p className="mt-4 text-[19px] font-semibold leading-snug">
+          {/* Smaller than it was. The question is the label on a card whose
+              real content is the answer, and at 19px a two-line question ate
+              the space the options and the field need. */}
+          <p className="mt-3 text-[16px] font-semibold leading-snug">
             {card.label}
           </p>
         </>
@@ -227,6 +270,6 @@ export default function QuestionCard({
           </span>
         </div>
       ) : null}
-    </button>
+    </div>
   );
 }

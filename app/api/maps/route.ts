@@ -16,6 +16,14 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const map = await createMap(seedIdea);
+  // Names only — see the schema note on ThinkingMap.attachments.
+  const attachments = Array.isArray(body.attachments)
+    ? (body.attachments as unknown[])
+        .map((a) => String((a as { name?: unknown })?.name ?? '').trim())
+        .filter(Boolean)
+        .map((name) => ({ name }))
+    : [];
+
+  const map = await createMap(seedIdea, attachments);
   return NextResponse.json({ id: map.id }, { status: 201 });
 }

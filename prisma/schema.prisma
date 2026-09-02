@@ -37,6 +37,12 @@ model ThinkingMap {
   /// Which stage of the loop this map has reached:
   /// idea | deconstruct | map | research | explore | next-steps
   phase    String @default("idea")
+  /// What the person attached alongside the idea, as JSON: [{ name }].
+  /// Names, not bytes. The board's job is to record that a scope doc or a
+  /// screenshot is part of this thinking — storing the file itself is a
+  /// different product with a different set of problems (size, privacy,
+  /// expiry), and none of them are the one being solved here.
+  attachments String?
   /// Monotonic change counter, bumped once per committed change in the same
   /// transaction as the write. This is the cursor an agent reads with, and the
   /// only shared notion of "now" across all three front doors. It is a column
@@ -132,6 +138,17 @@ model MapNode {
   status    String  @default("open")
   /// Where a research finding came from, when this node is a finding.
   sourceUrl String?
+  /// A picture to show on the card: a screenshot of an existing product, a
+  /// sketch, a diagram the partner drew. Held as a URL rather than as bytes
+  /// because the map is a place to point AT things, not a place to store them —
+  /// and a node the agent can write with one string is a node it will actually
+  /// use.
+  imageUrl  String?
+  /// What the picture is, for anyone who cannot see it.
+  imageAlt  String?
+  /// A small diagram the partner drew, as JSON: { steps: [...], note? }.
+  /// Declarative rather than markup on purpose — see app/lib/diagram.ts.
+  diagram   String?
   /// Left-to-right position among siblings.
   order     Int     @default(0)
   /// The galaxy this node belongs to. Null for the root idea, which belongs to

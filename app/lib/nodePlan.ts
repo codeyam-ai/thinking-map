@@ -23,6 +23,9 @@ export interface PlannedInsert {
   themeRef: string | null;
   /** Offered options, or null for an open-ended question. */
   choices: string[] | null;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  diagram: { steps: string[]; note?: string } | null;
 }
 
 /** A theme the model asked to open, validated but not yet written. The hue is
@@ -67,6 +70,21 @@ export interface ToolInvocation {
  * Insert order is preserved because a parent must be written before the child
  * that names it.
  */
+/** Validate a diagram the model asked for. A shape that cannot be drawn — no
+ *  steps, or steps that are all blank — becomes null rather than an empty box,
+ *  because a card announcing a diagram and showing nothing is worse than one
+ *  that never claimed to have one. */
+function readDiagram(raw: unknown): { steps: string[]; note?: string } | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const d = raw as Record<string, unknown>;
+  const steps = Array.isArray(d.steps)
+    ? d.steps.map((x) => String(x ?? '').trim()).filter(Boolean)
+    : [];
+  if (steps.length < 2) return null;
+  const note = typeof d.note === 'string' && d.note.trim() ? d.note.trim() : undefined;
+  return note ? { steps, note } : { steps };
+}
+
 export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
   const themes: PlannedTheme[] = [];
   const inserts: PlannedInsert[] = [];
@@ -119,6 +137,9 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           sourceUrl: node.sourceUrl ? String(node.sourceUrl) : null,
           order: order++,
           themeRef: node.themeRef ? String(node.themeRef) : null,
+          diagram: readDiagram(node.diagram),
+          imageUrl: node.imageUrl ? String(node.imageUrl) : null,
+          imageAlt: node.imageAlt ? String(node.imageAlt) : null,
           // Blank options are dropped rather than rendered as empty pills, and
           // a list that empties out becomes null — an open-ended question,
           // which is the honest fallback.

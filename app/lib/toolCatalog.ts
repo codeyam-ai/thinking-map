@@ -81,6 +81,27 @@ const nodeShape = z.object({
   detail: z.string().optional(),
   status: z.enum(NODE_STATUSES).optional(),
   sourceUrl: z.string().optional(),
+  imageUrl: z
+    .string()
+    .optional()
+    .describe(
+      'A picture to show on this card — a screenshot of an existing product, a diagram, a reference. Prefer showing over describing: a competitor the person can look at lands harder than a paragraph about it.',
+    ),
+  imageAlt: z
+    .string()
+    .optional()
+    .describe('What the picture shows. Required whenever imageUrl is set.'),
+  diagram: z
+    .object({
+      steps: z
+        .array(z.string())
+        .describe('Two to six stages, in order. Kept short — these are boxes, not paragraphs.'),
+      note: z.string().optional().describe('One line under the diagram.'),
+    })
+    .optional()
+    .describe(
+      'Draw a small flow on this card: a sequence of stages with arrows between them. Use it when the thing you are explaining IS a shape — a process, a funnel, a before/after — and prose would make the reader rebuild the picture in their head.',
+    ),
   choices: z
     .array(z.string())
     .optional()

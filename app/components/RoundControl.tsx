@@ -51,13 +51,14 @@ export default function RoundControl({
     return () => clearInterval(t);
   }, [waiting]);
 
+  // Renders INLINE, inside the composer's bar. It used to position itself at
+  // the bottom of the board, which is also where the composer lives — two
+  // floating controls stacking on the same spot. One bar carrying both is also
+  // the truer arrangement: saying something and ending a round are the two
+  // things you can do that are not about one particular card.
   return (
-    <div
-      className="pointer-events-auto absolute bottom-6 left-1/2 z-20 -translate-x-1/2"
-      data-no-pan
-    >
-      <div className="flex items-center gap-4 rounded-full border border-white/12 bg-black/80 px-3 py-2 pl-6 backdrop-blur">
-        <span className="text-[13px] text-white/60">
+    <>
+      <span className="hidden shrink-0 whitespace-nowrap pl-1 text-[12px] text-white/45 sm:block">
           {waiting ? (
             <>
               Your partner is thinking
@@ -70,14 +71,14 @@ export default function RoundControl({
           ) : (
             'Everything on the board is answered'
           )}
-        </span>
+      </span>
 
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={waiting}
-          className="flex items-center gap-2 rounded-full bg-[#d9f27e] px-5 py-2.5 text-[13px] font-semibold text-black transition-opacity disabled:opacity-45"
-        >
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={waiting}
+        className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-[#d9f27e] px-5 py-2.5 text-[13px] font-semibold text-black transition-opacity disabled:opacity-45"
+      >
           {waiting ? (
             <>
               {/* The one moving thing on a still board, so "something is
@@ -86,10 +87,9 @@ export default function RoundControl({
               Waiting
             </>
           ) : (
-            <>Next round →</>
-          )}
-        </button>
-      </div>
-    </div>
+          <>Next round →</>
+        )}
+      </button>
+    </>
   );
 }

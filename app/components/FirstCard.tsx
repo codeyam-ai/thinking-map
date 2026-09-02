@@ -33,7 +33,12 @@ export default function FirstCard() {
       const res = await fetch('/api/maps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ seedIdea }),
+        // Names travel, bytes do not. What the board needs to know is that a
+        // scope doc is part of this thinking, so the partner can ask about it.
+        body: JSON.stringify({
+          seedIdea,
+          attachments: files.map((f) => ({ name: f.name })),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Could not start a map.');

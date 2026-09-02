@@ -33,11 +33,18 @@ export interface GalaxyNodeInput {
   status: string;
   /** Options offered with this question, or null for an open-ended one. */
   choices?: string[] | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  diagram?: { steps: string[]; note?: string } | null;
 }
 
 export interface PlacedCard extends GalaxyNodeInput {
   x: number;
   y: number;
+  /** This card's own width. Not every card carries the same amount: a diagram
+   *  or a screenshot needs room the default column cannot give without
+   *  squeezing its content into a strip. */
+  w: number;
   /** The hue of the owning theme, copied onto the card so a renderer never has
    *  to hold both collections to draw one card. */
   hue: number;
@@ -69,6 +76,9 @@ const FAN_X = 1180;
 const ROW_GAP = 620;
 const HUB_RADIUS = 66;
 const CARD_W = 300;
+/** What a card carrying a diagram or a picture gets instead. Wide enough that a
+ *  four-step flow reads as a flow rather than as a stack of slivers. */
+const CARD_W_WIDE = 420;
 const CARD_H = 360;
 const CARD_GAP = 34;
 /** Gap between a hub and the first card of its row, and between the last card
@@ -83,6 +93,14 @@ const CORE_RADIUS = 250;
  * Rows are centred vertically on the idea, so a map with two lines of thinking
  * is balanced rather than looking like a map with three that lost one.
  */
+/** How wide a card needs to be. Driven by what it carries, not declared by the
+ *  agent: the model should describe content and let the board decide how much
+ *  room that content takes, or every card becomes a layout negotiation. */
+function widthFor(node: GalaxyNodeInput): number {
+  if (node.diagram || node.imageUrl) return CARD_W_WIDE;
+  return CARD_W;
+}
+
 export function layOutGalaxy(
   themes: GalaxyTheme[],
   nodes: GalaxyNodeInput[],
@@ -99,12 +117,23 @@ export function layOutGalaxy(
     // One row running right. Cards are vertically centred on their hub so the
     // whole line — hub, then questions — sits on one axis the eye can follow
     // without hunting.
-    const cards: PlacedCard[] = own.map((node, j) => ({
-      ...node,
-      hue: theme.hue,
-      x: cx + HUB_RADIUS + RUN_GAP + j * (CARD_W + CARD_GAP),
-      y: cy - CARD_H / 2,
-    }));
+    //
+    // Each card's x is the running sum of the widths before it rather than an
+    // index times a constant, so a wide card pushes its neighbours along
+    // instead of sitting under them.
+    let run = cx + HUB_RADIUS + RUN_GAP;
+    const cards: PlacedCard[] = own.map((node) => {
+      const w = widthFor(node);
+      const card: PlacedCard = {
+        ...node,
+        hue: theme.hue,
+        w,
+        x: run,
+        y: cy - CARD_H / 2,
+      };
+      run += w + CARD_GAP;
+      return card;
+    });
 
     return { theme, x: cx, y: cy, cards };
   });
@@ -113,7 +142,7 @@ export function layOutGalaxy(
   // backwards to reach it.
   const longest = clusters.reduce((max, c) => {
     const last = c.cards[c.cards.length - 1];
-    return last ? Math.max(max, last.x + CARD_W) : max;
+    return last ? Math.max(max, last.x + last.w) : max;
   }, FAN_X + HUB_RADIUS);
   const convergence = { x: longest + RUN_GAP + 160, y: 0 };
 
@@ -129,7 +158,7 @@ export function layOutGalaxy(
     for (const card of cluster.cards) {
       minX = Math.min(minX, card.x);
       minY = Math.min(minY, card.y);
-      maxX = Math.max(maxX, card.x + CARD_W);
+      maxX = Math.max(maxX, card.x + card.w);
       maxY = Math.max(maxY, card.y + CARD_H);
     }
   }
