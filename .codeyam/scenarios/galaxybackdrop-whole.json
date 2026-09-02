@@ -1,0 +1,12 @@
+{
+  "name": "GalaxyBackdrop - Whole",
+  "id": "d710c800-c6bd-4739-b3a6-1f09d22d2814",
+  "url": "/isolated-components/GalaxyBackdrop?s=Whole",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GalaxyBackdrop",
+  "scenarioType": "component",
+  "description": "Far enough out that the whole disc fits. This is where the tilt reads: ellipses rather than circles, so the galaxy is seen from slightly above rather than dead on."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "ThemeParticles - Default",
+  "id": "b70eaa9d-8827-4dd0-aa5f-77ff489274d1",
+  "url": "/isolated-components/ThemeParticles?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThemeParticles",
+  "scenarioType": "component",
+  "description": "The dust around a galaxy's hub, in the first theme's magenta. Deterministic by design — every position, size and orbit comes from a PRNG seeded off the hue — so the server and the client draw the same field and the page does not throw a hydration error. Sizes are skewed small so a few large particles give the band depth instead of it reading as one size drawn badly."
+}

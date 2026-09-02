@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - Default",
+  "id": "003f71e1-7cf0-41a2-99db-cbedc0dd3b3b",
+  "url": "/isolated-components/RoundControl?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "Mid-round: some questions answered, some still open. The count is the whole message — it says how much of this round is left without anyone having to go and tally the cards."
+}

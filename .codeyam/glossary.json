@@ -96,6 +96,18 @@
     ]
   },
   {
+    "description": "Writing an answer in your own words: a box that fills whatever the card has left, with an explicit Save and a Cancel under it. The controls are the point — a keyboard hint alone left no visible way to commit an answer or to change your mind, which is exactly what someone is deciding at that moment. Cancel is absent when there is nowhere to go back to, since a control that does nothing is worse than no control.",
+    "filePath": "app/components/AnswerComposer.tsx",
+    "name": "AnswerComposer",
+    "scenarios": [
+      "answercomposer-default",
+      "answercomposer-typed",
+      "answercomposer-nothingtocancel",
+      "answercomposer-editingondark",
+      "answercomposer-longanswer"
+    ]
+  },
+  {
     "description": "Just enough of the WebMCP bridge to record an answer. Narrowed deliberately: the answers hook has no business with tools or connection status, and the narrow shape is what lets a test hand it a plain function instead of standing up a context.",
     "filePath": "app/hooks/useMapAnswers.ts",
     "name": "AnswerWriter",
@@ -139,6 +151,40 @@
     "scenarios": [
       "askpresencenote-listening",
       "askpresencenote-noagent"
+    ]
+  },
+  {
+    "description": "The conversation, sitting over the whole map rather than in a bar beside it — a bar reads as one more widget by the zoom buttons and what you typed into it vanished with no trace that anyone had heard you. Its line mapper deliberately drops node.added, theme.added and phase.set: those are things you can SEE on the board, and repeating them here would make the panel a changelog of a picture the person is already looking at.",
+    "filePath": "app/components/BoardChat.tsx",
+    "name": "BoardChat",
+    "scenarios": [
+      "boardchat-default",
+      "boardchat-empty",
+      "boardchat-boardvisibleonly",
+      "boardchat-justopened"
+    ]
+  },
+  {
+    "description": "The way back to your other boards, collapsed into the header — the boards you are not looking at should cost no space on the one you are. It closes on an outside click and on Escape, because a menu that can only be closed by the button that opened it is a trap on a surface where every other click means something.",
+    "filePath": "app/components/BoardMenu.tsx",
+    "name": "BoardMenu",
+    "scenarios": [
+      "boardmenu-default",
+      "boardmenu-nootherboards",
+      "boardmenu-oneother",
+      "boardmenu-many",
+      "boardmenu-nonecurrent"
+    ]
+  },
+  {
+    "description": "The board and the conversation as one surface, and the owner of the live-refresh contract. WebMCP is pull-only — the page cannot be woken by an agent — so this watches the bridge's revision and calls router.refresh() when it advances, which is the whole of what makes an answer or a newly-written question appear without a reload. The first revision it sees only seeds the reference: refreshing on mount would re-fetch the page the person just loaded, and a repeated or lower revision must not refresh at all or a retried poll puts the page in a loop.",
+    "filePath": "app/components/BoardWorkspace.tsx",
+    "name": "BoardWorkspace",
+    "scenarios": [
+      "boardworkspace-working",
+      "boardworkspace-noagent",
+      "boardworkspace-working_agent",
+      "boardworkspace-justarrived"
     ]
   },
   {
@@ -287,6 +333,30 @@
     ]
   },
   {
+    "description": "The shortlist on a question card and the way past it. Really two things that must both survive: the options, and an escape from them. Every list the partner writes is a guess about what you might say and the guess must never be the only thing you are allowed to say — so the options scroll and the escape stays pinned, because with a fixed-size card something has to give and it must not be that.",
+    "filePath": "app/components/CardChoiceList.tsx",
+    "name": "CardChoiceList",
+    "scenarios": [
+      "cardchoicelist-default",
+      "cardchoicelist-overflowing",
+      "cardchoicelist-single",
+      "cardchoicelist-longoptions",
+      "cardchoicelist-ondarkcard"
+    ]
+  },
+  {
+    "description": "A small drawn shape on a card: declarative steps rather than markup, so the partner describes a flow with one string per step and the board decides how it looks. This is what the wide card width exists for — at the standard column the same steps become a stack of slivers.",
+    "filePath": "app/components/CardDiagram.tsx",
+    "name": "CardDiagram",
+    "scenarios": [
+      "carddiagram-default",
+      "carddiagram-nonote",
+      "carddiagram-shortest",
+      "carddiagram-longsteps",
+      "carddiagram-magentatheme"
+    ]
+  },
+  {
     "description": "The facts a card knows about itself that its eyebrow can name: kind, origin, brief section, whether it has been asked about, and whether it has been answered.",
     "filePath": "app/lib/cardEyebrow.ts",
     "name": "CardEyebrowFacts",
@@ -339,6 +409,18 @@
     ]
   },
   {
+    "description": "Where the lines of thinking come back together. Three states in sequence rather than three variants: an empty ring while nothing has been answered, a cycling label while the partner reads the round, and the conclusion with ways forward attached. Choosing one is not answering — nothing on the map is closed, a direction is taken, and what the partner does next depends on which.",
+    "filePath": "app/components/ConvergenceNode.tsx",
+    "name": "ConvergenceNode",
+    "scenarios": [
+      "convergencenode-waiting",
+      "convergencenode-composing",
+      "convergencenode-ready",
+      "convergencenode-readynochoices",
+      "convergencenode-readynodetail"
+    ]
+  },
+  {
     "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original secondary appearance and promotes to a lime-filled primary for the handoff band, so promoting that one caller cannot restyle the others. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation.",
     "filePath": "app/components/CopyablePrompt.tsx",
     "name": "CopyablePrompt",
@@ -349,6 +431,30 @@
       "copyableprompt-primary"
     ],
     "testFile": "app/components/CopyablePrompt.render.test.tsx"
+  },
+  {
+    "description": "The list of things brought along with an idea, hanging beneath the core card. Names only — the board is a place to point AT things rather than to hold them. Edits are optimistic: the list is the person's own change, and making them wait on a round trip to see their own file appear would be slower than the thing it is recording.",
+    "filePath": "app/components/CoreAttachments.tsx",
+    "name": "CoreAttachments",
+    "scenarios": [
+      "coreattachments-default",
+      "coreattachments-empty",
+      "coreattachments-single",
+      "coreattachments-many"
+    ]
+  },
+  {
+    "description": "The idea at the centre of the board — the thing every galaxy orbits, and the only card with nothing to answer. A long idea gets smaller type rather than a bigger circle: the circle's size is what marks it as the centre, so it stays put while the text it holds does not, and growing it would move every galaxy on the board to accommodate one sentence.",
+    "filePath": "app/components/CoreIdeaCard.tsx",
+    "name": "CoreIdeaCard",
+    "scenarios": [
+      "coreideacard-default",
+      "coreideacard-shortidea",
+      "coreideacard-longidea",
+      "coreideacard-withattachments",
+      "coreideacard-withinsight",
+      "coreideacard-dayone"
+    ]
   },
   {
     "description": "The strongest directions on the summary screen, lettered A onward so they can be referred to by name in conversation.",
@@ -438,6 +544,36 @@
       "justification": "A capture-only seam, like BridgeFixture and ErrorBoundaryFixture beside it. It exists so the isolation routes can show a failed request at all, and nothing in the app imports it. What it enables is asserted directly in readJson.test.ts and IdeaPrompt.render.test.tsx.",
       "kind": "test-fixture"
     }
+  },
+  {
+    "description": "Where a board begins: the single card on the landing screen that turns a typed sentence into a map. It autofocuses its field on mount, because the one thing a person arriving here should be able to do is start typing.",
+    "filePath": "app/components/FirstCard.tsx",
+    "name": "FirstCard",
+    "untestabilityReason": {
+      "justification": "It cannot be captured in isolation: the capture browser blocks autofocusing a textarea inside a cross-origin subframe, and this card autofocuses on mount by design. Unlike QuestionCard there is no variant of it without the field, so no scenario avoids the block. It is visible in the landing-page application scenarios, and its behaviour — starting a map, carrying files along, refusing an empty idea — is asserted in tests rather than pictured.",
+      "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "The galaxy the board sits in: thirty-four concentric ellipses, each slightly larger and slightly more rotated than the last. The progressive twist is the whole trick — individually they are plain ellipses, but the accumulating rotation makes their overlaps sweep outward into something the eye reads as an arm, where drawing actual spiral paths gives a tidier, deader figure. It rides under the board's own transform so it scales and pans with the cards; a backdrop that stayed fixed would slide against the map and destroy the sense that the galaxy is where the thinking lives.",
+    "filePath": "app/components/GalaxyBackdrop.tsx",
+    "name": "GalaxyBackdrop",
+    "scenarios": [
+      "galaxybackdrop-default",
+      "galaxybackdrop-whole",
+      "galaxybackdrop-close"
+    ]
+  },
+  {
+    "description": "The board itself: one plane holding every card under a single CSS transform, so zoomed out it is the shape of someone's thinking and zoomed in it is the one question in front of you — the same surface at two scales rather than two screens, which is what stops a person losing the thread by navigating. Reads its geometry from layOutGalaxy and its curves from boardConnectors, and frames itself from the layout's own bounds rather than a tuned constant, because a map with two clusters and one with nine cannot share a magic number.",
+    "filePath": "app/components/GalaxyBoard.tsx",
+    "name": "GalaxyBoard",
+    "scenarios": [
+      "galaxyboard-default",
+      "galaxyboard-firsttime",
+      "galaxyboard-emptytheme",
+      "galaxyboard-manythemes"
+    ]
   },
   {
     "description": "The last resort: a failure in the root layout itself, where app/error.tsx has no layout left to render into. Supplies its own html and body, and deliberately does NOT use ErrorScreen - it cannot lean on anything that assumes the app chrome mounted. Imports globals.css directly for tokens and nothing else.",
@@ -785,6 +921,20 @@
     "testFile": "app/lib/agentPanel.test.ts"
   },
   {
+    "description": "One card on the board, in whichever of its three faces cardPresentation says it wears: an open question saturated in its theme's colour, an answered one with your words as the content and the question demoted to their label, or an insight — the partner's own thinking. Its root is deliberately a plain div with no button role: it was a button first, which hoisted the choice pills out and made them unclickable, and role=button then made the card announce its entire contents as its own name.",
+    "filePath": "app/components/QuestionCard.tsx",
+    "name": "QuestionCard",
+    "scenarios": [
+      "questioncard-open",
+      "questioncard-choices",
+      "questioncard-answered",
+      "questioncard-insight",
+      "questioncard-reference",
+      "questioncard-diagram",
+      "questioncard-focused"
+    ]
+  },
+  {
     "description": "What the person said, shown back in the card's body. The Edit affordance is deliberately quiet — the eyebrow's weight rather than a button's — because an answered question is settled and reopening it should be available without being an invitation.",
     "filePath": "app/components/RecordedAnswer.tsx",
     "name": "RecordedAnswer",
@@ -811,6 +961,18 @@
       "justification": "A TypeScript interface describing one round as the map draws it. It declares a shape and emits no runtime code; its values are asserted throughout mapRounds.test.ts.",
       "kind": "type-only"
     }
+  },
+  {
+    "description": "The control that ends a round, riding inside the chat and appearing only once there is a round to end. It reports two things: how much of the round is still open, and whether the partner is already working. The wait shows elapsed seconds rather than a bare spinner, because under WebMCP the page cannot ask an agent to hurry or even know one is coming — and a spinner with no number reads the same at two seconds as at forty.",
+    "filePath": "app/components/RoundControl.tsx",
+    "name": "RoundControl",
+    "scenarios": [
+      "roundcontrol-default",
+      "roundcontrol-nothinganswered",
+      "roundcontrol-allanswered",
+      "roundcontrol-oneleft",
+      "roundcontrol-waiting"
+    ]
   },
   {
     "description": "What to do when the round is done, under the round it is done with. Composition and one choice: the count while there is still answering to do, the phase's action once nothing more is coming, and deliberately NOTHING in between — while the map is still reaching, the shimmering row above is already saying it, and a second line one line apart was the first thing that looked wrong on screen. No presence line lives here for the same reason.",
@@ -946,6 +1108,29 @@
       "summaryview-default",
       "summaryview-noslices",
       "summaryview-empty"
+    ]
+  },
+  {
+    "description": "The dust around a galaxy's hub. Every position, size and orbit comes from a PRNG seeded off the theme's hue, so the server and the client draw an identical field — that determinism is the load-bearing property, and losing it produces a real hydration error rather than a cosmetic difference. Sizes are skewed small so a few large particles give the band depth instead of it reading as one size drawn badly.",
+    "filePath": "app/components/ThemeParticles.tsx",
+    "name": "ThemeParticles",
+    "scenarios": [
+      "themeparticles-default",
+      "themeparticles-muted",
+      "themeparticles-green",
+      "themeparticles-blue",
+      "themeparticles-huezero"
+    ]
+  },
+  {
+    "description": "The wait between someone writing an idea and the first questions arriving. That gap is unavoidable and can be long — under WebMCP the page cannot ask an agent to hurry and cannot even know one is coming — so it has to be legible, and legible in the right PLACE: the dots sit on the axis the branches will grow along and travel outward, so the waiting traces the path the answers then arrive along. A spinner in a corner would say 'the app is busy', which is a different claim than 'someone is considering what you wrote'.",
+    "filePath": "app/components/ThinkingIndicator.tsx",
+    "name": "ThinkingIndicator",
+    "scenarios": [
+      "thinkingindicator-default",
+      "thinkingindicator-thinking",
+      "thinkingindicator-longlabel",
+      "thinkingindicator-furtherout"
     ]
   },
   {
@@ -1109,6 +1294,12 @@
     "testFile": "app/lib/cardThreads.test.ts"
   },
   {
+    "description": "Holds the board's zoom inside its limits. Past the floor the board is a few pixels of noise with no way back; past the ceiling one card fills the screen and the shape of the thinking — the whole point of the board — is gone. It also guarantees the scale can never reach zero or invert, which matters because every drag delta is divided by it.",
+    "filePath": "app/hooks/useBoardCamera.ts",
+    "name": "clampScale",
+    "testFile": "app/hooks/useBoardCamera.test.ts"
+  },
+  {
     "description": "Turns a thrown database failure into what a person should be told: a title, a message, and in development the command that fixes it plus the column or table Prisma named. Recognises a Prisma error structurally (a string code beside a clientVersion) rather than by instanceof, because the thrown value has usually crossed a server component boundary by the time it arrives. P2022/P2021 become the schema-drift diagnosis with npm run db:push; P1001/P1003 point at DATABASE_URL; everything else falls through to a generic message that leaks nothing. The dev flag is a parameter rather than a read of NODE_ENV so the production behaviour - the half that withholds - is testable.",
     "filePath": "app/lib/loadError.ts",
     "name": "classifyLoadError",
@@ -1264,6 +1455,12 @@
     "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
+    "description": "The SVG curve from the idea out to one theme's hub. Both control points sit midway along the run, one holding the idea's horizontal and one the row's, so every branch leaves the idea flat and arrives at its row flat — which is what makes several of them read as one splaying bundle rather than as unrelated diagonals. Rim to rim rather than centre to centre, or the curve disappears under the circle it points at.",
+    "filePath": "app/lib/boardConnectors.ts",
+    "name": "fanPath",
+    "testFile": "app/lib/boardConnectors.test.ts"
+  },
+  {
     "description": "Read one non-empty string field off an event payload, or null. The single guard every rail reader goes through, so an unparseable row degrades to a plainer line rather than throwing.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "field",
@@ -1379,16 +1576,34 @@
     "testFile": "app/lib/handoffCopy.test.ts"
   },
   {
+    "description": "The colour of the nth theme, handed out along the golden angle from a magenta start. Colour is the board's navigation affordance — it is how you know which galaxy you are looking at once the labels are too small to read — so the promise is that the hues stay mutually distinguishable however many themes an idea turns out to need, which is what an irrational step round the wheel gives and a fixed palette cannot. Pure and total, so a theme's colour survives a reload without being stored twice.",
+    "filePath": "app/lib/themeHue.ts",
+    "name": "hueForIndex",
+    "testFile": "app/lib/themeHue.test.ts"
+  },
+  {
     "description": "Stands in for a heading when a passage has none: the first nine words of its opening line, elided if there were more. A person scanning the outline needs to recognise the passage, not read it.",
     "filePath": "app/lib/briefSections.ts",
     "name": "impliedHeading",
     "testFile": "app/lib/briefSections.test.ts"
   },
   {
+    "description": "Whether a card should show your words as its content with the question demoted to their label. Only a question can reach this state: a settled insight carries an answered status all over the seed data and is still not something you answered, and drawing it with a pencil would invite editing the partner's own thinking as though it were your reply.",
+    "filePath": "app/lib/cardPresentation.ts",
+    "name": "isAnsweredCard",
+    "testFile": "app/lib/cardPresentation.test.ts"
+  },
+  {
     "description": "Guard for the eight kinds the exchange log can record. A kind outside the set would become a row that nothing knows how to render or resume past.",
     "filePath": "app/lib/exchange.ts",
     "name": "isEventKind",
     "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Whether a board card is showing you something rather than asking you something. Two clauses: the node's kind is one of the partner's own thinking, OR the card carries a diagram or a picture — and the second clause is the one that was missing. The layout's widthFor already hands exactly those cards the wide column on that reasoning, so without the same rule here an approach with a diagram was laid out at the wide width, drawn as an answered question, and its diagram never rendered at all.",
+    "filePath": "app/lib/cardPresentation.ts",
+    "name": "isInsightCard",
+    "testFile": "app/lib/cardPresentation.test.ts"
   },
   {
     "description": "Type guard for the node kinds the map knows how to draw. Used to drop a hallucinated kind at the planning stage rather than storing a node no component has a treatment for.",
@@ -1401,6 +1616,12 @@
     "filePath": "app/lib/mapKinds.ts",
     "name": "isNodeStatus",
     "testFile": "app/lib/mapKinds.test.ts"
+  },
+  {
+    "description": "Whether a card is still asking something of you, and so still carries a field. The three faces are mutually exclusive and total by construction — two of them true at once would stack two bodies in one card, none of them true would render an empty box.",
+    "filePath": "app/lib/cardPresentation.ts",
+    "name": "isOpenCard",
+    "testFile": "app/lib/cardPresentation.test.ts"
   },
   {
     "description": "Type guard for the five phases of the loop. SQLite has no enums, so phase strings arrive from the database and from model tool calls unvalidated; this is what keeps an unknown value out of the phase nav. It deliberately answers a NARROWER question than normalizePhase: whether a value is literally one of the five current phases, which is what the tool schema validates against. A stored phase from before deconstruct and map merged is not one of them, and goes through normalizePhase instead.",
@@ -1425,6 +1646,24 @@
     "filePath": "app/lib/webmcp.ts",
     "name": "isWebMcpAvailable",
     "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
+    "description": "The mirror of the fan: the curve from the end of a finished row back to the conclusion. Leaves from the far edge of the last card rather than its origin, so it does not run back through the card, and returns null for a row with no cards — there is no end to leave from, and a line drawn from the hub would promise a conclusion the row has not reached.",
+    "filePath": "app/lib/boardConnectors.ts",
+    "name": "joinPath",
+    "testFile": "app/lib/boardConnectors.test.ts"
+  },
+  {
+    "description": "Places the idea, the lines of thinking fanning off it, each row of question cards, and the point where the rows converge — in abstract board units, knowing nothing about pixels or zoom. Each card sits at the running sum of the widths before it rather than at an index times a constant, which is what lets a card carrying a diagram or a picture push its neighbours along instead of being drawn on top of them. The convergence clears the longest row, and an empty map still returns finite bounds so a board with nothing on it frames on something real.",
+    "filePath": "app/lib/galaxyLayout.ts",
+    "name": "layOutGalaxy",
+    "testFile": "app/lib/galaxyLayout.test.ts"
+  },
+  {
+    "description": "Reads one event from the exchange log as a line of conversation, or as nothing. The nothing is the editorial decision worth knowing about: node.added, theme.added and phase.set deliberately produce no bubble, because they are things you can SEE on the board and narrating them would make the panel a changelog of a picture the person is already looking at. It also unwraps the recorded question shape — stringifying it gave every agent-asked question the bubble '[object Object]'.",
+    "filePath": "app/components/BoardChat.tsx",
+    "name": "line",
+    "testFile": "app/components/BoardChat.render.test.tsx"
   },
   {
     "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",
@@ -1529,10 +1768,28 @@
     }
   },
   {
+    "description": "Reads back the list of things brought along with an idea. Names only, and anything unreadable becomes an empty list — the rule is about availability rather than correctness: a board that cannot parse its own attachment column must still OPEN, because one stray string taking the whole page down is a far worse outcome than a board rendering without its attachments.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "parseAttachments",
+    "testFile": "app/lib/attachments.test.ts"
+  },
+  {
     "description": "Reads a brief off an untrusted request body. A brief with no text in it is not a brief, and every way of expressing that - missing, empty, whitespace, wrongly typed, not an object - reduces to undefined so the caller has one case rather than five. The text is kept verbatim; a missing source name or media type falls back to the pasted defaults.",
     "filePath": "app/lib/briefInput.ts",
     "name": "parseBriefInput",
     "testFile": "app/lib/briefInput.test.ts"
+  },
+  {
+    "description": "Reads a question's shortlist back off the map. Stored as a JSON string because SQLite has no array column, so anything malformed degrades to an open-ended question rather than throwing — a card that cannot render its options is still a question worth asking, and a board that will not open is not.",
+    "filePath": "app/components/MapScreen.tsx",
+    "name": "parseChoices",
+    "testFile": "app/components/QuestionCard.render.test.tsx"
+  },
+  {
+    "description": "Reads a card's drawn shape back off the map, with the same contract as parseChoices: a stored value that cannot be parsed becomes no diagram rather than an exception. The card then renders as an ordinary one, which is the right degradation — a missing shape costs a picture, a throw costs the whole board.",
+    "filePath": "app/components/MapScreen.tsx",
+    "name": "parseDiagram",
+    "testFile": "app/components/QuestionCard.render.test.tsx"
   },
   {
     "description": "Reads a nudge batch off a request body, returning the parsed batch or the message to send back — the caller picks the status code, this decides what is acceptable. Offsets must be FINITE, not merely numeric: NaN and Infinity are both typeof number and either would put a node nowhere. One bad entry rejects the whole batch, since a partial arrangement is harder to explain than a refused one. Vestigial along with its route: nothing produces a nudge now that the map is a scrolling column of cards.",
@@ -1616,6 +1873,12 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
+    "description": "Validates a drawn shape a language model asked for, on its way into the map. A shape that cannot be drawn — fewer than two steps once blanks are dropped, or not an object at all — becomes null rather than a half-formed diagram, because a card announcing a shape and then showing nothing is worse than one that never claimed to have it. The note is omitted entirely rather than carried empty, since the card renders a caption line for anything truthy.",
+    "filePath": "app/lib/nodePlan.ts",
+    "name": "readDiagram",
+    "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
     "description": "Reads a fetch response whose body might not be JSON, and never lets JSON.parse throw at a person. Consumes the body as text once, then returns the data on success, the route's own stated error on a failing JSON body, and '<fallback> (HTTP <status>)' for an empty, truncated, or HTML body. Reports ok only when the caller actually got usable data, so a 200 carrying a truncated body reads as the failure it is. Pure over a Response, so it is testable with a constructed one and no network.",
     "filePath": "app/lib/readJson.ts",
     "name": "readJson",
@@ -1664,6 +1927,12 @@
     "testFile": "app/lib/roundProgress.test.ts"
   },
   {
+    "description": "Whether a line of thinking has been answered through, which is what decides if its line to the conclusion is drawn at all. A row is done when it has questions and none is still open; an empty row is deliberately not done, because every question being answered is vacuously true of no questions and would run a conclusion line off a row nobody has said anything in. Insights do not count either way — nobody was asked them.",
+    "filePath": "app/lib/boardConnectors.ts",
+    "name": "rowDone",
+    "testFile": "app/lib/boardConnectors.test.ts"
+  },
+  {
     "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "runLength",
@@ -1694,6 +1963,12 @@
     "filePath": "app/lib/briefFormat.ts",
     "name": "sectionLabel",
     "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "A mulberry32 PRNG keyed off a theme's hue, so a galaxy's dust is the same on the server and in the browser. The determinism is the load-bearing part rather than the randomness: lose it and React finds a different tree than the one the server sent, which is a hydration error on a board that otherwise looks fine. Not exported — the property is asserted through the markup it produces, since that is what actually has to match.",
+    "filePath": "app/components/ThemeParticles.tsx",
+    "name": "seeded",
+    "testFile": "app/components/ThemeParticles.render.test.tsx"
   },
   {
     "description": "Turns a model's suggested answers into the JSON array the column stores, dropping the field entirely unless at least one usable string survives — so an agent sending an empty list or a list of blanks produces a plain question rather than a node carrying an array nothing can render. Non-strings are filtered rather than coerced, because a numeric option is a mistake and stringifying it would hide one.",
@@ -1759,6 +2034,12 @@
     }
   },
   {
+    "description": "A theme's hue as a CSS colour at a given lightness, saturation and alpha. One place decides what a theme looks like so a card, its connector and its cluster label cannot drift apart. Emits no alpha channel when the colour is opaque, because an always-present slash-one would be valid CSS that changed every colour string in the app for nothing.",
+    "filePath": "app/lib/themeHue.ts",
+    "name": "themeColor",
+    "testFile": "app/lib/themeHue.test.ts"
+  },
+  {
     "description": "How deep a thread bends, given the vertical gap between two rows: two thirds of the gap, clamped at both ends. The floor exists because a straight line between two rows reads as a table rule rather than a thread; the ceiling exists because past it the control points overshoot their own endpoints and the curve loops back on itself. Between the clamps the bend tracks the gap, so a taller gap gets a lazier curve rather than the same one stretched.",
     "filePath": "app/lib/threadGeometry.ts",
     "name": "threadPull",
@@ -1793,6 +2074,12 @@
     "filePath": "app/hooks/useAskUser.ts",
     "name": "useAskUser",
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
+  },
+  {
+    "description": "Pan and zoom over the board, held as one piece of state so a scale and a translation landing in different renders cannot make the board visibly shear. The load-bearing detail is that the pointer is NOT captured on pointerdown but only after a few pixels of travel: capturing early retargets the eventual click to the canvas, which silently made every card on the board unclickable. Drag deltas are divided by the current scale so the board tracks the cursor identically at every zoom, and the scale is clamped at both ends so it can never invert or collapse.",
+    "filePath": "app/hooks/useBoardCamera.ts",
+    "name": "useBoardCamera",
+    "testFile": "app/hooks/useBoardCamera.test.ts"
   },
   {
     "description": "How long something has been true, reported once it has been true long enough — the only input the pending row needs that a pure function cannot compute. Reports a STEP rather than a ticking clock, 0 until the limit then the limit, because a value changing every frame would re-render the whole map column to move a decision that flips exactly once. Restarts on its reset key, so a new round means the page is reaching for something new rather than still waiting on the old.",
@@ -1871,6 +2158,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "who",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "How wide a card needs to be, driven by what it carries rather than declared by the agent: a card holding a drawn shape or a picture gets the wide column, everything else the standard one. Letting the model describe content and the board decide the room it takes is what stops every card becoming a layout negotiation. Not exported — its rule is asserted through the placements layOutGalaxy produces, which is the thing that actually matters: a card that gained a diagram but kept the narrow column squeezes its content into a strip.",
+    "filePath": "app/lib/galaxyLayout.ts",
+    "name": "widthFor",
+    "testFile": "app/lib/galaxyLayout.test.ts"
   },
   {
     "description": "Wraps a Next route handler so an unanticipated throw becomes a JSON 500 rather than an unparseable body. Logs the original error to the terminal, runs it through classifyLoadError, and answers { error, command?, hint?, detail? } with the fix and the internals present only in development. A handler's own response passes through untouched, so a deliberate 400 or 404 keeps its status and body. Variadic so it composes with both (request) and (request, { params }) handlers without casting.",

@@ -299,21 +299,25 @@ codeyam-editor start
 
 States captured as runnable scenarios with codeyam-editor:
 
-### A brief, and nobody has picked it up yet
+### A board with pictures, a drawn shape and a shortlist
 
-<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png" alt="A brief, and nobody has picked it up yet" width="280">
+<img src=".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png" alt="A board with pictures, a drawn shape and a shortlist" width="280">
 
 ### A plan with a gap - one slice proves nothing
 
 <img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
 
-### An older question, three rounds up, still open
+### A brief, and nobody has picked it up yet
 
-<img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
+<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png" alt="A brief, and nobody has picked it up yet" width="280">
 
 ### Complete - what to do next
 
 <img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
+
+### An older question, three rounds up, still open
+
+<img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
 
 ### Brief attached, nothing cited yet
 
@@ -326,8 +330,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Conflict declined - the person rewording survived
 
 <img src=".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png" alt="Conflict declined - the person rewording survived" width="280">
-
-### Day one - nothing yet
-
-<img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png" alt="Day one - nothing yet" width="280">
 <!-- codeyam:scenario-gallery:end -->

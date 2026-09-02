@@ -1,0 +1,12 @@
+{
+  "name": "AnswerComposer - NothingToCancel",
+  "id": "2a846911-7b4a-464b-be18-19c1da9a0c4b",
+  "url": "/isolated-components/AnswerComposer?s=NothingToCancel",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerComposer",
+  "scenarioType": "component",
+  "description": "A card with no shortlist: this box is the only affordance, so it is open on arrival and there is nowhere to cancel back to. A Cancel here would be a control that does nothing."
+}

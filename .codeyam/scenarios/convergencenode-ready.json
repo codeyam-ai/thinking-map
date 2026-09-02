@@ -1,0 +1,12 @@
+{
+  "name": "ConvergenceNode - Ready",
+  "id": "dff9d355-4395-4774-9e23-94c46a0af838",
+  "url": "/isolated-components/ConvergenceNode?s=Ready",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ConvergenceNode",
+  "scenarioType": "component",
+  "description": "A conclusion, with ways forward attached. Choosing one is not answering: nothing on the map is being closed, a direction is being taken, and what the partner does next depends on which one."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardWorkspace - Working",
+  "id": "ca0051d9-865f-4d10-852e-7446f0f50d91",
+  "url": "/isolated-components/BoardWorkspace?s=Working",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWorkspace",
+  "scenarioType": "component",
+  "description": "The surface a person actually uses: the board underneath and the conversation over all of it, with an agent attached and a round in progress. The chat sits above the map rather than beside one card because that is the true relationship — the map is what the conversation has produced so far."
+}

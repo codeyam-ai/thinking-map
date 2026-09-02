@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Answered",
+  "id": "6760eb37-8f2a-441e-92a7-fbf35fde4799",
+  "url": "/isolated-components/QuestionCard?s=Answered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "Your words are the content and the question has become their label. The inversion is what makes an answered card read as a statement rather than as a form with the fields missing, and the pencil is what keeps the answer a thought at a moment rather than a verdict."
+}

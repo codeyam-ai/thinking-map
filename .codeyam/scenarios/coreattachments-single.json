@@ -1,0 +1,12 @@
+{
+  "name": "CoreAttachments - Single",
+  "id": "dfb8486a-6820-428d-a827-9c69cea33010",
+  "url": "/isolated-components/CoreAttachments?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreAttachments",
+  "scenarioType": "component",
+  "description": "Exactly one attachment — the boundary where the strip becomes a list."
+}

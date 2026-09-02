@@ -1,0 +1,12 @@
+{
+  "name": "BoardMenu - Default",
+  "id": "4ece9ff9-9f1f-47ad-9f96-35ff1878ae07",
+  "url": "/isolated-components/BoardMenu?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardMenu",
+  "scenarioType": "component",
+  "description": "The way back to your other boards, collapsed. The boards you are not looking at should cost no space on the one you are, which is why this is a button rather than a rail."
+}

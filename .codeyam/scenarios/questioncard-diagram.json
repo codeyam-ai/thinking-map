@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Diagram",
+  "id": "accfe479-d762-4375-ab9e-017285ee4222",
+  "url": "/isolated-components/QuestionCard?s=Diagram",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "A card carrying a drawn shape, at the wide width. This is the frame that caught the bug: an approach is not an 'insight kind', so the card took the wide column and then rendered as an answered question with its diagram dropped entirely."
+}

@@ -1,0 +1,144 @@
+{
+  "surface": "GalaxyBoard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "themes",
+      "value": "empty",
+      "rationale": "source-derived state themes=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "themes",
+      "value": "one",
+      "rationale": "source-derived state themes=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "themes",
+      "value": "many",
+      "rationale": "source-derived state themes=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "cards",
+      "value": "empty",
+      "rationale": "source-derived state cards=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "cards",
+      "value": "one",
+      "rationale": "source-derived state cards=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "cards",
+      "value": "many",
+      "rationale": "source-derived state cards=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "rows",
+      "value": "empty",
+      "rationale": "source-derived state rows=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "rows",
+      "value": "one",
+      "rationale": "source-derived state rows=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "rows",
+      "value": "many",
+      "rationale": "source-derived state rows=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "loose",
+      "value": "empty",
+      "rationale": "source-derived state loose=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "loose",
+      "value": "one",
+      "rationale": "source-derived state loose=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "loose",
+      "value": "many",
+      "rationale": "source-derived state loose=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "nodes",
+      "value": "empty",
+      "rationale": "source-derived state nodes=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "nodes",
+      "value": "one",
+      "rationale": "source-derived state nodes=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "nodes",
+      "value": "many",
+      "rationale": "source-derived state nodes=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "far",
+      "value": "true",
+      "rationale": "source-derived state far=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "far",
+      "value": "false",
+      "rationale": "source-derived state far=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "last",
+      "value": "true",
+      "rationale": "source-derived state last=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "last",
+      "value": "false",
+      "rationale": "source-derived state last=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "coreInsight",
+      "value": "true",
+      "rationale": "source-derived state coreInsight=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "coreInsight",
+      "value": "false",
+      "rationale": "source-derived state coreInsight=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "join",
+      "value": "true",
+      "rationale": "source-derived state join=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "join",
+      "value": "false",
+      "rationale": "source-derived state join=false",
+      "status": "covered"
+    }
+  ]
+}

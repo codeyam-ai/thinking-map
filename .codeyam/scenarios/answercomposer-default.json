@@ -1,0 +1,12 @@
+{
+  "name": "AnswerComposer - Default",
+  "id": "425c1dc4-8180-4df6-91e7-f2bf949c0026",
+  "url": "/isolated-components/AnswerComposer?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerComposer",
+  "scenarioType": "component",
+  "description": "Reached past a shortlist, with nothing typed yet. Save is disabled because an empty answer would close the question against a blank, and Cancel is present because there is a list to go back to."
+}

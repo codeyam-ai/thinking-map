@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Focused",
+  "id": "852edeb3-732f-4629-997a-bb9df52ceb08",
+  "url": "/isolated-components/QuestionCard?s=Focused",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "The focus ring, which is what tells you which card the board's attention is on when a dozen are visible at once. Shown on a card with a shortlist on purpose: focus also autofocuses the free-text box, and a capture iframe blocks cross-origin autofocus, so a focused card with its field showing cannot be captured at all."
+}

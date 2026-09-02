@@ -1,0 +1,12 @@
+{
+  "name": "AnswerComposer - LongAnswer",
+  "id": "d2ad1711-78ed-40db-9d8d-92e285ceb945",
+  "url": "/isolated-components/AnswerComposer?s=LongAnswer",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerComposer",
+  "scenarioType": "component",
+  "description": "A long answer, which is exactly what someone reaching past a list of guesses tends to be writing — and the reason the box fills the card instead of holding to two rows."
+}

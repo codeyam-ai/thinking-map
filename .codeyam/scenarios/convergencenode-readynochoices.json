@@ -1,0 +1,12 @@
+{
+  "name": "ConvergenceNode - ReadyNoChoices",
+  "id": "99dbb5a8-ec48-472b-bced-45676a473e09",
+  "url": "/isolated-components/ConvergenceNode?s=ReadyNoChoices",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ConvergenceNode",
+  "scenarioType": "component",
+  "description": "A conclusion with no routes offered. The partner named a direction without proposing ways to take it, and the absence must close up rather than leave an empty row where the buttons would have been."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "CoreAttachments - Many",
+  "id": "35f83fd0-2d69-4c62-aef4-9251747e4a7e",
+  "url": "/isolated-components/CoreAttachments?s=Many",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreAttachments",
+  "scenarioType": "component",
+  "description": "Enough to wrap, including a filename too long to fit. A truncated name still has to stay identifiable enough that somebody can remove the right one."
+}

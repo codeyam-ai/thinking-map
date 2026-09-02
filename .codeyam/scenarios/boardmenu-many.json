@@ -1,0 +1,12 @@
+{
+  "name": "BoardMenu - Many",
+  "id": "3ffb95d1-f5ae-4bf9-ba84-fd9796bd7264",
+  "url": "/isolated-components/BoardMenu?s=Many",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardMenu",
+  "scenarioType": "component",
+  "description": "Enough boards that the list has to hold its shape, with titles long enough to need truncating rather than wrapping the header open."
+}

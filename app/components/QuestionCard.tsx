@@ -5,34 +5,38 @@
 // A card is one of three things, and each looks different enough that the board
 // can be read at a glance without a legend:
 //
-//   open      — saturated in the theme's colour, carrying an empty field. The
-//               ones still asking something of you.
+//   open      — saturated in the theme's colour, and always carrying a way to
+//               answer. The ones still asking something of you.
 //   answered  — near-black, the question in the theme's colour and YOUR words
 //               in white underneath. What you said is the content; the question
 //               becomes its label.
 //   insight   — near-black too, but eyebrowed as the partner's own thinking
 //               rather than as something you wrote.
 //
+// Which face it wears is decided by `cardPresentation`, not here: it is a rule
+// about the node rather than about rendering, and it is worth a test.
+//
+// An open card's answer area has two modes and shows exactly one of them — the
+// partner's shortlist, or the box for saying something the shortlist does not
+// contain. Never both: stacked, the box read as one more option and the pair
+// overflowed the card's fixed height.
+//
 // An answered card keeps a pencil, because an answer is a thought at a moment
 // and thinking is the thing this board is for. Re-answering replaces the
 // previous answer through the same path a first answer takes.
 
 import { useEffect, useState } from 'react';
+import { cardEyebrow } from '@/app/lib/cardEyebrow';
+import {
+  isAnsweredCard,
+  isInsightCard,
+  isOpenCard,
+} from '@/app/lib/cardPresentation';
 import type { PlacedCard } from '@/app/lib/galaxyLayout';
 import { themeColor } from '@/app/lib/themeHue';
 import CardDiagram from './CardDiagram';
-
-/** Kinds that are the partner's own thinking rather than a question for you. */
-const INSIGHT_KINDS = new Set([
-  'assumption',
-  'finding',
-  'gap',
-  'risk',
-  'pro',
-  'direction',
-  'known',
-  'unknown',
-]);
+import CardChoiceList from './CardChoiceList';
+import AnswerComposer from './AnswerComposer';
 
 export default function QuestionCard({
   card,
@@ -45,12 +49,18 @@ export default function QuestionCard({
   onFocus: () => void;
   onAnswer: (text: string) => void;
 }) {
-  const isInsight = INSIGHT_KINDS.has(card.kind);
-  const answered = card.status === 'answered' && !isInsight;
-  const open = !answered && !isInsight;
+  // Which of the three faces this card shows. The rule is a property of the
+  // node rather than of rendering, so it lives in `cardPresentation` where a
+  // test can hold it — including the clause a card carrying a diagram or a
+  // picture depends on, which this component used to get wrong.
+  const isInsight = isInsightCard(card);
+  const answered = isAnsweredCard(card);
+  const open = isOpenCard(card);
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
+  /** The free-text box, opened from under a shortlist. */
+  const [otherOpen, setOtherOpen] = useState(false);
 
   // Seed the editor from what is on the card, so opening the pencil shows the
   // existing answer to amend rather than an empty box to retype.
@@ -60,13 +70,33 @@ export default function QuestionCard({
 
   const accent = themeColor(card.hue);
   const writing = open || editing;
+  const hasChoices = Boolean(card.choices?.length);
+
+  // A card with a shortlist shows EITHER the list or the free-text box, never
+  // both at once. Stacking them put a cramped two-row field hard against the
+  // last pill — it read as one more option rather than as the way past them —
+  // and on a four-option card the pair overflowed the card's fixed height, so
+  // the field was clipped and its only submit hint fell outside the card.
+  //
+  // Without a shortlist the box is always open, because then it is the only
+  // affordance there is: an unanswered card must look typeable before anyone
+  // has clicked anything.
+  const composing = editing || otherOpen || !hasChoices;
+  /** There is somewhere to go back TO — a shortlist, or the answer being
+   *  amended. A first answer on a card with no options has nothing to cancel. */
+  const cancellable = otherOpen || editing;
+
+  function closeComposer() {
+    setOtherOpen(false);
+    setEditing(false);
+    setDraft('');
+  }
 
   function submit() {
     const text = draft.trim();
     if (!text) return;
     onAnswer(text);
-    setDraft('');
-    setEditing(false);
+    closeComposer();
   }
 
   return (
@@ -100,11 +130,21 @@ export default function QuestionCard({
     >
       {isInsight ? (
         <>
+          {/* What the card CARRIES wins over what kind it is: a drawn shape and
+              a piece of reference are recognisable at a glance and worth naming
+              as such. Everything else defers to `cardEyebrow`, so the word for a
+              kind is decided in exactly one tested place — an assumption says
+              "Assumption" here and on every other card in the app, rather than
+              the generic "Insight" this used to flatten them all into. */}
           <span
             className="text-[11px] font-semibold uppercase tracking-[0.14em]"
             style={{ color: accent }}
           >
-            {card.diagram ? 'Shape' : card.imageUrl ? 'Reference' : 'Insight'}
+            {card.diagram
+              ? 'Shape'
+              : card.imageUrl
+                ? 'Reference'
+                : cardEyebrow({ kind: card.kind })}
           </span>
 
           {/* The picture, above the words. A reference card exists so someone
@@ -191,11 +231,18 @@ export default function QuestionCard({
         </>
       ) : (
         <>
+          {/* Editing is a transient state of the CARD, not a fact about the
+              node, so it stays local. The resting word comes from `cardEyebrow`
+              — the same helper that guarantees an answered question stops
+              calling itself Open, which is the rule this card would otherwise
+              be a second, untested implementation of. */}
           <span
             className="text-[11px] font-semibold uppercase tracking-[0.14em]"
             style={{ color: open ? 'rgba(0,0,0,0.55)' : accent }}
           >
-            {editing ? 'Editing your answer' : 'Open question'}
+            {editing
+              ? 'Editing your answer'
+              : cardEyebrow({ kind: card.kind, answered: card.status === 'answered' })}
           </span>
           {/* Smaller than it was. The question is the label on a card whose
               real content is the answer, and at 19px a two-line question ate
@@ -206,68 +253,50 @@ export default function QuestionCard({
         </>
       )}
 
-      {/* The field is on EVERY unanswered card, not just the focused one: the
-          one thing a first-time user has to discover is that these are typed
-          into, so the affordance has to exist before the interaction that would
-          reveal it. Only the focused card autofocuses, so a dozen visible
-          fields still leave exactly one cursor on the board. */}
-      {/* Offered options, when the partner gave any.
-          Picking one answers immediately — a chosen option is already the whole
-          answer, and making someone confirm it would add a step that carries no
-          information. The free field stays underneath as "Other", so a list can
-          narrow the question without ever closing it: every list the partner
-          writes is a guess about what you might say, and the guess must never
-          be the only thing you are allowed to say. */}
-      {writing && card.choices?.length ? (
-        <div
-          className="mt-4 flex flex-col gap-2"
-          data-no-pan
-          onClick={(e) => e.stopPropagation()}
-        >
-          {card.choices.map((choice) => (
-            <button
-              key={choice}
-              type="button"
-              onClick={() => {
-                onAnswer(choice);
-                setEditing(false);
-              }}
-              className="rounded-full px-4 py-2.5 text-left text-[14px] font-semibold transition-transform hover:scale-[1.02]"
-              style={{
-                background: open ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.1)',
-                color: open ? '#000' : '#fff',
-              }}
-            >
-              {choice}
-            </button>
-          ))}
+      {/* The answer area, in one of its two modes — the shortlist, or the box
+          for saying something it does not contain. Never both: stacking them
+          put a cramped field hard against the last option, where it read as one
+          more option, and on a four-option card the pair overflowed the card's
+          fixed height and clipped the field along with its submit hint.
+
+          Whichever is showing is wrapped in `data-no-pan` so a drag that starts
+          on a control belongs to the control rather than panning the board. */}
+      {writing && hasChoices && !composing ? (
+        <div data-no-pan className="contents" onClick={(e) => e.stopPropagation()}>
+          <CardChoiceList
+            choices={card.choices ?? []}
+            light={open}
+            onPick={(choice) => {
+              onAnswer(choice);
+              closeComposer();
+            }}
+            onOther={() => {
+              setOtherOpen(true);
+              onFocus();
+            }}
+          />
         </div>
       ) : null}
 
-      {writing ? (
-        <div className="mt-auto" data-no-pan onClick={(e) => e.stopPropagation()}>
-          <textarea
-            autoFocus={focused || editing}
+      {writing && composing ? (
+        <div data-no-pan className="contents" onClick={(e) => e.stopPropagation()}>
+          <AnswerComposer
             value={draft}
-            onFocus={() => { if (!focused) onFocus(); }}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              // Enter sends; shift+enter is a newline. A question here is
-              // usually one sentence, so sending is the common case.
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                submit();
-              }
-              if (e.key === 'Escape' && editing) setEditing(false);
+            onChange={setDraft}
+            onSubmit={submit}
+            onCancel={cancellable ? closeComposer : null}
+            // On a card with no shortlist this box IS the affordance, so it
+            // says what to do; reached past a list it says why you are here.
+            placeholder={hasChoices ? 'Say it in your own words…' : 'Answer here'}
+            // Only the focused card autofocuses, so a dozen visible fields
+            // still leave exactly one cursor on the board.
+            autoFocus={focused || editing || otherOpen}
+            onFieldFocus={() => {
+              if (!focused) onFocus();
             }}
-            placeholder={card.choices?.length ? 'Other…' : 'Answer here'}
-            rows={2}
-            className="w-full resize-none rounded-xl bg-black/25 p-3 text-[15px] outline-none placeholder:opacity-45"
-            style={{ color: open ? '#000' : '#fff' }}
+            light={open}
+            accent={accent}
           />
-          <span className="mt-2 block text-[11px] opacity-60">
-            {editing ? 'Enter to save · Esc to cancel' : 'Enter to answer'}
-          </span>
         </div>
       ) : null}
     </div>

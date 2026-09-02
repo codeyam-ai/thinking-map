@@ -3,16 +3,40 @@
   "surface_kind": "component",
   "states": [
     {
-      "dimension": "mapId",
-      "value": "true",
-      "rationale": "source-derived state mapId=true",
+      "dimension": "steps",
+      "value": "empty",
+      "rationale": "source-derived state steps=empty",
       "status": "covered"
     },
     {
-      "dimension": "mapId",
-      "value": "false",
-      "rationale": "source-derived state mapId=false",
+      "dimension": "steps",
+      "value": "one",
+      "rationale": "source-derived state steps=one",
       "status": "covered"
+    },
+    {
+      "dimension": "steps",
+      "value": "many",
+      "rationale": "source-derived state steps=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "cleaned",
+      "value": "empty",
+      "rationale": "source-derived state cleaned=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "cleaned",
+      "value": "one",
+      "rationale": "source-derived state cleaned=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "cleaned",
+      "value": "many",
+      "rationale": "source-derived state cleaned=many",
+      "status": "planned"
     }
   ]
 }

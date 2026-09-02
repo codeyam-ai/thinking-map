@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - NothingAnswered",
+  "id": "726ce142-4207-4408-be5e-aa0fc8280f7e",
+  "url": "/isolated-components/RoundControl?s=NothingAnswered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "The round has been asked but not started. It has to read differently from a round that is nearly done, or the control says nothing at all."
+}

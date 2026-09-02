@@ -1,0 +1,12 @@
+{
+  "name": "ConvergenceNode - ReadyNoDetail",
+  "id": "1ccc6d17-bbb9-4a30-a0b1-e6a06ddcaea0",
+  "url": "/isolated-components/ConvergenceNode?s=ReadyNoDetail",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ConvergenceNode",
+  "scenarioType": "component",
+  "description": "The claim alone, with no supporting paragraph beneath it. It has to stand on its own line without the layout collapsing around the missing detail."
+}

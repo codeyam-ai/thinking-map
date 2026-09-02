@@ -4,28 +4,13 @@ import AppHeader from '@/app/components/AppHeader';
 import ErrorScreen from '@/app/components/ErrorScreen';
 import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
+import { parseAttachments } from '@/app/lib/attachments';
 import { getMap, listMaps } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
 import { classifyLoadError } from '@/app/lib/loadError';
 import { normalizePhase, type Phase } from '@/app/lib/mapKinds';
 
 export const dynamic = 'force-dynamic';
-
-/** Names only, and anything unreadable becomes an empty list — a board that
- *  cannot parse its own attachment list should still open. */
-function parseAttachments(raw: string | null): { name: string }[] {
-  if (!raw) return [];
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .map((a) => String((a as { name?: unknown })?.name ?? '').trim())
-      .filter(Boolean)
-      .map((name) => ({ name }));
-  } catch {
-    return [];
-  }
-}
 
 /** The browser-tab title. Open questions are counted into it so a backgrounded
  *  board still says how much is waiting. */

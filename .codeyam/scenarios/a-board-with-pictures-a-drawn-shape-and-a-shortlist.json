@@ -1,0 +1,345 @@
+{
+  "name": "A board with pictures, a drawn shape and a shortlist",
+  "id": "455fe0c8-388b-444b-a16e-5a6617a08f78",
+  "url": "/map/map-galaxy",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "gev-1",
+        "kind": "node.added",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "payload": "{\"id\": \"g-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Handover between shifts at a small veterinary practice\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "gev-2",
+        "kind": "user.note",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "payload": "{\"text\": \"Everyone blames the whiteboard but I don't think the whiteboard is the problem.\"}",
+        "revision": 2
+      },
+      {
+        "id": "gev-3",
+        "kind": "agent.note",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"text\": \"Three things worth pulling apart: what falls through, who is carrying it when it falls, and only then what a fix looks like.\"}",
+        "revision": 3
+      },
+      {
+        "id": "gev-4",
+        "kind": "theme.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"th-context\", \"label\": \"What actually gets lost\"}",
+        "revision": 4
+      },
+      {
+        "id": "gev-5",
+        "kind": "theme.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"th-people\", \"label\": \"Who is holding it\"}",
+        "revision": 5
+      },
+      {
+        "id": "gev-6",
+        "kind": "theme.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"th-shape\", \"label\": \"What it could be\"}",
+        "revision": 6
+      },
+      {
+        "id": "gev-7",
+        "kind": "question.asked",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-ctx-1\", \"label\": \"Which handover item goes missing most often?\"}",
+        "revision": 7
+      },
+      {
+        "id": "gev-8",
+        "kind": "user.answer",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "payload": "{\"id\": \"g-ctx-1\", \"text\": \"Owner call-backs. A missed re-check surfaces the next morning; a missed call-back surfaces in a public review three weeks later.\"}",
+        "revision": 8
+      },
+      {
+        "id": "gev-9",
+        "kind": "question.asked",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-ctx-2\", \"label\": \"At what moment does it actually get dropped?\"}",
+        "revision": 9
+      },
+      {
+        "id": "gev-10",
+        "kind": "node.added",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "payload": "{\"id\": \"g-ctx-3\", \"kind\": \"finding\", \"label\": \"The whiteboard is wiped at 6pm, before the evening shift has read it\"}",
+        "revision": 10
+      },
+      {
+        "id": "gev-11",
+        "kind": "user.note",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "payload": "{\"text\": \"I photographed it on two Tuesdays running. The evening vet arrives at 6:15.\"}",
+        "revision": 11
+      },
+      {
+        "id": "gev-12",
+        "kind": "question.asked",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-ppl-1\", \"label\": \"Who is supposed to own a call-back once the shift ends?\"}",
+        "revision": 12
+      },
+      {
+        "id": "gev-13",
+        "kind": "node.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-ppl-2\", \"kind\": \"assumption\", \"label\": \"The receptionist is already the informal handover system\"}",
+        "revision": 13
+      },
+      {
+        "id": "gev-14",
+        "kind": "agent.note",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"text\": \"If she is the system, then the board is documentation of a system that lives in one person's head.\"}",
+        "revision": 14
+      },
+      {
+        "id": "gev-15",
+        "kind": "node.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-shape-1\", \"kind\": \"approach\", \"label\": \"A handover list that survives the shift boundary\"}",
+        "revision": 15
+      },
+      {
+        "id": "gev-16",
+        "kind": "node.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-shape-2\", \"kind\": \"risk\", \"label\": \"A second screen nobody looks at during a busy consult\"}",
+        "revision": 16
+      },
+      {
+        "id": "gev-17",
+        "kind": "question.asked",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-shape-3\", \"label\": \"Does this replace the whiteboard or sit beside it?\"}",
+        "revision": 17
+      },
+      {
+        "id": "gev-18",
+        "kind": "node.added",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-shape-4\", \"kind\": \"slice\", \"label\": \"Call-backs only, for one week, on paper\"}",
+        "revision": 18
+      }
+    ],
+    "mapNode": [
+      {
+        "detail": "Our vets lose things between the morning and evening shift — a dog that needed re-checking, an owner who was promised a call back.",
+        "id": "g-idea",
+        "kind": "idea",
+        "label": "Handover between shifts at a small veterinary practice",
+        "mapId": "map-galaxy",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered",
+        "themeId": null
+      },
+      {
+        "choices": "[\"Owner call-backs\", \"Re-checks\", \"Lab results to chase\", \"Medication changes\"]",
+        "detail": "Owner call-backs. A missed re-check surfaces the next morning; a missed call-back surfaces in a public review three weeks later.",
+        "id": "g-ctx-1",
+        "kind": "open-question",
+        "label": "Which handover item goes missing most often?",
+        "mapId": "map-galaxy",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "answered",
+        "themeId": "th-context"
+      },
+      {
+        "choices": "[\"During the verbal handover\", \"After handover, before the task is done\", \"It was never written down at all\"]",
+        "detail": null,
+        "id": "g-ctx-2",
+        "kind": "open-question",
+        "label": "At what moment does it actually get dropped?",
+        "mapId": "map-galaxy",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "open",
+        "themeId": "th-context"
+      },
+      {
+        "detail": "Photographed on two consecutive Tuesdays. The evening vet arrives at 6:15.",
+        "id": "g-ctx-3",
+        "imageAlt": "A wall-mounted whiteboard covered in handwritten notes, half of it wiped clean.",
+        "imageUrl": "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800&q=80",
+        "kind": "finding",
+        "label": "The whiteboard is wiped at 6pm, before the evening shift has read it",
+        "mapId": "map-galaxy",
+        "order": 2,
+        "origin": "user",
+        "parentId": "g-idea",
+        "status": "answered",
+        "themeId": "th-context"
+      },
+      {
+        "choices": "[\"The vet who promised it\", \"Whoever is on the evening desk\", \"Nobody — it is on the board\"]",
+        "detail": null,
+        "id": "g-ppl-1",
+        "kind": "open-question",
+        "label": "Who is supposed to own a call-back once the shift ends?",
+        "mapId": "map-galaxy",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "open",
+        "themeId": "th-people"
+      },
+      {
+        "detail": "She remembers what the board does not, which is why nobody has felt the gap as a system problem yet.",
+        "id": "g-ppl-2",
+        "kind": "assumption",
+        "label": "The receptionist is already the informal handover system",
+        "mapId": "map-galaxy",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "answered",
+        "themeId": "th-people"
+      },
+      {
+        "detail": "Each open promise carries an owner and does not clear itself until someone closes it.",
+        "diagram": "{\"steps\": [\"Vet promises a call-back\", \"It joins the open list with their name on it\", \"Evening shift sees it unclosed\", \"Closing it needs a person, not a wipe\"], \"note\": \"The wipe is what deletes the state today.\"}",
+        "id": "g-shape-1",
+        "kind": "approach",
+        "label": "A handover list that survives the shift boundary",
+        "mapId": "map-galaxy",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "answered",
+        "themeId": "th-shape"
+      },
+      {
+        "detail": "The whiteboard's one real virtue is that it is in the room and always visible.",
+        "id": "g-shape-2",
+        "kind": "risk",
+        "label": "A second screen nobody looks at during a busy consult",
+        "mapId": "map-galaxy",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "answered",
+        "themeId": "th-shape"
+      },
+      {
+        "detail": null,
+        "id": "g-shape-3",
+        "kind": "open-question",
+        "label": "Does this replace the whiteboard or sit beside it?",
+        "mapId": "map-galaxy",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "open",
+        "themeId": "th-shape"
+      },
+      {
+        "detail": "If a named owner and an explicit close fixes call-backs on paper, the software is worth building. If it does not, no screen will save it.",
+        "id": "g-shape-4",
+        "kind": "slice",
+        "label": "Call-backs only, for one week, on paper",
+        "mapId": "map-galaxy",
+        "order": 3,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "answered",
+        "testsNodeId": "g-ppl-1",
+        "themeId": "th-shape"
+      }
+    ],
+    "message": [
+      {
+        "content": "Our vets lose things between the morning and evening shift — a dog that needed re-checking, an owner who was promised a call back. Everyone blames the whiteboard but I don't think the whiteboard is the problem.",
+        "id": "gm-1",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Agreed that the whiteboard is probably a symptom. Three things worth pulling apart: what specifically falls through, who is meant to be carrying it at the moment it falls, and only then what shape a fix would take.",
+        "id": "gm-2",
+        "mapId": "map-galaxy",
+        "origin": "agent",
+        "role": "assistant"
+      },
+      {
+        "content": "The call-backs are the ones that sting. A missed re-check we catch the next day. A missed call-back we hear about in a review.",
+        "id": "gm-3",
+        "mapId": "map-galaxy",
+        "origin": "user",
+        "role": "user"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "th-context",
+        "label": "What actually gets lost",
+        "mapId": "map-galaxy",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "th-people",
+        "label": "Who is holding it",
+        "mapId": "map-galaxy",
+        "order": 1
+      },
+      {
+        "hue": 233,
+        "id": "th-shape",
+        "label": "What it could be",
+        "mapId": "map-galaxy",
+        "order": 2
+      }
+    ],
+    "thinkingMap": [
+      {
+        "attachments": "[{\"name\": \"shift-handover-notes.pdf\"}, {\"name\": \"whiteboard-photo.jpg\"}]",
+        "id": "map-galaxy",
+        "phase": "explore",
+        "revision": 18,
+        "seedIdea": "Our vets lose things between the morning and evening shift — a dog that needed re-checking, an owner who was promised a call back. Everyone blames the whiteboard but I don't think the whiteboard is the problem.",
+        "title": "Handover between shifts at a small veterinary practice"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The only saved board that exercises what a card can actually CARRY. Three lines of thinking of unequal length — three cards, two, then four — so the conclusion has to clear the longest run rather than a typical one. One card holds a photograph and one a drawn shape, both at the wide width that pushes their neighbours along instead of overlapping them; two open questions carry the partner's shortlist with the way past it underneath. Every other saved board is plain text, which is why the card that silently dropped its diagram went unseen for a whole build."
+}

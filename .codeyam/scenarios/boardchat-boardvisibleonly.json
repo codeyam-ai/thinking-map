@@ -1,0 +1,12 @@
+{
+  "name": "BoardChat - BoardVisibleOnly",
+  "id": "7764d04f-ccdc-4d66-8de8-8aee53c2fb14",
+  "url": "/isolated-components/BoardChat?s=BoardVisibleOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "A log holding only the three kinds the panel drops. As far as the conversation goes nothing was said — the board moved, and the board is where you can see that."
+}

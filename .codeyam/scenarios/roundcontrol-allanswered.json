@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - AllAnswered",
+  "id": "7e9422f6-d18d-4de5-82ca-30f54e65c2cf",
+  "url": "/isolated-components/RoundControl?s=AllAnswered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "Everything answered — the state that has actually earned the next round, and where the control is doing its real job of offering the way on."
+}

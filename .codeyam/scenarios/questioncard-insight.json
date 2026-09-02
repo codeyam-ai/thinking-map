@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Insight",
+  "id": "877d3225-6ea6-49ee-b170-867eeaaaf974",
+  "url": "/isolated-components/QuestionCard?s=Insight",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "The partner's own thinking rather than a question for you. The eyebrow reads the word for the kind — 'Assumption' — which comes from the same shared helper every other card in the app uses, so the board can be read without a legend."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - LongOptions",
+  "id": "7d36d2d9-183c-4a61-8d2d-5f9b13eb1cf4",
+  "url": "/isolated-components/CardChoiceList?s=LongOptions",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "Options long enough to wrap, which is the shape a real question produces rather than a demo one. A pill that wraps still has to read as one tappable thing."
+}

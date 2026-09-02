@@ -1,0 +1,12 @@
+{
+  "name": "CoreAttachments - Default",
+  "id": "8c34b3ba-b0d7-4e26-96fc-fc4d874ebd14",
+  "url": "/isolated-components/CoreAttachments?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreAttachments",
+  "scenarioType": "component",
+  "description": "What the person brought along, listed under the core. Names only — the board is a place to point AT things rather than to hold them, so nothing here is a file."
+}

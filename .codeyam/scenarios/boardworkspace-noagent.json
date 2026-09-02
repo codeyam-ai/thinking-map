@@ -1,0 +1,12 @@
+{
+  "name": "BoardWorkspace - NoAgent",
+  "id": "cf62d245-15d4-4d79-b95f-49fc5f2c6cb6",
+  "url": "/isolated-components/BoardWorkspace?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWorkspace",
+  "scenarioType": "component",
+  "description": "No agent bound, which is the state every preview and capture genuinely produces — WebMCP is unreachable inside a frame by definition. The surface stays fully usable anyway, which is the point: the board is not a viewer for an agent's output."
+}

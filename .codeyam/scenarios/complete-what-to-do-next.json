@@ -1,6 +1,10 @@
 {
   "name": "Complete - what to do next",
   "id": "8aa56d4f-62f0-44bd-bd41-083d9e7461b4",
+  "demonstratesState": {
+    "steps": "many",
+    "cleaned": "many"
+  },
   "url": "/map/map-game",
   "dimensions": [
     "Desktop"

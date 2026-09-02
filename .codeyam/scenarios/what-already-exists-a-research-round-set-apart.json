@@ -1,6 +1,6 @@
 {
   "name": "What already exists - a research round set apart",
-  "id": "5cdeafd5-2f29-43f0-94ba-99ac218fa0dd",
+  "id": "e2a073e4-3ad8-45d3-952c-f40c81387989",
   "url": "/map/map-lending",
   "dimensions": [
     "Tablet"
@@ -102,7 +102,8 @@
         "order": 0,
         "origin": "agent",
         "parentId": "l-idea",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-res"
       },
       {
         "detail": "Shared custody was the strongest predictor of a library folding.",
@@ -113,7 +114,8 @@
         "order": 1,
         "origin": "agent",
         "parentId": "l-idea",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-res"
       },
       {
         "detail": "Every organiser who tried a subscription described it as the point it stopped feeling like a favour.",
@@ -124,7 +126,8 @@
         "order": 2,
         "origin": "agent",
         "parentId": "l-idea",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-res"
       },
       {
         "detail": "Every write-up stops at the launch. What breaks, and who stops turning up, is unrecorded.",
@@ -135,7 +138,8 @@
         "order": 3,
         "origin": "agent",
         "parentId": "l-idea",
-        "status": "open"
+        "status": "open",
+        "themeId": "t-gap"
       },
       {
         "detail": "Take the three things every surviving library had and nothing else.",
@@ -146,7 +150,8 @@
         "order": 0,
         "origin": "agent",
         "parentId": "l-res",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-res"
       },
       {
         "detail": "The thing that keeps it alive is the thing that can end it.",
@@ -157,7 +162,8 @@
         "order": 1,
         "origin": "agent",
         "parentId": "l-res",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-res"
       }
     ],
     "message": [
@@ -174,6 +180,22 @@
         "mapId": "map-lending",
         "origin": "agent",
         "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-res",
+        "label": "What already exists",
+        "mapId": "map-lending",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-gap",
+        "label": "What nobody knows",
+        "mapId": "map-lending",
+        "order": 1
       }
     ],
     "thinkingMap": [

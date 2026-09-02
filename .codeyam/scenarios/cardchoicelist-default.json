@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - Default",
+  "id": "c6bb7ea5-7abf-4549-b2d5-296d0455164e",
+  "url": "/isolated-components/CardChoiceList?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "The shortlist on an open card: solid pills you can pick, and beneath them, in a different shape, the way to say something the list does not contain. Picking one answers immediately — a chosen option is already the whole answer."
+}

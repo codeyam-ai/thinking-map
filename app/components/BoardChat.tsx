@@ -35,9 +35,19 @@ function line(e: ExchangeEvent): { who: 'you' | 'partner'; text: string } | null
       return { who: 'partner', text: String(p.text ?? '') };
     case 'question.asked': {
       const qs = Array.isArray(p.questions) ? p.questions : [];
-      return qs.length
-        ? { who: 'partner', text: qs.map((q) => String(q)).join(' · ') }
-        : null;
+      // The recorded shape is `{ id, text }` per question — see the
+      // `question.asked` write in `toolRuntime`. Stringifying the object gave
+      // every agent-asked question the bubble "[object Object]". A bare string
+      // is still accepted because it costs nothing and a log written by an
+      // older or hand-rolled caller should degrade to its words, not to noise.
+      const asked = qs
+        .map((q) =>
+          typeof q === 'string'
+            ? q.trim()
+            : String((q as { text?: unknown })?.text ?? '').trim(),
+        )
+        .filter(Boolean);
+      return asked.length ? { who: 'partner', text: asked.join(' · ') } : null;
     }
     default:
       // node.added, theme.added, phase.set and friends are things you can SEE

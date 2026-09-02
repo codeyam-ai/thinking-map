@@ -1,0 +1,12 @@
+{
+  "name": "CardDiagram - LongSteps",
+  "id": "c4fbf21b-bd02-41be-9ae5-89dcc85e5a88",
+  "url": "/isolated-components/CardDiagram?s=LongSteps",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardDiagram",
+  "scenarioType": "component",
+  "description": "Steps long enough to wrap, which is what a real process produces. The arrows have to keep marking the sequence once the boxes stop being one line each."
+}

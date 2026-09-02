@@ -1,0 +1,12 @@
+{
+  "name": "ThemeParticles - Green",
+  "id": "e87fa42f-e1f7-429a-a18a-8a87bb1cf60b",
+  "url": "/isolated-components/ThemeParticles?s=Green",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThemeParticles",
+  "scenarioType": "component",
+  "description": "The second hue the golden angle hands out. The seed is the hue, so a different galaxy gets a visibly different field as well as a different colour — which is what stops two clusters reading as the same one twice."
+}

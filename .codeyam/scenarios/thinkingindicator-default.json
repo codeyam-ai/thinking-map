@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingIndicator - Default",
+  "id": "9168594f-f4ac-49fb-9d52-ed0628640ada",
+  "url": "/isolated-components/ThinkingIndicator?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingIndicator",
+  "scenarioType": "component",
+  "description": "The gap between writing an idea and the first questions arriving — unavoidable, and sometimes long. The dots sit on the axis the branches will grow along and travel outward, so the wait points at where the answer is about to appear; a spinner in a corner says 'the app is busy', which is a different claim than 'someone is considering what you wrote'."
+}

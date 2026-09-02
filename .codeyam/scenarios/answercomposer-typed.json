@@ -1,0 +1,12 @@
+{
+  "name": "AnswerComposer - Typed",
+  "id": "ba6234bc-47c2-4f10-95d5-e100924a6583",
+  "url": "/isolated-components/AnswerComposer?s=Typed",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerComposer",
+  "scenarioType": "component",
+  "description": "With words in it: Save turns solid and reads as the primary action. Explicit controls rather than a keyboard hint alone, which left no visible way to commit an answer or to change your mind."
+}

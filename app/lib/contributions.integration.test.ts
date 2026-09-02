@@ -234,3 +234,122 @@ describe('contributionEvents — leaving a note', () => {
     expect(await prisma.mapNode.count({ where: { mapId: id } })).toBe(before);
   });
 });
+
+// What the person brought along with the idea.
+//
+// Database-bound for the same reason the rest of this file is: the bug already
+// found by hand was that the names were collected in the UI and never sent, and
+// the mirror of it on this side is that they are sent and not durably stored.
+// Only a real round trip can tell those apart from a page that merely looks
+// right immediately after the click.
+describe('attachments', () => {
+  /** The route handler, imported lazily so it picks up the temporary database
+   *  the same way the other modules here do. */
+  async function putAttachments(mapId: string, attachments: unknown) {
+    const { PUT } = await import('@/app/api/maps/[id]/attachments/route');
+    return PUT(
+      new Request('http://test/attachments', {
+        method: 'PUT',
+        body: JSON.stringify({ attachments }),
+      }),
+      { params: Promise.resolve({ id: mapId }) },
+    );
+  }
+
+  const storedNames = async (id: string) => {
+    const map = await prisma.thinkingMap.findUnique({ where: { id } });
+    const raw = map?.attachments;
+    return raw === null || raw === undefined ? null : JSON.parse(raw);
+  };
+
+  // The round trip the hand-found bug was about: what the person browsed for
+  // has to still be there when the board is re-read, not just while the tab
+  // that added it is open.
+  it('keeps what was attached across a re-read', async () => {
+    const id = await freshMap();
+
+    await putAttachments(id, [
+      { name: 'shift-handover-notes.pdf' },
+      { name: 'whiteboard-photo.jpg' },
+    ]);
+
+    expect(await storedNames(id)).toEqual([
+      { name: 'shift-handover-notes.pdf' },
+      { name: 'whiteboard-photo.jpg' },
+    ]);
+  });
+
+  // A whole-list PUT REPLACES. If it appended, removing an attachment would be
+  // impossible through the only endpoint there is, and every save would
+  // duplicate the list the client sent.
+  it('replaces the list rather than appending to it', async () => {
+    const id = await freshMap();
+
+    await putAttachments(id, [{ name: 'first.pdf' }, { name: 'second.pdf' }]);
+    await putAttachments(id, [{ name: 'only.pdf' }]);
+
+    expect(await storedNames(id)).toEqual([{ name: 'only.pdf' }]);
+  });
+
+  // Clearing has to leave NOTHING, not an empty JSON array. `[]` is truthy as a
+  // stored string, so the board would go on rendering the "brought along" strip
+  // with no items in it — a stray empty row where the attachments used to be.
+  it('clears to nothing rather than to an empty list', async () => {
+    const id = await freshMap();
+
+    await putAttachments(id, [{ name: 'temporary.pdf' }]);
+    await putAttachments(id, []);
+
+    const map = await prisma.thinkingMap.findUnique({ where: { id } });
+    expect(map?.attachments ?? null).toBeNull();
+  });
+
+  // Names are the only thing stored. The board is a place to point AT things,
+  // not to hold them, and a column that quietly grew a second shape is one the
+  // rest of the app does not know how to read.
+  it('stores names and drops everything else sent with them', async () => {
+    const id = await freshMap();
+
+    await putAttachments(id, [
+      { name: 'notes.pdf', size: 91_234, url: 'https://example.test/notes.pdf' },
+    ]);
+
+    expect(await storedNames(id)).toEqual([{ name: 'notes.pdf' }]);
+  });
+
+  // A blank name would render as an unlabelled row that cannot be identified or
+  // removed, so it is dropped the way an unlabelled theme is.
+  it('drops an entry with no usable name', async () => {
+    const id = await freshMap();
+
+    await putAttachments(id, [
+      { name: '   ' },
+      {},
+      { name: 'real.pdf' },
+    ]);
+
+    expect(await storedNames(id)).toEqual([{ name: 'real.pdf' }]);
+  });
+
+  // Attaching to a map that does not exist is a 404 rather than a silent
+  // success — `updateMany` matches zero rows without complaining, so without
+  // the count check the client would be told its files were saved.
+  it('reports a missing map instead of silently saving nothing', async () => {
+    await freshMap();
+
+    const res = await putAttachments('no-such-map', [{ name: 'a.pdf' }]);
+
+    expect(res.status).toBe(404);
+  });
+
+  // Malformed input is refused rather than stored. Anything that reached the
+  // column in a shape the reader cannot parse would make the board unable to
+  // open its own attachment list.
+  it('refuses a body that is not a list of attachments', async () => {
+    const id = await freshMap();
+
+    expect((await putAttachments(id, 'nope')).status).toBe(400);
+    expect((await putAttachments(id, { name: 'a.pdf' })).status).toBe(400);
+    expect(await storedNames(id)).toBeNull();
+  });
+});

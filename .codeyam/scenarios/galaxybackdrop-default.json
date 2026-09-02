@@ -1,0 +1,12 @@
+{
+  "name": "GalaxyBackdrop - Default",
+  "id": "86871f71-6a11-4739-a4ed-fc51dcac03ff",
+  "url": "/isolated-components/GalaxyBackdrop?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GalaxyBackdrop",
+  "scenarioType": "component",
+  "description": "The galaxy the board sits in, at roughly the scale a populated board opens at. Thirty-four concentric ellipses, each slightly larger and slightly more rotated than the last — the arms are an illusion made of accumulating twist, not drawn paths, because actual spiral paths give a tidier, deader figure: a logo rather than a place."
+}

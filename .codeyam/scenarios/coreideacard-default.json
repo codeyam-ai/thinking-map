@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaCard - Default",
+  "id": "6701fd25-c640-4038-b146-830f119c7542",
+  "url": "/isolated-components/CoreIdeaCard?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaCard",
+  "scenarioType": "component",
+  "description": "The idea at the centre of the board — the thing every galaxy orbits, and the only card with nothing to answer. It centres itself on the map's origin, which is why it is the one card whose position is never computed."
+}

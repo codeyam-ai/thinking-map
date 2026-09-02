@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - OnDarkCard",
+  "id": "2757b394-e5e2-4404-a4db-5eaef11120c6",
+  "url": "/isolated-components/CardChoiceList?s=OnDarkCard",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "The same list on the near-black surface of a card being amended, where the pills are translucent white instead of solid. One component, two grounds — and both have to keep the options and the escape distinguishable from each other."
+}

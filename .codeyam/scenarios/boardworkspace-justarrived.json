@@ -1,0 +1,12 @@
+{
+  "name": "BoardWorkspace - JustArrived",
+  "id": "206ce86e-4d1c-4724-af0a-7aa6ea844f50",
+  "url": "/isolated-components/BoardWorkspace?s=JustArrived",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWorkspace",
+  "scenarioType": "component",
+  "description": "The moment after someone types an idea: a core, no galaxies, and an empty conversation. Both halves have to read as not-yet rather than as having failed to load — this is the first thing anyone sees."
+}

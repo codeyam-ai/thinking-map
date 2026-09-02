@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Choices",
+  "id": "046b4b97-63b8-48f6-a124-83cf7091c53f",
+  "url": "/isolated-components/QuestionCard?s=Choices",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "A shortlist the partner offered, as real buttons — picking one answers immediately. The options scroll and 'Say something else…' is pinned below them, because every list is a guess about what you might say and the way past it must never be what falls off the bottom of the card."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "ConvergenceNode - Composing",
+  "id": "dd4cea51-7567-4d9a-8095-e6e616effa19",
+  "url": "/isolated-components/ConvergenceNode?s=Composing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ConvergenceNode",
+  "scenarioType": "component",
+  "description": "The partner is reading the round. The label cycles through words for thinking, which is what keeps the wait from looking like a stall — a spinner would say nothing about what is happening."
+}

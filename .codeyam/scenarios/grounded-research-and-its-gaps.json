@@ -1,193 +1,222 @@
 {
- "name": "Grounded - research and its gaps",
- "id": "5446c2e7-3fdd-4c90-bcbd-edc5573e007e",
- "url": "/map/map-game",
- "dimensions": [
-  "Tablet"
- ],
- "mocks": {},
- "seed": {
-  "mapNode": [
-   {
-    "id": "n-idea",
-    "kind": "idea",
-    "label": "Educational game for kids",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": null,
-    "status": "answered",
-    "origin": "user"
-   },
-   {
-    "id": "n-age",
-    "kind": "assumption",
-    "label": "Ages 6-8",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": "n-idea",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "id": "n-prob",
-    "kind": "problem",
-    "label": "Vocabulary",
-    "mapId": "map-game",
-    "order": 1,
-    "parentId": "n-idea",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "id": "n-goal",
-    "kind": "goal",
-    "label": "Not yet explored",
-    "mapId": "map-game",
-    "order": 2,
-    "parentId": "n-idea",
-    "status": "open",
-    "origin": "agent"
-   },
-   {
-    "id": "n-res",
-    "kind": "research",
-    "label": "3 existing apps found",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": "n-prob",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "detail": "All three treat the child as the only user. Nobody surfaces what was learned to the adult who bought the app.",
-    "id": "n-gap1",
-    "kind": "gap",
-    "label": "No parent involvement",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": "n-res",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "detail": "Word lists are age-banded, not ability-banded, so a strong reader is bored within a week.",
-    "id": "n-gap2",
-    "kind": "gap",
-    "label": "Fixed difficulty level",
-    "mapId": "map-game",
-    "order": 1,
-    "parentId": "n-res",
-    "status": "answered",
-    "origin": "agent"
-   }
+  "name": "Grounded - research and its gaps",
+  "id": "dbfa6774-2698-404f-8df0-3ac538c0be4a",
+  "url": "/map/map-game",
+  "dimensions": [
+    "Tablet"
   ],
-  "message": [
-   {
-    "content": "I want to build an educational game for kids, but I don't know what it should be.",
-    "id": "msg-1",
-    "mapId": "map-game",
-    "role": "user",
-    "origin": "user"
-   },
-   {
-    "content": "Before we think about the game itself: who is this actually for, what should they learn, and what are they doing today instead?",
-    "id": "msg-2",
-    "mapId": "map-game",
-    "role": "assistant",
-    "origin": "agent"
-   },
-   {
-    "content": "Probably kids around 6 to 8, and I want them to learn vocabulary.",
-    "id": "msg-3",
-    "mapId": "map-game",
-    "role": "user",
-    "origin": "user"
-   },
-   {
-    "content": "Got it. I looked at what already exists for that age and skill, found three apps worth knowing about, and added them to the map. Two gaps stood out right away.",
-    "id": "msg-4",
-    "mapId": "map-game",
-    "role": "assistant",
-    "origin": "agent"
-   }
-  ],
-  "thinkingMap": [
-   {
-    "id": "map-game",
-    "phase": "research",
-    "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-    "title": "Educational game for kids",
-    "revision": 8
-   }
-  ],
-  "mapEvent": [
-   {
-    "id": "ev-map-game-1",
-    "mapId": "map-game",
-    "revision": 1,
-    "kind": "node.added",
-    "origin": "user",
-    "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-2",
-    "mapId": "map-game",
-    "revision": 2,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-age\", \"parentId\": \"n-idea\", \"kind\": \"assumption\", \"label\": \"Ages 6-8\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-3",
-    "mapId": "map-game",
-    "revision": 3,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-prob\", \"parentId\": \"n-idea\", \"kind\": \"problem\", \"label\": \"Vocabulary\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-4",
-    "mapId": "map-game",
-    "revision": 4,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"goal\", \"label\": \"Not yet explored\", \"status\": \"open\"}"
-   },
-   {
-    "id": "ev-map-game-5",
-    "mapId": "map-game",
-    "revision": 5,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-res\", \"parentId\": \"n-prob\", \"kind\": \"research\", \"label\": \"3 existing apps found\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-6",
-    "mapId": "map-game",
-    "revision": 6,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-gap1\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"No parent involvement\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-7",
-    "mapId": "map-game",
-    "revision": 7,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"n-gap2\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"Fixed difficulty level\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-8",
-    "mapId": "map-game",
-    "revision": 8,
-    "kind": "phase.set",
-    "origin": "agent",
-    "payload": "{\"phase\": \"research\"}"
-   }
-  ]
- },
- "scenarioType": "application",
- "pageFilePath": "app/map/[id]/page.tsx",
- "description": "The research phase: three existing apps found, and the two gaps in them that are the most useful thing on the map."
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "user",
+        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-game-2",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-age\", \"parentId\": \"n-idea\", \"kind\": \"assumption\", \"label\": \"Ages 6-8\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-game-3",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-prob\", \"parentId\": \"n-idea\", \"kind\": \"problem\", \"label\": \"Vocabulary\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-game-4",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"goal\", \"label\": \"Not yet explored\", \"status\": \"open\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-game-5",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-res\", \"parentId\": \"n-prob\", \"kind\": \"research\", \"label\": \"3 existing apps found\", \"status\": \"answered\"}",
+        "revision": 5
+      },
+      {
+        "id": "ev-map-game-6",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-gap1\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"No parent involvement\", \"status\": \"answered\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-map-game-7",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-gap2\", \"parentId\": \"n-res\", \"kind\": \"gap\", \"label\": \"Fixed difficulty level\", \"status\": \"answered\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-map-game-8",
+        "kind": "phase.set",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"phase\": \"research\"}",
+        "revision": 8
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "n-idea",
+        "kind": "idea",
+        "label": "Educational game for kids",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "n-age",
+        "kind": "assumption",
+        "label": "Ages 6-8",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered",
+        "themeId": "t-who"
+      },
+      {
+        "id": "n-prob",
+        "kind": "problem",
+        "label": "Vocabulary",
+        "mapId": "map-game",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "answered",
+        "themeId": "t-problem"
+      },
+      {
+        "id": "n-goal",
+        "kind": "goal",
+        "label": "Not yet explored",
+        "mapId": "map-game",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open",
+        "themeId": "t-goal"
+      },
+      {
+        "id": "n-res",
+        "kind": "research",
+        "label": "3 existing apps found",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-prob",
+        "status": "answered",
+        "themeId": "t-problem"
+      },
+      {
+        "detail": "All three treat the child as the only user. Nobody surfaces what was learned to the adult who bought the app.",
+        "id": "n-gap1",
+        "kind": "gap",
+        "label": "No parent involvement",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-res",
+        "status": "answered",
+        "themeId": "t-problem"
+      },
+      {
+        "detail": "Word lists are age-banded, not ability-banded, so a strong reader is bored within a week.",
+        "id": "n-gap2",
+        "kind": "gap",
+        "label": "Fixed difficulty level",
+        "mapId": "map-game",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "n-res",
+        "status": "answered",
+        "themeId": "t-problem"
+      }
+    ],
+    "message": [
+      {
+        "content": "I want to build an educational game for kids, but I don't know what it should be.",
+        "id": "msg-1",
+        "mapId": "map-game",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Before we think about the game itself: who is this actually for, what should they learn, and what are they doing today instead?",
+        "id": "msg-2",
+        "mapId": "map-game",
+        "origin": "agent",
+        "role": "assistant"
+      },
+      {
+        "content": "Probably kids around 6 to 8, and I want them to learn vocabulary.",
+        "id": "msg-3",
+        "mapId": "map-game",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Got it. I looked at what already exists for that age and skill, found three apps worth knowing about, and added them to the map. Two gaps stood out right away.",
+        "id": "msg-4",
+        "mapId": "map-game",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-who",
+        "label": "Who it is for",
+        "mapId": "map-game",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-problem",
+        "label": "The problem",
+        "mapId": "map-game",
+        "order": 1
+      },
+      {
+        "hue": 233,
+        "id": "t-goal",
+        "label": "What good looks like",
+        "mapId": "map-game",
+        "order": 2
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-game",
+        "phase": "research",
+        "revision": 8,
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The research phase: three existing apps found, and the two gaps in them that are the most useful thing on the map."
 }

@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaCard - DayOne",
+  "id": "36f76d3f-1e2d-45f9-bd03-348cb3ed38db",
+  "url": "/isolated-components/CoreIdeaCard?s=DayOne",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaCard",
+  "scenarioType": "component",
+  "description": "An idea and nothing else: no attachments, no insight. The state someone meets in the second after they press return."
+}

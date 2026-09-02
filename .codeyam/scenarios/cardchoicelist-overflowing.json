@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - Overflowing",
+  "id": "eda81c1a-d93a-4c31-aadd-9001f2d4f93d",
+  "url": "/isolated-components/CardChoiceList?s=Overflowing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "More options than the card is tall. The partner decides how many options to write and the card is a fixed size on the board, so something has to give: the list scrolls and the escape hatch stays pinned, because that is the one control that must never be what falls off the bottom."
+}

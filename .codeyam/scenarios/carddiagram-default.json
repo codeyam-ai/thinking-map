@@ -1,0 +1,12 @@
+{
+  "name": "CardDiagram - Default",
+  "id": "5bdd2d45-745f-412b-8b8e-d79469144009",
+  "url": "/isolated-components/CardDiagram?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardDiagram",
+  "scenarioType": "component",
+  "description": "A four-step flow with a note under it. This is what the wide card width exists for: at the standard column the same steps become a stack of slivers."
+}

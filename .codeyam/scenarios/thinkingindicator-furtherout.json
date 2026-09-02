@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingIndicator - FurtherOut",
+  "id": "27e70251-8e4c-4ccc-8f85-2fc547a52cf5",
+  "url": "/isolated-components/ThinkingIndicator?s=FurtherOut",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingIndicator",
+  "scenarioType": "component",
+  "description": "Started further right, as it is on a board whose idea card is wider. The offset belongs to the caller, so the indicator places itself from it rather than assuming the origin."
+}

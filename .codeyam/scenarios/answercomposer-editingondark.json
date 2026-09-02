@@ -1,0 +1,12 @@
+{
+  "name": "AnswerComposer - EditingOnDark",
+  "id": "f94c009c-903c-451a-8053-ecba8e428aa4",
+  "url": "/isolated-components/AnswerComposer?s=EditingOnDark",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AnswerComposer",
+  "scenarioType": "component",
+  "description": "Amending an answer through the pencil, on the near-black surface an answered card has. Pre-filled with what was said before, because the pencil is for changing an answer rather than for retyping it."
+}

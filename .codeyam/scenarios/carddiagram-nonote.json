@@ -1,0 +1,12 @@
+{
+  "name": "CardDiagram - NoNote",
+  "id": "af335ee4-941b-4e04-ad6e-9549f9254814",
+  "url": "/isolated-components/CardDiagram?s=NoNote",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardDiagram",
+  "scenarioType": "component",
+  "description": "The caption is optional, and its absence must close up rather than leave a gap where a line of type would have been."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "GalaxyBackdrop - Close",
+  "id": "d0148be6-9ba2-4233-b643-b53b9a30449e",
+  "url": "/isolated-components/GalaxyBackdrop?s=Close",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GalaxyBackdrop",
+  "scenarioType": "component",
+  "description": "Close enough that the individual rings resolve. Worth its own frame because it shows the trick plainly — every ring is a plain ellipse, and only their overlaps sweep."
+}

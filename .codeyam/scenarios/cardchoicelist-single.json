@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - Single",
+  "id": "6de22172-792a-4bb0-a688-f8b2fd2feab9",
+  "url": "/isolated-components/CardChoiceList?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "One suggestion is a legitimate shortlist, and it must not read as a submit button — which is exactly why the way past it sits right underneath in a visibly different shape."
+}

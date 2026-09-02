@@ -1,0 +1,12 @@
+{
+  "name": "ThemeParticles - Blue",
+  "id": "f7311254-7787-47c5-bf32-5b3cf2874d26",
+  "url": "/isolated-components/ThemeParticles?s=Blue",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThemeParticles",
+  "scenarioType": "component",
+  "description": "The third hue. With the magenta and green beside it, these three frames pin what a board's opening galaxies look like."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - Waiting",
+  "id": "50f57d0e-28a9-41b6-9d95-dde100a5e9fe",
+  "url": "/isolated-components/RoundControl?s=Waiting",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "Waiting on the partner. Under WebMCP the page cannot ask an agent to hurry and cannot even know one is coming, so the wait shows elapsed seconds — a spinner with no number reads the same at two seconds as at forty."
+}

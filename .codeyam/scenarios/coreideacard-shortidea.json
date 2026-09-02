@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaCard - ShortIdea",
+  "id": "eb611220-ce5d-4ade-86bb-94cf319175e8",
+  "url": "/isolated-components/CoreIdeaCard?s=ShortIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaCard",
+  "scenarioType": "component",
+  "description": "A short idea gets the largest type. The circle is exactly the size it is in every other frame here, which is the point of comparing this one with LongIdea."
+}

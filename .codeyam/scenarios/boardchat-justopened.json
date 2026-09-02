@@ -1,0 +1,12 @@
+{
+  "name": "BoardChat - JustOpened",
+  "id": "91bc1242-4be4-4725-8cb0-16f9cff775c1",
+  "url": "/isolated-components/BoardChat?s=JustOpened",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "One turn in. It has to read as the start of a conversation rather than as a system message announcing itself."
+}

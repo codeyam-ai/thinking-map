@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Reference",
+  "id": "91c4595b-490e-4a47-bbf9-a56385e88a0f",
+  "url": "/isolated-components/QuestionCard?s=Reference",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "A card carrying a picture, at the wide width. The image sits above the words rather than under a caption describing what you are about to see — a reference card exists so somebody can look at the thing."
+}

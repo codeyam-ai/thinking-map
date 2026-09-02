@@ -1,0 +1,12 @@
+{
+  "name": "CoreAttachments - Empty",
+  "id": "54934240-beaf-4ddf-83f4-c060b57aee48",
+  "url": "/isolated-components/CoreAttachments?s=Empty",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreAttachments",
+  "scenarioType": "component",
+  "description": "Nothing attached, which is most boards. It has to read as an invitation rather than as an empty row where something failed to load."
+}

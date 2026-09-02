@@ -1,0 +1,12 @@
+{
+  "name": "GalaxyBoard - EmptyTheme",
+  "id": "22c78ddd-e2a5-47a1-a438-cf618811e196",
+  "url": "/isolated-components/GalaxyBoard?s=EmptyTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GalaxyBoard",
+  "scenarioType": "component",
+  "description": "A line of thinking the partner has opened but not yet asked anything in. It still gets a hub, because a theme with no cards has not started rather than gone away — dropping it would make the board silently forget a direction."
+}

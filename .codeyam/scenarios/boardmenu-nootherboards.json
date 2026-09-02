@@ -1,0 +1,12 @@
+{
+  "name": "BoardMenu - NoOtherBoards",
+  "id": "9fa69cef-2c88-4f19-9bec-d1643fed632d",
+  "url": "/isolated-components/BoardMenu?s=NoOtherBoards",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardMenu",
+  "scenarioType": "component",
+  "description": "Day one: there is nowhere else to go yet. The menu has to say so rather than open onto an empty list."
+}

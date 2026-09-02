@@ -1,6 +1,6 @@
 {
   "name": "Brief fully accounted for",
-  "id": "e2dc4f8f-085a-4707-a562-ca6e1f42ad84",
+  "id": "957ae513-0dbd-4ab3-a12a-b13397bd1783",
   "url": "/map/map-brief-covered",
   "dimensions": [
     "Tablet"
@@ -55,7 +55,8 @@
         "origin": "agent",
         "parentId": "nc-idea",
         "sourceRef": "s2",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-problem"
       },
       {
         "id": "nc-q1",
@@ -66,7 +67,8 @@
         "origin": "agent",
         "parentId": "nc-problem",
         "sourceRef": "s5",
-        "status": "open"
+        "status": "open",
+        "themeId": "t-problem"
       },
       {
         "id": "nc-user",
@@ -77,7 +79,8 @@
         "origin": "agent",
         "parentId": "nc-idea",
         "sourceRef": "s3",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-user"
       },
       {
         "id": "nc-goal",
@@ -88,7 +91,8 @@
         "origin": "agent",
         "parentId": "nc-user",
         "sourceRef": "s4",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-user"
       },
       {
         "id": "nc-measure",
@@ -99,7 +103,8 @@
         "origin": "agent",
         "parentId": "nc-goal",
         "sourceRef": "s7",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-user"
       },
       {
         "id": "nc-scope",
@@ -110,7 +115,8 @@
         "origin": "agent",
         "parentId": "nc-goal",
         "sourceRef": "s8",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-user"
       },
       {
         "id": "nc-constraint",
@@ -121,7 +127,8 @@
         "origin": "agent",
         "parentId": "nc-idea",
         "sourceRef": "s6",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-constraint"
       }
     ],
     "message": [
@@ -131,6 +138,29 @@
         "mapId": "map-brief-covered",
         "origin": "user",
         "role": "user"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-problem",
+        "label": "The problem",
+        "mapId": "map-brief-covered",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-user",
+        "label": "Who it is for",
+        "mapId": "map-brief-covered",
+        "order": 1
+      },
+      {
+        "hue": 233,
+        "id": "t-constraint",
+        "label": "What constrains it",
+        "mapId": "map-brief-covered",
+        "order": 2
       }
     ],
     "thinkingMap": [

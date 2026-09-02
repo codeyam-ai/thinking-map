@@ -1,0 +1,12 @@
+{
+  "name": "ThemeParticles - Muted",
+  "id": "945c5050-7e70-4235-8fcc-7e120581a7a6",
+  "url": "/isolated-components/ThemeParticles?s=Muted",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThemeParticles",
+  "scenarioType": "component",
+  "description": "Dimmed while a card is focused, so the dust never competes with the thing being read. Same field, same seed — only the opacity moves."
+}

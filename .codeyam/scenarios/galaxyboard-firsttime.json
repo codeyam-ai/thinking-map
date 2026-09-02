@@ -1,0 +1,12 @@
+{
+  "name": "GalaxyBoard - FirstTime",
+  "id": "14db1ee1-acd0-4dca-b226-7e46aa818a4d",
+  "url": "/isolated-components/GalaxyBoard?s=FirstTime",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GalaxyBoard",
+  "scenarioType": "component",
+  "description": "The second after someone types an idea: the core card alone, no themes, nothing to do but attach something or press on. A board with no galaxies has to read as not-yet rather than as broken, which is the whole reason the layout seeds its bounds on the idea and the conclusion."
+}

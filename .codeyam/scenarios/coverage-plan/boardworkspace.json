@@ -1,0 +1,30 @@
+{
+  "surface": "BoardWorkspace",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "status",
+      "value": "answered",
+      "rationale": "source-derived state status=answered",
+      "status": "planned"
+    },
+    {
+      "dimension": "status",
+      "value": "open",
+      "rationale": "source-derived state status=open",
+      "status": "planned"
+    },
+    {
+      "dimension": "showRound",
+      "value": "true",
+      "rationale": "source-derived state showRound=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "showRound",
+      "value": "false",
+      "rationale": "source-derived state showRound=false",
+      "status": "covered"
+    }
+  ]
+}

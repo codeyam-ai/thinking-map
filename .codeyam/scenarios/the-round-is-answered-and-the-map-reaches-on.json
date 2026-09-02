@@ -1,6 +1,6 @@
 {
   "name": "The round is answered, and the map reaches on",
-  "id": "6117efbb-9957-44ff-be40-1f689439ce10",
+  "id": "8a809d29-4da0-4be3-ab5c-b76db9177233",
   "url": "/map/map-reaching",
   "dimensions": [
     "Tablet"
@@ -70,7 +70,8 @@
         "order": 0,
         "origin": "agent",
         "parentId": "r-idea",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       },
       {
         "id": "r-q-liability",
@@ -81,7 +82,8 @@
         "order": 1,
         "origin": "agent",
         "parentId": "r-idea",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-risk"
       }
     ],
     "message": [
@@ -98,6 +100,22 @@
         "mapId": "map-reaching",
         "origin": "agent",
         "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-who",
+        "label": "Who turns up",
+        "mapId": "map-reaching",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-risk",
+        "label": "When a repair fails",
+        "mapId": "map-reaching",
+        "order": 1
       }
     ],
     "thinkingMap": [

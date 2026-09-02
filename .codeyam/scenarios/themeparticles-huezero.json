@@ -1,0 +1,12 @@
+{
+  "name": "ThemeParticles - HueZero",
+  "id": "30fbfddb-6cc8-4841-ac4d-fd66601acb2b",
+  "url": "/isolated-components/ThemeParticles?s=HueZero",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThemeParticles",
+  "scenarioType": "component",
+  "description": "Hue zero is a real place on the colour wheel and a falsy value in JavaScript. Worth its own frame because a truthiness check anywhere in the chain would quietly send it to a default colour instead of red."
+}

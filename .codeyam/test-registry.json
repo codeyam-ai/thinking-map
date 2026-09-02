@@ -163,6 +163,159 @@
       "runner": "tests"
     },
     {
+      "description": "An empty send would post a blank turn into the transcript, which reads as the person having said nothing on purpose.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › does not send an empty message",
+      "line": 182,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state every new board starts in. An empty conversation must read as inviting rather than broken — it is the first thing anyone sees, so it is the one state that must not look like a failure to load.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › is present and usable with nothing said yet",
+      "line": 147,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The mixed case, which is the real one: a log is never all conversation or all board movement, and the filter has to hold while both are present.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › keeps the conversation when board events are mixed into the log",
+      "line": 127,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A log of ONLY board-visible events is, as far as the conversation goes, an empty one — and must render like one rather than as an empty scroller.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › reads as empty when the log holds only board-visible events",
+      "line": 155,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer belongs in the conversation as the words the person said, not as a reference to the card it closed — the card already shows that.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › renders an answer as the words that were said",
+      "line": 53,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The recorded shape is `{ id, text }` per question — see the `question.asked` write in `toolRuntime`. Stringifying the object gave EVERY agent-asked question the bubble \"[object Object]\", which is the whole of what the partner said arriving as noise.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › renders an asked question as its words, not as its object",
+      "line": 72,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The two sides of the exchange, each on its own side of the panel. Without this a transcript is a wall of text with no way to tell who said what.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › renders what each side said",
+      "line": 36,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The panel is where you say something that applies to the whole map rather than to whichever card is nearest — so sending has to work.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › reports what was typed into it",
+      "line": 169,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The editorial rule, stated directly. These three kinds are the board MOVING; repeating them here would turn the conversation into a debug log.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › says nothing about the events you can already see on the board",
+      "line": 108,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A log written by an older or hand-rolled caller should degrade to its words rather than to noise — it costs one branch and the alternative is the same failure again from a different direction.",
+      "file": "app/components/BoardChat.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardChat › still reads a question recorded as a bare string",
+      "line": 93,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The first revision it sees only SEEDS the reference. Refreshing on mount would re-fetch the page the person just loaded — a wasted round trip on every single board open, and a visible flash for nothing.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › does not refresh on the first revision it sees",
+      "line": 58,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A retried or out-of-order poll can report a revision BEHIND the one already seen. Treating that as a change would refresh backwards and then forwards again on the next poll — the loop, arrived at from the other direction.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › does not refresh when the revision goes backwards",
+      "line": 95,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A poll that returns the same revision is the NORMAL case — it is what the bridge reports most of the time. Refreshing on it would put the page in a permanent refresh loop driven by its own polling.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › does not refresh when the revision repeats",
+      "line": 80,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "No agent is bound inside an iframe, which is the state EVERY preview and capture genuinely produces — so an unbound bridge is the common case, not an edge one. Read as zero it would look like a revision, and every board that later bound an agent would refresh spuriously.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › ignores an unbound bridge rather than reading it as zero",
+      "line": 109,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The sequence a real session produces: bind, then several advances. Each one is a refresh, and none of them is a double.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › refreshes once per advance across a run of them",
+      "line": 121,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The contract itself: the map moved, so the server component has to re-run. Exactly once — this is the only thing that makes the board live.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › refreshes once when the revision advances",
+      "line": 67,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Binding late is the ordinary path: the page renders, then the bridge reports a revision for the first time. That first real number is a seed, not an advance — refreshing on it is the mount bug wearing a hat.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace live refresh › treats the first real revision after an unbound start as a seed",
+      "line": 136,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
       "description": "While a file is being read, offering to read another is a way to lose the first one.",
       "file": "app/components/BriefMenu.render.test.tsx",
       "format": "vitest",
@@ -595,6 +748,168 @@
       "runner": "tests"
     },
     {
+      "description": "Every list the partner writes is a guess about what you might say, and the guess must never be the only thing you are allowed to say. The way past the list has to be present and named in words — it was a grey box captioned \"Other…\" jammed against the last option, which read as one more option.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › always offers a way to say something the list does not contain",
+      "line": 161,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Picking one answers immediately: a chosen option is already the whole answer, and asking someone to confirm it adds a step carrying no information.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › answers with an option the moment one is picked",
+      "line": 141,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Opening the box must not be a one-way door — the options are still the likeliest answers, and someone who opened it to look should get them back.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › gives the options back when the free-text box is cancelled",
+      "line": 199,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A first answer on a card with no options has nothing to go back to, so offering Cancel there would be a control that does nothing.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › offers no Cancel when there is nothing to cancel back to",
+      "line": 218,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The structural regression that cost the most. The card's root was a `button` first, which is invalid HTML — a button may not contain other buttons, so the parser HOISTS the inner ones out of it and they stop being clickable. The options silently became decoration.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › renders its options as real buttons, not decoration",
+      "line": 123,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The card shows EITHER the options or the free-text box. Stacking both overflowed the card's fixed height, which clipped the field and pushed its only submit hint outside the card entirely.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › swaps the options for a text box rather than stacking them",
+      "line": 179,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer is a thought at a moment, and thinking is what this board is for. The pencil is the whole of what makes an answer revisable.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an answered question › returns to an editable box through the pencil",
+      "line": 257,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Your words are the content and the question becomes their label — that inversion is what makes an answered card read as a statement rather than as a form with the fields missing.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an answered question › shows the answer with the question demoted to a label",
+      "line": 243,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bug this card had: `approach` is not an insight KIND, so a card carrying a diagram fell through to the answered-question branch and the diagram — the entire content of the card — was never drawn, while the layout had already given it the wide column.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an insight › draws a diagram it carries even when its kind is not an insight kind",
+      "line": 297,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The same hole, on the image side: a reference card exists so someone can LOOK at the thing.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an insight › draws a picture it carries even when its kind is not an insight kind",
+      "line": 319,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The eyebrow reads the word for the KIND rather than a generic label, which is what lets the board be read without a legend.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an insight › names the kind it is",
+      "line": 275,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An explicit product requirement, and nothing else defended it: an unanswered card must LOOK typeable before anyone has clicked anything. The one thing a first-time user has to discover is that these are typed into, so the affordance has to exist before the interaction that would reveal it.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an open question › carries a field without having to be clicked first",
+      "line": 43,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The eyebrow comes from `cardEyebrow`, the same helper every other card in the app uses. A second implementation of one design rule drifts, and the rule it guarantees — an answered question stops calling itself Open — is one this card would otherwise be re-deriving.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an open question › names its state with the shared eyebrow vocabulary",
+      "line": 61,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Typing and sending, through the control a person actually uses.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an open question › reports what was typed when it is saved",
+      "line": 75,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty answer is not an answer. Saving one would close the question against a blank, which reads on the board as answered-with-nothing.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — an open question › will not save an empty answer",
+      "line": 95,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Regression two, and the subtler one: `role=\"button\"` fixed the markup but not the meaning. An element's accessible name is computed from its contents, so the card announced itself as a button named after its own entire text — swallowing its controls into one label and producing ambiguous matches for assistive technology and for tests alike.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — structure › does not announce itself as a button either",
+      "line": 364,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Regression one. A `button` may not contain the option pills and the pencil; the parser hoists them out, leaving them unclickable. The card is a CONTAINER — the controls inside it are what should be buttons.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — structure › is not itself a button",
+      "line": 344,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Clicking the card brings it into focus — a convenience on top of the real controls, which is why it takes the click without taking a role.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — structure › reports a click as a request for focus",
+      "line": 390,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
       "description": "While questions are open the cards are the action, so the footer counts and offers nothing to press.",
       "file": "app/components/RowFooter.render.test.tsx",
       "format": "vitest",
@@ -673,6 +988,51 @@
       "key": "SavedMapList › shows every map and no disclosure when it fits",
       "line": 36,
       "registeredAt": "2026-09-01T18:29:34Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Muting is what keeps the dust from competing with a card being read. It changes only the opacity of the whole field — the particles themselves must not move, or focusing a card would make the galaxy reshuffle behind it.",
+      "file": "app/components/ThemeParticles.render.test.tsx",
+      "format": "vitest",
+      "key": "ThemeParticles › dims without redrawing the field",
+      "line": 62,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A different galaxy must look like a different galaxy. If the seed were ignored, every cluster on the board would wear the same dust in a different colour — which reads as one cluster drawn repeatedly.",
+      "file": "app/components/ThemeParticles.render.test.tsx",
+      "format": "vitest",
+      "key": "ThemeParticles › draws a different field for a different hue",
+      "line": 41,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The property the whole component rests on: same hue in, same field out. Two renders are what a server pass and a client pass amount to.",
+      "file": "app/components/ThemeParticles.render.test.tsx",
+      "format": "vitest",
+      "key": "ThemeParticles › draws an identical field from the same hue",
+      "line": 28,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "It is decoration sitting behind the thing you are reading, so it must not reach the accessibility tree or take a click meant for a card.",
+      "file": "app/components/ThemeParticles.render.test.tsx",
+      "format": "vitest",
+      "key": "ThemeParticles › stays out of the way of the board",
+      "line": 76,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Hue 0 is a real place on the colour wheel and a falsy value in JavaScript. A truthiness check anywhere in the chain would quietly send it somewhere else, so it has to produce a field like any other hue.",
+      "file": "app/components/ThemeParticles.render.test.tsx",
+      "format": "vitest",
+      "key": "ThemeParticles › treats hue zero as a hue rather than as absent",
+      "line": 53,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
       "runner": "tests"
     },
     {
@@ -1027,6 +1387,69 @@
       "runner": "tests"
     },
     {
+      "description": "Clearing has to leave NOTHING, not an empty JSON array. `[]` is truthy as a stored string, so the board would go on rendering the \"brought along\" strip with no items in it — a stray empty row where the attachments used to be.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › clears to nothing rather than to an empty list",
+      "line": 297,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A blank name would render as an unlabelled row that cannot be identified or removed, so it is dropped the way an unlabelled theme is.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › drops an entry with no usable name",
+      "line": 322,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The round trip the hand-found bug was about: what the person browsed for has to still be there when the board is re-read, not just while the tab that added it is open.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › keeps what was attached across a re-read",
+      "line": 268,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Malformed input is refused rather than stored. Anything that reached the column in a shape the reader cannot parse would make the board unable to open its own attachment list.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › refuses a body that is not a list of attachments",
+      "line": 348,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A whole-list PUT REPLACES. If it appended, removing an attachment would be impossible through the only endpoint there is, and every save would duplicate the list the client sent.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › replaces the list rather than appending to it",
+      "line": 285,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Attaching to a map that does not exist is a 404 rather than a silent success — `updateMany` matches zero rows without complaining, so without the count check the client would be told its files were saved.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › reports a missing map instead of silently saving nothing",
+      "line": 337,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Names are the only thing stored. The board is a place to point AT things, not to hold them, and a column that quietly grew a second shape is one the rest of the app does not know how to read.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › stores names and drops everything else sent with them",
+      "line": 310,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
       "description": "No agent at all — the common case, including every codeyam capture. It must be a silent no-op with a disposer that is safe to call.",
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
@@ -1148,7 +1571,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › attaches annotations only to the tools that declare them",
-      "line": 201,
+      "line": 202,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -1157,7 +1580,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › binds each descriptor to its own tool name",
-      "line": 209,
+      "line": 210,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -1166,7 +1589,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › carries each tool’s description and schema through",
-      "line": 191,
+      "line": 192,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -1175,7 +1598,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › describes every catalog tool",
-      "line": 183,
+      "line": 184,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -1913,7 +2336,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "errorResponse › marks the response as an error carrying the message",
-      "line": 225,
+      "line": 226,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -2059,6 +2482,51 @@
       "key": "fanOrigins › spreads the departures evenly about the centre",
       "line": 59,
       "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A row on the idea's own line is the middle row of an odd-numbered board, and its connector is a straight run rather than a special case.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "fanPath › handles a row level with the idea",
+      "line": 75,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The curve has to LEAVE the idea flat and ARRIVE at the row flat — that is what makes a bundle of them splay rather than read as loose diagonals. Flat at both ends means the first control point shares the idea's y and the second shares the row's.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "fanPath › leaves the idea flat and arrives at the row flat",
+      "line": 41,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Rows above the idea have negative y, and the curve is the MIRROR of a row below rather than a clamped or flattened version of it — a clamp would send every upper row to the idea's own line and stack them on each other.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "fanPath › mirrors for a row above the idea",
+      "line": 86,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Both control points share one x, midway along the run. That symmetry is what keeps the curve from leaning toward either end.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "fanPath › places both control points midway along the run",
+      "line": 64,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "It must start on the idea's rim and stop at the hub's, not at either centre — a curve drawn to the centre disappears under the circle it is pointing at.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "fanPath › runs rim to rim rather than centre to centre",
+      "line": 54,
+      "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
     {
@@ -2665,6 +3133,114 @@
       "runner": "tests"
     },
     {
+      "description": "A negative index should not be reachable, but a non-negative modulo costs one expression and the alternative is a negative hue that paints nothing.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "hueForIndex › does not produce a negative hue from a negative index",
+      "line": 35,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Pure and total: the same index always gives the same colour, which is what lets a theme's hue be recomputed on every render instead of stored, and what makes the same map look identical on two screens.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "hueForIndex › is deterministic",
+      "line": 67,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE promise, and the whole reason the golden angle was chosen over slicing the wheel into N: theme 11 has to be as findable as theme 1 was, without anyone knowing in advance that there would be twelve. A fixed palette cannot make this claim and a model picking \"a nice pink\" certainly cannot.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "hueForIndex › keeps the first twelve themes mutually distinguishable",
+      "line": 47,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The first three are written as literals into every board fixture. Pinning them here is what stops the fixtures and the function drifting apart in silence: a capture would still render, just in colours the palette no longer produces.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "hueForIndex › starts on the magenta the mockups were drawn around",
+      "line": 15,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every CSS colour function reads a hue outside [0,360) as invalid rather than as wrapping, so a theme past the fourth or fifth would simply fail to paint. The wrap has to happen here.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "hueForIndex › stays a whole number on the wheel however far around it goes",
+      "line": 24,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "What makes a card show your words as its content, with the question demoted to a label above them. Only a question can reach this state — it is the presence of an answer that earns it, not the status string alone.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isAnsweredCard › is an answered question and nothing else",
+      "line": 87,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An insight carries `status: 'answered'` all over the seed data — it is how a settled claim is marked. It is still not something YOU answered, and drawing it with a pencil would invite editing the partner's own thinking as though it were your reply.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isAnsweredCard › never treats a settled insight as your answer",
+      "line": 100,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The regression this function exists for. `approach` is not an insight kind, so before the carried-content clause an approach with a diagram fell through to the answered-question branch and its diagram was never drawn — while `widthFor` had already given it the 420px wide column.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isInsightCard › counts a card carrying a diagram, whatever its kind",
+      "line": 52,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The image half of the same clause. A reference card exists so somebody can LOOK at the thing; drawn as an answered question the picture is not shown at all, which loses the entire point of the card.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isInsightCard › counts a card carrying a picture, whatever its kind",
+      "line": 64,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The clause must not fire on the ABSENCE of content. A null image is the ordinary case on almost every card, and if it read as \"carries something\" every question on the board would render as an insight.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isInsightCard › is not tripped by null or empty carried content",
+      "line": 73,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The kind list is the half that was always right. Pinned so that removing a kind from it — which silently turns a settled claim into an editable question with a pencil on it — shows up here rather than on the board.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isInsightCard › recognises the kinds that are the partner thinking, not asking",
+      "line": 26,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The base case, and the one every other clause must not swallow: a bare open question carries no content and is not an insight kind, so it stays a question and keeps its field.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "isInsightCard › treats a plain question as a question",
+      "line": 44,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
       "description": "The headline case: a round that went and looked at what already exists.",
       "file": "app/lib/mapRounds.test.ts",
       "format": "vitest",
@@ -2752,6 +3328,141 @@
       "key": "isWebMcpAvailable › is unavailable without a browser agent",
       "line": 55,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The wide card case again, from the other end: the join must start past the card's own width or it begins underneath it.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "joinPath › accounts for the last card’s width, not just its position",
+      "line": 134,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "It arrives flat on the idea's line, which is what makes the rows read as coming back TOGETHER rather than as converging on one of them.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "joinPath › arrives flat on the conclusion’s line",
+      "line": 117,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing to leave FROM. A curve drawn from the hub instead would promise a conclusion this line of thinking has not reached.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "joinPath › draws nothing for a row with no cards",
+      "line": 128,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The return curve starts at the RIGHT EDGE of the last card, not its origin — starting at the origin would draw the line back through the card.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "joinPath › leaves from the far edge of the last card",
+      "line": 108,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The card carries its theme's hue so a renderer never has to hold both collections to draw one card — and so a card can never be drawn in a colour its own row is not.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › copies the owning theme’s hue onto every card",
+      "line": 191,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`widthFor` is not exported, so its rule is asserted through the placement it produces — which is the thing that actually matters anyway. A card that gained a diagram but kept the narrow column is the regression: the content is then squeezed into a strip.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › gives a card carrying a diagram or a picture the wider column",
+      "line": 83,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Bounds are what the opening zoom is computed from, so a card outside them is a card the board opens with off-screen.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › grows its bounds to contain every card it placed",
+      "line": 224,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The regression the accumulator exists to prevent, stated directly: the gap after a wide card must be at least that card's own width, or its neighbour is drawn on top of it.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › lets a wide card push its neighbour along instead of overlapping it",
+      "line": 65,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A node belongs to exactly one row, and one that names no theme — the root idea — belongs to none of them. Leaking it into a cluster would draw the idea twice, once in the middle and once as a card.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › puts each card only in its own theme, and themeless nodes in none",
+      "line": 175,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Asserted as a RELATIONSHIP against rows of different lengths, never against a hardcoded number: the conclusion must clear the longest run, and a constant that happened to clear the longest run in one fixture would pass while overlapping in every board with more cards.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › puts the convergence clear of the longest row",
+      "line": 151,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The day-one board. An empty map has to frame on something real: seeded from an inverted-infinity box the bounds come back as ±Infinity and the camera has nothing to fit to, so the board opens blank.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › returns a renderable layout for a map with nothing on it",
+      "line": 204,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The running-sum accumulator, and the single most breakable line in the file. Placing each card at `index * constant` looks identical on a board where every card is the standard width and silently overlaps the moment one of them is wide.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › runs a theme’s cards left to right from its hub",
+      "line": 48,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Order is a property of the theme, not of the array it arrived in — the agent may write them in any order and a reload may return them in another.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › sorts by declared order rather than by array position",
+      "line": 118,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Rows stack in the theme's declared order and are centred on the idea, so a two-theme map is balanced rather than looking like a three-theme map that lost one.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › stacks themes in order and centres them on the idea",
+      "line": 102,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A theme with no cards is a line of thinking that has not produced questions yet, not an absent one. Dropping its hub would make the board silently forget a direction the partner had already opened.",
+      "file": "app/lib/galaxyLayout.test.ts",
+      "format": "vitest",
+      "key": "layOutGalaxy › still places a hub for a theme that has no cards yet",
+      "line": 134,
+      "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
     {
@@ -3196,6 +3907,51 @@
       "runner": "tests"
     },
     {
+      "description": "A blank name would render as a row you cannot identify or remove, so it is dropped the same way the endpoint drops it on the way in.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "parseAttachments › drops entries with no usable name",
+      "line": 60,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Names only. Anything else the row carries is dropped rather than passed through, so the board cannot start rendering a shape the rest of the app does not know about.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "parseAttachments › keeps the name and drops everything else on the row",
+      "line": 52,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing attached is the common case — most boards never attach anything — so it has to be cheap and silent rather than an absence to handle.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "parseAttachments › reads no attachments as an empty list",
+      "line": 27,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, in the shape the endpoint actually writes.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "parseAttachments › reads the names the endpoint stored",
+      "line": 14,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The availability rule. A column that is not JSON at all, or is JSON of the wrong shape, must not throw — a page that 500s because of a stray string in one column is a worse outcome than a board with its attachments missing.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "parseAttachments › survives a column it cannot parse",
+      "line": 36,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "Wrongly-typed metadata falls back rather than failing the whole brief — the document is what matters, and its packaging is recoverable.",
       "file": "app/lib/briefInput.test.ts",
       "format": "vitest",
@@ -3533,7 +4289,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › drops non-string options rather than stringifying them",
-      "line": 247,
+      "line": 248,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
@@ -3542,7 +4298,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › leaves a node that predates the field unchanged",
-      "line": 271,
+      "line": 272,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
@@ -3551,7 +4307,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › serialises a question’s suggested answers to a JSON array",
-      "line": 210,
+      "line": 211,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
@@ -3560,7 +4316,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › stores nothing for an empty option list",
-      "line": 227,
+      "line": 228,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
@@ -3569,7 +4325,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › stores nothing when every option is blank",
-      "line": 234,
+      "line": 235,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
@@ -3578,7 +4334,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › stores nothing when options is not an array",
-      "line": 258,
+      "line": 259,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
       "runner": "tests"
     },
@@ -3587,8 +4343,134 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations suggested answers › stores nothing when the model offered no options",
-      "line": 221,
+      "line": 222,
       "registeredAt": "2026-09-01T19:22:56.419941890+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Blank steps are dropped before the length is judged, so three steps of which two are whitespace is still not a flow.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — a node carrying a diagram › drops blank steps and judges the length after",
+      "line": 449,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: steps survive in order, and the note with them.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — a node carrying a diagram › keeps a well-formed shape, steps in order",
+      "line": 428,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A node that never mentioned a diagram is the ordinary case and must come through carrying none.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — a node carrying a diagram › leaves a node with no diagram alone",
+      "line": 475,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The note is optional, and its absence must not leave the key present with an empty value — the card renders a caption line for anything truthy.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — a node carrying a diagram › omits the note entirely rather than carrying an empty one",
+      "line": 458,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "One step is not a flow — it is a sentence, and it would draw as a single box with an arrow pointing at nothing.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — a node carrying a diagram › rejects a shape too short to be a flow",
+      "line": 442,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Anything that is not a shape at all produces no diagram rather than a throw that would take the whole turn down with it.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — a node carrying a diagram › survives junk where a shape was expected",
+      "line": 467,
+      "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "NO HUE IS ASSIGNED HERE, and the absence is the point. The hue depends on how many themes the map already has, which this pure function cannot see — and the split (the agent names the theme, the app colours it) is the whole reason the palette stays mutually distinguishable however many themes an agent invents. This case exists to stop someone \"helpfully\" adding one.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › assigns no colour, leaving that to the app",
+      "line": 358,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A theme with no ref is unreachable — no node could ever name it — so it would be a galaxy on the board with nothing able to orbit it.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › drops a theme that no node could name",
+      "line": 309,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A theme with no label draws a hub captioned nothing, and a cluster you cannot identify is worse than a cluster that is not there.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › drops a theme that would render as an unlabelled cluster",
+      "line": 323,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A node may name a theme created in the SAME turn, which is how a round normally arrives: open the galaxies, then hang the questions off them.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › keeps a node’s reference to a theme from the same turn",
+      "line": 368,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The order they were opened in is also the order they are drawn down the board, so it has to survive planning.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › keeps the themes in the order they were sent",
+      "line": 337,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A node naming no theme is the root idea, which belongs to no galaxy precisely because it is what every galaxy orbits.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › leaves a node that names no theme unattached",
+      "line": 387,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary path: a valid theme survives with both the ref a node will name it by and the label its cluster is drawn with.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › plans a theme with its ref and label intact",
+      "line": 295,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Malformed input has to survive the way it does for nodes: a non-array, a null entry or a junk scalar produces no themes rather than a throw that would take the whole turn down with it.",
+      "file": "app/lib/nodePlan.test.ts",
+      "format": "vitest",
+      "key": "planMapMutations — create_themes › survives malformed theme input rather than throwing",
+      "line": 398,
+      "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
     {
@@ -3596,7 +4478,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations › carries a slice tests ref through as testsRef",
-      "line": 159,
+      "line": 160,
       "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
@@ -3632,7 +4514,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations › handles adds, updates and a phase change in one turn",
-      "line": 189,
+      "line": 190,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -3686,7 +4568,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations › leaves testsRef null when a slice names nothing",
-      "line": 172,
+      "line": 173,
       "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
@@ -3713,7 +4595,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations › plans an update to what a slice settles",
-      "line": 181,
+      "line": 182,
       "registeredAt": "2026-09-01T16:07:54Z",
       "runner": "tests"
     },
@@ -3758,7 +4640,7 @@
       "file": "app/lib/nodePlan.test.ts",
       "format": "vitest",
       "key": "planMapMutations › survives a call with a missing or malformed input",
-      "line": 146,
+      "line": 147,
       "registeredAt": "2026-08-31T23:23:10.330657569+00:00",
       "runner": "tests"
     },
@@ -4213,6 +5095,51 @@
       "runner": "tests"
     },
     {
+      "description": "Insights are the partner's own thinking, not something anyone was asked. A row holding only those has still not been answered.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowDone › does not count insights as answered questions",
+      "line": 175,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point: the line to the conclusion is only drawn once every question in the row has an answer.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowDone › is done when every question in the row is answered",
+      "line": 145,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty row has not STARTED, and \"every question is answered\" is vacuously true of no questions — which would run a conclusion line off a line of thinking nobody has said anything in.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowDone › is not done when the row has no questions at all",
+      "line": 169,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One open question is enough to keep the row unfinished — a conclusion drawn over an unanswered question claims something the board cannot show.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowDone › is not done while any question is still open",
+      "line": 158,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Insights sitting alongside questions must not dilute the check either way: what decides it is the questions.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowDone › judges a mixed row on its questions alone",
+      "line": 185,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
       "description": "An agent turn that writes four nodes is one thing that happened.",
       "file": "app/lib/exchangeRail.test.ts",
       "format": "vitest",
@@ -4541,7 +5468,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › finds a tool by name and reports nothing for an unknown one",
-      "line": 50,
+      "line": 51,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4550,7 +5477,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › gives every tool a title and a description",
-      "line": 57,
+      "line": 58,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4559,7 +5486,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › leaves the whole-collection tools out of the shared set",
-      "line": 32,
+      "line": 33,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4568,8 +5495,44 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › marks the three read-only tools as read-only",
-      "line": 41,
+      "line": 42,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Exactly one is true for any card. If two could be, the card would render two bodies stacked; if none, it would render an empty box.",
+      "file": "app/lib/cardPresentation.test.ts",
+      "format": "vitest",
+      "key": "the three faces › are mutually exclusive and total",
+      "line": 115,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One place decides what a theme looks like, so a card, its connector and its cluster label cannot drift apart — which means the knobs have to work.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "themeColor › carries saturation and lightness through",
+      "line": 89,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case is fully opaque, and an always-present `/ 1` would be valid CSS that changed every colour string in the app for no reason.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "themeColor › emits no alpha channel when the colour is opaque",
+      "line": 77,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Translucency is how a connector and a focus ring sit behind their card without a second colour being invented for them.",
+      "file": "app/lib/themeHue.test.ts",
+      "format": "vitest",
+      "key": "themeColor › uses the slash form when it is not",
+      "line": 83,
+      "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
     {
@@ -4604,7 +5567,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › caps a timeout longer than the ceiling",
-      "line": 78,
+      "line": 79,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4613,7 +5576,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › falls back to the default when the agent names no timeout",
-      "line": 68,
+      "line": 69,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4622,7 +5585,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › floors a zero or negative timeout at one second",
-      "line": 83,
+      "line": 84,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4631,7 +5594,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
-      "line": 73,
+      "line": 74,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4759,6 +5722,96 @@
       "key": "useAdvancePhase › writes the note before it moves the phase",
       "line": 37,
       "registeredAt": "2026-09-01T21:23:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A hand tremor during a click is a click, not a pan. Below the threshold the board must not creep — a board that nudges every time you answer a card feels broken in a way that is hard to name.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera panning › does not pan for movement below the threshold",
+      "line": 67,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Only the primary button drags; a right-click is a context menu.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera panning › ignores a non-primary button",
+      "line": 122,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bug, stated as the behaviour that must hold. A press and release with no movement in between must leave the camera untouched AND must never call setPointerCapture — the capture is what swallowed the click, so its absence is the actual assertion, not the unchanged camera.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera panning › never captures the pointer on a click that does not move",
+      "line": 52,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Past the threshold it is a drag, and only THEN is the pointer captured — so the gesture survives the cursor leaving the element, without having cost anyone a click.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera panning › pans and captures once the pointer has travelled far enough",
+      "line": 81,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A drag beginning inside a card's own controls belongs to the control. A textarea you cannot select text in because the board panned away underneath is the same class of bug as the unclickable card.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera panning › refuses to start a drag from inside a control",
+      "line": 111,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The delta is divided by the current scale so the board tracks the cursor by the same SCREEN distance however far out you are zoomed. Without it a drag zoomed out crawls and a drag zoomed in throws the board off-screen.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera panning › tracks the cursor identically at every zoom level",
+      "line": 96,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A focus that asks for an out-of-range zoom is clamped like any other, so \"frame everything\" on a huge board cannot push the camera past the floor.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › clamps a zoom asked for through focusOn",
+      "line": 181,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Flying to a card moves the camera and may change the zoom in the same commit — the two are one piece of state precisely so they cannot tear.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › focuses on a point, optionally changing zoom with it",
+      "line": 169,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The clamp at both ends. Past the floor the board is a few pixels of noise with no way back; past the ceiling one card fills the screen and the shape of the thinking — the entire point of the board — is gone.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › holds the zoom inside its limits at both ends",
+      "line": 137,
+      "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Zoom must never invert. A negative or zero scale flips or collapses the whole transformed layer, and every coordinate that divides by it explodes.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › never lets the scale reach zero or go negative",
+      "line": 157,
+      "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
     {

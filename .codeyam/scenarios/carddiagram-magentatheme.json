@@ -1,0 +1,12 @@
+{
+  "name": "CardDiagram - MagentaTheme",
+  "id": "fd092c99-6f50-41d7-aef1-7ce90e2f4103",
+  "url": "/isolated-components/CardDiagram?s=MagentaTheme",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardDiagram",
+  "scenarioType": "component",
+  "description": "The same diagram in another galaxy's colour. The palette follows the theme the card belongs to, so nothing here decides its own accent."
+}

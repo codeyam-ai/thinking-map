@@ -1,0 +1,12 @@
+{
+  "name": "BoardMenu - OneOther",
+  "id": "3d5a0d74-217b-4df6-8708-654809694845",
+  "url": "/isolated-components/BoardMenu?s=OneOther",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardMenu",
+  "scenarioType": "component",
+  "description": "Exactly one other board — the boundary where a list becomes a list."
+}

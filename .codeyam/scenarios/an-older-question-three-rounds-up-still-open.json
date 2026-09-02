@@ -1,6 +1,6 @@
 {
   "name": "An older question, three rounds up, still open",
-  "id": "23b27381-2c9a-413d-824b-7cf5100bb2b9",
+  "id": "1da39559-ecf0-4973-9c00-77f7ada9f237",
   "url": "/map/map-skipped",
   "dimensions": [
     "Tablet"
@@ -134,7 +134,8 @@
         "order": 0,
         "origin": "agent",
         "parentId": "s-idea",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       },
       {
         "id": "s-q-broken",
@@ -145,7 +146,8 @@
         "order": 1,
         "origin": "agent",
         "parentId": "s-idea",
-        "status": "open"
+        "status": "open",
+        "themeId": "t-broken"
       },
       {
         "detail": "Both charge a yearly membership and both are oversubscribed for exactly the heavy tools you named.",
@@ -156,7 +158,8 @@
         "order": 0,
         "origin": "agent",
         "parentId": "s-q-who",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       },
       {
         "detail": "They both push the risk onto the borrower with a signed form, which is the cheap answer rather than the good one.",
@@ -167,7 +170,8 @@
         "order": 1,
         "origin": "agent",
         "parentId": "s-q-who",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       },
       {
         "id": "s-g-storage",
@@ -177,7 +181,8 @@
         "order": 2,
         "origin": "agent",
         "parentId": "s-q-who",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       },
       {
         "id": "s-q-where",
@@ -188,7 +193,8 @@
         "order": 0,
         "origin": "agent",
         "parentId": "s-f-existing",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       },
       {
         "id": "s-q-cost",
@@ -199,7 +205,8 @@
         "order": 1,
         "origin": "agent",
         "parentId": "s-f-existing",
-        "status": "answered"
+        "status": "answered",
+        "themeId": "t-who"
       }
     ],
     "message": [
@@ -216,6 +223,22 @@
         "mapId": "map-skipped",
         "origin": "agent",
         "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-who",
+        "label": "Who it is for",
+        "mapId": "map-skipped",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-broken",
+        "label": "When something goes wrong",
+        "mapId": "map-skipped",
+        "order": 1
       }
     ],
     "thinkingMap": [

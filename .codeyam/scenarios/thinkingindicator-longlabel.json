@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingIndicator - LongLabel",
+  "id": "928620e0-78a3-46ee-be84-3de88fa88c47",
+  "url": "/isolated-components/ThinkingIndicator?s=LongLabel",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingIndicator",
+  "scenarioType": "component",
+  "description": "A label long enough to test its lane. A line that grew past it would start colliding with the very cards it is pointing at."
+}

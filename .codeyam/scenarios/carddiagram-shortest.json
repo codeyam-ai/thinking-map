@@ -1,0 +1,12 @@
+{
+  "name": "CardDiagram - Shortest",
+  "id": "c1ddf462-429b-46fe-9e41-db7935c0f95c",
+  "url": "/isolated-components/CardDiagram?s=Shortest",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardDiagram",
+  "scenarioType": "component",
+  "description": "Two steps and one arrow — the shortest thing that is still a flow. It must not read as a heading with a subtitle."
+}

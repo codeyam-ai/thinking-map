@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaCard - LongIdea",
+  "id": "8bfac10b-44f9-414a-9a4c-f063a213f526",
+  "url": "/isolated-components/CoreIdeaCard?s=LongIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaCard",
+  "scenarioType": "component",
+  "description": "A long idea gets smaller type rather than a bigger circle. The circle's size is what marks it as the centre, so it stays put while the text it holds does not — growing it would move every galaxy on the board to accommodate one long sentence."
+}

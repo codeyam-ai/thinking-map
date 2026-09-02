@@ -1,0 +1,12 @@
+{
+  "name": "BoardWorkspace - Working_Agent",
+  "id": "fdb2b1fe-5f1f-4c01-85a2-c35803b42031",
+  "url": "/isolated-components/BoardWorkspace?s=Working_Agent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWorkspace",
+  "scenarioType": "component",
+  "description": "A tool in flight. The board says so rather than going quiet, because under WebMCP the page cannot ask an agent to hurry and an unexplained pause is indistinguishable from a hang."
+}

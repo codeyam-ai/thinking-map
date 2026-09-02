@@ -15,9 +15,9 @@ import {
   HUB_SIZE,
   type GalaxyTheme,
   type GalaxyNodeInput,
-  type PlacedCluster,
 } from '@/app/lib/galaxyLayout';
 import { themeColor } from '@/app/lib/themeHue';
+import { fanPath, joinPath, rowDone } from '@/app/lib/boardConnectors';
 import { useBoardCamera } from '@/app/hooks/useBoardCamera';
 import QuestionCard from './QuestionCard';
 import CoreIdeaCard from './CoreIdeaCard';
@@ -40,13 +40,6 @@ const LABEL_ONLY_BELOW = 0.16;
  *  Deliberately narrow: a `finding` or a `direction` is a claim about where the
  *  idea stands, while a `problem` or a `goal` is a piece of it. */
 const CORE_INSIGHT_KINDS = new Set(['direction', 'finding', 'assumption']);
-
-/** A row is finished when it has questions and none are still open. An empty
- *  row is not finished — it has not started. */
-function rowDone(c: PlacedCluster): boolean {
-  const qs = c.cards.filter((k) => k.kind === 'open-question');
-  return qs.length > 0 && qs.every((k) => k.status === 'answered');
-}
 
 export default function GalaxyBoard({
   seedIdea,
@@ -196,20 +189,12 @@ export default function GalaxyBoard({
             const stroke = themeColor(c.theme.hue, { s: 70, l: 62, a: 0.75 });
             const w = 2 / camera.scale;
             const last = c.cards[c.cards.length - 1];
-            // The fan. Both control points sit on the run between the two ends,
-            // one holding the idea's horizontal and one holding the row's, so
-            // every branch leaves the idea flat and arrives at its row flat —
-            // which is what makes several of them read as one splaying bundle
-            // rather than as separate diagonals.
-            const midX = (CORE_SIZE.radius + c.x) / 2;
-            const fan = `M ${CORE_SIZE.radius} 0 C ${midX} 0, ${midX} ${c.y}, ${c.x - HUB_SIZE.radius} ${c.y}`;
-            // …and the mirror of it, coming back together.
-            const backMid = last
-              ? (last.x + last.w + layout.convergence.x) / 2
-              : 0;
-            const join = last
-              ? `M ${last.x + last.w} ${c.y} C ${backMid} ${c.y}, ${backMid} 0, ${layout.convergence.x - 90} 0`
-              : null;
+            // The curves are string math, so they live in `boardConnectors`
+            // where a test can hold their shape — a wrong control point makes a
+            // kinked or backwards line that neither the type checker nor a
+            // screenshot of one good board would catch.
+            const fan = fanPath(CORE_SIZE.radius, HUB_SIZE.radius, c);
+            const join = joinPath(c, layout.convergence.x);
             return (
               <g key={c.theme.id}>
                 <path d={fan} fill="none" stroke={stroke} strokeWidth={w} />

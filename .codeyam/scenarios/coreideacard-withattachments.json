@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaCard - WithAttachments",
+  "id": "a91848cc-427d-4f19-b40e-af59fbb942e9",
+  "url": "/isolated-components/CoreIdeaCard?s=WithAttachments",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaCard",
+  "scenarioType": "component",
+  "description": "What the person brought along, listed under the idea. Names only — the board is a place to point AT things rather than to hold them, and storing the files themselves is a different product with a different set of problems."
+}

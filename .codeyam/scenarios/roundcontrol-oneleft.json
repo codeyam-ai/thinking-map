@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - OneLeft",
+  "id": "6959adfa-fbc6-4eb9-8749-efc46c3440fb",
+  "url": "/isolated-components/RoundControl?s=OneLeft",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "One question left. Its own frame because a count of one is exactly where singular and plural copy diverge, and reads wrong if nobody looked."
+}

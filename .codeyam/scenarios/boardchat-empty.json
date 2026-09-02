@@ -1,0 +1,12 @@
+{
+  "name": "BoardChat - Empty",
+  "id": "b98f909d-16d8-415b-9062-497e93a3c859",
+  "url": "/isolated-components/BoardChat?s=Empty",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "Nothing said yet. Every new board starts here, so it is the one state that must not look like a failure to load — present and inviting rather than a blank box."
+}

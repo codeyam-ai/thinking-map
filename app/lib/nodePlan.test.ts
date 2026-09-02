@@ -277,3 +277,206 @@ describe('planMapMutations suggested answers', () => {
     expect(plan.inserts[0]!.label).toBe('Two keyholders');
   });
 });
+
+// `create_themes` — the door the galaxies come through.
+//
+// It arrived with the board redesign and had no coverage at all: before these
+// cases the word "theme" appeared in this file exactly once, in the empty-plan
+// assertion. What an agent sends here is untrusted in the same way node input
+// is, so these are mostly about what gets REJECTED.
+const createThemes = (themes: unknown[]) => ({
+  name: 'create_themes',
+  input: { themes },
+});
+
+describe('planMapMutations — create_themes', () => {
+  // The ordinary path: a valid theme survives with both the ref a node will
+  // name it by and the label its cluster is drawn with.
+  it('plans a theme with its ref and label intact', () => {
+    const plan = planMapMutations([
+      createThemes([{ ref: 'ctx', label: 'What actually gets lost' }]),
+    ]);
+
+    expect(plan.themes).toHaveLength(1);
+    expect(plan.themes[0]).toMatchObject({
+      ref: 'ctx',
+      label: 'What actually gets lost',
+    });
+  });
+
+  // A theme with no ref is unreachable — no node could ever name it — so it
+  // would be a galaxy on the board with nothing able to orbit it.
+  it('drops a theme that no node could name', () => {
+    const plan = planMapMutations([
+      createThemes([
+        { label: 'Nameless' },
+        { ref: '', label: 'Also nameless' },
+        { ref: 'ok', label: 'Reachable' },
+      ]),
+    ]);
+
+    expect(plan.themes.map((t) => t.ref)).toEqual(['ok']);
+  });
+
+  // A theme with no label draws a hub captioned nothing, and a cluster you
+  // cannot identify is worse than a cluster that is not there.
+  it('drops a theme that would render as an unlabelled cluster', () => {
+    const plan = planMapMutations([
+      createThemes([
+        { ref: 'a', label: '   ' },
+        { ref: 'b' },
+        { ref: 'c', label: 'Named' },
+      ]),
+    ]);
+
+    expect(plan.themes.map((t) => t.ref)).toEqual(['c']);
+  });
+
+  // The order they were opened in is also the order they are drawn down the
+  // board, so it has to survive planning.
+  it('keeps the themes in the order they were sent', () => {
+    const plan = planMapMutations([
+      createThemes([
+        { ref: 'a', label: 'First' },
+        { ref: 'b', label: 'Second' },
+        { ref: 'c', label: 'Third' },
+      ]),
+    ]);
+
+    expect(plan.themes.map((t) => t.label)).toEqual([
+      'First',
+      'Second',
+      'Third',
+    ]);
+  });
+
+  // NO HUE IS ASSIGNED HERE, and the absence is the point. The hue depends on
+  // how many themes the map already has, which this pure function cannot see —
+  // and the split (the agent names the theme, the app colours it) is the whole
+  // reason the palette stays mutually distinguishable however many themes an
+  // agent invents. This case exists to stop someone "helpfully" adding one.
+  it('assigns no colour, leaving that to the app', () => {
+    const plan = planMapMutations([
+      createThemes([{ ref: 'ctx', label: 'What actually gets lost' }]),
+    ]);
+
+    expect(plan.themes[0]).not.toHaveProperty('hue');
+  });
+
+  // A node may name a theme created in the SAME turn, which is how a round
+  // normally arrives: open the galaxies, then hang the questions off them.
+  it('keeps a node’s reference to a theme from the same turn', () => {
+    const plan = planMapMutations([
+      createThemes([{ ref: 'ctx', label: 'What actually gets lost' }]),
+      addNodes([
+        {
+          ref: 'q1',
+          kind: 'open-question',
+          label: 'What goes missing?',
+          themeRef: 'ctx',
+        },
+      ]),
+    ]);
+
+    expect(plan.themes[0]!.ref).toBe('ctx');
+    expect(plan.inserts[0]!.themeRef).toBe('ctx');
+  });
+
+  // A node naming no theme is the root idea, which belongs to no galaxy
+  // precisely because it is what every galaxy orbits.
+  it('leaves a node that names no theme unattached', () => {
+    const plan = planMapMutations([
+      addNodes([{ ref: 'a', kind: 'goal', label: 'Stop losing call-backs' }]),
+    ]);
+
+    expect(plan.inserts[0]!.themeRef).toBeNull();
+  });
+
+  // Malformed input has to survive the way it does for nodes: a non-array, a
+  // null entry or a junk scalar produces no themes rather than a throw that
+  // would take the whole turn down with it.
+  it('survives malformed theme input rather than throwing', () => {
+    expect(
+      planMapMutations([{ name: 'create_themes', input: { themes: 'nope' } }])
+        .themes,
+    ).toEqual([]);
+    expect(planMapMutations([createThemes([null, undefined, 42])]).themes).toEqual(
+      [],
+    );
+    expect(
+      planMapMutations([{ name: 'create_themes', input: {} }]).themes,
+    ).toEqual([]);
+  });
+});
+
+// The diagram a model asks for, on its way to becoming a drawn shape.
+//
+// Reached through `planMapMutations` because it is not exported — which is the
+// right level to test it at anyway, since what matters is what survives into
+// the plan. A card that announces a diagram and then draws nothing is worse
+// than one that never claimed to have it, so the validation here is what stops
+// a half-formed shape reaching the board at all.
+describe('planMapMutations — a node carrying a diagram', () => {
+  const withDiagram = (diagram: unknown) =>
+    planMapMutations([
+      addNodes([
+        { ref: 'a', kind: 'approach', label: 'A handover list', diagram },
+      ]),
+    ]).inserts[0]!;
+
+  // The ordinary case: steps survive in order, and the note with them.
+  it('keeps a well-formed shape, steps in order', () => {
+    const node = withDiagram({
+      steps: ['A call-back is promised', 'It joins the list', 'Someone closes it'],
+      note: 'The wipe is what deletes the state today.',
+    });
+
+    expect(node.diagram).toEqual({
+      steps: ['A call-back is promised', 'It joins the list', 'Someone closes it'],
+      note: 'The wipe is what deletes the state today.',
+    });
+  });
+
+  // One step is not a flow — it is a sentence, and it would draw as a single
+  // box with an arrow pointing at nothing.
+  it('rejects a shape too short to be a flow', () => {
+    expect(withDiagram({ steps: ['Only this'] }).diagram).toBeNull();
+    expect(withDiagram({ steps: [] }).diagram).toBeNull();
+  });
+
+  // Blank steps are dropped before the length is judged, so three steps of
+  // which two are whitespace is still not a flow.
+  it('drops blank steps and judges the length after', () => {
+    expect(withDiagram({ steps: ['Real', '   ', ''] }).diagram).toBeNull();
+    expect(
+      withDiagram({ steps: ['Real', '  ', 'Also real'] }).diagram,
+    ).toEqual({ steps: ['Real', 'Also real'] });
+  });
+
+  // The note is optional, and its absence must not leave the key present with
+  // an empty value — the card renders a caption line for anything truthy.
+  it('omits the note entirely rather than carrying an empty one', () => {
+    const node = withDiagram({ steps: ['One', 'Two'], note: '   ' });
+
+    expect(node.diagram).toEqual({ steps: ['One', 'Two'] });
+    expect(node.diagram).not.toHaveProperty('note');
+  });
+
+  // Anything that is not a shape at all produces no diagram rather than a
+  // throw that would take the whole turn down with it.
+  it('survives junk where a shape was expected', () => {
+    for (const junk of [null, undefined, 'steps', 42, [], { steps: 'one,two' }]) {
+      expect(withDiagram(junk).diagram).toBeNull();
+    }
+  });
+
+  // A node that never mentioned a diagram is the ordinary case and must come
+  // through carrying none.
+  it('leaves a node with no diagram alone', () => {
+    const plan = planMapMutations([
+      addNodes([{ ref: 'a', kind: 'finding', label: 'Two keyholders' }]),
+    ]);
+
+    expect(plan.inserts[0]!.diagram).toBeNull();
+  });
+});

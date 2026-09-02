@@ -1,0 +1,12 @@
+{
+  "name": "BoardMenu - NoneCurrent",
+  "id": "a85390f1-8ea4-47d7-b957-871701f597b8",
+  "url": "/isolated-components/BoardMenu?s=NoneCurrent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardMenu",
+  "scenarioType": "component",
+  "description": "Viewing a board that is not in the list, which is reachable by direct link. Nothing should be marked as current when nothing is."
+}

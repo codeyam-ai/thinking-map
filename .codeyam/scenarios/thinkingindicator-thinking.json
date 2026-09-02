@@ -1,0 +1,12 @@
+{
+  "name": "ThinkingIndicator - Thinking",
+  "id": "7456ee77-9d1b-48c7-b52e-a9c0a871a3e0",
+  "url": "/isolated-components/ThinkingIndicator?s=Thinking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "ThinkingIndicator",
+  "scenarioType": "component",
+  "description": "A later beat in the same wait. The wording is a prop because what the partner is doing changes, and the line has to hold its place on the axis whatever it says."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - Open",
+  "id": "a178f862-78a7-4c0a-b395-51b953c8b4a1",
+  "url": "/isolated-components/QuestionCard?s=Open",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "An unanswered card, saturated in its theme's colour, carrying a field nobody had to click to reveal. The one thing a first-time user has to discover is that these are typed into, so the affordance exists before the interaction that would show it."
+}
