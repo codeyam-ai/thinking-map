@@ -223,7 +223,6 @@ blob-report/
 .codeyam/state/last-advance.txt
 .codeyam/state/provider-auth-verdict.json
 .codeyam/state/dependency-provision.json
-.codeyam/state/setup-provision.json
 .codeyam/state/session-results-snapshot.json
 .codeyam/state/step-highwater.json
 .codeyam/state/finalize-phase-fingerprints.json

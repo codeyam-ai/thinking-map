@@ -77,26 +77,8 @@ no human-observable consequence, and say so in the report rather than padding.
 Per partition:
 
 - **`covered`** → surface `scenario`, carrying the slug, name, `scenarioType`
-  (`application` or `component`) and a one-line reason. Step one is always
-  opening that scenario — the row's button does it for the reader. What the
-  remaining steps may say depends on which kind it is, and the two are not
-  interchangeable:
-  - **`scenarioType: application`** — the scenario boots the seeded app. Steps
-    may navigate, click, and fill within it. A click-through is exactly right.
-  - **`scenarioType: component`** — the scenario renders the component in the
-    state the test needs, in isolation. The remaining steps are what to *look
-    at* in that frame, plus only those interactions the isolated render
-    actually supports. Never write a route to navigate, a preceding screen to
-    pass through, or a sequence of states: the frame is already the end state,
-    so "open the prompt screen and expand the picker" is unfollowable there.
-
-  Some isolated components genuinely respond to clicks in their render, so the
-  rule is not "component scenarios take no interaction" — it is **take no step
-  the isolated render cannot support**. When you cannot tell which applies, run
-  `codeyam-editor editor scenario-explain <slug>`: it reports what the scenario
-  seeds and which URL it renders, and its screenshot shows what the reader will
-  see. If the steps you are about to write are not performable against that,
-  they are the wrong steps or it is the wrong surface.
+  (`application` or `component`) and a one-line reason. Steps open that
+  scenario and exercise the specific thing that changed.
 - **`uncovered`** → surface `uncovered`, carrying `uncoveredKind`
   (`component` or `route`), the name, and the file. **Still write the test.**
   Silently skipping surfaces with no scenario hides exactly the gaps that
@@ -105,30 +87,6 @@ Per partition:
 - **`noUiImpact`** → surface `noUiSurface` with a note, and steps describing a
   CLI or API verification. Write nothing only when the change genuinely has no
   observable effect.
-
-**When no surface can demonstrate the behavior, capture one — never write the
-unfollowable steps anyway.** Generation otherwise only ever *reads* the scenario
-set, which is what forces the bad trade: a verification the existing frames
-cannot show gets written as navigation against a frame that cannot be navigated.
-Three moves, each **proposed to the user and run only on confirmation**, because
-each writes into `.codeyam/scenarios/` and produces screenshots the audit gates
-read:
-
-- A **missing state**, with a component or route that already exists →
-  `codeyam-editor editor register` to capture it, then point the test at the new
-  slug.
-- An **interactive state** reachable by one action →
-  `codeyam-editor editor preview-interact`, which drives the click and
-  re-captures without editing application source.
-- A **sequence** — the verification is a round trip, not a frame ("choose one,
-  then clear it, and see the field return to its empty line") →
-  `codeyam-editor editor preview-flow`, whose ordered captioned filmstrip is
-  what such a test should point at.
-
-The boundary stays where it was: you still never edit application source, and a
-`noUiImpact` change has nothing to capture. Capture is **offered, never
-mandatory** — if the user declines, say in the test's `intent` that the surface
-does not exist yet rather than writing steps against one that does not.
 
 Writing the fields:
 
