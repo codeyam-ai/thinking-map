@@ -1,0 +1,467 @@
+{
+  "timestamp": "2026-09-03T11:35:55Z",
+  "title": "A Pinch on the Map Zooms the Map, Not the Page",
+  "type": "feature",
+  "userRequest": "## Summary\n\nPinching on the board zooms the whole browser page before (and as well as) the\nboard. The board's zoom handler is a React `onWheel` prop, and React attaches\n`wheel` at the root container as a **passive** listener — so nothing in that\nhandler can ever call `preventDefault()`, and the browser is free to apply its\nown page zoom to the same gesture. The `touch-none` class on the board shell\nalready covers touchscreen pinch; what is unhandled is the trackpad pinch, which\narrives as `ctrl`+`wheel` on desktop and as Safari's non-standard `gesture*`\nevents. Fix: register the wheel and gesture listeners natively on the board\nelement with `{ passive: false }` and call `preventDefault()`, so the gesture\nbelongs to the board and the page never scales.\n\n## Key Decisions\n\n- **Native listeners, not the React prop.** React 19 registers `wheel` (like\n  `touchstart`/`touchmove`) as passive on the root container, so\n  `e.preventDefault()` inside `onWheel` is a no-op and logs a console warning.\n  There is no React-level flag to opt out; the only working seam is\n  `addEventListener('wheel', h, { passive: false })` on the element itself. This\n  is why the earlier plan's zoom \"worked\" while the page kept zooming — the\n  board's zoom ran, but the browser's did too.\n- **Prevent the plain-wheel pan too, not just the pinch.** The board is a\n  canvas: a two-finger scroll over it should move the board and nothing else.\n  `overscroll-contain` stops the scroll chaining to an ancestor but does not stop\n  the page from scrolling in the first place if it ever becomes scrollable.\n  Preventing every wheel event the board consumes is the honest rule.\n- **Handle Safari's `gesturestart` / `gesturechange` / `gestureend`.** Safari\n  emits these for trackpad pinch alongside `ctrl`+`wheel`, and an unprevented\n  `gesturestart` still triggers Safari's page zoom. They are not in `lib.dom`,\n  so they are attached by string name with a locally-declared event shape rather\n  than a global type augmentation.\n- **The hook owns the listeners, keyed off a surface ref passed in.**\n  `useBoardCamera` already owns pan, zoom and the selection lock for this\n  surface; splitting \"the gesture\" across the hook and the component is what let\n  the preventDefault gap open. `GalaxyBoard` already holds a `shell` ref for\n  measuring — pass that same ref to the hook rather than introducing a second.\n- **Zoom stays about the viewport centre.** Zoom-about-pointer is a real\n  improvement and is now cheap (the native event carries `clientX`/`clientY`),\n  but it is a behaviour change, not this bug. Out of scope.\n\n## Implementation\n\n### 1. Attach the wheel and gesture listeners natively\n\n**File**: `app/hooks/useBoardCamera.ts`\n\nGive the hook a second parameter — the board surface, as a\n`RefObject<HTMLElement | null>` — and add a `useEffect` that attaches the\nlisteners to `surface.current` with `{ passive: false }`, returning a cleanup\nthat removes them.\n\n- `wheel`: call `e.preventDefault()` unconditionally (the board consumes every\n  wheel event over it), then apply the existing split — `ctrlKey || metaKey`\n  scales by `clampScale(c.scale * (1 - deltaY * 0.01))`, otherwise pan by\n  `deltaX`/`deltaY` divided by scale. The body of the current `onWheel` moves\n  here verbatim; only the event type changes from `React.WheelEvent` to the\n  native `WheelEvent`.\n- `gesturestart`, `gesturechange`, `gestureend`: `preventDefault()` on each.\n  `gesturechange` additionally scales — Safari's `scale` on the event is\n  cumulative for the gesture, so track the previous value in a ref and apply the\n  ratio, which keeps the clamp and the units consistent with the wheel path.\n- Remove `onWheel` from the returned `handlers` object, since the React prop is\n  exactly the thing that cannot work. The pointer handlers stay as they are.\n\nKeep the effect's dependency list empty apart from the ref: all camera writes go\nthrough the `setCamera` updater form, so the listeners never close over a stale\ncamera and never need reattaching.\n\n### 2. Pass the board shell to the camera\n\n**File**: `app/components/GalaxyBoard.tsx`\n\nMove the `const shell = useRef<HTMLDivElement>(null)` declaration above the\n`useBoardCamera(...)` call and pass it as the second argument. The\n`{...handlers}` spread on the shell `div` stays — it now carries only the\npointer handlers. Nothing else about the element changes; `touch-none`,\n`overscroll-contain` and `isolate` are all still doing their jobs for the\ntouchscreen and scroll-chaining cases.\n\nAdd a short comment at the spread noting that wheel/pinch is deliberately NOT in\nthis spread, and why — otherwise the next person \"tidies up\" by re-adding\n`onWheel` and quietly restores the bug.\n\n### 3. Pin the fix with the reproduction test\n\n**File**: `app/hooks/useBoardCamera.test.ts`\n\nAdd the test in `## Reproduction Test` to the existing `useBoardCamera zooming`\ndescribe block, plus a companion asserting the pinch actually changes\n`camera.scale` (so a fix that prevents the default but stops zooming would still\nbe caught) and one asserting a plain wheel pans rather than zooms.\n\n## Reused existing code\n\n- `clampScale` from `app/hooks/useBoardCamera.ts` (glossary entry: `clampScale`)\n  — the zoom clamp is unchanged; both the wheel and gesture paths go through it.\n- `useBoardCamera` from `app/hooks/useBoardCamera.ts` (glossary entry:\n  `useBoardCamera`) — the hook being modified; its pan, threshold and selection\n  behaviour are untouched.\n- `GalaxyBoard` from `app/components/GalaxyBoard.tsx` (glossary entry:\n  `GalaxyBoard`) — the only caller; already holds the `shell` ref this needs.\n- `suppressTextSelection` from `app/lib/textSelection.ts` (glossary entry:\n  `suppressTextSelection`) — untouched, listed because it shares the gesture\n  lifecycle and must keep working across this change.\n\n**Existing-implementation survey**: there is no other wheel, `gesture*`, or\n`touch-action` handling anywhere in `app/` — a grep for\n`touchAction|touch-action|gesturestart|ctrlKey|onWheel|user-scalable|maximum-scale`\nreturns only `app/hooks/useBoardCamera.ts` and its test, plus the `touch-none` class on the\nboard shell. No viewport `<meta>` with `user-scalable=no` exists in\n`app/layout.tsx`, and none should be added: disabling page zoom document-wide\nwould break legitimate accessibility zoom everywhere else in the app. The fix\nbelongs on the board element alone.\n\n## Reproduction Test\n\nPins that a trackpad pinch over the board is consumed by the board rather than\nhanded to the browser as a page zoom.\n\n**Target**: `app/hooks/useBoardCamera.test.ts` — run with\n`codeyam-editor editor refresh-tests --test useBoardCamera`.\n\n```ts\n// The reported bug: a trackpad pinch over the board zooms the whole PAGE. The\n// board's wheel handler was a React `onWheel` prop, and React attaches `wheel`\n// passively at the root — so preventDefault could never fire and the browser\n// applied its own zoom on top. The assertion is `defaultPrevented`, not the\n// camera: the camera already moved before the fix, and the page zoomed anyway.\nit('consumes a trackpad pinch instead of letting the page zoom', () => {\n  const surface = document.createElement('div');\n  document.body.appendChild(surface);\n  const ref = { current: surface };\n\n  renderHook(() => useBoardCamera(START, ref));\n\n  const pinch = new WheelEvent('wheel', {\n    deltaY: -10,\n    ctrlKey: true,\n    bubbles: true,\n    cancelable: true,\n  });\n  surface.dispatchEvent(pinch);\n\n  expect(pinch.defaultPrevented).toBe(true);\n\n  surface.remove();\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: `useBoardCamera`\ntakes one argument today and registers no native listener, so nothing calls\n`preventDefault` and `pinch.defaultPrevented` is `false`. Under TypeScript the\nsecond argument is also a compile error before the hook signature changes, which\nis the same red one step earlier.\n\n## Scenarios to Demonstrate\n\n- A full board at the default framing, pinched in on a trackpad — the board\n  scales and the page chrome stays exactly where it was.\n- The same board pinched back out past the zoom floor — the clamp holds and the\n  page still does not scale.\n- A two-finger scroll (plain wheel) over the board — the board pans, the page\n  behind it does not move.\n- A pinch that starts over a card's composer (`[data-no-pan]`) — the board still\n  zooms, because zoom is not a drag, and the textarea keeps its own selection.\n- An empty board — nothing to zoom, and the gesture is still swallowed rather\n  than reaching the browser.",
+  "description": "Pinching on the board used to zoom the whole browser page as well as the board. The board's zoom was a React onWheel prop, and React registers wheel as a PASSIVE listener at the root container, so preventDefault inside that handler was a no-op the browser was free to ignore: the board zoomed, and the page zoomed with it. The fix moves wheel and pinch onto native listeners attached to the board element itself with passive false, where preventDefault actually takes effect, and removes onWheel from the returned handlers entirely so it cannot be put back by accident. Safari's non-standard gesturestart, gesturechange and gestureend are handled on the same element, because an unprevented gesturestart still hands Safari its own page zoom - preventing only the wheel would have left the bug half-fixed there. Every wheel event over the board is consumed, the plain two-finger scroll included, since the board is a canvas and the whole gesture belongs to it. The listeners live in useBoardCamera rather than being split across the hook and GalaxyBoard: splitting the gesture is what let the preventDefault gap open in the first place, and GalaxyBoard's existing shell ref is what the hook is now handed.\n\nZoom about the pointer was considered and deliberately left out - it is a real improvement and now cheap, since the native event carries clientX and clientY, but it is a behaviour change rather than this bug.\n\nPinned by five tests in app/hooks/useBoardCamera.test.ts. Four of them - the pinch being consumed, the pinch actually scaling the board, a plain wheel panning and being consumed, and Safari's gesture events being consumed - were proven to go RED with the fix reverted, via prove-red, so they genuinely reproduce the bug rather than passing vacuously. The fifth asserts the listeners are removed on unmount and is green both ways by design, recorded as a survival guard. A new component scenario, GalaxyBoard - ZoomedIn, shows the board at a non-default zoom, which none of the four existing board scenarios did; it is driven by the on-screen zoom control because a capture browser cannot emit a trackpad pinch, so what it demonstrates is the camera's end of the gesture, not the page-zoom suppression, which no screenshot can show. All 43 existing scenarios recaptured pixel-identical, confirming the change altered no rendering anywhere in the app.\n\nSCOPE VERDICT: this cycle delivered no project deliverable and deferred none. All 10 were already resolved before it began - deliverables --open reported zero open at the plan-confirmation gate - so there was no deliverable subset to close. The project's one outstanding deferral, assist-track-not-this-build-flow-registering, was deferred by the user in an earlier cycle and is untouched here. No agent-decided deferrals were made.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/a-pinch-on-the-map-zooms-the-map-not-the-page.md\t.codeyam/plans/completed/a-pinch-on-the-map-zooms-the-map-not-the-page.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/galaxyboard-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/galaxyboard-emptytheme.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/galaxyboard-firsttime.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/galaxyboard-manythemes.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5c736f42ecaeb0a184d1a5d14e2620467148c229b7c81083906d715139bc12df.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e4fc46313c6ef4f57a85fa989b15ebade0f568550f6c5ab6c7e9d0bc6171d349.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useBoardCamera.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useBoardCamera.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/galaxyboard-zoomedin.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-zoomedin--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-zoomedin--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/a-pinch-on-the-map-zooms-the-map-not-the-page.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1544537ccdd4e681fe9ad8c36d5574ceefea0a3b8b65dcd005e903abfe85c166.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2aca6f6c5a8475cb85ea16de0304141dd9e036123283e4ba45c20de0c53b5bfc.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/66d5e06ecb3e8982743546ca242b82372ed6966f9b7d75511e23df6b1f023e70.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e67219ea3b2091e37c086412afbc85468b937e30096ba1b7ab5075ed78d8cb02.json",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round ends itself, on a real board",
+      "screenshotPath": "the-round-ends-itself-on-a-real-board--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - RoundHeldOpen",
+      "screenshotPath": "boardworkspace-roundheldopen--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ZoomedIn",
+      "screenshotPath": "galaxyboard-zoomedin--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 36,
+    "passed": 36,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 36,
+        "passed": 36
+      }
+    ]
+  }
+}

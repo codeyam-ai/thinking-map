@@ -76,13 +76,19 @@ export default function GalaxyBoard({
   onChoose?: (choice: string) => void;
 }) {
   const layout = useMemo(() => layOutGalaxy(themes, nodes), [themes, nodes]);
-  const { camera, zoomBy, focusOn, handlers } = useBoardCamera({
-    scale: 0.4,
-    x: 0,
-    y: 0,
-  });
-  const [focusedId, setFocusedId] = useState<string | null>(null);
+  // Declared above the camera because the camera needs it: the wheel and pinch
+  // listeners are attached to this element directly, which is the only way they
+  // can stop the browser zooming the page along with the board.
   const shell = useRef<HTMLDivElement>(null);
+  const { camera, zoomBy, focusOn, handlers } = useBoardCamera(
+    {
+      scale: 0.4,
+      x: 0,
+      y: 0,
+    },
+    shell,
+  );
+  const [focusedId, setFocusedId] = useState<string | null>(null);
 
   /** Frame the whole board.
    *
@@ -124,6 +130,10 @@ export default function GalaxyBoard({
       // drift rather than hold still while you zoom.
       className="relative isolate h-full w-full touch-none overflow-hidden overscroll-contain rounded-[26px] bg-[#050505]"
       style={{ cursor: 'grab' }}
+      // Pointer handlers only. Wheel and pinch are deliberately NOT in this
+      // spread: React registers `wheel` passively, so an `onWheel` prop here
+      // could never call preventDefault and the browser would zoom the page
+      // along with the board. They live on the element itself, in the camera.
       {...handlers}
     >
       {/* The galaxy, under the same transform as the cards — a backdrop that

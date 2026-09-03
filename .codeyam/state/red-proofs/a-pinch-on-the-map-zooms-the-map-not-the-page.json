@@ -1,0 +1,58 @@
+{
+  "provenAt": "2026-09-03T11:09:45Z",
+  "slug": "a-pinch-on-the-map-zooms-the-map-not-the-page",
+  "paths": [
+    "app/hooks/useBoardCamera.ts",
+    "app/components/GalaxyBoard.tsx"
+  ],
+  "runScope": [
+    "app/hooks/useBoardCamera.ts",
+    "app/components/GalaxyBoard.tsx"
+  ],
+  "tests": {
+    "consumes Safari gesture events so the page does not scale": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "consumes a trackpad pinch instead of letting the page zoom": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "pans rather than zooms on a plain wheel, and consumes that too": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "scales the board when a pinch is consumed": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "stops consuming wheel events once the board unmounts": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "consumes a trackpad pinch instead of letting the page zoom",
+      "scales the board when a pinch is consumed",
+      "pans rather than zooms on a plain wheel, and consumes that too",
+      "consumes Safari gesture events so the page does not scale"
+    ]
+  }
+}

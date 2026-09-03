@@ -1,0 +1,22 @@
+{
+  "name": "GalaxyBoard - ZoomedIn",
+  "id": "b26db6f7-796f-4197-8bb0-6ce9234d8240",
+  "url": "/isolated-components/GalaxyBoard?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "GalaxyBoard",
+  "scenarioType": "component",
+  "description": "The same worked board after the camera has been zoomed in — the state every other GalaxyBoard scenario is missing, because all four of them sit at the opening framed-all zoom. It is the state this feature is about: the board scales and the frame around it does not, which is the whole claim of moving wheel and pinch onto native listeners that call preventDefault instead of a React onWheel prop the browser was free to zoom the page on. Reached by the zoom control rather than a trackpad pinch, because a capture browser cannot emit one; what the frame proves is the camera's end of the gesture.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "+"
+    },
+    {
+      "action": "click",
+      "text": "+"
+    }
+  ]
+}

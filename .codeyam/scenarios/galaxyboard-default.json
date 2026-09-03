@@ -8,5 +8,8 @@
   "mocks": {},
   "componentName": "GalaxyBoard",
   "scenarioType": "component",
+  "demonstratesState": {
+    "cards": "many"
+  },
   "description": "The worked board: the idea on the left, three lines of thinking fanning out at the golden angle's first three hues, and rows of unequal length — three, two and four — so the conclusion has to clear the longest one rather than a typical one. One card carries a picture and one a drawn shape, both at the wide width that pushes their neighbours along."
 }

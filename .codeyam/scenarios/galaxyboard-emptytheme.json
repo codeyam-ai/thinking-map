@@ -8,5 +8,8 @@
   "mocks": {},
   "componentName": "GalaxyBoard",
   "scenarioType": "component",
+  "demonstratesState": {
+    "cards": "empty"
+  },
   "description": "A line of thinking the partner has opened but not yet asked anything in. It still gets a hub, because a theme with no cards has not started rather than gone away — dropping it would make the board silently forget a direction."
 }

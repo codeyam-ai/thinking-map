@@ -186,6 +186,137 @@ describe('useBoardCamera and text selection', () => {
 });
 
 describe('useBoardCamera zooming', () => {
+  // The reported bug: a trackpad pinch over the board zoomed the whole PAGE.
+  // The board's wheel handler was a React `onWheel` prop, and React attaches
+  // `wheel` passively at the root — so preventDefault could never fire and the
+  // browser applied its own zoom on top. The assertion is `defaultPrevented`,
+  // not the camera: the camera already moved before the fix, and the page
+  // zoomed anyway.
+  it('consumes a trackpad pinch instead of letting the page zoom', () => {
+    const surface = document.createElement('div');
+    document.body.appendChild(surface);
+    const ref = { current: surface };
+
+    renderHook(() => useBoardCamera(START, ref));
+
+    const pinch = new WheelEvent('wheel', {
+      deltaY: -10,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    surface.dispatchEvent(pinch);
+
+    expect(pinch.defaultPrevented).toBe(true);
+
+    surface.remove();
+  });
+
+  // Swallowing the gesture is only half the fix. A handler that prevents the
+  // default and then does nothing would pass the test above while leaving the
+  // board frozen under a pinch, which is a worse bug than the one being fixed.
+  it('scales the board when a pinch is consumed', () => {
+    const surface = document.createElement('div');
+    document.body.appendChild(surface);
+    const ref = { current: surface };
+
+    const { result } = renderHook(() => useBoardCamera(START, ref));
+
+    act(() => {
+      surface.dispatchEvent(
+        new WheelEvent('wheel', {
+          deltaY: -10,
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    });
+
+    expect(result.current.camera.scale).toBeGreaterThan(START.scale);
+
+    surface.remove();
+  });
+
+  // A plain wheel is a two-finger scroll, which the board reads as a pan — and
+  // it too must be consumed, because the board is a canvas and every wheel
+  // event over it belongs to the board rather than to the page behind it.
+  it('pans rather than zooms on a plain wheel, and consumes that too', () => {
+    const surface = document.createElement('div');
+    document.body.appendChild(surface);
+    const ref = { current: surface };
+
+    const { result } = renderHook(() => useBoardCamera(START, ref));
+
+    const scroll = new WheelEvent('wheel', {
+      deltaX: 30,
+      deltaY: 20,
+      bubbles: true,
+      cancelable: true,
+    });
+    act(() => {
+      surface.dispatchEvent(scroll);
+    });
+
+    expect(scroll.defaultPrevented).toBe(true);
+    expect(result.current.camera.scale).toBe(START.scale);
+    expect(result.current.camera.x).toBe(START.x + 30);
+    expect(result.current.camera.y).toBe(START.y + 20);
+
+    surface.remove();
+  });
+
+  // Safari does not only send ctrl+wheel for a trackpad pinch; it also emits
+  // its own gesture events, and an unprevented gesturestart still hands Safari
+  // its page zoom. Preventing the wheel alone leaves the bug half-fixed there.
+  it('consumes Safari gesture events so the page does not scale', () => {
+    const surface = document.createElement('div');
+    document.body.appendChild(surface);
+    const ref = { current: surface };
+
+    const { result } = renderHook(() => useBoardCamera(START, ref));
+
+    const start = new Event('gesturestart', { bubbles: true, cancelable: true });
+    Object.defineProperty(start, 'scale', { value: 1 });
+    const change = new Event('gesturechange', { bubbles: true, cancelable: true });
+    Object.defineProperty(change, 'scale', { value: 1.5 });
+
+    act(() => {
+      surface.dispatchEvent(start);
+      surface.dispatchEvent(change);
+    });
+
+    expect(start.defaultPrevented).toBe(true);
+    expect(change.defaultPrevented).toBe(true);
+    expect(result.current.camera.scale).toBeGreaterThan(START.scale);
+
+    surface.remove();
+  });
+
+  // The listeners belong to the surface, so unmounting must take them with it.
+  // A board that keeps swallowing wheel events after it is gone would freeze
+  // scrolling on whatever replaced it.
+  it('stops consuming wheel events once the board unmounts', () => {
+    const surface = document.createElement('div');
+    document.body.appendChild(surface);
+    const ref = { current: surface };
+
+    const { unmount } = renderHook(() => useBoardCamera(START, ref));
+    unmount();
+
+    const afterUnmount = new WheelEvent('wheel', {
+      deltaY: -10,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    surface.dispatchEvent(afterUnmount);
+
+    expect(afterUnmount.defaultPrevented).toBe(false);
+
+    surface.remove();
+  });
+
   // The clamp at both ends. Past the floor the board is a few pixels of noise
   // with no way back; past the ceiling one card fills the screen and the shape
   // of the thinking — the entire point of the board — is gone.

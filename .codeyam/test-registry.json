@@ -9122,8 +9122,26 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › clamps a zoom asked for through focusOn",
-      "line": 236,
+      "line": 367,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Safari does not only send ctrl+wheel for a trackpad pinch; it also emits its own gesture events, and an unprevented gesturestart still hands Safari its page zoom. Preventing the wheel alone leaves the bug half-fixed there.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › consumes Safari gesture events so the page does not scale",
+      "line": 272,
+      "registeredAt": "2026-09-03T11:09:52Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported bug: a trackpad pinch over the board zoomed the whole PAGE. The board's wheel handler was a React `onWheel` prop, and React attaches `wheel` passively at the root — so preventDefault could never fire and the browser applied its own zoom on top. The assertion is `defaultPrevented`, not the camera: the camera already moved before the fix, and the page zoomed anyway.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › consumes a trackpad pinch instead of letting the page zoom",
+      "line": 195,
+      "registeredAt": "2026-09-03T11:09:52Z",
       "runner": "tests"
     },
     {
@@ -9131,7 +9149,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › focuses on a point, optionally changing zoom with it",
-      "line": 224,
+      "line": 355,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -9140,7 +9158,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › holds the zoom inside its limits at both ends",
-      "line": 192,
+      "line": 323,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -9149,8 +9167,35 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › never lets the scale reach zero or go negative",
-      "line": 212,
+      "line": 343,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A plain wheel is a two-finger scroll, which the board reads as a pan — and it too must be consumed, because the board is a canvas and every wheel event over it belongs to the board rather than to the page behind it.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › pans rather than zooms on a plain wheel, and consumes that too",
+      "line": 244,
+      "registeredAt": "2026-09-03T11:09:52Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Swallowing the gesture is only half the fix. A handler that prevents the default and then does nothing would pass the test above while leaving the board frozen under a pinch, which is a worse bug than the one being fixed.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › scales the board when a pinch is consumed",
+      "line": 218,
+      "registeredAt": "2026-09-03T11:09:52Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The listeners belong to the surface, so unmounting must take them with it. A board that keeps swallowing wheel events after it is gone would freeze scrolling on whatever replaced it.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera zooming › stops consuming wheel events once the board unmounts",
+      "line": 299,
+      "registeredAt": "2026-09-03T11:09:52Z",
       "runner": "tests"
     },
     {

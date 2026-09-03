@@ -8,5 +8,9 @@
   "mocks": {},
   "componentName": "GalaxyBoard",
   "scenarioType": "component",
+  "demonstratesState": {
+    "themes": "many",
+    "nodes": "many"
+  },
   "description": "The palette under stress: twelve galaxies at once. The golden angle's whole promise is that the twelfth is as findable as the second, without anyone having known in advance there would be twelve — this is the frame where that is actually checked by eye."
 }

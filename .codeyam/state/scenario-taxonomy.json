@@ -330,6 +330,34 @@
         "status": "covered"
       }
     },
+    "GalaxyBoard": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The board renders synchronously from the themes and nodes it is handed; it never fetches. The in-flight state of a round is drawn by ThinkingIndicator, which the board composes and which owns that state on its own view, so a loading frame here would picture a child's state rather than the board's."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The board has no failure surface of its own. It draws whatever layout it is given, and a layout it cannot compute is not reachable - layOutGalaxy seeds its bounds on the idea and the conclusion, so even zero themes produces a valid frame, which is the FirstTime scenario rather than an error one. Write failures belong to the composers and to PhaseAdvance, each captured on its own view."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
     "Home": {
       "empty": {
         "status": "covered"

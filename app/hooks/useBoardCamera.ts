@@ -12,7 +12,7 @@
 // compositor handles for free, and a library would bring a renderer, a node
 // type registry and an edge system to replace about sixty lines.
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { suppressTextSelection } from '@/app/lib/textSelection';
 
 export interface Camera {
@@ -28,7 +28,18 @@ const MAX_SCALE = 1.6;
 
 const clampScale = (s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
 
-export function useBoardCamera(initial: Camera) {
+/** Safari's trackpad-pinch events, which are not in `lib.dom`. Declared here
+ *  and attached by string name rather than augmenting the global event map: a
+ *  global augmentation would claim every element in the app emits these, which
+ *  is only true in one browser. */
+interface GestureEventLike extends Event {
+  scale: number;
+}
+
+/** @param surface The board element the gestures belong to. Optional only so
+ *  the camera can be exercised without a DOM; with no surface the wheel and
+ *  pinch listeners have nowhere to attach and the browser keeps the gesture. */
+export function useBoardCamera(initial: Camera, surface?: RefObject<HTMLElement | null>) {
   const [camera, setCamera] = useState<Camera>(initial);
   // The drag origin lives in a ref, not state: it changes on every pointermove
   // and nothing renders from it, so putting it in state would re-render the
@@ -49,6 +60,10 @@ export function useBoardCamera(initial: Camera) {
   // the gesture lasts. A ref rather than state for the same reason as `drag`:
   // nothing renders from it.
   const restoreSelection = useRef<(() => void) | null>(null);
+  /** Safari's cumulative pinch scale as of the previous `gesturechange`, so each
+   *  event can be applied as a ratio and go through the same clamp as the wheel
+   *  path. A ref for the same reason as `drag`: nothing renders from it. */
+  const gestureScale = useRef(1);
 
 /** How far the pointer must travel before the gesture is a pan rather than a
  *  click. Three pixels is below the noise floor of a normal click but well
@@ -121,20 +136,75 @@ const PAN_THRESHOLD = 3;
     if (el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
   }, []);
 
-  const onWheel = useCallback((e: React.WheelEvent) => {
-    // Trackpad pinch arrives as a wheel event with ctrlKey set; a plain wheel
-    // is a two-finger scroll, which should pan rather than zoom.
-    if (e.ctrlKey || e.metaKey) {
-      setCamera((c) => ({ ...c, scale: clampScale(c.scale * (1 - e.deltaY * 0.01)) }));
-      return;
-    }
-    setCamera((c) => ({ ...c, x: c.x + e.deltaX / c.scale, y: c.y + e.deltaY / c.scale }));
-  }, []);
+  // Zoom and wheel-pan are attached natively rather than through React's
+  // `onWheel` prop, and that is the fix rather than a style preference. React
+  // registers `wheel` as a PASSIVE listener on the root container, so
+  // `preventDefault()` inside an `onWheel` handler is a no-op that only logs a
+  // warning — the board zoomed, and the browser zoomed the whole page on the
+  // same gesture. There is no React-level flag to opt out; the element's own
+  // listener with `{ passive: false }` is the only seam where the board can
+  // actually claim the gesture.
+  useEffect(() => {
+    const el = surface?.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      // Unconditional, not only for the pinch. The board is a canvas: every
+      // wheel event over it belongs to the board, and leaving the plain-wheel
+      // case unprevented would let the page scroll underneath the pan the
+      // moment the document ever becomes scrollable.
+      e.preventDefault();
+      // Trackpad pinch arrives as a wheel event with ctrlKey set; a plain wheel
+      // is a two-finger scroll, which should pan rather than zoom.
+      if (e.ctrlKey || e.metaKey) {
+        setCamera((c) => ({ ...c, scale: clampScale(c.scale * (1 - e.deltaY * 0.01)) }));
+        return;
+      }
+      setCamera((c) => ({ ...c, x: c.x + e.deltaX / c.scale, y: c.y + e.deltaY / c.scale }));
+    };
+
+    // Safari emits these for a trackpad pinch alongside ctrl+wheel, and an
+    // unprevented `gesturestart` still hands Safari its own page zoom — so
+    // preventing the wheel alone would leave the bug half-fixed there.
+    const onGestureStart = (e: Event) => {
+      e.preventDefault();
+      gestureScale.current = (e as GestureEventLike).scale || 1;
+    };
+    const onGestureChange = (e: Event) => {
+      e.preventDefault();
+      const s = (e as GestureEventLike).scale;
+      if (!s || !gestureScale.current) return;
+      const ratio = s / gestureScale.current;
+      gestureScale.current = s;
+      setCamera((c) => ({ ...c, scale: clampScale(c.scale * ratio) }));
+    };
+    const onGestureEnd = (e: Event) => {
+      e.preventDefault();
+      gestureScale.current = 1;
+    };
+
+    const opts: AddEventListenerOptions = { passive: false };
+    el.addEventListener('wheel', onWheel, opts);
+    el.addEventListener('gesturestart', onGestureStart, opts);
+    el.addEventListener('gesturechange', onGestureChange, opts);
+    el.addEventListener('gestureend', onGestureEnd, opts);
+    return () => {
+      el.removeEventListener('wheel', onWheel, opts);
+      el.removeEventListener('gesturestart', onGestureStart, opts);
+      el.removeEventListener('gesturechange', onGestureChange, opts);
+      el.removeEventListener('gestureend', onGestureEnd, opts);
+    };
+    // Every camera write goes through the `setCamera` updater form, so these
+    // listeners never close over a stale camera and never need reattaching.
+  }, [surface]);
 
   return {
     camera,
     zoomBy,
     focusOn,
-    handlers: { onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp, onWheel },
+    // No `onWheel` here, deliberately: see the effect above. A React wheel prop
+    // is registered passively and cannot preventDefault, so putting one back
+    // would silently restore the page-zooms-too bug.
+    handlers: { onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp },
   };
 }
