@@ -1,0 +1,12 @@
+{
+  "name": "BoardNav - SomethingChanged",
+  "id": "2dc40090-0e25-4f6b-a645-4631230766f5",
+  "url": "/isolated-components/BoardNav?s=SomethingChanged",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNav",
+  "scenarioType": "component",
+  "description": "The map moved while the person was answering. The partner read what they said and wrote at the far end, and the lime badge on the Insights button is the only thing on screen that says so — which is what makes crossing the board worth doing rather than a gamble."
+}

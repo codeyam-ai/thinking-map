@@ -26,6 +26,7 @@
 // previous answer through the same path a first answer takes.
 
 import { useEffect, useState } from 'react';
+import { composeAnswer, toggleChoice } from '@/app/lib/answerDraft';
 import { cardCopyLabel, cardCopyText } from '@/app/lib/boardCopyText';
 import { cardEyebrow } from '@/app/lib/cardEyebrow';
 import {
@@ -45,11 +46,15 @@ export default function QuestionCard({
   focused,
   onFocus,
   onAnswer,
+  onSkip,
 }: {
   card: PlacedCard;
   focused: boolean;
   onFocus: () => void;
   onAnswer: (text: string) => void;
+  /** Move on without answering. Optional: an isolated fixture has nowhere to
+   *  move on TO, and a Skip that goes nowhere is worse than no Skip. */
+  onSkip?: () => void;
 }) {
   // Which of the three faces this card shows. The rule is a property of the
   // node rather than of rendering, so it lives in `cardPresentation` where a
@@ -61,8 +66,23 @@ export default function QuestionCard({
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
-  /** The free-text box, opened from under a shortlist. */
-  const [otherOpen, setOtherOpen] = useState(false);
+  /** The options taken so far — plural, because "two of those" is an ordinary
+   *  answer and the card used to be able to record only one. */
+  const [picked, setPicked] = useState<string[]>([]);
+
+  /** What was just recorded, shown before the map has caught up.
+   *
+   *  Answering writes to the shared log and the board re-renders from the
+   *  server when the map's revision rises — which is a round trip, and until it
+   *  lands the card someone just answered still looks unanswered. Holding the
+   *  answer here lets the card turn over IMMEDIATELY, so the person sees their
+   *  own words land on the card they put them on. It is cleared by the real
+   *  node arriving answered, which is what makes this an early view of the
+   *  truth rather than a second copy of it. */
+  const [justAnswered, setJustAnswered] = useState<string | null>(null);
+  useEffect(() => {
+    if (card.status === 'answered') setJustAnswered(null);
+  }, [card.status]);
 
   // Seed the editor from what is on the card, so opening the pencil shows the
   // existing answer to amend rather than an empty box to retype.
@@ -71,34 +91,42 @@ export default function QuestionCard({
   }, [editing, card.detail]);
 
   const accent = themeColor(card.hue);
-  const writing = open || editing;
-  const hasChoices = Boolean(card.choices?.length);
+  const settled = answered || justAnswered !== null;
+  // Editing OUTRANKS settled, and the order matters. `settled` covers both a
+  // node that arrived answered and one answered a moment ago, and a card in
+  // either state stops offering a field — but the pencil's whole job is to put
+  // the field back on exactly such a card. Ordering these the other way round
+  // made the pencil open onto nothing.
+  const writing = editing || (open && !settled);
+  const choices = card.choices ?? [];
+  const hasChoices = choices.length > 0;
 
-  // A card with a shortlist shows EITHER the list or the free-text box, never
-  // both at once. Stacking them put a cramped two-row field hard against the
-  // last pill — it read as one more option rather than as the way past them —
-  // and on a four-option card the pair overflowed the card's fixed height, so
-  // the field was clipped and its only submit hint fell outside the card.
+  // The shortlist and the box for your own words now stand TOGETHER. They were
+  // mutually exclusive, which made the list a cage: you could take exactly one
+  // option, or reject the lot and type instead, and "one of those, with a
+  // qualification" — which is what most answers are — could not be said at all.
   //
-  // Without a shortlist the box is always open, because then it is the only
-  // affordance there is: an unanswered card must look typeable before anyone
-  // has clicked anything.
-  const composing = editing || otherOpen || !hasChoices;
-  /** There is somewhere to go back TO — a shortlist, or the answer being
-   *  amended. A first answer on a card with no options has nothing to cancel. */
-  const cancellable = otherOpen || editing;
+  // The reason they were split was real and is solved rather than ignored: two
+  // full-height regions overflowed a fixed-size card. So the list keeps the
+  // card's spare room and scrolls, and the field goes compact beneath it.
+  const answerText = composeAnswer(picked, draft, choices);
+
+  /** There is somewhere to go back TO. A first answer has nothing to cancel. */
+  const cancellable = editing;
 
   function closeComposer() {
-    setOtherOpen(false);
     setEditing(false);
     setDraft('');
+    setPicked([]);
   }
 
   function submit() {
-    const text = draft.trim();
-    if (!text) return;
-    onAnswer(text);
+    if (!answerText) return;
+    // Turn the card over first, so the answer is visible on it before the
+    // board moves on. `onAnswer` is what arms that move.
+    setJustAnswered(answerText);
     closeComposer();
+    onAnswer(answerText);
   }
 
   return (
@@ -119,7 +147,13 @@ export default function QuestionCard({
     <div
       onClick={onFocus}
       data-no-pan={focused ? '' : undefined}
-      className="group relative flex h-full w-full flex-col rounded-[22px] p-7 text-left transition-all duration-300"
+      // `overflow-hidden` and `break-words`: a card may scroll DOWN, inside the
+      // one region built to (the shortlist, the answer field), and never
+      // sideways. A horizontal scrollbar hides content in the axis nobody
+      // thinks to look in, and the thing that pushes a card sideways is
+      // always the same — one long unbroken word, a URL, a pasted id — so the
+      // fix is to break it rather than to let the card grow a second scrollbar.
+      className="group relative flex h-full w-full flex-col overflow-hidden break-words rounded-[22px] p-7 text-left transition-all duration-300"
       style={{
         background: open ? accent : '#141416',
         border: `1.5px solid ${open ? accent : themeColor(card.hue, { a: 0.42 })}`,
@@ -136,7 +170,7 @@ export default function QuestionCard({
           The icon takes the eyebrow's treatment rather than the raw accent — on
           an open card the accent IS the background, so an accent-coloured glyph
           would be invisible on the very card it sits on. */}
-      {writing && composing ? null : (
+      {writing ? null : (
         <CopyTextButton
           text={cardCopyText(card)}
           label={cardCopyLabel(card)}
@@ -199,7 +233,7 @@ export default function QuestionCard({
             </p>
           ) : null}
         </>
-      ) : answered && !editing ? (
+      ) : settled && !editing ? (
         <>
           {/* Vertically centred: an answered card is a statement, and hanging
               it from the top would leave it looking like a form with the rest
@@ -212,7 +246,9 @@ export default function QuestionCard({
             {card.label}
           </p>
           <p className="mt-2 text-[16px] font-semibold leading-snug text-white">
-            {card.detail}
+            {/* The answer just given outranks the node's own, for the moment
+                between writing it and the map catching up. */}
+            {justAnswered ?? card.detail}
           </p>
           <span className="flex-1" />
 
@@ -236,7 +272,13 @@ export default function QuestionCard({
             className="absolute bottom-6 right-6 opacity-70 transition-opacity hover:opacity-100"
             style={{ color: accent }}
           >
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
               <path
                 d="M4 20h4L19 9a2.1 2.1 0 10-3-3L5 17v3z"
                 stroke="currentColor"
@@ -260,7 +302,10 @@ export default function QuestionCard({
           >
             {editing
               ? 'Editing your answer'
-              : cardEyebrow({ kind: card.kind, answered: card.status === 'answered' })}
+              : cardEyebrow({
+                  kind: card.kind,
+                  answered: card.status === 'answered',
+                })}
           </span>
           {/* Smaller than it was. The question is the label on a card whose
               real content is the answer, and at 19px a two-line question ate
@@ -271,44 +316,50 @@ export default function QuestionCard({
         </>
       )}
 
-      {/* The answer area, in one of its two modes — the shortlist, or the box
-          for saying something it does not contain. Never both: stacking them
-          put a cramped field hard against the last option, where it read as one
-          more option, and on a four-option card the pair overflowed the card's
-          fixed height and clipped the field along with its submit hint.
+      {/* The answer area: the shortlist AND the box for what it does not
+          contain, together, submitted once. Wrapped in `data-no-pan` so a drag
+          that starts on a control belongs to the control rather than panning
+          the board underneath it. */}
+      {writing ? (
+        <div
+          data-no-pan
+          className="contents"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {hasChoices ? (
+            <CardChoiceList
+              choices={choices}
+              picked={picked}
+              light={open}
+              onToggle={(choice) => {
+                setPicked((p) => toggleChoice(p, choice));
+                if (!focused) onFocus();
+              }}
+            />
+          ) : null}
 
-          Whichever is showing is wrapped in `data-no-pan` so a drag that starts
-          on a control belongs to the control rather than panning the board. */}
-      {writing && hasChoices && !composing ? (
-        <div data-no-pan className="contents" onClick={(e) => e.stopPropagation()}>
-          <CardChoiceList
-            choices={card.choices ?? []}
-            light={open}
-            onPick={(choice) => {
-              onAnswer(choice);
-              closeComposer();
-            }}
-            onOther={() => {
-              setOtherOpen(true);
-              onFocus();
-            }}
-          />
-        </div>
-      ) : null}
-
-      {writing && composing ? (
-        <div data-no-pan className="contents" onClick={(e) => e.stopPropagation()}>
           <AnswerComposer
             value={draft}
             onChange={setDraft}
             onSubmit={submit}
             onCancel={cancellable ? closeComposer : null}
-            // On a card with no shortlist this box IS the affordance, so it
-            // says what to do; reached past a list it says why you are here.
-            placeholder={hasChoices ? 'Say it in your own words…' : 'Answer here'}
+            onSkip={onSkip ?? null}
+            // Under a shortlist the box is the place to QUALIFY what you
+            // picked; alone on the card it is the whole answer, so it says
+            // what to do rather than what it is for.
+            placeholder={
+              hasChoices ? 'Add anything the options miss…' : 'Answer here'
+            }
+            // Options taken with nothing typed is a complete answer, so Save
+            // cannot be gated on the field alone.
+            canSubmit={answerText !== null}
+            // The field gives up the card's spare room to the options above it.
+            compact={hasChoices}
             // Only the focused card autofocuses, so a dozen visible fields
-            // still leave exactly one cursor on the board.
-            autoFocus={focused || editing || otherOpen}
+            // still leave exactly one cursor on the board. Never on a card
+            // with a shortlist: the options are what to read first, and a
+            // cursor in the box below them says otherwise.
+            autoFocus={(focused || editing) && !hasChoices}
             onFieldFocus={() => {
               if (!focused) onFocus();
             }}

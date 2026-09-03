@@ -1,0 +1,12 @@
+{
+  "name": "BoardTradeoffs - EffortOnly",
+  "id": "5d5c4da2-e0b1-46a6-b072-98ef659fcece",
+  "url": "/isolated-components/BoardTradeoffs?s=EffortOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardTradeoffs",
+  "scenarioType": "component",
+  "description": "The partner knew the effort and nothing else. A partial answer is kept rather than padded: inventing a cost to fill the shape is exactly the plausible-sounding nothing this field exists to avoid."
+}

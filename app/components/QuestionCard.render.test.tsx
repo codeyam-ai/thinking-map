@@ -135,10 +135,10 @@ describe('QuestionCard — a shortlist', () => {
     }
   });
 
-  // Picking one answers immediately: a chosen option is already the whole
-  // answer, and asking someone to confirm it adds a step carrying no
-  // information.
-  it('answers with an option the moment one is picked', () => {
+  // Picking one no longer ANSWERS. It used to, which made a shortlist a cage:
+  // one option or nothing, and no way to qualify the one you took. Save is
+  // what records, and until it is pressed nothing has been said.
+  it('takes an option without answering on the spot', () => {
     const onAnswer = vi.fn();
     render(
       <QuestionCard
@@ -151,14 +151,40 @@ describe('QuestionCard — a shortlist', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Re-checks' }));
 
-    expect(onAnswer).toHaveBeenCalledWith('Re-checks');
+    expect(onAnswer).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('button', { name: 'Re-checks' }).getAttribute('aria-pressed'),
+    ).toBe('true');
+  });
+
+  // The change this card exists for. "Two of those" is an ordinary answer and
+  // the card could not record it at all.
+  it('records several options as one answer', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={withChoices}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Re-checks' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Owner call-backs' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    // The SHORTLIST's order, not the order they were clicked — an answer that
+    // read differently depending on which pill was tapped first would be one
+    // answer wearing two faces.
+    expect(onAnswer).toHaveBeenCalledWith('Owner call-backs, Re-checks');
   });
 
   // Every list the partner writes is a guess about what you might say, and the
-  // guess must never be the only thing you are allowed to say. The way past the
-  // list has to be present and named in words — it was a grey box captioned
-  // "Other…" jammed against the last option, which read as one more option.
-  it('always offers a way to say something the list does not contain', () => {
+  // guess must never be the only thing you are allowed to say. The box is now
+  // present ALONGSIDE the options rather than replacing them, so the two can
+  // be combined instead of chosen between.
+  it('offers the box for what the list does not contain, beside the list', () => {
     render(
       <QuestionCard
         card={withChoices}
@@ -167,36 +193,82 @@ describe('QuestionCard — a shortlist', () => {
         onAnswer={noop}
       />,
     );
-
-    expect(
-      screen.getByRole('button', { name: /say something else/i }),
-    ).toBeTruthy();
-  });
-
-  // The card shows EITHER the options or the free-text box. Stacking both
-  // overflowed the card's fixed height, which clipped the field and pushed its
-  // only submit hint outside the card entirely.
-  it('swaps the options for a text box rather than stacking them', () => {
-    render(
-      <QuestionCard
-        card={withChoices}
-        focused={false}
-        onFocus={noop}
-        onAnswer={noop}
-      />,
-    );
-
-    expect(document.querySelector('textarea')).toBeNull();
-
-    fireEvent.click(screen.getByRole('button', { name: /say something else/i }));
 
     expect(document.querySelector('textarea')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Re-checks' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Re-checks' })).toBeTruthy();
   });
 
-  // Opening the box must not be a one-way door — the options are still the
-  // likeliest answers, and someone who opened it to look should get them back.
-  it('gives the options back when the free-text box is cancelled', () => {
+  // What most real answers look like: one of the guesses, and the part the
+  // guess missed. Neither half was sayable with the other before.
+  it('joins the options taken to the words typed', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={withChoices}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Re-checks' }));
+    fireEvent.change(document.querySelector('textarea')!, {
+      target: { value: 'and the Friday locum ones' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(onAnswer).toHaveBeenCalledWith(
+      'Re-checks — and the Friday locum ones',
+    );
+  });
+
+  // Save must not be gated on the FIELD when the answer is not only in the
+  // field. Options taken with nothing typed is a complete answer.
+  it('will not record a blank, but will record options alone', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={withChoices}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onAnswer).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Lab results' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onAnswer).toHaveBeenCalledWith('Lab results');
+  });
+
+  // Not answering is a real answer to give. A board that only lets you proceed
+  // by answering turns "I don't know yet" into a made-up answer, which the
+  // partner cannot tell from a real one — and the question stays OPEN, so the
+  // bar keeps counting it and it comes round again.
+  it('offers a way past a question without answering it', () => {
+    const onSkip = vi.fn();
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={withChoices}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+        onSkip={onSkip}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Skip' }));
+
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(onAnswer).not.toHaveBeenCalled();
+  });
+
+  // An isolated fixture has nowhere to move on TO, and a Skip that goes
+  // nowhere is worse than no Skip at all.
+  it('offers no Skip where there is nowhere to skip to', () => {
     render(
       <QuestionCard
         card={withChoices}
@@ -206,15 +278,11 @@ describe('QuestionCard — a shortlist', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /say something else/i }));
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    expect(screen.getByRole('button', { name: 'Re-checks' })).toBeTruthy();
-    expect(document.querySelector('textarea')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull();
   });
 
-  // A first answer on a card with no options has nothing to go back to, so
-  // offering Cancel there would be a control that does nothing.
+  // A first answer has nothing to go back to, so offering Cancel there would
+  // be a control that does nothing.
   it('offers no Cancel when there is nothing to cancel back to', () => {
     render(
       <QuestionCard
@@ -226,6 +294,30 @@ describe('QuestionCard — a shortlist', () => {
     );
 
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
+  });
+
+  // The card turns over the instant it is answered, before the map has caught
+  // up. Answering writes to the shared log and the board re-renders from the
+  // server when the revision rises — a round trip — so without this the card
+  // someone just answered still looks unanswered, which reads as the board
+  // having eaten the answer.
+  it('shows the answer on the card immediately, before the map catches up', () => {
+    render(
+      <QuestionCard
+        card={withChoices}
+        focused={false}
+        onFocus={noop}
+        onAnswer={noop}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Lab results' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    // The node is still `open` — nothing about the card's props changed — and
+    // the card is showing the answer anyway.
+    expect(screen.getByText('Lab results')).toBeTruthy();
+    expect(document.querySelector('textarea')).toBeNull();
   });
 });
 

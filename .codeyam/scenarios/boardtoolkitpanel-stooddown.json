@@ -1,0 +1,12 @@
+{
+  "name": "BoardToolkitPanel - StoodDown",
+  "id": "f38559ac-6f96-4183-8e7d-aafcb472b100",
+  "url": "/isolated-components/BoardToolkitPanel?s=StoodDown",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardToolkitPanel",
+  "scenarioType": "component",
+  "description": "Standing down while a card is focused, or on a finished map. Not the same as dismissed — this is temporary and unrecorded — and it exists because a tablet-width board has no room for both a 300px note and the 276px card someone just flew to, so leaving it up would have the instruction cover the very thing it asked them to do."
+}

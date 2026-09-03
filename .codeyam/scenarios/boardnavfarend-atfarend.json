@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavFarEnd - AtFarEnd",
+  "id": "a782c08a-35c0-424c-9c62-e9dce174e0cb",
+  "url": "/isolated-components/BoardNavFarEnd?s=AtFarEnd",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavFarEnd",
+  "scenarioType": "component",
+  "description": "The same control from the other end, now the way back. It says where it goes rather than just 'back', because 'back' on a board that pans in every direction is not an address."
+}

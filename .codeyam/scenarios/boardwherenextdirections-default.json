@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextDirections - Default",
+  "id": "ef128c26-7657-4901-8319-a381c822339c",
+  "url": "/isolated-components/BoardWhereNextDirections?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextDirections",
+  "scenarioType": "component",
+  "description": "Three directions as pressable buttons. On paper these were lettered list items — A, B, C, inert — which made the end of the map a thing to read. Pressing one is the same contribution the insight stack's 'where next' already makes: a note saying which way to go, not an answer, because no question on the map is closed by choosing a direction."
+}

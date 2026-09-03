@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavFarEnd - OneChanged",
+  "id": "0073933d-0648-4143-8317-7d38ce44c82f",
+  "url": "/isolated-components/BoardNavFarEnd?s=OneChanged",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavFarEnd",
+  "scenarioType": "component",
+  "description": "A single arrival. The badge is a number rather than the word 'new', so the singular costs nothing."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextPanel - Default",
+  "id": "d7db8ecd-b05b-4e58-bdd2-73dee77b6f89",
+  "url": "/isolated-components/BoardWhereNextPanel?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextPanel",
+  "scenarioType": "component",
+  "description": "One region of the far-end column. Its whole reason for existing is that the heading is InsightSectionLabel rather than a sixth hand-copy of the same six utility classes — the board's eyebrow, deliberately not the app's paper-palette one, which is near-black and renders invisible on this plane."
+}

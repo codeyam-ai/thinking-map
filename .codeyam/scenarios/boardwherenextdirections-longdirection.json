@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextDirections - LongDirection",
+  "id": "465f9fc6-6898-49a1-a651-bcef907130ae",
+  "url": "/isolated-components/BoardWhereNextDirections?s=LongDirection",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextDirections",
+  "scenarioType": "component",
+  "description": "A direction long enough to wrap. It wraps rather than truncating, because half a direction cannot be chosen between — which is the only thing these buttons are for."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardNav - Answered",
+  "id": "0bd9bd5d-9fef-415d-a028-922a0489f19b",
+  "url": "/isolated-components/BoardNav?s=Answered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNav",
+  "scenarioType": "component",
+  "description": "Everything answered, and the way ON standing exactly where the count stood, in the same lime. This is the bar's one rule made visible: the left side always points somewhere. It briefly read 'Nothing waiting on you' here, next to two other controls each claiming to be the next move — a dead end in the one place a person looks to find out where to go."
+}

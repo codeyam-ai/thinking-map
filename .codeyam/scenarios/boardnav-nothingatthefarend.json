@@ -1,0 +1,12 @@
+{
+  "name": "BoardNav - NothingAtTheFarEnd",
+  "id": "935af4ab-5455-44c9-9d84-c85bfd8ec55b",
+  "url": "/isolated-components/BoardNav?s=NothingAtTheFarEnd",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNav",
+  "scenarioType": "component",
+  "description": "A fresh board with no insights yet, where the Insights button is ABSENT rather than empty. A door onto an empty room competes for attention with the one thing genuinely waiting, so the bar offers the questions and nothing else until the partner has actually worked something out."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestions - Answered",
+  "id": "71c1b716-0320-4284-93d0-e6145d5ec14d",
+  "url": "/isolated-components/BoardNavQuestions?s=Answered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestions",
+  "scenarioType": "component",
+  "description": "Nothing left open and a phase still to reach. The way on takes the count's PLACE rather than sitting beside it: only one of the two can ever be the next thing to do, and showing both is what made this bar say three different things at once."
+}

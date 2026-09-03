@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestionList - Single",
+  "id": "43d1b5e0-068e-41bf-81fe-0cbcf215443b",
+  "url": "/isolated-components/BoardNavQuestionList?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestionList",
+  "scenarioType": "component",
+  "description": "One question is a legitimate list, and it must not read as a heading."
+}

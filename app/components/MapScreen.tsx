@@ -2,69 +2,26 @@ import AgentHandoff from './AgentHandoff';
 import AgentStatus from './AgentStatus';
 import AppHeader from './AppHeader';
 import BoardWorkspace from './BoardWorkspace';
-import SummaryScreen from './SummaryScreen';
+// `SummaryScreen` is deliberately NOT imported. The plan moved onto the board
+// rather than being deleted: the screen, its view and their scenarios all
+// stand, and nothing routes to them from here any more.
+import { boardNodesOf, type StoredNode } from '../lib/boardNodes';
 import type { Phase } from '../lib/mapKinds';
-import type { FlatNode } from '../lib/mapLayout';
-import type { SummaryNode } from '../lib/summaryGroups';
 import type { GalaxyTheme } from '../lib/galaxyLayout';
 import type { Attachment } from '../lib/attachments';
 
 /**
- * The whole map surface: the header, and whichever view the phase calls for.
+ * The whole map surface: the header and the board, at every phase.
  *
- * The two views are the same map at different moments — the working tree while
- * the thinking is live, the plan once it has run out — so choosing between them
- * belongs here rather than in the route, which should only fetch and mount.
+ * It used to choose between two views — the working board while the thinking
+ * was live, a page of paper cards once it had run out. It no longer chooses,
+ * because that swap said two things the product does not believe: that the
+ * thinking was over, and that the plan is a different object from the map it
+ * came out of. The plan now stands at the far end of the board.
+ *
+ * What is left here is composition and one projection, and the projection
+ * lives in `boardNodes` so its degrade-to-null parsers can be tested.
  */
-/** Read the stored options. Total: anything unparseable becomes null. */
-function parseChoices(raw: string | null | undefined): string[] | null {
-  if (!raw) return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return null;
-    const cleaned = parsed.map((c) => String(c ?? '').trim()).filter(Boolean);
-    return cleaned.length > 0 ? cleaned : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Read the ids an insight cites. Same total, degrade-to-null contract as
- *  parseChoices, and it matters more here: a malformed value must yield no
- *  citations rather than throwing away the insight that carries it. An insight
- *  whose sources cannot be read is still a claim worth showing — one that took
- *  the board down with it would not be. */
-function parseFromNodeIds(raw: string | null | undefined): string[] | null {
-  if (!raw) return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return null;
-    const cleaned = parsed.filter(
-      (id): id is string => typeof id === 'string' && id.length > 0,
-    );
-    return cleaned.length > 0 ? cleaned : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Read the stored diagram. Same contract as parseChoices: anything that will
- *  not draw becomes null, so a card degrades to its text rather than throwing. */
-function parseDiagram(raw: string | null | undefined) {
-  if (!raw) return null;
-  try {
-    const d = JSON.parse(raw) as { steps?: unknown; note?: unknown };
-    const steps = Array.isArray(d.steps)
-      ? d.steps.map((x) => String(x ?? '').trim()).filter(Boolean)
-      : [];
-    if (steps.length < 2) return null;
-    return typeof d.note === 'string' && d.note.trim()
-      ? { steps, note: d.note.trim() }
-      : { steps };
-  } catch {
-    return null;
-  }
-}
 
 export default function MapScreen({
   phase,
@@ -90,24 +47,10 @@ export default function MapScreen({
    *  can mount the screen without inventing one. */
   brief?: Record<string, unknown> | null;
   themes: GalaxyTheme[];
-  nodes: (FlatNode &
-    SummaryNode & {
-      themeId?: string | null;
-      choices?: string | null;
-      imageUrl?: string | null;
-      imageAlt?: string | null;
-      diagram?: string | null;
-      /** The JSON array of cited node ids, as the column stores it. Optional
-       *  for the same reason `choices` is: most nodes are not insights, and a
-       *  fixture mounting this screen has no reason to invent one. */
-      fromNodeIds?: string | null;
-      /** When the node was written and when it last moved. Optional so an
-       *  isolated fixture can mount the screen without dating every node; an
-       *  undated map is one cohort in which nothing is behind anything, which
-       *  is the right reading of a fixture. */
-      createdAt?: Date | string;
-      updatedAt?: Date | string;
-    })[];
+  /** The map's nodes as the store hands them over — the drawable fields flat,
+   *  the three array-shaped ones still the JSON strings their columns hold.
+   *  `boardNodes` owns what each of those degrades to. */
+  nodes: StoredNode[];
 }) {
   return (
     // overflow-hidden so the page itself never scrolls. The board is the only
@@ -132,46 +75,33 @@ export default function MapScreen({
           dense={phase === 'next-steps'}
         />
       ) : null}
-      {phase === 'next-steps' ? (
-        <SummaryScreen nodes={nodes} />
-      ) : (
-        <BoardWorkspace
-          seedIdea={seedIdea}
-          mapId={currentId ?? ''}
-          // The board needs the arc, not just the cards on it: which phase this
-          // is decides what "move on" means and what the round's closing note
-          // tells the partner is due. This screen has held the phase all along
-          // and only ever used it for its own layout.
-          mapPhase={phase}
-          attachments={attachments}
-          themes={themes}
-          nodes={nodes.map((n) => ({
-            id: n.id,
-            themeId: n.themeId ?? null,
-            kind: n.kind,
-            label: n.label,
-            detail: n.detail,
-            status: n.status,
-            // Stored as a JSON string because SQLite has no array column. A
-            // malformed value degrades to an open-ended question rather than
-            // throwing — a card that cannot render its options is still a
-            // question worth asking.
-            choices: parseChoices(n.choices),
-            diagram: parseDiagram(n.diagram),
-            imageUrl: n.imageUrl ?? null,
-            imageAlt: n.imageAlt ?? null,
-            // What the insight stack reads: when a claim was written, when the
-            // questions around it were answered, and which of them it came out
-            // of. Carried on the same nodes the board already lays out rather
-            // than fetched again — the stream is a reading of these nodes, not
-            // a second collection.
-            origin: n.origin ?? null,
-            createdAt: n.createdAt,
-            updatedAt: n.updatedAt,
-            fromNodeIds: parseFromNodeIds(n.fromNodeIds),
-          }))}
-        />
-      )}
+      {/* One surface, at every phase.
+          Reaching `next-steps` used to swap this whole workspace for a page of
+          paper cards, which said two things the product does not believe: that
+          the thinking was over, and that the plan is a different object from
+          the map it came out of. The plan now stands at the far end of the
+          board, where the rows already converge — so the map, its cards and
+          every answer stay reachable while you read the conclusion they
+          produced. `SummaryScreen` and `SummaryView` are untouched and still
+          have their scenarios; nothing routes to them here any more. */}
+      <BoardWorkspace
+        seedIdea={seedIdea}
+        mapId={currentId ?? ''}
+        // The board needs the arc, not just the cards on it: which phase this
+        // is decides what "move on" means and what the round's closing note
+        // tells the partner is due. This screen has held the phase all along
+        // and only ever used it for its own layout.
+        mapPhase={phase}
+        attachments={attachments}
+        themes={themes}
+        // One projection, in `boardNodes`, where its parsers can be tested.
+        // The three JSON columns each degrade to null rather than throwing,
+        // and that rule — not the field list — is the part worth holding: a
+        // card that cannot render its options is still a question worth
+        // asking, and an insight whose citations will not parse is still a
+        // claim worth showing.
+        nodes={boardNodesOf(nodes)}
+      />
     </main>
   );
 }

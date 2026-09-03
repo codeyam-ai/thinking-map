@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextTry - SettlesNothing",
+  "id": "a7250383-e6b4-496f-83af-2b2de149158e",
+  "url": "/isolated-components/BoardWhereNextTry?s=SettlesNothing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextTry",
+  "scenarioType": "component",
+  "description": "The judgement on screen. A slice that settles nothing wears a dashed edge — the board's own word for unsettled, the same treatment an unanswered card wears — shown in the client's own reading order rather than filtered out, because an increment that tests no assumption is work scheduled early and a list that hid those would be a plan with rounded corners."
+}

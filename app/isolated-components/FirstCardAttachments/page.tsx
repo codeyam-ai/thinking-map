@@ -84,9 +84,11 @@ function Harness() {
         style={{ background: '#e4ec4b' }}
       >
         <Component
-          brief={config.brief}
+          // A list now: the card takes more than one link, and the scenarios
+          // carry either none or one until a multi-link scenario is registered.
+          briefs={config.brief ? [config.brief] : []}
           files={config.files}
-          onClearBrief={() => {}}
+          onRemoveBrief={() => {}}
           onRemoveFile={() => {}}
         />
       </div>

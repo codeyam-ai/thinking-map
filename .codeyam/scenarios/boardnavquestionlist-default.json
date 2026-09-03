@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestionList - Default",
+  "id": "60124555-d8a2-4a0a-8976-bafe8c3772b0",
+  "url": "/isolated-components/BoardNavQuestionList?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestionList",
+  "scenarioType": "component",
+  "description": "Every open question by its own words, each dotted in its card's own colour so a row here and a card on the board read as the same object. A list of 'Question 1, Question 2' would be a menu of positions, and the whole reason this exists is the case where you already know which question you want to think about."
+}

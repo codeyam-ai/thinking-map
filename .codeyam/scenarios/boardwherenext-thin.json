@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNext - Thin",
+  "id": "f579a4eb-ec10-4d9b-9239-33e315d8048e",
+  "url": "/isolated-components/BoardWhereNext?s=Thin",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNext",
+  "scenarioType": "component",
+  "description": "A map that reached the far end thin. Every region names the next action rather than the absence of data, and the ask at the top is the honest answer to a thin column: everything here is a reading of what has been said, so the response is to give the partner more to work with rather than to stare at it."
+}

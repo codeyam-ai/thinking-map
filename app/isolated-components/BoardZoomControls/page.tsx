@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import Component from "../../../app/components/BoardZoomControls";
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Component from '../../../app/components/BoardZoomControls';
 
 // A client harness rather than a server page: the stack takes three callbacks,
 // and an event handler cannot be passed from a server component to a client
 // one.
 
 function Harness() {
-  const s = useSearchParams().get("s") ?? "Default";
+  const s = useSearchParams().get('s') ?? 'Default';
   // A zoom factor the harness applies to nothing — it exists so the controls
   // are genuinely wired, since a capture of three dead buttons looks exactly
   // like a capture of three live ones.
   const [zoom, setZoom] = useState(1);
 
-  if (s !== "Default") return <div>Unknown scenario: {s}</div>;
+  if (s !== 'Default') return <div>Unknown scenario: {s}</div>;
 
   // The component positions itself absolutely against the board's bottom-left,
   // so it contributes nothing to its parent's intrinsic size — a shrink-to-fit
@@ -26,10 +26,10 @@ function Harness() {
     <div
       id="codeyam-capture"
       style={{
-        background: "#0a0a0b",
+        background: '#0a0a0b',
         width: 320,
         height: 260,
-        position: "relative",
+        position: 'relative',
       }}
     >
       <Component

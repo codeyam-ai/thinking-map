@@ -17,6 +17,8 @@
 // Keeping that split means the layout can be asserted in a test without a DOM,
 // and the camera can move without the layout being recomputed.
 
+import type { Tradeoffs } from './tradeoffs';
+
 export interface GalaxyTheme {
   id: string;
   label: string;
@@ -48,6 +50,22 @@ export interface GalaxyNodeInput {
   updatedAt?: Date | string;
   /** Node ids this insight was drawn out of, already parsed. */
   fromNodeIds?: string[] | null;
+  /** The two fields the PLAN reads, carried on the same nodes for the same
+   *  reason `origin` and the timestamps are: the plan now stands at the far end
+   *  of this board rather than on a screen of its own, and it groups and orders
+   *  the very nodes laid out here. Fetching them separately is how two readings
+   *  of one map come to disagree.
+   *
+   *  `layOutGalaxy` never touches either — no geometry moves because they are
+   *  here — and both are optional so every existing caller and layout test is
+   *  unchanged. */
+  order?: number;
+  /** On a slice, the node it claims it would settle. */
+  testsNodeId?: string | null;
+  /** What this would take and what taking it would cost, already parsed. Only
+   *  ever set on something you could DO — an approach, an experiment, a slice,
+   *  a direction. */
+  tradeoffs?: Tradeoffs | null;
 }
 
 export interface PlacedCard extends GalaxyNodeInput {
@@ -91,7 +109,15 @@ const CARD_W = 300;
 /** What a card carrying a diagram or a picture gets instead. Wide enough that a
  *  four-step flow reads as a flow rather than as a stack of slivers. */
 const CARD_W_WIDE = 420;
-const CARD_H = 360;
+/** Taller than the content strictly needs, and that is the point.
+ *
+ *  A card now carries more than it did — a shortlist you can take several
+ *  options from AND a box for what the shortlist misses, where before it showed
+ *  one or the other — and at the old 360 the two were pressed against each
+ *  other with the question crowding them from above. The extra height is not
+ *  for more content; it is so the content that is there can be read without
+ *  everything touching. */
+const CARD_H = 460;
 const CARD_GAP = 34;
 /** Gap between a hub and the first card of its row, and between the last card
  *  and the convergence point. */

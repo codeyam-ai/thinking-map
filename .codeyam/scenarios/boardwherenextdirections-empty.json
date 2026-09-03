@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextDirections - Empty",
+  "id": "a515fb94-e469-4ebd-ada5-56ed88090a2d",
+  "url": "/isolated-components/BoardWhereNextDirections?s=Empty",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextDirections",
+  "scenarioType": "component",
+  "description": "The partner has not picked directions yet, which is most of a session. The region names the next action rather than the absence of data."
+}

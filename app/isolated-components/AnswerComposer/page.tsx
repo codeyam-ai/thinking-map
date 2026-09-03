@@ -21,6 +21,13 @@ const scenarios: Record<
     placeholder: string;
     light: boolean;
     accent: string;
+    /** Whether there is somewhere to move on to without answering. */
+    skippable?: boolean;
+    /** Sitting under a shortlist, giving up its height to the options. */
+    compact?: boolean;
+    /** Options taken with nothing typed — a complete answer the field alone
+     *  cannot see, which is why Save takes its verdict from outside. */
+    canSubmit?: boolean;
   }
 > = {
   // Reached past a shortlist. Cancel goes back to the options, and Save is
@@ -77,6 +84,34 @@ const scenarios: Record<
     light: true,
     accent: MAGENTA,
   },
+
+  // Under a shortlist, which is where this box now lives on any card that has
+  // one. Compact, because the options above it need the card's spare room —
+  // two regions both claiming it is what overflowed the card when the two were
+  // first put together. Save is live on options alone, so it takes its verdict
+  // from outside the field.
+  UnderAShortlist: {
+    initial: "",
+    cancellable: false,
+    placeholder: "Add anything the options miss…",
+    light: true,
+    accent: MAGENTA,
+    compact: true,
+    canSubmit: true,
+    skippable: true,
+  },
+
+  // Not answering is a real answer to give. "I don't know yet" is a position,
+  // and a board that only lets you proceed by answering turns it into a
+  // made-up answer the partner cannot tell from a real one.
+  Skippable: {
+    initial: "",
+    cancellable: false,
+    placeholder: "Answer here",
+    light: true,
+    accent: MAGENTA,
+    skippable: true,
+  },
 };
 
 function Harness() {
@@ -107,11 +142,14 @@ function Harness() {
           onChange={setValue}
           onSubmit={() => setSaved(value)}
           onCancel={scenario.cancellable ? () => setValue("") : null}
+          onSkip={scenario.skippable ? () => setSaved("skipped") : null}
           placeholder={scenario.placeholder}
           autoFocus={false}
           onFieldFocus={() => {}}
           light={scenario.light}
           accent={scenario.accent}
+          canSubmit={scenario.canSubmit}
+          compact={scenario.compact}
         />
       </div>
       {saved ? (

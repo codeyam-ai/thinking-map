@@ -1,0 +1,290 @@
+{
+  "name": "Weighing the alternatives against each other",
+  "id": "9347b0de-ccbe-480d-8743-6a10b6b1cd30",
+  "url": "/map/map-weighing",
+  "dimensions": [
+    "Desktop"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-weighing-1",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "user",
+        "payload": "{\"id\": \"w-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Sharing tools on one street\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-weighing-2",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-k1\", \"parentId\": \"w-idea\", \"kind\": \"known\", \"label\": \"Four neighbours already own the same three tools.\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-weighing-3",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-k2\", \"parentId\": \"w-idea\", \"kind\": \"known\", \"label\": \"Everyone asked would lend; nobody asked would ask.\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-weighing-4",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-u1\", \"parentId\": \"w-idea\", \"kind\": \"unknown\", \"label\": \"Who holds a tool between two borrowings.\", \"status\": \"open\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-weighing-5",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-u2\", \"parentId\": \"w-idea\", \"kind\": \"unknown\", \"label\": \"What happens the first time somebody moves away.\", \"status\": \"open\"}",
+        "revision": 5
+      },
+      {
+        "id": "ev-map-weighing-6",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-d1\", \"parentId\": \"w-idea\", \"kind\": \"direction\", \"label\": \"A shed one person keeps\", \"status\": \"answered\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-map-weighing-7",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-d2\", \"parentId\": \"w-idea\", \"kind\": \"direction\", \"label\": \"A list on the group chat\", \"status\": \"answered\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-map-weighing-8",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-d3\", \"parentId\": \"w-idea\", \"kind\": \"direction\", \"label\": \"A shared pot that buys the next one\", \"status\": \"answered\"}",
+        "revision": 8
+      },
+      {
+        "id": "ev-map-weighing-9",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-e1\", \"parentId\": null, \"kind\": \"experiment\", \"label\": \"Lend one tool to one neighbour this week and write down who has it\", \"status\": \"answered\"}",
+        "revision": 9
+      },
+      {
+        "id": "ev-map-weighing-10",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-b1\", \"parentId\": \"w-idea\", \"kind\": \"slice\", \"label\": \"A paper sheet on one shed door\", \"status\": \"answered\"}",
+        "revision": 10
+      },
+      {
+        "id": "ev-map-weighing-11",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-b2\", \"parentId\": \"w-idea\", \"kind\": \"slice\", \"label\": \"A pinned message the group chat keeps editing\", \"status\": \"answered\"}",
+        "revision": 11
+      },
+      {
+        "id": "ev-map-weighing-12",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-b3\", \"parentId\": \"w-idea\", \"kind\": \"slice\", \"label\": \"A shared account that buys the next tool\", \"status\": \"answered\"}",
+        "revision": 12
+      },
+      {
+        "id": "ev-map-weighing-13",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-n1\", \"parentId\": \"w-idea\", \"kind\": \"next-step\", \"label\": \"Ask the four who already own one\", \"status\": \"answered\"}",
+        "revision": 13
+      },
+      {
+        "id": "ev-map-weighing-14",
+        "kind": "node.added",
+        "mapId": "map-weighing",
+        "origin": "agent",
+        "payload": "{\"id\": \"w-n2\", \"parentId\": \"w-idea\", \"kind\": \"next-step\", \"label\": \"Borrow one thing and see who chases it\", \"status\": \"answered\"}",
+        "revision": 14
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "w-idea",
+        "kind": "idea",
+        "label": "Sharing tools on one street",
+        "mapId": "map-weighing",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "w-k1",
+        "kind": "known",
+        "label": "Four neighbours already own the same three tools.",
+        "mapId": "map-weighing",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      },
+      {
+        "id": "w-k2",
+        "kind": "known",
+        "label": "Everyone asked would lend; nobody asked would ask.",
+        "mapId": "map-weighing",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      },
+      {
+        "id": "w-u1",
+        "kind": "unknown",
+        "label": "Who holds a tool between two borrowings.",
+        "mapId": "map-weighing",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "open"
+      },
+      {
+        "id": "w-u2",
+        "kind": "unknown",
+        "label": "What happens the first time somebody moves away.",
+        "mapId": "map-weighing",
+        "order": 3,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "open"
+      },
+      {
+        "id": "w-d1",
+        "kind": "direction",
+        "label": "A shed one person keeps",
+        "mapId": "map-weighing",
+        "order": 4,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      },
+      {
+        "id": "w-d2",
+        "kind": "direction",
+        "label": "A list on the group chat",
+        "mapId": "map-weighing",
+        "order": 5,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      },
+      {
+        "id": "w-d3",
+        "kind": "direction",
+        "label": "A shared pot that buys the next one",
+        "mapId": "map-weighing",
+        "order": 6,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      },
+      {
+        "detail": "Costs nothing and settles the custody question in seven days.",
+        "id": "w-e1",
+        "kind": "experiment",
+        "label": "Lend one tool to one neighbour this week and write down who has it",
+        "mapId": "map-weighing",
+        "order": 7,
+        "origin": "agent",
+        "parentId": null,
+        "status": "answered",
+        "tradeoffs": "{\"effort\":\"An afternoon\",\"cost\":\"Nothing\"}"
+      },
+      {
+        "detail": "Names and dates in pencil. No app, no accounts, no group chat.",
+        "id": "w-b1",
+        "kind": "slice",
+        "label": "A paper sheet on one shed door",
+        "mapId": "map-weighing",
+        "order": 8,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered",
+        "testsNodeId": "w-u1",
+        "tradeoffs": "{\"effort\":\"About two days\",\"cost\":\"A few pounds of printing\",\"requires\":[\"One neighbour willing to host the shed\",\"Three tools nobody minds losing\"],\"betterWhen\":\"You want an answer inside a fortnight\",\"worseWhen\":\"The street is bigger than about a dozen doors\"}"
+      },
+      {
+        "detail": "One list everybody can change, and nobody owns.",
+        "id": "w-b2",
+        "kind": "slice",
+        "label": "A pinned message the group chat keeps editing",
+        "mapId": "map-weighing",
+        "order": 9,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered",
+        "testsNodeId": "w-u2",
+        "tradeoffs": "{\"effort\":\"An hour\",\"cost\":\"Nothing\",\"requires\":[\"Everyone already in one chat\"],\"betterWhen\":\"You want it running tonight\",\"worseWhen\":\"You need to know who had a thing last, six months later\"}"
+      },
+      {
+        "detail": "Money changes the question from lending to owning together.",
+        "id": "w-b3",
+        "kind": "slice",
+        "label": "A shared account that buys the next tool",
+        "mapId": "map-weighing",
+        "order": 10,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered",
+        "testsNodeId": "w-u2",
+        "tradeoffs": "{\"effort\":\"Weeks, and a conversation nobody wants to start\",\"cost\":\"Whatever the first tool costs, times four\",\"requires\":[\"Four people who trust each other with money\",\"Somebody to hold the account\"],\"betterWhen\":\"The street stays the same people for years\",\"worseWhen\":\"Anyone might move — which is the thing you said you were worried about\"}"
+      },
+      {
+        "id": "w-n1",
+        "kind": "next-step",
+        "label": "Ask the four who already own one",
+        "mapId": "map-weighing",
+        "order": 11,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      },
+      {
+        "id": "w-n2",
+        "kind": "next-step",
+        "label": "Borrow one thing and see who chases it",
+        "mapId": "map-weighing",
+        "order": 12,
+        "origin": "agent",
+        "parentId": "w-idea",
+        "status": "answered"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-weighing",
+        "phase": "next-steps",
+        "revision": 14,
+        "seedIdea": "Four people on my street have each bought a tile cutter they used once. I want to fix that, but every version of it I imagine collapses the moment someone moves away.",
+        "title": "Sharing tools on one street"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The far end of a map where every way forward states what it would take and what taking it would cost. This is the state the tradeoffs field exists for: 'Ten words on paper cards' and 'The round goes home for a parent' are not comparable as sentences, and the question a person actually has is which is easier, which is cheaper, what each one needs, and what makes one better than another. Two bullets stand on each card and the rest wait behind 'Dig in', because a card is scanned while being held against the option below it and printing all six facts would turn a shortlist into a wall. Every value is the partner's own sentence, printed as written — a rough estimate someone can argue with is more honest than a number that merely looks computed, and nothing here is normalised to a scale or compared for you. The experiment carries none: it costs an afternoon and settles a question, and inventing a comparison for it would be the plausible-sounding nothing the field exists to avoid."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextTry - SomethingNew",
+  "id": "eadc9dfe-f975-4c32-832c-544000160830",
+  "url": "/isolated-components/BoardWhereNextTry?s=SomethingNew",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextTry",
+  "scenarioType": "component",
+  "description": "The partner wrote at the far end while the person was answering elsewhere. Marked in place rather than sorted to the top: the mark is worth having because it can be read AGAINST what was already there, and a list that reorders itself between visits is one nobody can keep their place in."
+}

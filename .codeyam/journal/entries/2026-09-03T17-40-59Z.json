@@ -1,0 +1,3039 @@
+{
+  "timestamp": "2026-09-03T17:40:59Z",
+  "title": "One Bar Over the Map",
+  "type": "feature",
+  "userRequest": "Project context: A conversational AI tool that helps people turn vague ideas and problems into clear, structured, actionable plans. It will need to be an MCP",
+  "description": "The chat panel that floated over the board is hidden, and a bar took its place: it counts what is still waiting, flies the camera to the next unanswered card when you press the count, lists every open question by its own words behind a chevron, and carries Chat, the way on to the next phase, and a round trip to the far end of the map badged with what arrived while you were answering. Its one rule is that the left side ALWAYS POINTS SOMEWHERE — it briefly read 'Nothing waiting on you' beside two other controls each claiming to be the next move, which is the dead end the rule now exists to prevent. The answer card grew (360 to 460 board units) and stopped making you choose: shortlist options TOGGLE so several can be taken, the free-text box sits beside them rather than replacing them, one Save records the combination, Skip moves you on without answering so the question stays open, and after saving the card turns over to show your words before the board carries you to the next one. The far end stopped being a separate screen and stopped calling itself a finish line: 'I didn't build the product yet' is gone, and what stands where the map's rows converge is Insights & experiments — things you could try with what each would settle, directions you can take as buttons, what is being learned, what is still open, and a way back into the loop. Every way forward can now state what it would take and what taking it would cost, through a new MapNode.tradeoffs column and a matching field in the agent's tool schema: two bullets on the card and the rest behind 'Dig in', printed as the partner wrote them because a rough estimate someone can argue with beats a number that only looks computed.\n\nSCOPE VERDICT — DELIVERED: nothing new from the project's deliverable list, because all nine build deliverables were already delivered in earlier cycles; this cycle refines three of them ('a live visual map that grows as the conversation develops', 'a final actionable output', and 'after the plan is produced, keep discussing and working'), the last of those most directly, since the plan is no longer a screen you leave the map to read. DEFERRED: none by this cycle. One deliverable remains deferred from an earlier one — registering the MCP server in a client such as Claude Desktop — which the user themselves confirmed at that cycle's plan gate as assist-track work (machine configuration and a walkthrough, not code). Every other row is `decidedBy: agent` and every one of those is marked delivered, so no agent-decided deferral is hiding in this trail.\n\nCOVERAGE LOST, deliberately and at the user's instruction: the 'Next round' button was removed, and with it the visible countdown you could cancel by typing. The round still ends itself and typing in the bar still holds it open, but two scenarios existed to demonstrate the cancel — boardworkspace-roundheldopen and the-round-ends-itself-on-a-real-board — and with nothing left on screen to photograph they were retired rather than left asserting something the app no longer shows.\n\nSTALE DOCUMENTATION, not fixed here: design_system.md section 4 still describes the retired scrolling-column map and says pan/zoom were removed, and section 7 still names 'I DIDN'T BUILD THE PRODUCT YET.' as the product's voice. Both were already wrong about the shipped board before this cycle; the second is now wrong because of it. Naming them so the next reader does not follow the doc into a design the app abandoned.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/a-plan-with-a-gap-one-slice-proves-nothing.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/boardworkspace-roundheldopen.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/complete-what-to-do-next.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/mapscreen-summary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/mapscreen-summaryreattach.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-healthybinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-nothingbound--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-olderconvention--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-refusedtools--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-attachedviamcp--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-panelopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-boundtopage--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-noagentnoreason--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-overmcpserver--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-boundtopage--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-overmcpserver--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-partiallyrefused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/answercomposer-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/answercomposer-editingondark--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/answercomposer-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/answercomposer-nothingtocancel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/answercomposer-typed--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-nothemesyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-danglinglink--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-firstsliceonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-longsequence--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/buildsequence-provesnothing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/bulletcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/bulletcard-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-longoptions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-longoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-ondarkcard--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-ondarkcard--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-overflowing--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-single--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-single--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-overflowingidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/directionscard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/directionscard-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-both--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-filesonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-linkattached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-longfilename--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-pastedscreenshot--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-screenshotanddoc--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-shortname--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-busy--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-busy--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-shortidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-shortidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-wrappedidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-wrappedidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-claimalone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-nocitations--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-longclaim--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-promptfilledthebox--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentidle--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settlednoagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nextstepstrack-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nextstepstrack-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-endofmap--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-endofresearch--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-nomaptoadvance--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-ontheboard--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/phaseadvance-ontheboardendofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowfooter-readytoresearch--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowfooter-roundofstatements--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowfooter-stillanswering--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-danglinglink--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-noeffortstated--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/slicecard-provesnothing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryview-noslices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-board-s-bottom-right-corner-uncovered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-board-s-bottom-right-corner-uncovered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/the-round-ends-itself-on-a-real-board.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1cff4f1aea8e68dfc8ea9ce55d2cfa8fa9d62f01372355e7eb99aa96a223f4a1.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/d835b4d71a9563d27e98eec2324c69f41bcde7c3e8a98664bdb153377ae6b474.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AnswerComposer.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CardChoiceList.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardPrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/PhaseAdvance.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/QuestionCard.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/QuestionCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/AnswerComposer/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChat/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChatBubble/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChatComposer/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChatHeader/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChatPill/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardChatTranscript/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardMenu/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardWorkspace/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/BoardZoomControls/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/CardChoiceList/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/FirstCardAttachments/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/galaxyLayout.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/insightStream.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/nodePlan.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/summaryGroups.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnav-answered.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnav-atthefarend.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnav-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnav-nothingatthefarend.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnav-somethingchanged.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavcomposer-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavcount-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavcount-many.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavcount-one.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavfarend-atfarend.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavfarend-changed.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavfarend-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavfarend-onechanged.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestionlist-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestionlist-longquestion.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestionlist-overflowing.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestionlist-single.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestions-answered.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestions-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestions-endofthearc.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardnavquestions-nothinglearnedyet.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtoolkitpanel-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtoolkitpanel-stooddown.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtradeoffs-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtradeoffs-effortonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtradeoffs-none.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtradeoffs-nothinghidden.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardtradeoffs-thecomparison.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenext-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenext-experimentsonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenext-thin.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextbullets-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextbullets-empty.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextbullets-longclaim.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextbullets-single.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextdirections-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextdirections-empty.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextdirections-longdirection.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextdirections-two.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextempty-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextpanel-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenextpanel-longheading.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenexttry-danglingreason.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenexttry-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenexttry-empty.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenexttry-settlesnothing.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/boardwherenexttry-somethingnew.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-answered--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-answered--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-atthefarend--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-atthefarend--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-nothingatthefarend--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-nothingatthefarend--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-somethingchanged--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnav-somethingchanged--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcomposer-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcomposer-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcount-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcount-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcount-many--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcount-many--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcount-one--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavcount-one--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-atfarend--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-atfarend--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-changed--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-changed--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-onechanged--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavfarend-onechanged--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-longquestion--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-longquestion--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-overflowing--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-overflowing--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-single--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestionlist-single--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-answered--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-answered--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-endofthearc--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-endofthearc--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-nothinglearnedyet--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardnavquestions-nothinglearnedyet--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtoolkitpanel-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtoolkitpanel-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtoolkitpanel-stooddown--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtoolkitpanel-stooddown--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-effortonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-effortonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-none--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-none--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-nothinghidden--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-nothinghidden--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-thecomparison--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardtradeoffs-thecomparison--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenext-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenext-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenext-experimentsonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenext-experimentsonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenext-thin--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenext-thin--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-empty--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-empty--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-longclaim--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-longclaim--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-single--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextbullets-single--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-empty--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-empty--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-longdirection--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-longdirection--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-two--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextdirections-two--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextempty-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextempty-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextpanel-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextpanel-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextpanel-longheading--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenextpanel-longheading--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-danglingreason--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-danglingreason--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-empty--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-empty--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-settlesnothing--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-settlesnothing--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-somethingnew--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardwherenexttry-somethingnew--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/weighing-the-alternatives-against-each-other--desktop.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/weighing-the-alternatives-against-each-other--desktop.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/weighing-the-alternatives-against-each-other.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3a7ccd1dce8f9ad9a7bae8abb08336bdcae968b2da9c273ba5cc3aa20bba94bd.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/4a42e944db7be8b642ddbdf49038c1d51a3635e6c8041eff7fe1636a4c8656ce.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b8fcf41918d146e5f2371e245a9456e8f60265a69372bfa5e296cbdf4a64b1c9.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/f25c6bfc932828a0ae6e01a53c395f89adcfe881de52395321c47ae7cdd95c81.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardNav.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardNavComposer.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardNavCount.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardNavFarEnd.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardNavQuestionList.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardNavQuestions.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardToolkitPanel.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardTradeoffs.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardWhereNext.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardWhereNextBullets.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardWhereNextDirections.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardWhereNextEmpty.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardWhereNextPanel.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/BoardWhereNextTry.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useDelayedAdvance.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useDelayedAdvance.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useDismissedOnce.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useDismissedOnce.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardNav/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardNavComposer/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardNavCount/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardNavFarEnd/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardNavQuestionList/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardNavQuestions/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardToolkitPanel/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardTradeoffs/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardWhereNext/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardWhereNextBullets/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardWhereNextDirections/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardWhereNextEmpty/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardWhereNextPanel/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/BoardWhereNextTry/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/answerDraft.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/answerDraft.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardNav.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardNav.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardNodes.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardNodes.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/growField.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/growField.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/tradeoffs.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/tradeoffs.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/whatChanged.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/whatChanged.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The board's bottom-right corner, uncovered",
+      "screenshotPath": "the-board-s-bottom-right-corner-uncovered--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "Weighing the alternatives against each other",
+      "screenshotPath": "weighing-the-alternatives-against-each-other--desktop.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - HealthyBinding",
+      "screenshotPath": "agentbinddiagnostics-healthybinding--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - NothingBound",
+      "screenshotPath": "agentbinddiagnostics-nothingbound--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - OlderConvention",
+      "screenshotPath": "agentbinddiagnostics-olderconvention--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - RefusedTools",
+      "screenshotPath": "agentbinddiagnostics-refusedtools--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - AttachedViaMcp",
+      "screenshotPath": "agentstatus-attachedviamcp--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - MapDeleted",
+      "screenshotPath": "agentstatus-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - PanelOpen",
+      "screenshotPath": "agentstatus-panelopen--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - BoundToPage",
+      "screenshotPath": "agentstatusnarrative-boundtopage--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - MapDeleted",
+      "screenshotPath": "agentstatusnarrative-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgent",
+      "screenshotPath": "agentstatusnarrative-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgentNoReason",
+      "screenshotPath": "agentstatusnarrative-noagentnoreason--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - OverMcpServer",
+      "screenshotPath": "agentstatusnarrative-overmcpserver--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - BoundToPage",
+      "screenshotPath": "agentstatuspanel-boundtopage--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - MapDeleted",
+      "screenshotPath": "agentstatuspanel-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - NoAgent",
+      "screenshotPath": "agentstatuspanel-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - OverMcpServer",
+      "screenshotPath": "agentstatuspanel-overmcpserver--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - PartiallyRefused",
+      "screenshotPath": "agentstatuspanel-partiallyrefused--tablet.png"
+    },
+    {
+      "name": "AnswerComposer - Default",
+      "screenshotPath": "answercomposer-default--tablet.png"
+    },
+    {
+      "name": "AnswerComposer - EditingOnDark",
+      "screenshotPath": "answercomposer-editingondark--tablet.png"
+    },
+    {
+      "name": "AnswerComposer - LongAnswer",
+      "screenshotPath": "answercomposer-longanswer--tablet.png"
+    },
+    {
+      "name": "AnswerComposer - NothingToCancel",
+      "screenshotPath": "answercomposer-nothingtocancel--tablet.png"
+    },
+    {
+      "name": "AnswerComposer - Typed",
+      "screenshotPath": "answercomposer-typed--tablet.png"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly",
+      "screenshotPath": "boardchat-boardvisibleonly--tablet.png"
+    },
+    {
+      "name": "BoardChat - Default",
+      "screenshotPath": "boardchat-default--tablet.png"
+    },
+    {
+      "name": "BoardChat - DeletedTheme",
+      "screenshotPath": "boardchat-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChat - Empty",
+      "screenshotPath": "boardchat-empty--tablet.png"
+    },
+    {
+      "name": "BoardChat - JustOpened",
+      "screenshotPath": "boardchat-justopened--tablet.png"
+    },
+    {
+      "name": "BoardChat - LongAnswer",
+      "screenshotPath": "boardchat-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChat - ThreeThemes",
+      "screenshotPath": "boardchat-threethemes--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Default",
+      "screenshotPath": "boardchattranscript-default--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - DeletedTheme",
+      "screenshotPath": "boardchattranscript-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - LongAnswer",
+      "screenshotPath": "boardchattranscript-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - NoThemesYet",
+      "screenshotPath": "boardchattranscript-nothemesyet--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Overflowing",
+      "screenshotPath": "boardchattranscript-overflowing--tablet.png"
+    },
+    {
+      "name": "BoardNav - Answered",
+      "screenshotPath": "boardnav-answered--tablet.png"
+    },
+    {
+      "name": "BoardNav - AtTheFarEnd",
+      "screenshotPath": "boardnav-atthefarend--tablet.png"
+    },
+    {
+      "name": "BoardNav - Default",
+      "screenshotPath": "boardnav-default--tablet.png"
+    },
+    {
+      "name": "BoardNav - NothingAtTheFarEnd",
+      "screenshotPath": "boardnav-nothingatthefarend--tablet.png"
+    },
+    {
+      "name": "BoardNav - SomethingChanged",
+      "screenshotPath": "boardnav-somethingchanged--tablet.png"
+    },
+    {
+      "name": "BoardNavComposer - Default",
+      "screenshotPath": "boardnavcomposer-default--tablet.png"
+    },
+    {
+      "name": "BoardNavCount - Default",
+      "screenshotPath": "boardnavcount-default--tablet.png"
+    },
+    {
+      "name": "BoardNavCount - Many",
+      "screenshotPath": "boardnavcount-many--tablet.png"
+    },
+    {
+      "name": "BoardNavCount - One",
+      "screenshotPath": "boardnavcount-one--tablet.png"
+    },
+    {
+      "name": "BoardNavFarEnd - AtFarEnd",
+      "screenshotPath": "boardnavfarend-atfarend--tablet.png"
+    },
+    {
+      "name": "BoardNavFarEnd - Changed",
+      "screenshotPath": "boardnavfarend-changed--tablet.png"
+    },
+    {
+      "name": "BoardNavFarEnd - Default",
+      "screenshotPath": "boardnavfarend-default--tablet.png"
+    },
+    {
+      "name": "BoardNavFarEnd - OneChanged",
+      "screenshotPath": "boardnavfarend-onechanged--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestionList - Default",
+      "screenshotPath": "boardnavquestionlist-default--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestionList - LongQuestion",
+      "screenshotPath": "boardnavquestionlist-longquestion--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestionList - Overflowing",
+      "screenshotPath": "boardnavquestionlist-overflowing--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestionList - Single",
+      "screenshotPath": "boardnavquestionlist-single--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestions - Answered",
+      "screenshotPath": "boardnavquestions-answered--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestions - Default",
+      "screenshotPath": "boardnavquestions-default--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestions - EndOfTheArc",
+      "screenshotPath": "boardnavquestions-endofthearc--tablet.png"
+    },
+    {
+      "name": "BoardNavQuestions - NothingLearnedYet",
+      "screenshotPath": "boardnavquestions-nothinglearnedyet--tablet.png"
+    },
+    {
+      "name": "BoardToolkitPanel - Default",
+      "screenshotPath": "boardtoolkitpanel-default--tablet.png"
+    },
+    {
+      "name": "BoardToolkitPanel - StoodDown",
+      "screenshotPath": "boardtoolkitpanel-stooddown--tablet.png"
+    },
+    {
+      "name": "BoardTradeoffs - Default",
+      "screenshotPath": "boardtradeoffs-default--tablet.png"
+    },
+    {
+      "name": "BoardTradeoffs - EffortOnly",
+      "screenshotPath": "boardtradeoffs-effortonly--tablet.png"
+    },
+    {
+      "name": "BoardTradeoffs - None",
+      "screenshotPath": "boardtradeoffs-none--tablet.png"
+    },
+    {
+      "name": "BoardTradeoffs - NothingHidden",
+      "screenshotPath": "boardtradeoffs-nothinghidden--tablet.png"
+    },
+    {
+      "name": "BoardTradeoffs - TheComparison",
+      "screenshotPath": "boardtradeoffs-thecomparison--tablet.png"
+    },
+    {
+      "name": "BoardWhereNext - Default",
+      "screenshotPath": "boardwherenext-default--tablet.png"
+    },
+    {
+      "name": "BoardWhereNext - ExperimentsOnly",
+      "screenshotPath": "boardwherenext-experimentsonly--tablet.png"
+    },
+    {
+      "name": "BoardWhereNext - Thin",
+      "screenshotPath": "boardwherenext-thin--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextBullets - Default",
+      "screenshotPath": "boardwherenextbullets-default--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextBullets - Empty",
+      "screenshotPath": "boardwherenextbullets-empty--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextBullets - LongClaim",
+      "screenshotPath": "boardwherenextbullets-longclaim--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextBullets - Single",
+      "screenshotPath": "boardwherenextbullets-single--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextDirections - Default",
+      "screenshotPath": "boardwherenextdirections-default--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextDirections - Empty",
+      "screenshotPath": "boardwherenextdirections-empty--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextDirections - LongDirection",
+      "screenshotPath": "boardwherenextdirections-longdirection--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextDirections - Two",
+      "screenshotPath": "boardwherenextdirections-two--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextEmpty - Default",
+      "screenshotPath": "boardwherenextempty-default--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextPanel - Default",
+      "screenshotPath": "boardwherenextpanel-default--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextPanel - LongHeading",
+      "screenshotPath": "boardwherenextpanel-longheading--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextTry - DanglingReason",
+      "screenshotPath": "boardwherenexttry-danglingreason--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextTry - Default",
+      "screenshotPath": "boardwherenexttry-default--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextTry - Empty",
+      "screenshotPath": "boardwherenexttry-empty--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextTry - SettlesNothing",
+      "screenshotPath": "boardwherenexttry-settlesnothing--tablet.png"
+    },
+    {
+      "name": "BoardWhereNextTry - SomethingNew",
+      "screenshotPath": "boardwherenexttry-somethingnew--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "BuildSequence - DanglingLink",
+      "screenshotPath": "buildsequence-danglinglink--tablet.png"
+    },
+    {
+      "name": "BuildSequence - Default",
+      "screenshotPath": "buildsequence-default--tablet.png"
+    },
+    {
+      "name": "BuildSequence - Empty",
+      "screenshotPath": "buildsequence-empty--tablet.png"
+    },
+    {
+      "name": "BuildSequence - FirstSliceOnly",
+      "screenshotPath": "buildsequence-firstsliceonly--tablet.png"
+    },
+    {
+      "name": "BuildSequence - LongSequence",
+      "screenshotPath": "buildsequence-longsequence--tablet.png"
+    },
+    {
+      "name": "BuildSequence - ProvesNothing",
+      "screenshotPath": "buildsequence-provesnothing--tablet.png"
+    },
+    {
+      "name": "BulletCard - Default",
+      "screenshotPath": "bulletcard-default--tablet.png"
+    },
+    {
+      "name": "BulletCard - Empty",
+      "screenshotPath": "bulletcard-empty--tablet.png"
+    },
+    {
+      "name": "CardChoiceList - Default",
+      "screenshotPath": "cardchoicelist-default--tablet.png"
+    },
+    {
+      "name": "CardChoiceList - LongOptions",
+      "screenshotPath": "cardchoicelist-longoptions--tablet.png"
+    },
+    {
+      "name": "CardChoiceList - OnDarkCard",
+      "screenshotPath": "cardchoicelist-ondarkcard--tablet.png"
+    },
+    {
+      "name": "CardChoiceList - Overflowing",
+      "screenshotPath": "cardchoicelist-overflowing--tablet.png"
+    },
+    {
+      "name": "CardChoiceList - Single",
+      "screenshotPath": "cardchoicelist-single--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne",
+      "screenshotPath": "coreideacard-dayone--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - Default",
+      "screenshotPath": "coreideacard-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea",
+      "screenshotPath": "coreideacard-longidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - OverflowingIdea",
+      "screenshotPath": "coreideacard-overflowingidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea",
+      "screenshotPath": "coreideacard-shortidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments",
+      "screenshotPath": "coreideacard-withattachments--tablet.png"
+    },
+    {
+      "name": "DirectionsCard - Default",
+      "screenshotPath": "directionscard-default--tablet.png"
+    },
+    {
+      "name": "DirectionsCard - Empty",
+      "screenshotPath": "directionscard-empty--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - Both",
+      "screenshotPath": "firstcardattachments-both--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - FilesOnly",
+      "screenshotPath": "firstcardattachments-filesonly--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - LinkAttached",
+      "screenshotPath": "firstcardattachments-linkattached--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - LongFilename",
+      "screenshotPath": "firstcardattachments-longfilename--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - PastedScreenshot",
+      "screenshotPath": "firstcardattachments-pastedscreenshot--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - ScreenshotAndDoc",
+      "screenshotPath": "firstcardattachments-screenshotanddoc--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - ShortName",
+      "screenshotPath": "firstcardattachments-shortname--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - Busy",
+      "screenshotPath": "firstcardprompt-busy--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - Default",
+      "screenshotPath": "firstcardprompt-default--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - ShortIdea",
+      "screenshotPath": "firstcardprompt-shortidea--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - WrappedIdea",
+      "screenshotPath": "firstcardprompt-wrappedidea--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "InsightCard - Default",
+      "screenshotPath": "insightcard-default--tablet.png"
+    },
+    {
+      "name": "InsightCard - Experiment",
+      "screenshotPath": "insightcard-experiment--tablet.png"
+    },
+    {
+      "name": "InsightCard - LongLabel",
+      "screenshotPath": "insightcard-longlabel--tablet.png"
+    },
+    {
+      "name": "InsightCard - Stale",
+      "screenshotPath": "insightcard-stale--tablet.png"
+    },
+    {
+      "name": "InsightCard - StaleByOne",
+      "screenshotPath": "insightcard-stalebyone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - AgentWorking",
+      "screenshotPath": "insightdetail-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightDetail - ClaimAlone",
+      "screenshotPath": "insightdetail-claimalone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - Default",
+      "screenshotPath": "insightdetail-default--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoAgent",
+      "screenshotPath": "insightdetail-noagent--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoCitations",
+      "screenshotPath": "insightdetail-nocitations--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - AgentWorking",
+      "screenshotPath": "insightgodeeper-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - Listening",
+      "screenshotPath": "insightgodeeper-listening--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - LongClaim",
+      "screenshotPath": "insightgodeeper-longclaim--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - NoAgent",
+      "screenshotPath": "insightgodeeper-noagent--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - PromptFilledTheBox",
+      "screenshotPath": "insightgodeeper-promptfilledthebox--tablet.png"
+    },
+    {
+      "name": "InsightStack - CardOpened",
+      "screenshotPath": "insightstack-cardopened--tablet.png"
+    },
+    {
+      "name": "InsightStack - EdgeLabels",
+      "screenshotPath": "insightstack-edgelabels--tablet.png"
+    },
+    {
+      "name": "InsightStack - OneInsight",
+      "screenshotPath": "insightstack-oneinsight--tablet.png"
+    },
+    {
+      "name": "InsightStack - Overflowing",
+      "screenshotPath": "insightstack-overflowing--tablet.png"
+    },
+    {
+      "name": "InsightStack - ThreeInsights",
+      "screenshotPath": "insightstack-threeinsights--tablet.png"
+    },
+    {
+      "name": "InsightStack - Waiting",
+      "screenshotPath": "insightstack-waiting--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentIdle",
+      "screenshotPath": "insightstackempty-settledagentidle--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentWorking",
+      "screenshotPath": "insightstackempty-settledagentworking--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledNoAgent",
+      "screenshotPath": "insightstackempty-settlednoagent--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - Waiting",
+      "screenshotPath": "insightstackempty-waiting--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NextStepsTrack - Default",
+      "screenshotPath": "nextstepstrack-default--tablet.png"
+    },
+    {
+      "name": "NextStepsTrack - Empty",
+      "screenshotPath": "nextstepstrack-empty--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - EndOfExplore",
+      "screenshotPath": "phaseadvance-endofexplore--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - EndOfMap",
+      "screenshotPath": "phaseadvance-endofmap--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - EndOfResearch",
+      "screenshotPath": "phaseadvance-endofresearch--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - NoMapToAdvance",
+      "screenshotPath": "phaseadvance-nomaptoadvance--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - OnTheBoard",
+      "screenshotPath": "phaseadvance-ontheboard--tablet.png"
+    },
+    {
+      "name": "PhaseAdvance - OnTheBoardEndOfExplore",
+      "screenshotPath": "phaseadvance-ontheboardendofexplore--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Answered",
+      "screenshotPath": "questioncard-answered--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Choices",
+      "screenshotPath": "questioncard-choices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Diagram",
+      "screenshotPath": "questioncard-diagram--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Focused",
+      "screenshotPath": "questioncard-focused--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Insight",
+      "screenshotPath": "questioncard-insight--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Open",
+      "screenshotPath": "questioncard-open--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Reference",
+      "screenshotPath": "questioncard-reference--tablet.png"
+    },
+    {
+      "name": "RowFooter - ReadyToResearch",
+      "screenshotPath": "rowfooter-readytoresearch--tablet.png"
+    },
+    {
+      "name": "RowFooter - RoundOfStatements",
+      "screenshotPath": "rowfooter-roundofstatements--tablet.png"
+    },
+    {
+      "name": "RowFooter - StillAnswering",
+      "screenshotPath": "rowfooter-stillanswering--tablet.png"
+    },
+    {
+      "name": "SliceCard - DanglingLink",
+      "screenshotPath": "slicecard-danglinglink--tablet.png"
+    },
+    {
+      "name": "SliceCard - Default",
+      "screenshotPath": "slicecard-default--tablet.png"
+    },
+    {
+      "name": "SliceCard - NoEffortStated",
+      "screenshotPath": "slicecard-noeffortstated--tablet.png"
+    },
+    {
+      "name": "SliceCard - ProvesNothing",
+      "screenshotPath": "slicecard-provesnothing--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "SummaryView - Default",
+      "screenshotPath": "summaryview-default--tablet.png"
+    },
+    {
+      "name": "SummaryView - Empty",
+      "screenshotPath": "summaryview-empty--tablet.png"
+    },
+    {
+      "name": "SummaryView - NoSlices",
+      "screenshotPath": "summaryview-noslices--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 415,
+    "passed": 415,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 415,
+        "passed": 415
+      }
+    ]
+  }
+}

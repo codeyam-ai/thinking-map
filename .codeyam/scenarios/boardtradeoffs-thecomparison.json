@@ -1,0 +1,12 @@
+{
+  "name": "BoardTradeoffs - TheComparison",
+  "id": "f6852b0e-3a90-467b-970b-4d938a3d9b90",
+  "url": "/isolated-components/BoardTradeoffs?s=TheComparison",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardTradeoffs",
+  "scenarioType": "component",
+  "description": "Better-when and worse-when on their own — the comparison the whole field exists for. Both or neither: one on its own is a pitch rather than a tradeoff."
+}

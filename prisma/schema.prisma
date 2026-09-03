@@ -230,6 +230,25 @@ model MapNode {
   /// A small diagram the partner drew, as JSON: { steps: [...], note? }.
   /// Declarative rather than markup on purpose — see app/lib/diagram.ts.
   diagram   String?
+  /// What this way forward would cost and what it would cost you, as JSON:
+  /// { effort?, cost?, requires?: [...], betterWhen?, worseWhen? }.
+  ///
+  /// Only ever set on something you could DO — an approach, an experiment, a
+  /// slice, a direction. A `finding` has no effort and a `gap` has no
+  /// alternative to be better than, so the field stays null on them rather
+  /// than being filled with a plausible-sounding nothing.
+  ///
+  /// Structured rather than folded into `detail` for one reason: the point of
+  /// these is COMPARISON. Two approaches with their effort in prose cannot be
+  /// read against each other without the reader doing the extraction, which is
+  /// the work the card exists to save them. Structured, the same question is
+  /// in the same place on every card.
+  ///
+  /// Every field is optional and none is validated against a scale. "About two
+  /// days" is the agent's own sentence, printed as written — a rough estimate a
+  /// person can argue with is more honest than a number that merely looks
+  /// computed, which is the same rule the build sequence's effort note keeps.
+  tradeoffs String?
   /// The id of the node this slice would settle — the assumption, risk, or
   /// open question that building it would answer. A slice that names nothing
   /// is not a validating increment, just work scheduled early, and the summary

@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextBullets - Empty",
+  "id": "25aa9463-8b91-45c4-a342-219fe777ece4",
+  "url": "/isolated-components/BoardWhereNextBullets?s=Empty",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextBullets",
+  "scenarioType": "component",
+  "description": "Nothing yet, which is most of a session. The region says what to do about that rather than reporting the absence."
+}

@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "MapScreen",
   "scenarioType": "component",
-  "description": "The finished plan with nobody attached, which is where dense earns its keep. This main is an h-screen flex column, so every row the strip takes is a row of the summary the person came back to read - the screen passes dense on the next-steps phase for exactly that reason. Set beside Reattach it shows the same strip paying for itself in the one place the content below it is the whole point of the visit."
+  "description": "The same last-phase screen with nobody attached, which is where `dense` earns its keep. This main is an h-screen flex column, so every row the reattach strip takes is a row of the board the person came back to read. Set beside Reattach it shows the same strip paying for itself \u2014 and since the far end moved onto the board, what it is paying for is the map itself rather than a separate page."
 }

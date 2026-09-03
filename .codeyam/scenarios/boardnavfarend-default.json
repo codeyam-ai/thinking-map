@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavFarEnd - Default",
+  "id": "934f1daf-b855-49fa-a1c7-7e760a2213ee",
+  "url": "/isolated-components/BoardNavFarEnd?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavFarEnd",
+  "scenarioType": "component",
+  "description": "The plain invitation to the far end of the board, with nothing new since the last look. One control, not two: it takes you there and then it brings you back."
+}

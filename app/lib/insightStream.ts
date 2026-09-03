@@ -20,6 +20,8 @@
 // import — this is read by the server door rendering `read_map` AND by the
 // browser, and a module either side can hold is what keeps the two honest.
 
+import type { Tradeoffs } from './tradeoffs';
+
 /**
  * The kinds that are a claim about the whole idea rather than a piece of it.
  *
@@ -65,6 +67,14 @@ export interface InsightNode {
    *  string as it comes off the row. Both are accepted because the server has
    *  the string and the client usually has the array. */
   fromNodeIds?: string[] | string | null;
+  /** What this would take and what taking it would cost, on the kinds that are
+   *  things you could DO — an experiment, a suggestion, an approach.
+   *
+   *  The parsed object OR the raw JSON string the column holds, accepted both
+   *  ways for exactly the reason `fromNodeIds` above is: the server has the
+   *  string straight off the row and the client usually has the object. The
+   *  one place that reads it — `BoardTradeoffs` — is total over both. */
+  tradeoffs?: Tradeoffs | string | null;
   createdAt: Date | string;
   updatedAt: Date | string;
 }
@@ -120,7 +130,9 @@ function citedIds(raw: InsightNode['fromNodeIds']): string[] {
     }
   }
   if (!Array.isArray(parsed)) return [];
-  return parsed.filter((id): id is string => typeof id === 'string' && id.length > 0);
+  return parsed.filter(
+    (id): id is string => typeof id === 'string' && id.length > 0,
+  );
 }
 
 /**
@@ -135,7 +147,9 @@ function citedIds(raw: InsightNode['fromNodeIds']): string[] {
  */
 export function answeredAt(nodes: InsightNode[]): number[] {
   return nodes
-    .filter((node) => node.kind === 'open-question' && node.status === 'answered')
+    .filter(
+      (node) => node.kind === 'open-question' && node.status === 'answered',
+    )
     .map((node) => millis(node.updatedAt));
 }
 

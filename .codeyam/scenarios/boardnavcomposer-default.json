@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavComposer - Default",
+  "id": "3567e333-4e01-4217-8d54-65a12bbaf403",
+  "url": "/isolated-components/BoardNavComposer?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavComposer",
+  "scenarioType": "component",
+  "description": "Collapsed to a single word, which is how it sits for almost all of a session. The panel this replaced was always open and always growing — obvious, and covering the thing being talked about. A button that opens a field is the other side of that trade: one press to reach, and the board uncovered every second you are not typing."
+}

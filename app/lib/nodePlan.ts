@@ -6,6 +6,7 @@ import {
   type NodeStatus,
   type Phase,
 } from './mapKinds';
+import { readTradeoffs, type Tradeoffs } from './tradeoffs';
 
 /** A node the model asked for, validated but not yet written. */
 export interface PlannedInsert {
@@ -54,6 +55,10 @@ export interface PlannedInsert {
   imageUrl: string | null;
   imageAlt: string | null;
   diagram: { steps: string[]; note?: string } | null;
+  /** What this would take and what taking it would cost, or null. Validated
+   *  through `readTradeoffs`, which is total — so a shape the model got wrong
+   *  becomes a card with no tradeoffs rather than a write that fails. */
+  tradeoffs: Tradeoffs | null;
 }
 
 /** A theme the model asked to open, validated but not yet written. The hue is
@@ -147,7 +152,8 @@ function readDiagram(raw: unknown): { steps: string[]; note?: string } | null {
     ? d.steps.map((x) => String(x ?? '').trim()).filter(Boolean)
     : [];
   if (steps.length < 2) return null;
-  const note = typeof d.note === 'string' && d.note.trim() ? d.note.trim() : undefined;
+  const note =
+    typeof d.note === 'string' && d.note.trim() ? d.note.trim() : undefined;
   return note ? { steps, note } : { steps };
 }
 
@@ -208,6 +214,13 @@ export function planMapMutations(calls: ToolInvocation[]): MapMutationPlan {
           order: order++,
           themeRef: node.themeRef ? String(node.themeRef) : null,
           diagram: readDiagram(node.diagram),
+          // Round-tripped through the same reader the board uses, so the model
+          // writing a shape and the card reading one can never disagree about
+          // what counts as usable. A blank object becomes null rather than an
+          // empty panel, which is where the reader is strict.
+          tradeoffs: readTradeoffs(
+            node.tradeoffs ? JSON.stringify(node.tradeoffs) : null,
+          ),
           imageUrl: node.imageUrl ? String(node.imageUrl) : null,
           imageAlt: node.imageAlt ? String(node.imageAlt) : null,
           // Blank options are dropped rather than rendered as empty pills, and

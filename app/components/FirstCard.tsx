@@ -38,7 +38,21 @@ export default function FirstCard() {
   const [linking, setLinking] = useState(false);
   const [url, setUrl] = useState('');
   const [reading, setReading] = useState(false);
-  const [brief, setBrief] = useState<FetchedBrief | null>(null);
+  /**
+   * Every page that was pointed at, in the order they were added.
+   *
+   * A list rather than one, because one link was a limit nobody asked for: an
+   * idea usually comes with a repo AND a doc AND the competitor's page, and the
+   * card allowed the first of those and then greyed the control out.
+   *
+   * The FIRST is still the brief — the document the board is ABOUT, which the
+   * schema has exactly one of and which the partner is told to read first. The
+   * rest travel as text attachments, which is what they are: things brought
+   * along. That split is a fact about the map's shape, not a ranking of the
+   * links, and the order is the person's own so it stays predictable.
+   */
+  const [briefs, setBriefs] = useState<FetchedBrief[]>([]);
+  const brief = briefs[0] ?? null;
   const [dragging, setDragging] = useState(false);
 
   /**
@@ -73,8 +87,27 @@ export default function FirstCard() {
    * about the third file would leave them looking at a start button that would
    * create a SECOND board.
    */
-  async function uploadFiles(mapId: string) {
-    for (const file of files) {
+  /**
+   * The links past the first, as files the board can open.
+   *
+   * The server already fetched each page and handed back its words, so there
+   * is nothing left to go and get — the text is turned into a plain-text file
+   * and sent up the same path a browsed document takes. That is deliberately
+   * the SAME path: a second link is something brought along, exactly like a
+   * dropped PDF, and giving it its own mechanism would mean two ways for a
+   * document to reach a board and two places for that to go wrong.
+   */
+  function briefsAsFiles(): File[] {
+    return briefs.slice(1).map(
+      (extra) =>
+        new File([extra.text], `${extra.sourceName}.txt`, {
+          type: 'text/plain',
+        }),
+    );
+  }
+
+  async function uploadFiles(mapId: string, extra: File[] = []) {
+    for (const file of [...files, ...extra]) {
       try {
         const form = new FormData();
         form.append('file', file);
@@ -108,7 +141,13 @@ export default function FirstCard() {
         setError(failed);
         return;
       }
-      setBrief(fetched);
+      // Same page twice is a slip, not an instruction. Silently keeping the
+      // one already there is kinder than an error about a duplicate.
+      setBriefs((prev) =>
+        prev.some((b) => b.sourceName === fetched.sourceName)
+          ? prev
+          : [...prev, fetched],
+      );
       setUrl('');
       setLinking(false);
     } finally {
@@ -150,7 +189,8 @@ export default function FirstCard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Could not start a map.');
-      if (files.length) await uploadFiles(data.id);
+      const extra = briefsAsFiles();
+      if (files.length || extra.length) await uploadFiles(data.id, extra);
       router.push(`/map/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start a map.');
@@ -209,9 +249,11 @@ export default function FirstCard() {
         ) : null}
 
         <FirstCardAttachments
-          brief={brief}
+          briefs={briefs}
           files={files}
-          onClearBrief={() => setBrief(null)}
+          onRemoveBrief={(sourceName) =>
+            setBriefs((prev) => prev.filter((b) => b.sourceName !== sourceName))
+          }
           onRemoveFile={(name) =>
             setFiles((prev) => prev.filter((f) => f.name !== name))
           }
@@ -220,7 +262,9 @@ export default function FirstCard() {
         <FirstCardControls
           busy={busy}
           canStart={value.trim().length > 0 || brief !== null}
-          linkDisabled={brief !== null}
+          // Never disabled now. One link was a limit nobody asked for: an idea
+          // usually arrives with a repo and a doc and somebody else's page.
+          linkDisabled={false}
           onBrowse={() => picker.current?.click()}
           onLink={() => setLinking((was) => !was)}
           onStart={() => void start()}

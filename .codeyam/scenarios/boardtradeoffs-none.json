@@ -1,0 +1,12 @@
+{
+  "name": "BoardTradeoffs - None",
+  "id": "1c24ab9c-6f2c-40c2-bc7b-ee7bd3631d18",
+  "url": "/isolated-components/BoardTradeoffs?s=None",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardTradeoffs",
+  "scenarioType": "component",
+  "description": "A finding or a gap has no effort and no alternative to be better than, so it carries none of this — and the component renders NOTHING rather than a heading over no bullets, which would announce thinking that never happened."
+}

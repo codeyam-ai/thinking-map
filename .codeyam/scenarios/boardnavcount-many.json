@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavCount - Many",
+  "id": "e866aeb5-72d4-4bf8-81df-88b458a9ab19",
+  "url": "/isolated-components/BoardNavCount?s=Many",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavCount",
+  "scenarioType": "component",
+  "description": "A board somebody has left for a while. The pill grows with the number and has to stay a pill rather than wrapping into a paragraph."
+}

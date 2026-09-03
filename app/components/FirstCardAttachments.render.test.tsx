@@ -28,9 +28,9 @@ describe('FirstCardAttachments', () => {
   it('renders nothing when the card is carrying nothing', () => {
     const { container } = render(
       <FirstCardAttachments
-        brief={null}
+        briefs={[]}
         files={[]}
-        onClearBrief={vi.fn()}
+        onRemoveBrief={vi.fn()}
         onRemoveFile={vi.fn()}
       />,
     );
@@ -43,9 +43,9 @@ describe('FirstCardAttachments', () => {
   it('truncates a long source name but keeps it whole in the label', () => {
     render(
       <FirstCardAttachments
-        brief={BRIEF}
+        briefs={[BRIEF]}
         files={[]}
-        onClearBrief={vi.fn()}
+        onRemoveBrief={vi.fn()}
         onRemoveFile={vi.fn()}
       />,
     );
@@ -60,9 +60,9 @@ describe('FirstCardAttachments', () => {
   it('leaves a short name alone', () => {
     render(
       <FirstCardAttachments
-        brief={{ ...BRIEF, sourceName: 'example.gov/spec' }}
+        briefs={[{ ...BRIEF, sourceName: 'example.gov/spec' }]}
         files={[]}
-        onClearBrief={vi.fn()}
+        onRemoveBrief={vi.fn()}
         onRemoveFile={vi.fn()}
       />,
     );
@@ -70,21 +70,46 @@ describe('FirstCardAttachments', () => {
     expect(screen.getByText('example.gov/spec')).toBeTruthy();
   });
 
-  // There is one brief per board, so dropping it is how you attach a different
-  // one — which makes this the only way back out of a wrong link.
-  it('reports dropping the brief', () => {
-    const onClearBrief = vi.fn();
+  // Removing one names WHICH one. The card carries several links now, so a
+  // bare "a link was dropped" would leave the caller guessing — and the guess
+  // it would make is the first, which is the one you least often mean.
+  it('reports removing a link by its source', () => {
+    const onRemoveBrief = vi.fn();
     render(
       <FirstCardAttachments
-        brief={BRIEF}
+        briefs={[BRIEF]}
         files={[]}
-        onClearBrief={onClearBrief}
+        onRemoveBrief={onRemoveBrief}
         onRemoveFile={vi.fn()}
       />,
     );
 
     fireEvent.click(screen.getByLabelText(`Remove ${BRIEF.sourceName}`));
-    expect(onClearBrief).toHaveBeenCalledTimes(1);
+    expect(onRemoveBrief).toHaveBeenCalledWith(BRIEF.sourceName);
+  });
+
+  // The state the change exists for: an idea usually arrives with a repo AND a
+  // doc AND somebody else's page, and the card used to allow the first and
+  // then grey the control out. They all wear the same chip — which one becomes
+  // the board's brief is a fact about the map's shape, not a ranking the
+  // person needs to be shown.
+  it('shows every link that was added, not only the first', () => {
+    render(
+      <FirstCardAttachments
+        briefs={[
+          { ...BRIEF, sourceName: 'example.gov/spec' },
+          { ...BRIEF, sourceName: 'github.com/acme/thing' },
+          { ...BRIEF, sourceName: 'competitor.example/pricing' },
+        ]}
+        files={[]}
+        onRemoveBrief={vi.fn()}
+        onRemoveFile={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('example.gov/spec')).toBeTruthy();
+    expect(screen.getByText('github.com/acme/thing')).toBeTruthy();
+    expect(screen.getByText('competitor.example/pricing')).toBeTruthy();
   });
 
   // Files are named rather than indexed, because the list is re-ordered by
@@ -93,9 +118,9 @@ describe('FirstCardAttachments', () => {
     const onRemoveFile = vi.fn();
     render(
       <FirstCardAttachments
-        brief={null}
+        briefs={[]}
         files={[new File([''], 'renewal-brief.pdf')]}
-        onClearBrief={vi.fn()}
+        onRemoveBrief={vi.fn()}
         onRemoveFile={onRemoveFile}
       />,
     );
@@ -109,9 +134,9 @@ describe('FirstCardAttachments', () => {
   it('shows a brief and browsed files together', () => {
     render(
       <FirstCardAttachments
-        brief={{ ...BRIEF, sourceName: 'example.gov/spec' }}
+        briefs={[{ ...BRIEF, sourceName: 'example.gov/spec' }]}
         files={[new File([''], 'notes.txt')]}
-        onClearBrief={vi.fn()}
+        onRemoveBrief={vi.fn()}
         onRemoveFile={vi.fn()}
       />,
     );

@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextDirections - Two",
+  "id": "56227b25-57e6-49d9-9cd3-db72018c4ed8",
+  "url": "/isolated-components/BoardWhereNextDirections?s=Two",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextDirections",
+  "scenarioType": "component",
+  "description": "Two is a real shortlist, and a pair must not read as an either/or toggle."
+}

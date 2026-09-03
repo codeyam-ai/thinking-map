@@ -1,8 +1,8 @@
-import Component from "../../components/BoardWorkspace";
-import BridgeFixture from "../BridgeFixture";
-import type { ExchangeEvent } from "../../lib/exchange";
-import type { GalaxyNodeInput, GalaxyTheme } from "../../lib/galaxyLayout";
-import type { Phase } from "../../lib/mapKinds";
+import Component from '../../components/BoardWorkspace';
+import BridgeFixture from '../BridgeFixture';
+import type { ExchangeEvent } from '../../lib/exchange';
+import type { GalaxyNodeInput, GalaxyTheme } from '../../lib/galaxyLayout';
+import type { Phase } from '../../lib/mapKinds';
 
 // The board and the conversation together, which is the surface a person
 // actually uses — the map is what the conversation has produced so far, and the
@@ -35,7 +35,7 @@ const node = (
   kind,
   label,
   detail: null,
-  status: "open",
+  status: 'open',
   choices: null,
   imageUrl: null,
   imageAlt: null,
@@ -45,8 +45,8 @@ const node = (
 
 const at = (
   revision: number,
-  kind: ExchangeEvent["kind"],
-  origin: ExchangeEvent["origin"],
+  kind: ExchangeEvent['kind'],
+  origin: ExchangeEvent['origin'],
   payload: unknown,
 ): ExchangeEvent => ({
   id: `e${revision}`,
@@ -61,50 +61,93 @@ const SEED_IDEA =
   "Our vets lose things between the morning and evening shift — a dog that needed re-checking, an owner who was promised a call back. Everyone blames the whiteboard but I don't think the whiteboard is the problem.";
 
 const THEMES: GalaxyTheme[] = [
-  theme("th-context", "What actually gets lost", 0),
-  theme("th-people", "Who is holding it", 1),
-  theme("th-shape", "What it could be", 2),
+  theme('th-context', 'What actually gets lost', 0),
+  theme('th-people', 'Who is holding it', 1),
+  theme('th-shape', 'What it could be', 2),
 ];
 
 const NODES: GalaxyNodeInput[] = [
-  node("g-idea", null, "idea", "Handover between shifts", { status: "answered" }),
-  node("g-ctx-1", "th-context", "open-question", "Which item goes missing most often?", {
-    detail: "Owner call-backs.",
-    status: "answered",
-    choices: ["Owner call-backs", "Re-checks", "Lab results to chase"],
+  node('g-idea', null, 'idea', 'Handover between shifts', {
+    status: 'answered',
   }),
-  node("g-ctx-2", "th-context", "open-question", "At what moment does it get dropped?", {
-    choices: ["During the verbal handover", "After it, before the task is done"],
-  }),
-  node("g-ppl-1", "th-people", "open-question", "Who owns a call-back once the shift ends?"),
-  node("g-ppl-2", "th-people", "assumption", "The receptionist is the informal system", {
-    detail: "She remembers what the board does not.",
-    status: "answered",
-  }),
-  node("g-shape-1", "th-shape", "approach", "A list that survives the shift boundary", {
-    status: "answered",
-    diagram: {
-      steps: ["A call-back is promised", "It joins the list with a name on it", "Closing it needs a person"],
-      note: "The wipe is what deletes the state today.",
+  node(
+    'g-ctx-1',
+    'th-context',
+    'open-question',
+    'Which item goes missing most often?',
+    {
+      detail: 'Owner call-backs.',
+      status: 'answered',
+      choices: ['Owner call-backs', 'Re-checks', 'Lab results to chase'],
     },
-  }),
-  node("g-shape-2", "th-shape", "risk", "A second screen nobody looks at", {
+  ),
+  node(
+    'g-ctx-2',
+    'th-context',
+    'open-question',
+    'At what moment does it get dropped?',
+    {
+      choices: [
+        'During the verbal handover',
+        'After it, before the task is done',
+      ],
+    },
+  ),
+  node(
+    'g-ppl-1',
+    'th-people',
+    'open-question',
+    'Who owns a call-back once the shift ends?',
+  ),
+  node(
+    'g-ppl-2',
+    'th-people',
+    'assumption',
+    'The receptionist is the informal system',
+    {
+      detail: 'She remembers what the board does not.',
+      status: 'answered',
+    },
+  ),
+  node(
+    'g-shape-1',
+    'th-shape',
+    'approach',
+    'A list that survives the shift boundary',
+    {
+      status: 'answered',
+      diagram: {
+        steps: [
+          'A call-back is promised',
+          'It joins the list with a name on it',
+          'Closing it needs a person',
+        ],
+        note: 'The wipe is what deletes the state today.',
+      },
+    },
+  ),
+  node('g-shape-2', 'th-shape', 'risk', 'A second screen nobody looks at', {
     detail: "The whiteboard's one virtue is that it is in the room.",
-    status: "answered",
+    status: 'answered',
   }),
 ];
 
 const EXCHANGE: ExchangeEvent[] = [
-  at(1, "user.note", "user", { text: "Everyone blames the whiteboard but I don't think it is the problem." }),
-  at(2, "theme.added", "agent", { id: "th-context", label: "What actually gets lost" }),
-  at(3, "agent.note", "agent", {
-    text: "Three things worth pulling apart: what falls through, who is carrying it when it falls, and only then what a fix looks like.",
+  at(1, 'user.note', 'user', {
+    text: "Everyone blames the whiteboard but I don't think it is the problem.",
   }),
-  at(4, "question.asked", "agent", {
-    questions: [{ id: "g-ctx-1", text: "Which item goes missing most often?" }],
+  at(2, 'theme.added', 'agent', {
+    id: 'th-context',
+    label: 'What actually gets lost',
   }),
-  at(5, "user.answer", "user", {
-    answers: [{ id: "g-ctx-1", answer: "Owner call-backs." }],
+  at(3, 'agent.note', 'agent', {
+    text: 'Three things worth pulling apart: what falls through, who is carrying it when it falls, and only then what a fix looks like.',
+  }),
+  at(4, 'question.asked', 'agent', {
+    questions: [{ id: 'g-ctx-1', text: 'Which item goes missing most often?' }],
+  }),
+  at(5, 'user.answer', 'user', {
+    answers: [{ id: 'g-ctx-1', answer: 'Owner call-backs.' }],
   }),
 ];
 
@@ -113,10 +156,14 @@ const EXCHANGE: ExchangeEvent[] = [
 // default — the round only ends itself when the board runs out of questions, so
 // a fixture that is always full could never show it happening.
 const ANSWERED_NODES: GalaxyNodeInput[] = NODES.map((n) =>
-  n.id === "g-ctx-2"
-    ? { ...n, status: "answered", detail: "After the verbal handover, before the task is done." }
-    : n.id === "g-ppl-1"
-      ? { ...n, status: "answered", detail: "Nobody. That is the actual gap." }
+  n.id === 'g-ctx-2'
+    ? {
+        ...n,
+        status: 'answered',
+        detail: 'After the verbal handover, before the task is done.',
+      }
+    : n.id === 'g-ppl-1'
+      ? { ...n, status: 'answered', detail: 'Nobody. That is the actual gap.' }
       : n,
 );
 
@@ -126,7 +173,7 @@ const scenarios: Record<
     themes: GalaxyTheme[];
     nodes: GalaxyNodeInput[];
     events: ExchangeEvent[];
-    status: "unavailable" | "connected" | "working";
+    status: 'unavailable' | 'connected' | 'working';
     revision: number;
     attachments?: { name: string }[];
     /** Where the map is on its arc. Drives both the note the round's end sends
@@ -141,9 +188,9 @@ const scenarios: Record<
     themes: THEMES,
     nodes: NODES,
     events: EXCHANGE,
-    status: "connected",
+    status: 'connected',
     revision: 5,
-    attachments: [{ name: "shift-handover-notes.pdf" }],
+    attachments: [{ name: 'shift-handover-notes.pdf' }],
   },
 
   // The state every preview and capture genuinely produces: no agent can bind
@@ -153,7 +200,7 @@ const scenarios: Record<
     themes: THEMES,
     nodes: NODES,
     events: EXCHANGE,
-    status: "unavailable",
+    status: 'unavailable',
     revision: 5,
   },
 
@@ -163,7 +210,7 @@ const scenarios: Record<
     themes: THEMES,
     nodes: NODES,
     events: EXCHANGE,
-    status: "working",
+    status: 'working',
     revision: 5,
   },
 
@@ -171,9 +218,13 @@ const scenarios: Record<
   // Both halves have to read as not-yet rather than as failed to load.
   JustArrived: {
     themes: [],
-    nodes: [node("g-idea", null, "idea", "Handover between shifts", { status: "answered" })],
+    nodes: [
+      node('g-idea', null, 'idea', 'Handover between shifts', {
+        status: 'answered',
+      }),
+    ],
     events: [],
-    status: "unavailable",
+    status: 'unavailable',
     revision: 0,
   },
 
@@ -187,7 +238,7 @@ const scenarios: Record<
     themes: THEMES,
     nodes: ANSWERED_NODES,
     events: EXCHANGE,
-    status: "connected",
+    status: 'connected',
     revision: 5,
   },
 
@@ -199,9 +250,9 @@ const scenarios: Record<
     themes: THEMES,
     nodes: ANSWERED_NODES,
     events: EXCHANGE,
-    status: "connected",
+    status: 'connected',
     revision: 5,
-    phase: "explore",
+    phase: 'explore',
   },
 };
 
@@ -210,7 +261,7 @@ export default async function Page({
 }: {
   searchParams: Promise<{ s?: string }>;
 }) {
-  const { s = "Working" } = await searchParams;
+  const { s = 'Working' } = await searchParams;
   const fixture = scenarios[s];
   if (!fixture) return <div>Unknown scenario: {s}</div>;
 
@@ -223,18 +274,20 @@ export default async function Page({
     <div
       id="codeyam-capture"
       className="flex flex-col"
-      style={{ height: "100vh", width: "100%", padding: "2rem 2.5rem" }}
+      style={{ height: '100vh', width: '100%', padding: '2rem 2.5rem' }}
     >
       <BridgeFixture
         status={fixture.status}
-        reason={fixture.status === "unavailable" ? "running inside an iframe" : null}
+        reason={
+          fixture.status === 'unavailable' ? 'running inside an iframe' : null
+        }
         events={fixture.events}
         revision={fixture.revision}
       >
         <Component
           seedIdea={SEED_IDEA}
           mapId="map-galaxy"
-          mapPhase={fixture.phase ?? "map"}
+          mapPhase={fixture.phase ?? 'map'}
           attachments={fixture.attachments}
           themes={fixture.themes}
           nodes={fixture.nodes}

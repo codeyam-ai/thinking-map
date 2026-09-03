@@ -23,8 +23,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import GalaxyBoard from './GalaxyBoard';
-import RoundControl, { type RoundPhase } from './RoundControl';
-import BoardChat from './BoardChat';
+// `RoundControl` is deliberately NOT imported — hidden, like the chat, not
+// deleted. Its component and scenarios stand; the bar simply no longer shows a
+// button for the one thing the board already does for itself.
+import { type RoundPhase } from './RoundControl';
+// `BoardChat` is deliberately NOT imported. The panel is HIDDEN, not deleted:
+// the component, its parts and its scenarios all stand, and the day a
+// transcript earns its place back on this surface it is one import away. What
+// it used to carry — saying something, ending a round, ending a phase — moved
+// into `BoardNav`, so nothing was lost by unmounting it.
 import PhaseAdvance from './PhaseAdvance';
 import { useWebMcpBridge } from './WebMcpBridge';
 import { useSelfEndingRound } from '@/app/hooks/useSelfEndingRound';
@@ -95,6 +102,18 @@ export default function BoardWorkspace({
     },
     [bridge],
   );
+
+  const onAskMore = useCallback(() => {
+    setRoundPhase('waiting');
+    // A note, like every other contribution: WebMCP is pull-only, so the page
+    // cannot wake an agent — it writes to the shared log and the partner, which
+    // is sitting in `await_user_activity`, wakes because the log moved. Naming
+    // what is being asked for matters as much here as it does at a round's end:
+    // "more" is not an instruction, "ask me more questions about this" is.
+    void bridge.contribute('user.note', {
+      text: 'Ask me another round of questions — I have more to give you on this.',
+    });
+  }, [bridge]);
 
   const onSay = useCallback(
     (text: string) => {
@@ -170,21 +189,18 @@ export default function BoardWorkspace({
     (n) => n.status === 'open' && n.kind === 'open-question',
   ).length;
 
-  // Something to advance FROM: either the person has answered a card this
-  // session, or the board is carrying answers from an earlier one. Waiting is
-  // its own reason to show it, so the spinner has somewhere to live.
-  const showRound =
-    roundPhase === 'waiting' ||
-    answeredThisRound > 0 ||
-    nodes.some((n) => n.kind === 'open-question' && n.status === 'answered');
-
   // ── The round ending itself ───────────────────────────────────────────────
   //
-  // The trigger is a STATE the board already knows and already says out loud,
-  // not the passage of time — `roundIsFinished` is that rule and the reasoning
-  // for each of its clauses. The seconds are only how long the person gets to
-  // change their mind, which is `useSelfEndingRound`.
-  const { remaining, holdOpen: holdRoundOpen } = useSelfEndingRound({
+  // The trigger is a STATE the board already knows, not the passage of time —
+  // `roundIsFinished` is that rule and the reasoning for each of its clauses.
+  // The seconds are only how long the person gets to change their mind.
+  //
+  // It is now the ONLY way a round ends. The button that also did it is gone:
+  // it offered a third "next move" in a bar whose whole job is to name one, for
+  // something the board already does on its own. `remaining` is therefore no
+  // longer rendered anywhere — the countdown runs unseen — and typing is what
+  // holds it open, which `onTyping` on the bar's composer still does.
+  const { holdOpen: holdRoundOpen } = useSelfEndingRound({
     armed: roundIsFinished({
       open: openCount,
       answeredThisRound,
@@ -199,6 +215,9 @@ export default function BoardWorkspace({
       <GalaxyBoard
         seedIdea={seedIdea}
         mapId={mapId}
+        // The board reads the arc for one thing: whether the far end still
+        // holds a provisional suggestion or now holds the finished plan.
+        mapPhase={mapPhase}
         attachments={attachments}
         themes={themes}
         nodes={nodes}
@@ -206,60 +225,38 @@ export default function BoardWorkspace({
         bridgeStatus={bridge.status}
         onAnswer={onAnswer}
         onChoose={onChoose}
-      />
-      {/* The chat is ALWAYS here; the round control rides along inside it
-          only once there is a round to end. The first set of questions arrives
-          on its own — creating the map is already a contribution — so showing
-          "Next round" before anyone has answered anything would put a button in
-          front of someone whose only job right now is to read what landed. */}
-      <BoardChat
-        events={bridge.events}
-        onSend={onSay}
+        onSay={onSay}
         // Typing holds the round open. Someone mid-sentence has not finished,
         // whatever the board's counts say — and the seconds after answering the
         // last card are exactly when the general remark that fits on no card
         // arrives. Losing that to a timer would make the automation a thing
         // done TO them rather than for them.
         onTyping={holdRoundOpen}
-        themes={themes}
-        nodes={nodes}
-        trailing={
-          showRound ? (
-            <RoundControl
-              open={openCount}
-              answered={answeredThisRound}
-              phase={roundPhase}
-              onNext={onNext}
-              countdown={remaining}
-              onCancel={holdRoundOpen}
-            />
-          ) : null
-        }
-        // The way OUT of the loop, on the board at last. It was built and then
-        // wired into a view the galaxy board replaced, so until now nothing on
-        // the page a person actually looks at could move the map's phase — the
-        // conclusion was reachable only by asking an agent in another window.
-        // Gated on the board being ANSWERED, not merely on the phase having a
-        // next step. `PHASE_ASK[phase].sentence` is written for the moment the
-        // phase's work is done — "the questions on the map are answered" — so
-        // showing it beside a board with three open cards would have the page
-        // assert something plainly untrue about what the person is looking at.
-        // This is the same discipline `RowFooter` kept, where the action only
-        // ever appeared once the round had settled.
+        // The way back INTO the loop, from the far end. It is the same
+        // mechanism as ending a round — one more entry on the shared log, which
+        // the partner wakes on — and it exists because the far end had no way
+        // to ask for more. Everything there is a reading of what has been said,
+        // so a thin column's honest answer is more input, not more staring.
+        onAskMore={onAskMore}
+        // The way OUT of the loop, and the ONLY thing the bar offers once the
+        // board is answered. It stands in the count's place rather than beside
+        // it: with a "Next round" button there too, the bar named three
+        // different next moves at once and led with a dead end that named none
+        // of them. The round still ends itself on its countdown, and typing
+        // still holds that open — what went is a button for something the board
+        // already does.
         //
-        // The `action` check is NOT a duplicate of the null PhaseAdvance
-        // already returns on `idea` and `next-steps`. The slot draws a bordered
-        // row around whatever it is given, and a component that renders nothing
-        // would leave that row as an empty stripe under the composer — the same
-        // trap MapScreen's band comment describes, where hiding by returning
-        // null leaves the wrapper behind.
-        footer={
+        // Gated on the board being ANSWERED, not merely on the phase having a
+        // next step: `PHASE_ASK[phase]` is written for the moment the phase's
+        // work is done, so offering it beside three open cards would have the
+        // page assert something plainly untrue about what is on screen.
+        navForward={
           openCount === 0 && PHASE_ASK[mapPhase].action ? (
             <PhaseAdvance
               phase={mapPhase}
               mapId={mapId || undefined}
               contribute={bridge.contribute}
-              tone="board"
+              tone="bar"
             />
           ) : null
         }

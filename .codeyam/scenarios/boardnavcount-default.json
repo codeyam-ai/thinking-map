@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavCount - Default",
+  "id": "0bc504be-01bf-4d6e-bd01-553e071ef8d3",
+  "url": "/isolated-components/BoardNavCount?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavCount",
+  "scenarioType": "component",
+  "description": "The count on an ordinary board mid-round. It is a BUTTON, not a readout: a board wide enough to need a count is already too wide to scan by eye, so a number that only reported would be a scoreboard for a problem it had just described and done nothing about. Pressing it flies the camera to the next unanswered card."
+}

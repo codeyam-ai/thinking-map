@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestionList - Overflowing",
+  "id": "2f988e45-d306-4759-9cfb-b02c0c68761f",
+  "url": "/isolated-components/BoardNavQuestionList?s=Overflowing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestionList",
+  "scenarioType": "component",
+  "description": "More questions than the panel is tall. It scrolls DOWN — the one direction anything on this surface may move — and the ceiling exists because a board with a dozen open cards would otherwise drop a list past the bottom of the screen."
+}

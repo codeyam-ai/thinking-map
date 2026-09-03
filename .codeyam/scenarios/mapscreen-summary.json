@@ -1,12 +1,12 @@
 {
- "name": "MapScreen - Summary",
- "id": "635114b0-e223-4b6e-99ae-f239818e47ec",
- "url": "/isolated-components/MapScreen?s=Summary",
- "dimensions": [
-  "Tablet"
- ],
- "mocks": {},
- "componentName": "MapScreen",
- "scenarioType": "component",
- "description": "The end of the loop: the plan above, with somewhere to keep going underneath it."
+  "name": "MapScreen - Summary",
+  "id": "635114b0-e223-4b6e-99ae-f239818e47ec",
+  "url": "/isolated-components/MapScreen?s=Summary",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "MapScreen",
+  "scenarioType": "component",
+  "description": "The whole screen at the map's last phase, which is now the SAME screen as every other phase. Reaching the end used to swap this workspace for a page of paper cards, and that swap said two things the product does not believe: that the thinking was over, and that the plan is a different object from the map it came out of. The board stays, and what the map produced stands at the far end of it \u2014 still pannable, still answerable."
 }

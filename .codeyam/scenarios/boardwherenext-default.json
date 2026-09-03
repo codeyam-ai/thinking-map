@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNext - Default",
+  "id": "72cc451b-8710-4ed9-9121-93da47fbf046",
+  "url": "/isolated-components/BoardWhereNext?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNext",
+  "scenarioType": "component",
+  "description": "The whole far end of a worked map: things to try, directions to take, what is being learned and what is still open. This was a separate screen that replaced the board and opened with a declaration about a finish line, on a tool whose case is that there is not one. The order here is deliberately not a report's — it leads with the MOVES, because someone who opens the far end of their own map is asking what now."
+}

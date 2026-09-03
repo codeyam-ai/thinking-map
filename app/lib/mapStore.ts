@@ -227,7 +227,13 @@ export async function getBrief(mapId: string) {
 export async function getAttachment(mapId: string, attachmentId: string) {
   return prisma.mapAttachment.findFirst({
     where: { id: attachmentId, mapId },
-    select: { id: true, name: true, mediaType: true, bytes: true, byteSize: true },
+    select: {
+      id: true,
+      name: true,
+      mediaType: true,
+      bytes: true,
+      byteSize: true,
+    },
   });
 }
 
@@ -405,7 +411,13 @@ export async function createMap(
 /** A compact rendering of the current map, given to the model as context so it
  *  can reference real node ids when it updates them. */
 export function summarizeMap(
-  nodes: { id: string; parentId: string | null; kind: string; label: string; status: string }[],
+  nodes: {
+    id: string;
+    parentId: string | null;
+    kind: string;
+    label: string;
+    status: string;
+  }[],
 ): string {
   if (nodes.length === 0) return '(empty — nothing on the map yet)';
   const byParent = new Map<string | null, typeof nodes>();
@@ -417,7 +429,8 @@ export function summarizeMap(
   const lines: string[] = [];
   const walk = (parentId: string | null, depth: number) => {
     for (const n of byParent.get(parentId) ?? []) {
-      const eyebrow = KIND_EYEBROW[n.kind as keyof typeof KIND_EYEBROW] ?? n.kind;
+      const eyebrow =
+        KIND_EYEBROW[n.kind as keyof typeof KIND_EYEBROW] ?? n.kind;
       lines.push(
         `${'  '.repeat(depth)}- [${n.id}] (${eyebrow}, ${n.status}) ${n.label}`,
       );
@@ -515,6 +528,7 @@ export async function applyToolCalls(
             sourceUrl: node.sourceUrl,
             choices: node.choices ? JSON.stringify(node.choices) : null,
             diagram: node.diagram ? JSON.stringify(node.diagram) : null,
+            tradeoffs: node.tradeoffs ? JSON.stringify(node.tradeoffs) : null,
             imageUrl: node.imageUrl,
             imageAlt: node.imageAlt,
             testsNodeId,
@@ -534,7 +548,12 @@ export async function applyToolCalls(
         events.push({
           kind: 'node.added',
           origin,
-          payload: nodeAddedPayload(created, parentId, testsNodeId, fromNodeIds),
+          payload: nodeAddedPayload(
+            created,
+            parentId,
+            testsNodeId,
+            fromNodeIds,
+          ),
         });
       }
 

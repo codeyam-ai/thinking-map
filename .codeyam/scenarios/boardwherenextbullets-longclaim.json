@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextBullets - LongClaim",
+  "id": "69e30f8d-6dac-4d5c-ab98-ea345de5c070",
+  "url": "/isolated-components/BoardWhereNextBullets?s=LongClaim",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextBullets",
+  "scenarioType": "component",
+  "description": "A claim long enough to wrap, which is the shape a real finding has. It wraps rather than truncating: half a claim cannot be weighed against anything."
+}

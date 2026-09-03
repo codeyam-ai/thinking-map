@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextEmpty - Default",
+  "id": "89d8240d-2cd8-4c4f-badc-8caaf7f2f25d",
+  "url": "/isolated-components/BoardWhereNextEmpty?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextEmpty",
+  "scenarioType": "component",
+  "description": "A region of the far-end column with nothing in it yet. Worth its own component rather than a trivial-wrapper classification, because what it says is a product decision rather than a layout: an empty region describes the NEXT ACTION rather than the absence of data, and on this column that carries the whole argument."
+}

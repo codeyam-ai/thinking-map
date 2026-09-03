@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextTry - Default",
+  "id": "13150893-5beb-49b8-9d71-5ffbae9583d1",
+  "url": "/isolated-components/BoardWhereNextTry?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextTry",
+  "scenarioType": "component",
+  "description": "The region that turned the far end from a report into a next move, drawing from two sources at once. The map's slice nodes are the small builds, each naming an assumption it would settle; the partner's experiments and suggestions are things worth running that nobody has to build. Both answer what could I do that would tell me something, so they belong in one list rather than two the reader has to reconcile."
+}

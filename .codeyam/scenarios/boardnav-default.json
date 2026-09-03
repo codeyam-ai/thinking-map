@@ -1,0 +1,12 @@
+{
+  "name": "BoardNav - Default",
+  "id": "306cf6b5-2436-440c-8a49-f17458148be1",
+  "url": "/isolated-components/BoardNav?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNav",
+  "scenarioType": "component",
+  "description": "The surface a person actually works on: what is waiting on the left, a way to the far end, and somewhere to say the thing that fits on no card. This bar replaced the chat panel in the corner, and the difference is what it answers — a transcript answers what was said, a board answers what is here, and neither answers the question someone arrives with, which is does anything still need me and how do I get to it."
+}

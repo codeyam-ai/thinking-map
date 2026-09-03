@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextTry - DanglingReason",
+  "id": "ae65c68e-c3b5-49aa-8424-7b03284bba10",
+  "url": "/isolated-components/BoardWhereNextTry?s=DanglingReason",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextTry",
+  "scenarioType": "component",
+  "description": "A slice whose reason was deleted out from under it. Distinct from naming nothing: it DID name something and that something is gone, which is worth reporting differently from a slice that never had a reason."
+}

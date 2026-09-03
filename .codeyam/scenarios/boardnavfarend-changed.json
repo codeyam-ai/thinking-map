@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavFarEnd - Changed",
+  "id": "229c4f13-d31a-4427-8c7b-724dc3ef9612",
+  "url": "/isolated-components/BoardNavFarEnd?s=Changed",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavFarEnd",
+  "scenarioType": "component",
+  "description": "The state the count exists for. The map moves while you are answering — the partner reads what you said and writes at the far end — and without this badge nothing on screen says so. Lime as a fill, on the one thing that just changed."
+}

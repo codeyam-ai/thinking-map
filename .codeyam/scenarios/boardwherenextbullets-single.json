@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextBullets - Single",
+  "id": "324bfe5c-1492-43db-8fd6-0a2164be31c1",
+  "url": "/isolated-components/BoardWhereNextBullets?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextBullets",
+  "scenarioType": "component",
+  "description": "One claim is a legitimate list, and an early map has exactly this."
+}

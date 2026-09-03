@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestionList - LongQuestion",
+  "id": "7b730183-fcd5-4028-b51a-9f05e49d8fe6",
+  "url": "/isolated-components/BoardNavQuestionList?s=LongQuestion",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestionList",
+  "scenarioType": "component",
+  "description": "A question long enough to wrap, which is the shape a real one has. It wraps rather than truncating: half a question cannot be chosen between, which is the only thing this list is for."
+}

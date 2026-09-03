@@ -1,0 +1,12 @@
+{
+  "name": "BoardTradeoffs - Default",
+  "id": "429c03d8-d6b4-45c6-af25-71146557899c",
+  "url": "/isolated-components/BoardTradeoffs?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardTradeoffs",
+  "scenarioType": "component",
+  "description": "Everything the partner could say about what a way forward would take: two bullets standing on the card and four more behind the control. A card is scanned while being held against the option below it, so printing all six would turn a shortlist into a wall — and hiding the rest rather than dropping it means someone who has narrowed it to two can still get the whole picture on both."
+}

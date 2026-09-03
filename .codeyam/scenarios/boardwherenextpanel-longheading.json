@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextPanel - LongHeading",
+  "id": "0daf8227-160c-46d1-9ba0-4e30ec11c83a",
+  "url": "/isolated-components/BoardWhereNextPanel?s=LongHeading",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextPanel",
+  "scenarioType": "component",
+  "description": "A heading long enough to be worth checking: the eyebrow's wide letter-spacing makes a long one much longer on screen than it looks in a string."
+}

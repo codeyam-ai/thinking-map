@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestions - EndOfTheArc",
+  "id": "09fe5d16-92a4-4f0f-b88b-84bdb9554b1f",
+  "url": "/isolated-components/BoardNavQuestions?s=EndOfTheArc",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestions",
+  "scenarioType": "component",
+  "description": "The last stop: nothing open and no phase left to reach. Even here it points somewhere — at the plan standing at the far end of the board, which is what the person came back for — rather than reporting that nothing is happening."
+}

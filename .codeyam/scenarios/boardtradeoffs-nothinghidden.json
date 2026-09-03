@@ -1,0 +1,12 @@
+{
+  "name": "BoardTradeoffs - NothingHidden",
+  "id": "d40620c6-8039-483d-a689-5b807b3f53b6",
+  "url": "/isolated-components/BoardTradeoffs?s=NothingHidden",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardTradeoffs",
+  "scenarioType": "component",
+  "description": "Two facts, so everything fits and the control knows not to offer itself. Nothing to dig into is a card with two facts on it, not a broken expander."
+}

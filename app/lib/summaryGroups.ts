@@ -1,3 +1,5 @@
+import type { Tradeoffs } from './tradeoffs';
+
 export interface SummaryNode {
   id: string;
   kind: string;
@@ -10,6 +12,10 @@ export interface SummaryNode {
    * there.
    */
   testsNodeId?: string | null;
+  /** What this would take and what taking it would cost, on the kinds that are
+   *  things you could DO. Optional: most nodes are not, and a fixture has no
+   *  reason to invent one. */
+  tradeoffs?: Tradeoffs | null;
 }
 
 export interface SummaryGroups {

@@ -25,35 +25,42 @@ import FirstCardFileChip from './FirstCardFileChip';
  * arrival.
  */
 export default function FirstCardAttachments({
-  brief,
+  briefs,
   files,
-  onClearBrief,
+  onRemoveBrief,
   onRemoveFile,
 }: {
-  brief: FetchedBrief | null;
+  /** Every page pointed at, in the order they were added. The first is the
+   *  brief the board is about; the rest travel as text attachments. They all
+   *  wear the same chip, because that split is a fact about the map's shape
+   *  and not a ranking the person needs to be shown. */
+  briefs: FetchedBrief[];
   files: File[];
-  onClearBrief: () => void;
+  onRemoveBrief: (sourceName: string) => void;
   onRemoveFile: (name: string) => void;
 }) {
   const previews = useFilePreviews(files);
 
-  if (!brief && files.length === 0) return null;
+  if (briefs.length === 0 && files.length === 0) return null;
 
   return (
     <ul className="mb-3 flex flex-wrap gap-2">
-      {brief ? (
-        <li className="flex max-w-full items-center gap-2 rounded-full bg-black px-3 py-1.5 text-[12px] text-[#e4ec4b]">
+      {briefs.map((brief) => (
+        <li
+          key={brief.sourceName}
+          className="flex max-w-full items-center gap-2 rounded-full bg-black px-3 py-1.5 text-[12px] text-[#e4ec4b]"
+        >
           <span className="truncate">{shortenName(brief.sourceName, 34)}</span>
           <button
             type="button"
             aria-label={`Remove ${brief.sourceName}`}
-            onClick={onClearBrief}
+            onClick={() => onRemoveBrief(brief.sourceName)}
             className="text-[#e4ec4b]/60 hover:text-[#e4ec4b]"
           >
             ×
           </button>
         </li>
-      ) : null}
+      ))}
       {files.map((file) => (
         <FirstCardFileChip
           key={file.name}
@@ -65,4 +72,3 @@ export default function FirstCardAttachments({
     </ul>
   );
 }
-

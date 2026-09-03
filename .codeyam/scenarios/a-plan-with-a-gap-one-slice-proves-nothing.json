@@ -357,7 +357,7 @@
         "role": "user"
       },
       {
-        "content": "Here's what we've learned, the three strongest directions, and where I'd start tomorrow. Nothing here is locked in — say the word and we can keep pulling on any of it.",
+        "content": "Here's what we've learned, the three strongest directions, and where I'd start tomorrow. Nothing here is locked in \u2014 say the word and we can keep pulling on any of it.",
         "id": "msg-2",
         "mapId": "map-game",
         "origin": "agent",
@@ -376,5 +376,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "The same finished plan as 'Complete - what to do next', with exactly one thing changed: the last increment settles nothing. Every other build in the sequence names the uncertainty it would close; this one names none, so shipping it would spend two weeks and leave the plan knowing what it knew before. The gap is deliberately on the LAST build rather than the middle one - the middle sits above the fold on this screen, and a scenario whose whole point is only visible if you scroll is not demonstrating anything."
+  "description": "The same far end as 'Complete - what to do next', with exactly one thing changed: the last increment settles nothing. Every other build names the uncertainty it would close; this one names none, so shipping it would spend two weeks and leave the map knowing what it knew before. It is MARKED in place with the dashed edge the board already uses for unsettled, rather than filtered out \u2014 a list that quietly hid those would be a plan with rounded corners. The gap is on the LAST build deliberately, so the frame has to reach it."
 }

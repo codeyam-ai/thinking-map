@@ -964,21 +964,21 @@
       "runner": "tests"
     },
     {
-      "description": "There is one brief per board, so dropping it is how you attach a different one — which makes this the only way back out of a wrong link.",
-      "file": "app/components/FirstCardAttachments.render.test.tsx",
-      "format": "vitest",
-      "key": "FirstCardAttachments › reports dropping the brief",
-      "line": 75,
-      "registeredAt": "2026-09-02T21:44:23Z",
-      "runner": "tests"
-    },
-    {
       "description": "Files are named rather than indexed, because the list is re-ordered by nothing and identified by name everywhere else in this card.",
       "file": "app/components/FirstCardAttachments.render.test.tsx",
       "format": "vitest",
       "key": "FirstCardAttachments › reports removing a browsed file by name",
-      "line": 92,
+      "line": 117,
       "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Removing one names WHICH one. The card carries several links now, so a bare \"a link was dropped\" would leave the caller guessing — and the guess it would make is the first, which is the one you least often mean.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › reports removing a link by its source",
+      "line": 76,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -986,8 +986,17 @@
       "file": "app/components/FirstCardAttachments.render.test.tsx",
       "format": "vitest",
       "key": "FirstCardAttachments › shows a brief and browsed files together",
-      "line": 109,
+      "line": 134,
       "registeredAt": "2026-09-02T21:44:23Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state the change exists for: an idea usually arrives with a repo AND a doc AND somebody else's page, and the card used to allow the first and then grey the control out. They all wear the same chip — which one becomes the board's brief is a fact about the map's shape, not a ranking the person needs to be shown.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › shows every link that was added, not only the first",
+      "line": 96,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -1279,30 +1288,21 @@
       "runner": "tests"
     },
     {
-      "description": "Every list the partner writes is a guess about what you might say, and the guess must never be the only thing you are allowed to say. The way past the list has to be present and named in words — it was a grey box captioned \"Other…\" jammed against the last option, which read as one more option.",
+      "description": "What most real answers look like: one of the guesses, and the part the guess missed. Neither half was sayable with the other before.",
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
-      "key": "QuestionCard — a shortlist › always offers a way to say something the list does not contain",
-      "line": 161,
-      "registeredAt": "2026-09-02T17:40:53Z",
+      "key": "QuestionCard — a shortlist › joins the options taken to the words typed",
+      "line": 203,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
     {
-      "description": "Picking one answers immediately: a chosen option is already the whole answer, and asking someone to confirm it adds a step carrying no information.",
+      "description": "Not answering is a real answer to give. A board that only lets you proceed by answering turns \"I don't know yet\" into a made-up answer, which the partner cannot tell from a real one — and the question stays OPEN, so the bar keeps counting it and it comes round again.",
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
-      "key": "QuestionCard — a shortlist › answers with an option the moment one is picked",
-      "line": 141,
-      "registeredAt": "2026-09-02T17:40:53Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Opening the box must not be a one-way door — the options are still the likeliest answers, and someone who opened it to look should get them back.",
-      "file": "app/components/QuestionCard.render.test.tsx",
-      "format": "vitest",
-      "key": "QuestionCard — a shortlist › gives the options back when the free-text box is cancelled",
-      "line": 199,
-      "registeredAt": "2026-09-02T17:40:53Z",
+      "key": "QuestionCard — a shortlist › offers a way past a question without answering it",
+      "line": 250,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
     {
@@ -1310,8 +1310,35 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › offers no Cancel when there is nothing to cancel back to",
-      "line": 218,
+      "line": 286,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An isolated fixture has nowhere to move on TO, and a Skip that goes nowhere is worse than no Skip at all.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › offers no Skip where there is nowhere to skip to",
+      "line": 271,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Every list the partner writes is a guess about what you might say, and the guess must never be the only thing you are allowed to say. The box is now present ALONGSIDE the options rather than replacing them, so the two can be combined instead of chosen between.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › offers the box for what the list does not contain, beside the list",
+      "line": 187,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The change this card exists for. \"Two of those\" is an ordinary answer and the card could not record it at all.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › records several options as one answer",
+      "line": 162,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
     {
@@ -1324,12 +1351,30 @@
       "runner": "tests"
     },
     {
-      "description": "The card shows EITHER the options or the free-text box. Stacking both overflowed the card's fixed height, which clipped the field and pushed its only submit hint outside the card entirely.",
+      "description": "The card turns over the instant it is answered, before the map has caught up. Answering writes to the shared log and the board re-renders from the server when the revision rises — a round trip — so without this the card someone just answered still looks unanswered, which reads as the board having eaten the answer.",
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
-      "key": "QuestionCard — a shortlist › swaps the options for a text box rather than stacking them",
-      "line": 179,
-      "registeredAt": "2026-09-02T17:40:53Z",
+      "key": "QuestionCard — a shortlist › shows the answer on the card immediately, before the map catches up",
+      "line": 304,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Picking one no longer ANSWERS. It used to, which made a shortlist a cage: one option or nothing, and no way to qualify the one you took. Save is what records, and until it is pressed nothing has been said.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › takes an option without answering on the spot",
+      "line": 141,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Save must not be gated on the FIELD when the answer is not only in the field. Options taken with nothing typed is a complete answer.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — a shortlist › will not record a blank, but will record options alone",
+      "line": 227,
+      "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
     {
@@ -1337,7 +1382,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an answered question › returns to an editable box through the pencil",
-      "line": 257,
+      "line": 349,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1346,7 +1391,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an answered question › shows the answer with the question demoted to a label",
-      "line": 243,
+      "line": 335,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1355,7 +1400,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an insight › draws a diagram it carries even when its kind is not an insight kind",
-      "line": 297,
+      "line": 389,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1364,7 +1409,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an insight › draws a picture it carries even when its kind is not an insight kind",
-      "line": 319,
+      "line": 411,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1373,7 +1418,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an insight › names the kind it is",
-      "line": 275,
+      "line": 367,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1418,7 +1463,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — structure › does not announce itself as a button either",
-      "line": 364,
+      "line": 456,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1427,7 +1472,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — structure › is not itself a button",
-      "line": 344,
+      "line": 436,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1436,7 +1481,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — structure › reports a click as a request for focus",
-      "line": 390,
+      "line": 482,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2494,6 +2539,141 @@
       "runner": "tests"
     },
     {
+      "description": "The degrade-to-null contract. A card that cannot render its options is still a question worth asking, so a broken value must leave an open-ended question rather than take the board down.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — choices › degrades unparseable options to an open-ended question",
+      "line": 48,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A list of blanks is not a shortlist of blanks — it is no shortlist, which leaves an open-ended question rather than a card of empty pills.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — choices › reads a list that is empty once trimmed as no shortlist at all",
+      "line": 55,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "SQLite has no array column, so a shortlist arrives as a JSON string.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — choices › reads a stored shortlist",
+      "line": 38,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The option becomes a pill and, once taken, part of the recorded answer, so stray spacing would travel all the way into what the partner reads back.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — choices › trims the options it keeps",
+      "line": 61,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "This one matters more than the others: an insight whose sources cannot be read is still a claim worth showing, so a malformed value yields no citations rather than throwing away the insight carrying it.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — cited sources › keeps the insight and drops only the unreadable citations",
+      "line": 76,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One bad entry written by an older agent must cost that entry, not the whole citation list — partial provenance beats none.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — cited sources › keeps the usable ids out of a mixed list",
+      "line": 83,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: an insight naming the questions it came out of, which is what lets the far end show its own provenance.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — cited sources › reads the ids an insight was drawn out of",
+      "line": 69,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Same contract as the other two columns: a shape that will not draw costs the shape, never the card that was carrying it.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — diagram › degrades an unparseable diagram to the card’s text",
+      "line": 115,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A caption of whitespace still draws a caption's worth of space under the diagram, which reads as a line somebody forgot to write.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — diagram › drops a blank note rather than drawing an empty caption",
+      "line": 107,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary diagram: a sequence of stages and the one line under it.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — diagram › reads a drawn shape and its note",
+      "line": 93,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A single step is not a flow. Drawing one would be a diagram making a claim about a sequence it does not have.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — diagram › refuses to draw a flow with fewer than two steps",
+      "line": 101,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The plan stands at the far end of the same board, so the fields it groups and orders by have to ride along on these nodes rather than be fetched again — two readings of one map is how the two came to disagree.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — what the plan reads › carries the ordering and the slice’s claim through to the board",
+      "line": 124,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Null rather than the empty string, so `buildSequence` can tell \"named nothing\" from \"named something that has since been deleted\" — two states the far end reports differently.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf — what the plan reads › reads a slice that names nothing as settling nothing",
+      "line": 133,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The flat fields, straight through. Nothing clever happens to them, and the point of asserting it is that nothing SHOULD.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf › carries the fields the board draws a card from",
+      "line": 19,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Themeless is a real state, not a missing value: it is how the far end's own nodes and the partner's insights are distinguished from row cards.",
+      "file": "app/lib/boardNodes.test.ts",
+      "format": "vitest",
+      "key": "boardNodesOf › reads a node with no theme as belonging to no line of thinking",
+      "line": 31,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "Some pages carry a whole sentence as their title. Past the limit the title stops helping and starts pushing the address out of a chip, so the address wins — it is the half that cannot be re-derived.",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
@@ -3214,6 +3394,60 @@
       "runner": "tests"
     },
     {
+      "description": "A blank answer reads as the person having said nothing on purpose, which is not something a Save button should be able to record.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "composeAnswer › is null when nothing was picked and nothing typed",
+      "line": 68,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Options alone is a complete answer, and the commonest one on a card that offers a shortlist worth offering.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "composeAnswer › is the picked options when nothing was typed",
+      "line": 35,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "And your own words alone, which is every card with no shortlist at all.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "composeAnswer › is the typed words when nothing was picked",
+      "line": 42,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point of the change. A shortlist is a guess about what you might say, and the two ways of answering were mutually exclusive — you could take the guess or reject it, never take it AND qualify it, which is what a real answer usually is.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "composeAnswer › joins the picked options to the typed words, marked as separate",
+      "line": 52,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A pick that is no longer on the shortlist — the partner rewrote the options while someone had one selected. Dropping it silently would record an answer they did not give; keeping it in place is the honest reading.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "composeAnswer › keeps a pick the shortlist no longer offers, after the ones it does",
+      "line": 76,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point of the change. A shortlist is a guess about what you might say, and the two ways of answering were mutually exclusive — you could take the guess or reject it, never take it AND qualify it, which is what a real answer usually is.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "composeAnswer › trims what was typed rather than recording the whitespace",
+      "line": 60,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "...unless something actually cites it, in which case the citation is real and the section is genuinely accounted for.",
       "file": "app/lib/briefCoverage.test.ts",
       "format": "vitest",
@@ -3283,6 +3517,42 @@
       "key": "computeBriefCoverage › treats a brief with nothing cited as fully untouched",
       "line": 62,
       "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The column hangs off the convergence point rather than being centred on it, so aiming at the point itself would frame its left edge.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "conclusionCamera › centres on the column rather than on the convergence point itself",
+      "line": 215,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Reading size, not fit-everything size. A finished map often lays out as one core card and a column a long way from it, and framing both renders the plan's type at a size nobody can read.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "conclusionCamera › holds a reading scale whatever the viewport",
+      "line": 224,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The regression this function exists to hold. Framing the column's top edge at the top of the SCREEN puts it under the bar, which is pinned there — the headline was cut in half. The camera has to look further down by the bar's height, so the plan starts BELOW it.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "conclusionCamera › leaves the bar room, rather than framing the headline underneath it",
+      "line": 207,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The plan is read from its beginning, so the camera frames the TOP of the column — which means looking at a point half a viewport below it.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "conclusionCamera › looks half a viewport below the column’s top edge",
+      "line": 198,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -4987,6 +5257,42 @@
       "runner": "tests"
     },
     {
+      "description": "The whole point: three lines of a long idea used to scroll inside a three-row box, so most of what someone had written was hidden while they were still writing it.",
+      "file": "app/lib/growField.test.ts",
+      "format": "vitest",
+      "key": "grownHeight › grows to fit what has been written",
+      "line": 14,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A short idea does not get a tall box. The field holding its floor is what keeps the card's empty space — the space that says \"this is yours to fill\".",
+      "file": "app/lib/growField.test.ts",
+      "format": "vitest",
+      "key": "grownHeight › holds the floor for something short",
+      "line": 7,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The boundary itself, which is where an off-by-one would show as a field that scrolls one line early or one line late.",
+      "file": "app/lib/growField.test.ts",
+      "format": "vitest",
+      "key": "grownHeight › is exact at the ceiling",
+      "line": 27,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "But not without end. The field lives on a card, and a card that grew with an essay would run off the screen the essay was being typed onto — so past the ceiling it goes back to scrolling, which is the honest trade.",
+      "file": "app/lib/growField.test.ts",
+      "format": "vitest",
+      "key": "grownHeight › stops at the ceiling rather than running off the card",
+      "line": 21,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "The wait these prompts ask for has to be one a host will actually let return. Both carry the number as a literal — this module stays free of the catalog so a client bundle does not pull zod in for one integer — so the pinning has to happen here, where importing it is free.",
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
@@ -6256,6 +6562,15 @@
       "runner": "tests"
     },
     {
+      "description": "The list carries the card's OWN colour so a question in the list and the question on the board are visibly the same object.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "navQuestionsOf › carries each question’s words and its card’s colour",
+      "line": 142,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "The one case worth a read.",
       "file": "app/lib/conflict.test.ts",
       "format": "vitest",
@@ -6298,6 +6613,96 @@
       "key": "needsPostgresUser › reports whether this process is running as root",
       "line": 102,
       "registeredAt": "2026-09-03T17:24:35.442816428+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Going back to a far end that has not moved marks nothing at all. A badge that persisted after you had looked would stop meaning anything.",
+      "file": "app/lib/whatChanged.test.ts",
+      "format": "vitest",
+      "key": "newSince › marks nothing when nothing has arrived",
+      "line": 25,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Before you have looked at all, nothing is marked. Everything being new on first sight is true and useless — the marker means \"this arrived while you were somewhere else\", and on arrival you were not anywhere else.",
+      "file": "app/lib/whatChanged.test.ts",
+      "format": "vitest",
+      "key": "newSince › marks nothing when the far end has never been looked at",
+      "line": 10,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case the whole marker exists for: the partner wrote at the far end while the person was answering somewhere else, and nothing else on screen would say so.",
+      "file": "app/lib/whatChanged.test.ts",
+      "format": "vitest",
+      "key": "newSince › marks what arrived since the last look",
+      "line": 17,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Something removed since the last look is not something new. The set is what to MARK, so it can only ever contain things that are on screen.",
+      "file": "app/lib/whatChanged.test.ts",
+      "format": "vitest",
+      "key": "newSince › never marks something that is no longer there",
+      "line": 31,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary press: one step along the row you are already reading.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "nextOpenAfter › goes to the one after where you are",
+      "line": 103,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state after answering: the focused card leaves the open list, so the id no longer resolves. Starting over is the only honest answer — anything derived from the missing card's old position would send someone to a question chosen by where a card they just finished used to be.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "nextOpenAfter › has nowhere to go on an empty board",
+      "line": 128,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One question is a legitimate board, and pressing the count there must not hang or throw — it re-lands on the same card.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "nextOpenAfter › re-lands on the only question there is",
+      "line": 134,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The first press of a session, before anyone has touched a card.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "nextOpenAfter › starts at the beginning when nothing is focused",
+      "line": 114,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state after answering: the focused card leaves the open list, so the id no longer resolves. Starting over is the only honest answer — anything derived from the missing card's old position would send someone to a question chosen by where a card they just finished used to be.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "nextOpenAfter › starts at the beginning when the focused card is no longer open",
+      "line": 122,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The clause that makes the count a loop rather than a dead end: pressing it on the last question has to come back round, not stop.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "nextOpenAfter › wraps from the last back to the first",
+      "line": 109,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -6622,6 +7027,51 @@
       "key": "onModelContextReady › stops watching when disposed",
       "line": 435,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A card CARRYING something — a drawn shape, a picture — is showing it to you whatever its kind. `isOpenCard` already encodes that; this holds the bar to the same rule so a diagram card is not counted as a question.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "openQuestionsOf › drops a card that carries a diagram or a picture",
+      "line": 80,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answered card is not waiting on anybody, so it must not be counted as waiting — this is the difference between the bar telling the truth and the bar being a node counter.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "openQuestionsOf › drops answered cards",
+      "line": 53,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The partner's own thinking is shown TO you rather than asked OF you. A gap or a finding sitting on the board with status 'open' would otherwise be counted as a question waiting for an answer nobody asked for.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "openQuestionsOf › drops the partner’s own thinking even when its status reads open",
+      "line": 64,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A board before the partner has drawn anything, which is every map's first few seconds. It must read as none rather than throwing on the empty fan.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "openQuestionsOf › is empty on a board with no clusters at all",
+      "line": 94,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, and the order the bar's \"next\" walks.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "openQuestionsOf › reads row by row, left to right, the way the board reads",
+      "line": 41,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -7801,6 +8251,60 @@
       "key": "readSince › returns the whole log when given no cursor",
       "line": 280,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The same degrade-to-null contract the other JSON columns keep: a card that cannot render its tradeoffs is still a thing worth trying, and one that took the board down with it would not be.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "readTradeoffs › degrades anything unreadable to nothing at all",
+      "line": 32,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Each requirement gets its own bullet, so a blank one is a bullet with nothing after it — a thing you either have or do not, unnamed.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "readTradeoffs › drops blank requirements rather than printing empty bullets",
+      "line": 51,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every field is optional. An agent that knows the effort but not the cost should say the effort rather than inventing a cost to fill the shape.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "readTradeoffs › keeps a partial answer rather than demanding the whole shape",
+      "line": 23,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An object with nothing usable in it is nothing, not an empty panel. A card that drew a \"Tradeoffs\" heading over no bullets would be announcing thinking that had not happened.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "readTradeoffs › reads an object with nothing in it as nothing",
+      "line": 43,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole shape, round-tripped. Every field is optional, so this is the only place the full set is asserted together.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "readTradeoffs › reads what a way forward would cost and what it would cost you",
+      "line": 7,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "These print in a fixed label column, where leading space is visible as a value that does not line up with the one above it.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "readTradeoffs › trims what it keeps",
+      "line": 59,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -9082,6 +9586,33 @@
       "runner": "tests"
     },
     {
+      "description": "The two fields the far-end column needs and the board's own nodes carry, so the column and the cards behind it are one reading of one map.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "summaryNodesOf › carries the fields the plan groups and orders by",
+      "line": 162,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An isolated fixture has no reason to invent an order for every node. One cohort in which nothing sorts ahead of anything is the right reading of that, and it keeps the plan's regions in a stable order rather than an arbitrary one.",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "summaryNodesOf › puts undated nodes in one cohort rather than sorting them at random",
+      "line": 180,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An isolated fixture has no reason to invent an order for every node. One cohort in which nothing sorts ahead of anything is the right reading of",
+      "file": "app/lib/boardNav.test.ts",
+      "format": "vitest",
+      "key": "summaryNodesOf › reads a missing testsNodeId as settling nothing",
+      "line": 188,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "The drag threshold is a few pixels in, so the browser may already have selected a character or two before suppression starts.",
       "file": "app/lib/textSelection.test.ts",
       "format": "vitest",
@@ -9280,12 +9811,84 @@
       "runner": "tests"
     },
     {
+      "description": "Taking an option the person has not taken yet — the ordinary press.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "toggleChoice › adds a choice that was not picked",
+      "line": 6,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The order the shortlist was written in, not the order they happened to be clicked. A recorded answer that reads differently depending on which pill someone tapped first is the same answer wearing two faces, and the agent reading it back has no way to tell that.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "toggleChoice › keeps the shortlist’s order however they were clicked",
+      "line": 22,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "And pressing it again gives it back. Options used to SUBMIT on click, so there was no such thing as changing your mind about one.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "toggleChoice › removes one that was",
+      "line": 12,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "What a driver or a browser agent lists. It must match the catalog exactly, since a tool missing here is a tool the agent never knows it can call.",
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "toolSummaries › summarises every catalog tool with a name, title and description",
       "line": 163,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The comparison the whole field exists for.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "tradeoffBullets › carries what makes it better and worse than the alternatives",
+      "line": 106,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One bullet per requirement rather than a comma-joined line: they are separate things you either have or do not.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "tradeoffBullets › gives each requirement its own bullet",
+      "line": 96,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing to dig into is not a broken expander — it is a card with two facts on it, and the control has to know not to offer itself.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "tradeoffBullets › has nothing hidden when everything already fits",
+      "line": 120,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Effort and cost lead, because those are the two that decide whether a thing is worth reading further about at all.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "tradeoffBullets › leads with what it takes and what it costs",
+      "line": 88,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A FEW bullets, not everything known. The card is a thing you scan while comparing it against the one below it, and a card that printed all five facts would be a paragraph in a list's clothing.",
+      "file": "app/lib/tradeoffs.test.ts",
+      "format": "vitest",
+      "key": "tradeoffBullets › shows a few up front and keeps the rest for digging in",
+      "line": 78,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {
@@ -9721,6 +10324,51 @@
       "runner": "tests"
     },
     {
+      "description": "The callback is re-created on every render of the component that owns it, so a hook that captured the first one would keep calling a stale closure — moving to a question chosen from a board several answers out of date.",
+      "file": "app/hooks/useDelayedAdvance.test.ts",
+      "format": "vitest",
+      "key": "useDelayedAdvance › calls the newest callback, not the one captured when it was armed",
+      "line": 75,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Someone who takes hold of the board has overruled the automation. Moving the view out from under a person who is doing something is the failure this cancel exists to prevent.",
+      "file": "app/hooks/useDelayedAdvance.test.ts",
+      "format": "vitest",
+      "key": "useDelayedAdvance › does not move on if it was cancelled first",
+      "line": 27,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A pending jump firing after the board has gone would move a camera that no longer exists.",
+      "file": "app/hooks/useDelayedAdvance.test.ts",
+      "format": "vitest",
+      "key": "useDelayedAdvance › drops a pending move when the board unmounts",
+      "line": 59,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Answering two cards quickly must not queue two jumps — the second answer replaces the first one's pending move rather than adding to it.",
+      "file": "app/hooks/useDelayedAdvance.test.ts",
+      "format": "vitest",
+      "key": "useDelayedAdvance › re-arming replaces the pending move rather than queueing another",
+      "line": 40,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The pause is the point. Moving the instant the answer is recorded takes the card away before the person has seen their own words land on it, which reads as the board having eaten the answer.",
+      "file": "app/hooks/useDelayedAdvance.test.ts",
+      "format": "vitest",
+      "key": "useDelayedAdvance › waits before moving on, so the card can turn over first",
+      "line": 13,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "The keyboard route out, which is the only one a person navigating without a pointer has.",
       "file": "app/hooks/useDismissOnOutside.test.ts",
       "format": "vitest",
@@ -9790,6 +10438,60 @@
       "key": "useDismissOnOutside › treats a null ref as outside rather than throwing",
       "line": 94,
       "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Closing it now, and recording that it was closed. Both halves matter: the second is what stops it coming back on the next map.",
+      "file": "app/hooks/useDismissedOnce.test.ts",
+      "format": "vitest",
+      "key": "useDismissedOnce › hides it once, and remembers",
+      "line": 24,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Two notes must not dismiss each other.",
+      "file": "app/hooks/useDismissedOnce.test.ts",
+      "format": "vitest",
+      "key": "useDismissedOnce › remembers each key separately",
+      "line": 42,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The failure that decides the direction of the whole hook. A private window, cleared site data, or a browser set to block site data can make the read THROW — and showing an instruction twice is a far smaller failure than never showing it at all, so a throw has to leave it visible.",
+      "file": "app/hooks/useDismissedOnce.test.ts",
+      "format": "vitest",
+      "key": "useDismissedOnce › shows it anyway when the browser refuses to be read",
+      "line": 54,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary first visit. It is shown only after the effect runs, never on the first render — server and client must agree, and only the client can know what the browser remembers.",
+      "file": "app/hooks/useDismissedOnce.test.ts",
+      "format": "vitest",
+      "key": "useDismissedOnce › shows the thing to someone who has never dismissed it",
+      "line": 17,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The second visit, which is the whole reason this is remembered at all.",
+      "file": "app/hooks/useDismissedOnce.test.ts",
+      "format": "vitest",
+      "key": "useDismissedOnce › stays hidden on a later visit",
+      "line": 33,
+      "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Closing has to work even when the closing cannot be recorded. Someone meeting the note once more on another visit is not worth a broken button.",
+      "file": "app/hooks/useDismissedOnce.test.ts",
+      "format": "vitest",
+      "key": "useDismissedOnce › still closes when the browser refuses to be written to",
+      "line": 65,
+      "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
     {

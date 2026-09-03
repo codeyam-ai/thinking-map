@@ -1,5 +1,5 @@
-import Component from "../../components/BoardMenu";
-import type { ComponentProps } from "react";
+import Component from '../../components/BoardMenu';
+import type { ComponentProps } from 'react';
 
 type Props = ComponentProps<typeof Component>;
 
@@ -10,16 +10,19 @@ type Props = ComponentProps<typeof Component>;
 // many there are to return to — and the day-one case, where there are none.
 
 const MAPS = [
-  { id: "map-galaxy", title: "Handover between shifts at a small vet practice" },
-  { id: "map-lending", title: "A tool library for the street" },
-  { id: "map-reaching", title: "A repair cafe in the church hall" },
-  { id: "map-game", title: "An educational game for kids" },
-  { id: "map-brief", title: "Northgate Library — digital membership renewal" },
+  {
+    id: 'map-galaxy',
+    title: 'Handover between shifts at a small vet practice',
+  },
+  { id: 'map-lending', title: 'A tool library for the street' },
+  { id: 'map-reaching', title: 'A repair cafe in the church hall' },
+  { id: 'map-game', title: 'An educational game for kids' },
+  { id: 'map-brief', title: 'Northgate Library — digital membership renewal' },
 ];
 
 const scenarios: Record<string, Props> = {
   // The ordinary case: a handful of boards, the current one among them.
-  Default: { maps: MAPS, currentId: "map-galaxy" },
+  Default: { maps: MAPS, currentId: 'map-galaxy' },
 
   // Day one. There is nowhere else to go yet, and the menu has to say so
   // rather than open onto an empty list. No board on screen either, so it must
@@ -40,23 +43,29 @@ const scenarios: Record<string, Props> = {
   NotYoursAtAll: { maps: [], currentId: "map-galaxy" },
 
   // Exactly one other board — the boundary where a list becomes a list.
-  OneOther: { maps: MAPS.slice(0, 2), currentId: "map-galaxy" },
+  OneOther: { maps: MAPS.slice(0, 2), currentId: 'map-galaxy' },
 
   // Enough boards that the list has to hold its shape, with titles long enough
   // to need truncating rather than wrapping the header open.
   Many: {
     maps: [
       ...MAPS,
-      { id: "m6", title: "Somewhere to put half-finished thoughts before they go" },
-      { id: "m7", title: "A tool for tracking what I read and why it mattered" },
-      { id: "m8", title: "Coordinating follow-up care across small clinics" },
+      {
+        id: 'm6',
+        title: 'Somewhere to put half-finished thoughts before they go',
+      },
+      {
+        id: 'm7',
+        title: 'A tool for tracking what I read and why it mattered',
+      },
+      { id: 'm8', title: 'Coordinating follow-up care across small clinics' },
     ],
-    currentId: "m7",
+    currentId: 'm7',
   },
 
   // Viewing a board that is not in the list — reachable by direct link, and the
   // menu must not mark anything as current when nothing is.
-  NoneCurrent: { maps: MAPS, currentId: "not-in-the-list" },
+  NoneCurrent: { maps: MAPS, currentId: 'not-in-the-list' },
 };
 
 export default async function Page({
@@ -64,7 +73,7 @@ export default async function Page({
 }: {
   searchParams: Promise<{ s?: string }>;
 }) {
-  const { s = "Default" } = await searchParams;
+  const { s = 'Default' } = await searchParams;
   const props = scenarios[s];
   if (!props) return <div>Unknown scenario: {s}</div>;
 
@@ -72,7 +81,7 @@ export default async function Page({
   // the harness reproduces that rather than the board's dark canvas.
   return (
     <div id="codeyam-capture">
-      <div style={{ width: 560, display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ width: 560, display: 'flex', justifyContent: 'flex-end' }}>
         <Component {...props} />
       </div>
     </div>

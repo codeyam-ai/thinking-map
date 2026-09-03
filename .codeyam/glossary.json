@@ -314,6 +314,151 @@
     ]
   },
   {
+    "description": "The bar over the map, and the surface that replaced the chat panel in the corner. A transcript answers what was said and a board answers what is here; neither answers the question someone actually arrives with, which is does anything still need me and how do I get to it. Its one rule is that the LEFT SIDE ALWAYS POINTS SOMEWHERE — the questions still waiting, or, when there are none, the way on to the next phase. It briefly broke that rule and read 'Nothing waiting on you' beside two other controls each claiming to be the next move, which is what the rule now exists to prevent. Pinned to the viewport rather than the board plane, because a navigation aid that shrank as you zoomed out would be exactly backwards.",
+    "filePath": "app/components/BoardNav.tsx",
+    "name": "BoardNav",
+    "scenarios": [
+      "boardnav-default",
+      "boardnav-nothingatthefarend",
+      "boardnav-somethingchanged",
+      "boardnav-answered",
+      "boardnav-atthefarend"
+    ]
+  },
+  {
+    "description": "Saying something that fits on no card, from the bar. Collapsed to a single word until you want it: the panel this replaced was always open and always growing, which made the channel obvious and covered the thing being talked about. It closes on send rather than staying open, because there is no transcript for a reply to appear in — the map is where the reply lands.",
+    "filePath": "app/components/BoardNavComposer.tsx",
+    "name": "BoardNavComposer",
+    "scenarios": [
+      "boardnavcomposer-default"
+    ]
+  },
+  {
+    "description": "How much is still waiting, as the thing that takes you there. A BUTTON rather than a readout: a board wide enough to need a count is already too wide to scan by eye, so a number that only reported would be a scoreboard for a problem it had just described and done nothing about. It wears the lime and it is the only lime on the bar — the palette allows the accent on exactly one thing per screen, the thing asking for the person.",
+    "filePath": "app/components/BoardNavCount.tsx",
+    "name": "BoardNavCount",
+    "scenarios": [
+      "boardnavcount-default",
+      "boardnavcount-one",
+      "boardnavcount-many"
+    ]
+  },
+  {
+    "description": "The round trip between the map and what it has produced, as ONE control: the button that takes you there is the button that brings you back, because a separate return would be a second thing to find at the moment someone is already lost. It carries a count of what arrived while the person was elsewhere, and stops carrying it the moment they have been to look — crossing the board is only worth doing when something is over there.",
+    "filePath": "app/components/BoardNavFarEnd.tsx",
+    "name": "BoardNavFarEnd",
+    "scenarios": [
+      "boardnavfarend-default",
+      "boardnavfarend-changed",
+      "boardnavfarend-onechanged",
+      "boardnavfarend-atfarend"
+    ]
+  },
+  {
+    "description": "Every open question by its own words, each row carrying its card's own colour so a question in the list and the card it flies to are visibly the same object. Taking them in order is the common case and the count already does that; this is for when you already know which question you want to think about, and the only thing that makes that choice possible is seeing what each one actually says.",
+    "filePath": "app/components/BoardNavQuestionList.tsx",
+    "name": "BoardNavQuestionList",
+    "scenarios": [
+      "boardnavquestionlist-default",
+      "boardnavquestionlist-single",
+      "boardnavquestionlist-overflowing",
+      "boardnavquestionlist-longquestion"
+    ]
+  },
+  {
+    "description": "The arrangement of the bar's left side: which of three things it is showing — the count and its list, the way on to the next phase, or the note that the plan is where the map ends — and whether the list is open. The count and the list each own their own appearance; what is left here is the decision between them.",
+    "filePath": "app/components/BoardNavQuestions.tsx",
+    "name": "BoardNavQuestions",
+    "scenarios": [
+      "boardnavquestions-default",
+      "boardnavquestions-nothinglearnedyet",
+      "boardnavquestions-answered",
+      "boardnavquestions-endofthearc"
+    ]
+  },
+  {
+    "description": "How the board is meant to be used, said once. The map arrives with questions already on it, which looks like something to read rather than something to do, and the one instruction worth giving is the loop itself. Dismissed by hand rather than on a timer — an instruction that vanished while you were still reading it would have to be remembered instead of read — but it stands down while a card is focused and on a finished map, because in both cases it would print an instruction over the very thing it asked you to go and do.",
+    "filePath": "app/components/BoardToolkitPanel.tsx",
+    "name": "BoardToolkitPanel",
+    "scenarios": [
+      "boardtoolkitpanel-default",
+      "boardtoolkitpanel-stooddown"
+    ]
+  },
+  {
+    "description": "What a way forward would take and what taking it would cost, as a few bullets and a way to see the rest. Both halves are load bearing: a card is scanned while being held against the option below it, so printing everything known would make the comparison harder rather than easier, and hiding the rest behind a control rather than dropping it means someone who has narrowed it to two can still get the whole picture on both. Every value is printed as the partner wrote it — nothing is normalised to a scale and nothing is compared for you.",
+    "filePath": "app/components/BoardTradeoffs.tsx",
+    "name": "BoardTradeoffs",
+    "scenarios": [
+      "boardtradeoffs-default",
+      "boardtradeoffs-effortonly",
+      "boardtradeoffs-nothinghidden",
+      "boardtradeoffs-thecomparison",
+      "boardtradeoffs-none"
+    ]
+  },
+  {
+    "description": "The far end of the map: where the thinking goes next. This was a summary, and twice over it was the wrong thing — a separate screen, so reaching it replaced the board and said the thinking was over, opening with a declaration about a finish line on a tool whose whole argument is that there is not one. It now stands where the lines already converge and leads with what to DO. The order is deliberately not a report's: a report leads with findings and ends with recommendations, and this leads with the moves, because someone who opens the far end of their own map is asking what now.",
+    "filePath": "app/components/BoardWhereNext.tsx",
+    "name": "BoardWhereNext",
+    "scenarios": [
+      "boardwherenext-default",
+      "boardwherenext-thin",
+      "boardwherenext-experimentsonly"
+    ]
+  },
+  {
+    "description": "A list of short claims in the far-end column. It takes strings rather than nodes because both regions that use it are MIXTURES — what is being learned is the map's known nodes plus the partner's findings, and what is still open is its unknowns plus the gaps — and where a line came from is not something the reader needs to sort out, so the component does not carry the distinction either.",
+    "filePath": "app/components/BoardWhereNextBullets.tsx",
+    "name": "BoardWhereNextBullets",
+    "scenarios": [
+      "boardwherenextbullets-default",
+      "boardwherenextbullets-single",
+      "boardwherenextbullets-longclaim",
+      "boardwherenextbullets-empty"
+    ]
+  },
+  {
+    "description": "The strongest directions, as a shortlist you can take. On paper these were lettered list items — A, B, C, inert — which made the end of the map a thing to read. They are buttons here, and pressing one is the same contribution the insight stack's where-next already makes: a note saying which way to go, not an answer closing a question, because no question on the map is being closed by choosing a direction.",
+    "filePath": "app/components/BoardWhereNextDirections.tsx",
+    "name": "BoardWhereNextDirections",
+    "scenarios": [
+      "boardwherenextdirections-default",
+      "boardwherenextdirections-two",
+      "boardwherenextdirections-longdirection",
+      "boardwherenextdirections-empty"
+    ]
+  },
+  {
+    "description": "A region of the far-end column with nothing in it yet. Per the design system an empty state describes the next action rather than the absence of data, and on this column that rule carries the whole argument: a thin region is a fact about how much thinking has happened, not about the rendering, and the honest response is to keep going. The board-toned twin of EmptyHint, two components rather than one prop because the two grounds share no colour at all.",
+    "filePath": "app/components/BoardWhereNextEmpty.tsx",
+    "name": "BoardWhereNextEmpty",
+    "scenarios": [
+      "boardwherenextempty-default"
+    ]
+  },
+  {
+    "description": "One region of the far-end column: a dark panel with a small-caps heading. Its reason for existing is that the heading is InsightSectionLabel rather than a sixth hand-copy of the same six utility classes — the board's eyebrow, deliberately not the app's paper-palette one, which is near-black and renders invisible on this plane.",
+    "filePath": "app/components/BoardWhereNextPanel.tsx",
+    "name": "BoardWhereNextPanel",
+    "scenarios": [
+      "boardwherenextpanel-default",
+      "boardwherenextpanel-longheading"
+    ]
+  },
+  {
+    "description": "Things to try, and what trying one would settle — the region that changed the far end from a report into a next move. It draws from two places on purpose: the map's slice nodes are the small builds, each naming an assumption it would test, and the partner's experiment and suggestion insights are things worth running that nobody has to build. Both answer what could I do that would tell me something, so they belong in one list rather than two the reader has to reconcile. A slice that settles nothing is MARKED rather than dropped, with the dashed edge the board already uses for unsettled.",
+    "filePath": "app/components/BoardWhereNextTry.tsx",
+    "name": "BoardWhereNextTry",
+    "scenarios": [
+      "boardwherenexttry-default",
+      "boardwherenexttry-settlesnothing",
+      "boardwherenexttry-danglingreason",
+      "boardwherenexttry-somethingnew",
+      "boardwherenexttry-empty"
+    ]
+  },
+  {
     "description": "The board and the conversation as one surface, and the owner of two contracts. FIRST, the live refresh: WebMCP is pull-only — the page cannot be woken by an agent — so this watches the bridge's revision and calls router.refresh() when it advances, which is the whole of what makes an answer or a newly-written question appear without a reload. The first revision it sees only seeds the reference: refreshing on mount would re-fetch the page the person just loaded, and a repeated or lower revision must not refresh at all or a retried poll puts the page in a loop. SECOND, the round ending itself: when the board runs out of open questions and the person has answered something in this sitting, a countdown starts and does what the Next round button did, with typing or an explicit press holding it open. Two phases meet here and they are not the same thing — the local RoundPhase is this component's idle/waiting, and mapPhase is where the whole map sits on its arc. The arc is what makes the loop terminate, since next-steps has no next, and it is also what decides the note the round's end sends and which step PhaseAdvance offers from the board.",
     "filePath": "app/components/BoardWorkspace.tsx",
     "name": "BoardWorkspace",
@@ -1688,6 +1833,12 @@
     "testFile": "app/lib/boardInsights.test.ts"
   },
   {
+    "description": "Every stored node in the shape the board draws and the far-end column reads. One projection, not two: the insight stack, the cards and the column are all readings of THESE nodes, and fetching any of them separately is how two readings of one map came to disagree. Its three JSON parsers are each total and degrade to null rather than throwing, which is the opinion worth holding — a card that cannot render its options is still a question worth asking, and an insight whose citations will not parse is still a claim worth showing.",
+    "filePath": "app/lib/boardNodes.ts",
+    "name": "boardNodesOf",
+    "testFile": "app/lib/boardNodes.test.ts"
+  },
+  {
     "description": "Names a brief pulled off the web: the page title paired with its host and path, or the bare address when the page is untitled or its title runs past 80 characters. The address is the half that always survives because this string is the only record of where a fetched brief came from — the page itself is not kept.",
     "filePath": "app/lib/briefFormat.ts",
     "name": "briefSourceName",
@@ -1810,10 +1961,22 @@
     "testFile": "app/lib/codeyamOnly.test.ts"
   },
   {
+    "description": "What gets recorded from a card's picked options and its typed words, or null when there is nothing to record. The picks are written in the SHORTLIST's order rather than the order clicked, because an answer that reads differently depending on which pill was tapped first is one answer wearing two faces. A pick the shortlist no longer offers is kept after the ones it does, since dropping it silently would record an answer the person did not give. The em dash between the picks and the typed words says the two parts came from different places.",
+    "filePath": "app/lib/answerDraft.ts",
+    "name": "composeAnswer",
+    "testFile": "app/lib/answerDraft.test.ts"
+  },
+  {
     "description": "Counts which sections of a client's brief the map actually accounts for. Pure by design - sections and nodes in, counts out, no database and no brief text on the way out - because the whole point is that coverage is COUNTED from the nodes that cite each section, never asserted by an agent. Reports the untouched sections and how much document they represent, since a section count alone understates the finding, and surfaces citations pointing at sections the brief does not have rather than dropping them, which would let the accounted-for count quietly overstate itself. A heading with nothing under it counts toward neither half.",
     "filePath": "app/lib/briefCoverage.ts",
     "name": "computeBriefCoverage",
     "testFile": "app/lib/briefCoverage.test.ts"
+  },
+  {
+    "description": "Where to point the camera to read the far-end column from its beginning. focusOn centres the point it is given, so putting the column's top edge near the top of the screen means looking at a point half a viewport BELOW it, less the bar's clearance. That clearance is the regression this function exists to hold: the first version framed the top edge at the top of the SCREEN, which is exactly where the bar is pinned, so the headline rendered underneath it cut in half.",
+    "filePath": "app/lib/boardNav.ts",
+    "name": "conclusionCamera",
+    "testFile": "app/lib/boardNav.test.ts"
   },
   {
     "description": "The conclusion at the far end of the board - its claim, its reasoning, and the ways forward it offers. The ways forward are rendered as a list under a 'Where next' heading because that is what they are on screen, a column of buttons rather than a comma-separated sentence; when none were offered the heading is omitted entirely, since an empty 'Where next' would say there had been options and they went missing. It copies the reasoning and the routes even while the card is collapsed and showing neither, because what is being copied is the conclusion rather than the current state of the panel - a paste that silently dropped the options because a panel happened to be shut would be a loss nobody could see.",
@@ -2260,6 +2423,12 @@
     "testFile": "app/lib/summaryGroups.test.ts"
   },
   {
+    "description": "How tall a text field should be for what has been written in it, clamped between a floor and a ceiling. The floor keeps the first card's deliberate empty space; the ceiling is what makes growing safe, because a card that grew with an essay would run off the screen the essay was being typed onto.",
+    "filePath": "app/lib/growField.ts",
+    "name": "grownHeight",
+    "testFile": "app/lib/growField.test.ts"
+  },
+  {
     "description": "The MCP HTTP endpoint. Builds a fresh server and transport per request so concurrent clients never share transport state, then hands the request to the transport.",
     "filePath": "app/api/mcp/route.ts",
     "name": "handle",
@@ -2575,6 +2744,12 @@
     "testFile": "app/lib/loadError.test.ts"
   },
   {
+    "description": "The open cards in the shape the bar lists them: their words, and the colour of the card they belong to, so a row in the list and a card on the board read as the same object rather than two things that happen to share a sentence.",
+    "filePath": "app/lib/boardNav.ts",
+    "name": "navQuestionsOf",
+    "testFile": "app/lib/boardNav.test.ts"
+  },
+  {
     "description": "Whether a guarded write warrants reading the log at all. An unguarded write is the agent saying it does not care, and a map that has not moved cannot have a conflict, so neither case costs a read.",
     "filePath": "app/lib/conflict.ts",
     "name": "needsConflictCheck",
@@ -2594,6 +2769,18 @@
       "justification": "Reads the process's OS user id; there is no seam to assert against without becoming a test of process.getuid itself.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "The ids to mark as new, given what was on screen at the last look at the far end. Null means it has not been looked at yet and marks nothing: everything being new on first sight is true and carries no information. The result only ever contains things currently present, because it is a set of things to draw a marker ON.",
+    "filePath": "app/lib/whatChanged.ts",
+    "name": "newSince",
+    "testFile": "app/lib/whatChanged.test.ts"
+  },
+  {
+    "description": "The next open question after wherever you are, wrapping. Anchored on the FOCUSED card rather than on a counter the board keeps: a counter would keep walking a list the person has been changing underneath it, because answering a card removes it, and would send them somewhere they had already been. A focus that resolves to nothing means start at the beginning, which is both the first press on a fresh board and the press right after answering.",
+    "filePath": "app/lib/boardNav.ts",
+    "name": "nextOpenAfter",
+    "testFile": "app/lib/boardNav.test.ts"
   },
   {
     "description": "Shapes the node.added event payload from the row that was just inserted. A translation, not a write: the database's vocabulary in, the exchange contract's vocabulary out. Both options and fromNodeIds are stored as JSON strings because SQLite has no array type, and the log speaks the contract's language rather than the column's, so they come back out as the arrays the tools take. The optional fields - testsNodeId, fromNodeIds, sourceRef, options - are OMITTED entirely when absent rather than sent as null, so a reader can treat presence as meaning and an ordinary node's event stays byte-for-byte what it has always been. fromNodeIds is omitted for an empty list too: an insight that cited nothing must be indistinguishable from one written before the field existed, where an empty array would instead read as 'this insight named its sources and they were none'. Pure, so it is unit-testable without a database; inline it could only be reached through a live insert.",
@@ -2641,6 +2828,12 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
+    "description": "The cards still asking something, in the order the board reads them: row by row, left to right, which is the order the eye would take if the whole board fitted on one screen. Both clauses of the filter matter and neither implies the other — status 'open' drops what has been answered, and isOpenCard drops what was never a question, meaning the partner's own findings, gaps and risks, and any card carrying a diagram or a picture, all of which are shown TO you rather than asked OF you however their status reads.",
+    "filePath": "app/lib/boardNav.ts",
+    "name": "openQuestionsOf",
+    "testFile": "app/lib/boardNav.test.ts"
+  },
+  {
     "description": "Reads back the LEGACY attachments column: names only, and anything unreadable becomes an empty list. Superseded by readAttachments once attachments became their own table with bytes behind them, and kept for exactly as long as it takes an existing database to run prisma/backfill-attachments.ts, which reads through here. Nothing in the app calls it any more. The availability rule it established survives in its replacement: a board that cannot make sense of its own attachments must still OPEN.",
     "filePath": "app/lib/attachments.ts",
     "name": "parseAttachments",
@@ -2660,19 +2853,19 @@
   },
   {
     "description": "Reads a question's shortlist back off the map. Stored as a JSON string because SQLite has no array column, so anything malformed degrades to an open-ended question rather than throwing — a card that cannot render its options is still a question worth asking, and a board that will not open is not.",
-    "filePath": "app/components/MapScreen.tsx",
+    "filePath": "app/lib/boardNodes.ts",
     "name": "parseChoices",
     "testFile": "app/components/QuestionCard.render.test.tsx"
   },
   {
     "description": "Reads a card's drawn shape back off the map, with the same contract as parseChoices: a stored value that cannot be parsed becomes no diagram rather than an exception. The card then renders as an ordinary one, which is the right degradation — a missing shape costs a picture, a throw costs the whole board.",
-    "filePath": "app/components/MapScreen.tsx",
+    "filePath": "app/lib/boardNodes.ts",
     "name": "parseDiagram",
     "testFile": "app/components/QuestionCard.render.test.tsx"
   },
   {
     "description": "Reads the JSON array of node ids an insight cites off the row, with the same total, degrade-to-null contract parseChoices holds - and it matters more here. A malformed value must yield no citations rather than throwing away the insight that carries it: an insight whose sources cannot be read is still a claim worth showing, and one that took the board's whole rendering down with it would not be. An empty array reads as null so the card renders no 'What this came out of' heading rather than an empty one.",
-    "filePath": "app/components/MapScreen.tsx",
+    "filePath": "app/lib/boardNodes.ts",
     "name": "parseFromNodeIds",
     "untestabilityReason": {
       "justification": "A module-local JSON.parse guard in a rendering component, not exported and not reachable from a test; it is the third instance of the parseChoices/parseDiagram shape already pinned beside it.",
@@ -2828,6 +3021,12 @@
     "filePath": "app/lib/exchange.ts",
     "name": "readSince",
     "testFile": "app/lib/exchange.integration.test.ts"
+  },
+  {
+    "description": "Read a node's stored tradeoffs, or nothing. Total and degrading to null exactly like the other JSON columns. An object with nothing usable in it reads as nothing rather than as an empty one, because a card that drew a heading over no bullets would be announcing thinking that had not happened, which is the failure the whole field exists to stop.",
+    "filePath": "app/lib/tradeoffs.ts",
+    "name": "readTradeoffs",
+    "testFile": "app/lib/tradeoffs.test.ts"
   },
   {
     "description": "The current browser's visitor id from its cookie, or null when it has never made a map. Null is the honest answer for a first arrival, and every caller must read it as no maps rather than all maps - that opposite default is the enumeration bug this feature exists to remove. Reads through next/headers, so it works in a server component as well as a route handler; only WRITING a cookie is restricted to the latter.",
@@ -3135,6 +3334,12 @@
     "testFile": "app/lib/summarizeMap.test.ts"
   },
   {
+    "description": "The board's nodes in the shape the far-end column reads them. A projection rather than a second fetch: order and testsNodeId ride on the board's own nodes precisely so the column standing at the far end and the cards behind it can never become two different readings of one map. Order falls back to 0 for a fixture that never dated its nodes, which is one cohort in which nothing sorts ahead of anything.",
+    "filePath": "app/lib/boardNav.ts",
+    "name": "summaryNodesOf",
+    "testFile": "app/lib/boardNav.test.ts"
+  },
+  {
     "description": "Holds text selection off for the duration of a board gesture and returns an idempotent restore function. Its one caller, useBoardCamera, takes the lock out on POINTERDOWN rather than when the drag passes the pan threshold - three pixels in, the browser already has a selection drag in flight, and clearing its ranges leaves the anchor behind for it to keep extending from, so pointerdown is the only seam where the highlight never starts at all. Scoped to the gesture rather than made permanent on the map, and skipped entirely for a press inside a [data-no-pan] subtree so selection in a card's own composer and in the chat panel keeps working. It used to say that selecting a node's label was worth keeping because that was how you copied one out; that is no longer true, and the copy button on each board surface - see CopyTextButton and cardCopyText - is what replaced it.",
     "filePath": "app/lib/textSelection.ts",
     "name": "suppressTextSelection",
@@ -3148,6 +3353,12 @@
       "justification": "Its whole job is starting and memoising a database server process. Exercised for real by all four integration test files.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "A trimmed string, or nothing. The one rule every tradeoff field shares: a value that is not a string, or that is only whitespace, is ABSENT rather than empty — which is what lets an object full of blanks read as no tradeoffs at all instead of as a heading over no bullets.",
+    "filePath": "app/lib/tradeoffs.ts",
+    "name": "text",
+    "testFile": "app/lib/tradeoffs.test.ts"
   },
   {
     "description": "What a tool response SAYS, as one string. `content` became a union the day an agent could be handed a picture, so every caller that only wants the words would otherwise narrow it itself. Blocks are joined rather than the first one taken: a result is text followed by pictures, and reading `content[0]` would quietly hold only the caption once a tool returned more than one text block.",
@@ -3183,10 +3394,22 @@
     "testFile": "app/lib/toolCatalog.test.ts"
   },
   {
+    "description": "Add a shortlist option to the answer being written, or take it away if it was already picked. The plural is the change: options used to submit on click, so a shortlist allowed exactly one, and two of those is an ordinary answer.",
+    "filePath": "app/lib/answerDraft.ts",
+    "name": "toggleChoice",
+    "testFile": "app/lib/answerDraft.test.ts"
+  },
+  {
     "description": "The catalog as a browser agent or the headless driver lists it. A tool missing here is a tool the agent never learns it can call, so it is derived from the catalog rather than restated.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "toolSummaries",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The tradeoff bullets, split into what a card shows and what sits behind 'dig in'. The order is the order the questions get asked: effort and cost lead because they decide whether the rest is worth reading, what it needs comes next because a requirement you cannot meet ends the conversation, and the comparison is last because better-when only matters once the thing is possible. Each requirement gets its own bullet, since they are separate things you either have or do not.",
+    "filePath": "app/lib/tradeoffs.ts",
+    "name": "tradeoffBullets",
+    "testFile": "app/lib/tradeoffs.test.ts"
   },
   {
     "description": "Builds the per-run PostgreSQL schema name for one test file: a fixed test_ prefix, the label reduced to [a-z0-9_], and a random suffix. Lowercased because an unquoted Postgres identifier folds to lower case, and sanitised because the name reaches a DROP SCHEMA statement.",
@@ -3237,10 +3460,22 @@
     "testFile": "app/lib/clippedText.test.ts"
   },
   {
+    "description": "Move on, but not instantly. Answering a card and being taken elsewhere in the same frame reads as the board having eaten the answer, so the card turns over first, holds long enough to be read, and only then does the camera move. The callback is held in a ref and read at FIRING time rather than captured when armed, because the component that owns it re-creates it every render and a captured copy would move to a question chosen from a board several answers out of date.",
+    "filePath": "app/hooks/useDelayedAdvance.ts",
+    "name": "useDelayedAdvance",
+    "testFile": "app/hooks/useDelayedAdvance.test.ts"
+  },
+  {
     "description": "Closes an open overlay on the two gestures that both mean 'not this' - a pointer down outside its element, or Escape. Extracted because three surfaces had each grown their own copy of the effect: AgentStatus's presence panel, BoardMenu, and BriefMenu. Uses mousedown rather than click so a drag that starts inside the panel and ends outside it - selecting the prompt text - is not read as a dismissal. Listens only while open, so the document carries listeners just for as long as there is something to dismiss.",
     "filePath": "app/hooks/useDismissOnOutside.ts",
     "name": "useDismissOnOutside",
     "testFile": "app/hooks/useDismissOnOutside.test.ts"
+  },
+  {
+    "description": "Show something until the person closes it, then never again on that browser. It starts hidden and is turned ON by an effect rather than the reverse, because server and first client render must agree and only the client knows what the browser remembers. Every read and write is guarded and all three failure paths fail towards SHOWING: a private window, cleared site data, or a browser that throws on access must leave the thing visible, because meeting a note twice is a much smaller failure than never meeting it at all.",
+    "filePath": "app/hooks/useDismissedOnce.ts",
+    "name": "useDismissedOnce",
+    "testFile": "app/hooks/useDismissedOnce.test.ts"
   },
   {
     "description": "The page's own copy of the exchange log, kept current. Polls the log forward from the cursor it holds — the same way an agent reads it, because WebMCP is pull-only and there is no push channel — and re-renders the server component when the log moves past what was rendered, so the server-rendered map does not sit out of step with its own log.",

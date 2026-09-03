@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavCount - One",
+  "id": "1c7ce0c5-253c-4fea-ad92-eab1f6881be6",
+  "url": "/isolated-components/BoardNavCount?s=One",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavCount",
+  "scenarioType": "component",
+  "description": "The singular. '1 questions waiting for you' is the kind of thing nobody notices until it is on screen in front of a client."
+}

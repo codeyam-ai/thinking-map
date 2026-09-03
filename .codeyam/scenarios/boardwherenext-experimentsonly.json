@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNext - ExperimentsOnly",
+  "id": "817819ad-1922-4c8f-af58-123133f62e55",
+  "url": "/isolated-components/BoardWhereNext?s=ExperimentsOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNext",
+  "scenarioType": "component",
+  "description": "The partner's own experiments with no plan nodes yet. They do not disappear because the map reached its last phase — an experiment worth running is worth running most of all at the point someone thinks they are finished."
+}

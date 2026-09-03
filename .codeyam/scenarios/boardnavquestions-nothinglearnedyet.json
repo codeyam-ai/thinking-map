@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestions - NothingLearnedYet",
+  "id": "8c76c8a3-8799-4c35-a6b5-265a962fef51",
+  "url": "/isolated-components/BoardNavQuestions?s=NothingLearnedYet",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestions",
+  "scenarioType": "component",
+  "description": "Questions waiting and nothing worked out yet. The insight count is absent rather than shown as zero — a '0 insights' would be a fact nobody needs and a second thing to read on a bar whose whole job is to name one next move."
+}

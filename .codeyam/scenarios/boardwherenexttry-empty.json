@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextTry - Empty",
+  "id": "a82c0e70-f2f0-432e-8682-dc0c99133951",
+  "url": "/isolated-components/BoardWhereNextTry?s=Empty",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextTry",
+  "scenarioType": "component",
+  "description": "Nothing to try yet, which is most of a session. The region names the next action rather than reporting the absence of data."
+}

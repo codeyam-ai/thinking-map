@@ -1,0 +1,12 @@
+{
+  "name": "BoardToolkitPanel - Default",
+  "id": "586e6623-b61e-4fa0-96b9-ab29873dd199",
+  "url": "/isolated-components/BoardToolkitPanel?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardToolkitPanel",
+  "scenarioType": "component",
+  "description": "The one instruction worth giving, on arrival at a map. The board arrives with questions already on it, which looks like something to read rather than something to do — and the difference between a person who gets a good plan out of this and one who does not is entirely whether they answered anything."
+}

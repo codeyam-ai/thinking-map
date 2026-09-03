@@ -1,0 +1,12 @@
+{
+  "name": "BoardWhereNextBullets - Default",
+  "id": "daa636d8-f477-46c7-947a-25f0f38ccf7d",
+  "url": "/isolated-components/BoardWhereNextBullets?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWhereNextBullets",
+  "scenarioType": "component",
+  "description": "What a map knows a few rounds in. It takes strings rather than nodes because both regions using it are mixtures — what is being learned is the map's own known nodes plus the partner's findings — and where a line came from is not something the reader has to sort out."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "BoardNavQuestions - Default",
+  "id": "17706196-021c-4a9f-9bd3-a78578112df1",
+  "url": "/isolated-components/BoardNavQuestions?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNavQuestions",
+  "scenarioType": "component",
+  "description": "Mid-round: questions waiting, and the partner has worked some things out. What this component owns is the arrangement — which of three things the left of the bar is showing — and each of its scenarios is one branch of that decision."
+}

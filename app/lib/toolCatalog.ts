@@ -106,7 +106,9 @@ const nodeShape = z.object({
       'The ref of a node created earlier in this call, or the real id of an existing node. Omit only for a root idea.',
     ),
   kind: z.enum(NODE_KINDS),
-  label: z.string().describe('Short text for the pill; aim for under 40 characters.'),
+  label: z
+    .string()
+    .describe('Short text for the pill; aim for under 40 characters.'),
   detail: z.string().optional(),
   status: z.enum(NODE_STATUSES).optional(),
   sourceUrl: z.string().optional(),
@@ -124,7 +126,9 @@ const nodeShape = z.object({
     .object({
       steps: z
         .array(z.string())
-        .describe('Two to six stages, in order. Kept short — these are boxes, not paragraphs.'),
+        .describe(
+          'Two to six stages, in order. Kept short — these are boxes, not paragraphs.',
+        ),
       note: z.string().optional().describe('One line under the diagram.'),
     })
     .optional()
@@ -136,6 +140,41 @@ const nodeShape = z.object({
     .optional()
     .describe(
       'Offer two to four concrete options instead of a blank field. Use them when the useful answers are enumerable — experience level, who it is for, build-or-buy. The person can always type something else instead, so a list never traps them.',
+    ),
+  tradeoffs: z
+    .object({
+      effort: z
+        .string()
+        .optional()
+        .describe(
+          'Roughly what it takes. Your own words — "about two days", "an afternoon". A rough estimate someone can argue with beats a number that only looks computed.',
+        ),
+      cost: z
+        .string()
+        .optional()
+        .describe(
+          'What it costs, in whatever unit is honest. "Free" is an answer.',
+        ),
+      requires: z
+        .array(z.string())
+        .optional()
+        .describe(
+          'What has to be true or in hand before this is possible at all. One per item — these are things the person either has or does not.',
+        ),
+      betterWhen: z
+        .string()
+        .optional()
+        .describe('What makes this the better of the alternatives.'),
+      worseWhen: z
+        .string()
+        .optional()
+        .describe(
+          'And what makes it the worse. Give both or neither — one on its own is a pitch, not a tradeoff.',
+        ),
+    })
+    .optional()
+    .describe(
+      'What this would take and what taking it would cost. Set it on things the person could DO — an approach, an experiment, a slice, a direction — because the question they actually have is which option is easier, which is cheaper, and what makes one better than another. Leave it off a finding or a gap: those have no effort and no alternative to be better than, and filling the shape with plausible-sounding nothing is worse than leaving it empty.',
     ),
   themeRef: z
     .string()
@@ -159,7 +198,9 @@ const themeShape = z.object({
     .describe('A temporary id so nodes in this same call can name this theme.'),
   label: z
     .string()
-    .describe('What this group of questions is about. Two or three words: "Context", "Who it is for".'),
+    .describe(
+      'What this group of questions is about. Two or three words: "Context", "Who it is for".',
+    ),
   tests: z
     .string()
     .optional()
@@ -206,7 +247,9 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
         .number()
         .int()
         .optional()
-        .describe('Return only changes after this revision. Omit for the full map.'),
+        .describe(
+          'Return only changes after this revision. Omit for the full map.',
+        ),
     }),
     annotations: { readOnlyHint: true },
   },
@@ -242,7 +285,7 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     name: 'read_attachment',
     title: 'Look at something the person attached',
     description:
-      "Open one thing the person brought along — a whiteboard photo, a screenshot of the flow they want replaced, a diagram they sketched. An image comes back as a picture for you to actually look at; a text document comes back as its text. read_map lists what is attached with an id for each; call this with one id, deliberately, for the ones that look like they matter. Do not walk the whole list out of habit — a picture costs far more of your context than the line naming it does. Some attachments are just a recorded name with no file behind them, and you will be told so plainly rather than as an error.",
+      'Open one thing the person brought along — a whiteboard photo, a screenshot of the flow they want replaced, a diagram they sketched. An image comes back as a picture for you to actually look at; a text document comes back as its text. read_map lists what is attached with an id for each; call this with one id, deliberately, for the ones that look like they matter. Do not walk the whole list out of habit — a picture costs far more of your context than the line naming it does. Some attachments are just a recorded name with no file behind them, and you will be told so plainly rather than as an error.',
     inputSchema: z.object({
       attachmentId: z
         .string()
@@ -284,7 +327,7 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
         .string()
         .optional()
         .describe(
-          'The id of the node this slice would settle. A slice\'s purpose usually sharpens once the whole sequence is laid out, so this is editable after the fact.',
+          "The id of the node this slice would settle. A slice's purpose usually sharpens once the whole sequence is laid out, so this is editable after the fact.",
         ),
       expectedRevision: z
         .number()

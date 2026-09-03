@@ -1,0 +1,12 @@
+{
+  "name": "BoardNav - AtTheFarEnd",
+  "id": "566fc9c2-29f9-4999-b081-e698a09247eb",
+  "url": "/isolated-components/BoardNav?s=AtTheFarEnd",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardNav",
+  "scenarioType": "component",
+  "description": "Standing at the far end, where the same button is the way back. One control rather than two: a separate return would be a second thing to find at the moment someone is already lost."
+}
