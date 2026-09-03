@@ -1,0 +1,84 @@
+name: Bug report
+description: Something in Thinking Map behaves differently than it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. If you are reporting a **security**
+        vulnerability, please stop and follow
+        [SECURITY.md](https://github.com/codeyam-ai/thinking-map/blob/main/SECURITY.md)
+        instead — a public issue tells everyone about the hole at once.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you see? Paste any error text verbatim rather than paraphrasing it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The smallest sequence that reliably shows the problem.
+      placeholder: |
+        1. Run `npm run dev`
+        2. Type "..." into the first card
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did you hit this?
+      options:
+        - Running locally (npm run dev)
+        - The hosted app
+        - Running the test suite
+        - Inside codeyam-editor
+        - Somewhere else
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: >
+        Node version (`node -v`), OS, and browser if it is a UI problem. Skip any
+        that plainly don't apply.
+      placeholder: |
+        Node: v24.x
+        OS: macOS 15.2
+        Browser: Chrome 141
+    validations:
+      required: false
+
+  - type: textarea
+    id: agent
+    attributes:
+      label: Which agent was attached, if any
+      description: >
+        Thinking Map never calls a model itself — the agent is the one you bring.
+        Naming it (Claude Code, a WebMCP-capable browser, something custom) is
+        often the difference between a reproducible report and a mystery.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true

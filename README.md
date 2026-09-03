@@ -1,324 +1,38 @@
 # Thinking Map
 
-An AI thinking partner that helps you deconstruct a vague idea, explore the problem
-space, and turn your thinking into a visual map and an actionable plan.
+[![CI](https://github.com/codeyam-ai/thinking-map/actions/workflows/ci.yml/badge.svg)](https://github.com/codeyam-ai/thinking-map/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](./LICENSE)
+
+An AI thinking partner that helps you deconstruct a vague idea and turn your thinking
+into a visual map and an actionable plan.
 
 You arrive with something you cannot yet describe — *"I want to build an educational
 game for kids, but I don't know what it should be"* — and instead of answering, the
-partner names what it doesn't know and asks the two or three questions that would
-change what you should build. Every answer becomes a node on a map. When it helps, it
-searches the web for what already exists and hangs the findings, and the gaps in them,
-off the map. Change direction and nothing is lost: the map updates and tells you what
-changed. You leave with what you know, what you don't, the strongest directions, the
-smallest thing worth building first, and where to start tomorrow.
-
-**A plan is a build sequence, not a to-do list.** A numbered list of everything is
-indistinguishable from a plan to build all of it in order, which is the outcome this
-tool exists to prevent. So the map ends on the smallest increment worth building, and
-each one names the assumption, risk, or open question that building it would settle. An
-increment that settles nothing is marked as proving nothing rather than sitting in the
-sequence looking like progress — making that gap visible is what stops the plan
-degenerating into a Gantt chart with rounded corners.
-
-**The agent is your browser's agent, and the page is the shared artifact.** There is no
-chat in this app. The thinking partner runs wherever you already talk to it and reaches
-this page through its tools; the map is the thing you both write to. That is a
-deliberate consequence of how WebMCP works rather than a missing feature — the page has
-no access to the agent's conversation and under WebMCP never will, so it shows the half
-it genuinely owns instead of faking the other.
-
-**A brief is read, not swallowed.** When the thing you arrive with is a twenty-page
-spec rather than a sentence, the document is stored whole as the map's source and the
-partner reads it the way anyone reads a long document — an outline first, then the
-passages that matter — through a `read_brief` tool that hands back a section list by
-default and one passage on request. It never rides along inside a map read, so a long
-brief cannot quietly fill the context window that ought to be spent thinking about it.
+partner asks the two or three questions that would change what you should build. Every
+answer becomes a node on the map. You leave with what you know, what you don't, the
+strongest directions, and the smallest thing worth building first.
 
 The central principle: **don't just give me an answer — help me understand the problem
 well enough to find a better answer.**
 
-## The loop
+The map moves through five phases: **01 Idea → 02 Map → 03 Research → 04 Explore →
+05 Next steps.**
 
-| Phase | What happens |
-| --- | --- |
-| 01 Idea | You type something vague into one free-text input. No structured fields. Or you arrive with a client's brief — paste it, drop the `.pdf` / `.docx` / `.md` / `.txt` / `.html`, or point at a page and let the server read it — and the document comes in whole. A brief is enough on its own: with one attached, the sentence becomes optional. |
-| 02 Map | The partner asks a small number of high-value questions instead of answering, and your answers become the map: users, problems, goals, assumptions, open questions. Asking and mapping were once two phases; they are one activity, and the cards make that literal — a question and the node it becomes are the same card. `deconstruct` is still accepted everywhere a phase is read or set, and resolves to this one. |
-| 03 Research | A live web search grounds the map in what already exists, and in the gaps. |
-| 04 Explore | You change direction; the map adds and updates, and explains what changed. |
-| 05 Next steps | What we know, what we don't, three directions, five concrete steps. |
-
-## Setup
+## Run it locally
 
 ```bash
 npm run setup   # install dependencies, provision PostgreSQL, push the schema, seed
-npm run dev     # start the dev server on http://localhost:3000
+npm run dev     # http://localhost:3000
 ```
 
-Nothing has to be installed or hosted first. With no `DATABASE_URL` set, `setup`
-starts a local PostgreSQL server of its own and writes the connection string to
-`.env.local` — see DATABASE.md, "The Local Development Database". Set
-`DATABASE_URL` yourself and that database is used instead, untouched.
-
-The production database starts **empty** by design — you see the day-one state and
-populate it by using the app. Each registered scenario carries its own seed data, so
-every screen can be viewed in every state without touching production data.
+Nothing has to be installed or hosted first. With no `DATABASE_URL` set, `setup` starts
+a local PostgreSQL server of its own and writes the connection string to `.env.local`.
+Set `DATABASE_URL` yourself and that database is used instead, untouched. See
+[`DATABASE.md`](DATABASE.md).
 
 No API key is needed. The app never calls a model itself — the agent is the one you
-already have, and it brings its own credentials.
-
-### Routes that only codeyam sees
-
-A plain `npm run dev` deliberately does **not** serve `/isolated-components/*`, the
-component-fixture pages the scenario captures render from. Those routes ask whether
-codeyam started this server rather than whether this is a dev build, so on a server
-you started yourself they return 404. That is the point: the fixtures render invented
-maps that look exactly like your real ones, and a hundred convincing fakes in your own
-dev session is a worse default than not having them at all.
-
-If you do want them, say so on the way in:
-
-```bash
-CODEYAM_APP_PORT=1 npm run dev   # serve the component fixtures too
-```
-
-The agent panel below follows the same principle with a different gesture — it is off
-unless you ask for it per tab with `?agentPanel=1`.
-
-### What you can put into the map
-
-The page's half of the exchange is a narrow column beside the map:
-
-- **Waiting on you** — every open question the agent has asked, each with an answer
-  field. Answering writes it to the log and releases the agent's turn if one is blocked
-  on it; you never have to know which of those is happening.
-- **Note** — a line for the agent to read on its next turn. It is not a chat message:
-  the reply comes back in the agent's own surface, not here.
-- **Add node** — put something on the map yourself, under any of the node kinds the
-  agent's tools use. Nodes you wrote are badged *yours*, which is also what stops the
-  agent re-ingesting its own writes.
-- **Activity** — what has happened to the map, from both sides, oldest first.
-
-There is also one affordance on the map itself rather than in the column:
-
-- **Ask about a node** — click any pill to ask a question about *that* node. The question
-  carries the node's id, so the agent is not left working out from prose which of twenty
-  pills you meant, and a node you have asked about is marked *asked* in its eyebrow. The
-  composer says which case you are in: with an agent attached, asking wakes it; with none
-  attached, it says so plainly and the question waits in the log. It never implies a reply
-  is coming when nobody is listening — WebMCP is pull-only, so you can wake an agent that
-  is waiting on you and you cannot start a turn in one that is not attached.
-
-### Handling the map
-
-The map is a single column of **rows built out of cards**, growing downward. Each round
-of thinking is one row: everything the agent added in one write arrives together, and the
-next round appears as the next row down.
-
-- **Scroll it** — that is the whole of the navigation. There is no zoom, no pan and no
-  fit-to-frame, because a column that grows downward does not need any of them.
-- **Answer inside the map** — a question is a card, and the card holds the question, a
-  few suggested answers, and the box you answer it in. You are no longer reading the
-  question in one place and answering it in another.
-- **Take a suggestion, or don't** — clicking a suggested answer *fills* the box rather
-  than sending it, so the words that get recorded are always yours. A question with no
-  suggestions is just a card with a box, which is the ordinary case.
-- **Edit an answer** — press **Edit** and the box comes back pre-filled. Saving records a
-  second answer rather than overwriting the first, so how your thinking changed is
-  itself part of the log.
-
-One row is a **round, not a tree depth**, and the difference is load-bearing: an agent
-usually asks its second batch of questions as further children of the same parent, so by
-depth both batches would collapse into one row and the map would stop showing that the
-conversation had two turns. The rounds are read off the exchange log instead — nodes
-written together share a contiguous run of revisions. A map with no log at all (an older
-map, or a seeded scenario) falls back to grouping by depth rather than refusing to draw.
-
-The tree is still there in the data. `parentId` and `order` are untouched and no agent
-had to change what it sends; only the drawing changed.
-
-### Driving it without an agent
-
-WebMCP binds only in a top-level secure page in a browser with an agent (Chrome 146+),
-so no agent can attach inside an iframe — which is every preview and every captured
-scenario. Outside production the page can therefore summon an **Agent panel** (bottom
-right), on request: add `?agentPanel=1` to the URL, since a panel that appeared on
-every dev page would be found and pressed by the very agents it is meant to stand in
-for. It calls `window.__thinkingMapAgent`, the same bound catalog a real agent uses,
-so its "run the demo sequence" button exercises the genuine tool paths rather than a
-mock of them.
-
-## Three front doors
-
-The map is a shared artifact, not a chat log. An agent can reach it three ways, and all
-three run the same tool catalog (`app/lib/toolCatalog.ts` declares the tools;
-`app/lib/toolRuntime.ts` implements them once), so no door can drift from the others.
-
-The shared tools are `read_map`, `add_nodes`, `update_node`, `set_phase`, `post_note`,
-`ask_user`, and `await_user_activity`. `list_thinking_maps`, `create_thinking_map` and
-`await_new_map` are server-door-only — a page is already on one map, so none of the
-three has anything to offer it.
-
-**In the page (WebMCP).** The agent lives in the browser and the page publishes its
-tools to it. This needs Chrome 146+ (`navigator.modelContext`), HTTPS or localhost, and
-the top-level frame — WebMCP is unavailable inside an iframe, deliberately. When any of
-that is missing the page says so rather than pretending to be connected.
-
-The page is designed to sit beside the agent that drives it — most often as half a
-screen next to ChatGPT, rather than filling a monitor on its own. The chrome is built
-to hold from about 640px wide upward, and degrades rather than reflows below that.
-
-**Over HTTP** — `POST /api/mcp` (streamable HTTP; send
-`Accept: application/json, text/event-stream`).
-
-**Over stdio**, for clients that launch the server as a child process:
-
-```bash
-npm run mcp
-```
-
-To register it with Claude Desktop, add to its MCP config:
-
-```json
-{
-  "mcpServers": {
-    "thinking-map": {
-      "command": "npm",
-      "args": ["run", "mcp"],
-      "cwd": "/absolute/path/to/this/project"
-    }
-  }
-}
-```
-
-### WebMCP is pull-only — the contract an agent should follow
-
-A page cannot wake an agent. There is no push channel, and the person editing the map is
-under no obligation to wait for anyone. So the exchange is a durable, ordered record
-rather than a live connection: every map carries a monotonic `revision`, and every change
-— yours or theirs — is one append-only event tagged with who made it.
-
-Three habits follow from that, and the tools are shaped to make them easy:
-
-- **Read with a cursor.** `read_map { sinceRevision }` returns only what happened after
-  that revision, so you never re-ingest your own writes as new information.
-- **Write with a `requestId`.** `add_nodes` and `update_node` take one, and a retry
-  carrying the same value returns the original revision instead of writing twice.
-- **Wait with `await_user_activity`,** not a polling loop. It blocks until the person
-  actually does something.
-- **Say in chat what you did and what you need.** Tool replies are invisible to the person
-  — they see a map, not your tool results. An agent that writes questions and then parks
-  silently leaves someone looking at a board with no idea anything is owed from them. So
-  the reply to every write that leaves questions open explicitly sends you back to chat
-  for a sentence or two: what went on the map, and that answers go on the map too.
-- **Park on `await_new_map` when you have no map yet.** Same idiom one level up: it
-  blocks until somebody starts a map anywhere, then hands you each new one with its seed
-  idea and whether it came from a brief. A page still cannot wake you — but if you are
-  already waiting at the server door when someone submits an idea, the map is picked up
-  the moment it exists rather than sitting there.
-
-Two more things worth knowing:
-
-- **Conflicts come back as results, not errors.** Pass `expectedRevision` to
-  `update_node`; if the person changed that node since you read it, the write is declined
-  and both versions are described back to you. Nothing is overwritten.
-- **Every wait is bounded and resumable.** `ask_user`, `await_user_activity` and
-  `await_new_map` take a timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
-  nothing: the question stays on the map and the answer lands in the log for your next
-  read.
-- **Each wait is short on purpose; the patience comes from the loop.** The default is 25
-  seconds, and `timedOut: true` is the normal return rather than a failure — re-call
-  immediately with the cursor and no contribution can slip through the gap. The limit is
-  not this server's: *your host* decides when a tool call has run too long, and a browser
-  agent aborts an in-flight WebMCP call after tens of seconds while a stock MCP client
-  gives up at sixty. A five-minute wait — which this default used to be — is therefore
-  killed in transit, so the agent reads a transport timeout instead of the `timedOut`
-  result, and an answer typed on the map a minute later reaches nobody. Ask for a longer
-  `timeoutSeconds` only if you know your own host will wait that long.
-- **The page advances its own phase, and says so on the log.** When a round's questions
-  are all answered and nothing more arrives, the map offers the one action that ends the
-  phase — "Ready to research", and so on. Pressing it posts a `user.note` naming the
-  transition and *then* calls `set_phase`, so a phase that moved is something you read
-  rather than something you infer from a value that changed under you. The person is no
-  longer required to go and prod you in the other window to make the loop advance.
-- **The pending row is a statement about the log, not about you.** Once a round is
-  answered the page immediately draws the next row as shimmering placeholders — but since
-  it cannot start your turn, that shimmer is bounded. After about twenty seconds it
-  resolves into whichever of three sentences is actually true: an agent is working and has
-  what was added, an agent is attached but not in a turn, or nothing can reach the page and
-  what was added is simply on the log. A row that shimmered indefinitely would be claiming
-  you were writing, which is exactly the claim this contract says a page can never make.
-  (The sentences say "what you have added" rather than "your answers" on purpose: the same
-  row appears on a day-one map that has a seed idea and no answers at all, and naming
-  answers there would name something that does not exist.)
-
-### Driving the tools without a browser agent
-
-WebMCP needs a top-level secure context, so it is genuinely absent in previews and
-captured scenarios. The page therefore always publishes a headless driver over the same
-bound catalog:
-
-```js
-await window.__thinkingMapAgent.callTool('read_map', {});
-await window.__thinkingMapAgent.callTool('post_note', { text: 'what I changed and why' });
-```
-
-The page-side binding forwards each call to `POST /api/maps/:id/tools`, which runs the
-same implementation the other two doors use. `GET|POST /api/maps/:id/exchange` is the
-log itself — read it with `?since=`, and post a `user.answer`, `user.note`, or
-`user.node` as the person.
-
-## How it's built
-
-- **Next.js + Prisma + SQLite.** Four tables: `ThinkingMap`, `Message`, `MapNode`, and
-  `MapEvent`. The map is a tree via a nullable `parentId`, so there is no separate edge
-  table. `Message` is now history only — nothing renders it, and new thinking is
-  recorded as `MapEvent`.
-- **`app/lib/exchange.ts`** is the only place map revisions are minted. One append-only
-  log answers all three forms of "what happened after revision N?" — the agent's delta,
-  the unread user contributions, and the activity feed — and it is the only thing that
-  can record a deletion, which a diff over `MapNode` rows cannot see.
-- **`app/lib/mapStore.ts`** is the only place that reads or writes a map; every front
-  door goes through it, and each write also becomes an event on the log.
-- **`app/lib/contributions.ts`** turns a contribution from the page into what it
-  actually does to the map — a node that has to appear, a question that has to stop
-  being open — server-side, so every front door sees it rather than only the browser
-  that did it.
-- **`app/lib/exchangeRail.ts`** is how the log reads to a person, and
-  `app/lib/exchangeFormat.ts` how it reads to an agent. They are separate on purpose:
-  an agent needs the revision cursor on every line, a person needs to know what happened
-  to their map.
-- **The map's geometry** is `app/lib/mapLayout.ts` — a tidy-tree layout returning
-  absolute pixel positions, tested for sibling non-overlap, parent centring, orphaned
-  parents, and cycle termination.
-
-### Two notes for anyone picking this up
-
-`package.json` runs `next dev --webpack`. Next 16 defaults to Turbopack, and Turbopack's
-dev output does not hydrate through the codeyam preview proxy — no client component
-becomes interactive. This is deliberate, not a leftover.
-
-Navigation anchors carry `suppressHydrationWarning`. The preview proxy rewrites
-`href="/"` to `href="/__codeyam_preview/"` in the served HTML while React's payload
-still says `/`. The rewrite is correct and wanted; only the warning needed silencing.
-
-## Development
-
-```bash
-npx tsc --noEmit                        # type-check
-codeyam-editor editor refresh-tests     # run the test suite
-codeyam-editor editor scenarios         # list every registered scenario
-```
-
-Before adding a feature that touches auth, file uploads, email, or another
-external service, read [`FEATURE_PATTERNS.md`](FEATURE_PATTERNS.md) — it sets out
-the local-first approach this stack expects and the upgrade path for each.
-[`DATABASE.md`](DATABASE.md) covers schema changes and where credentials belong.
-
-Built with [CodeYam](https://codeyam.com) — `codeyam editor` to launch the editor.
-
-## License
-
-[MIT](LICENSE).
+already have, and it brings its own credentials. See
+[`AGENT_CONTRACT.md`](AGENT_CONTRACT.md) for the three ways an agent can attach.
 
 <!-- codeyam:run-and-edit:start -->
 ## Develop this project with codeyam-editor
@@ -337,40 +51,90 @@ codeyam-editor start
 ```
 <!-- codeyam:run-and-edit:end -->
 
-<!-- codeyam:scenario-gallery:start -->
-## Scenario gallery
+Every screen has runnable scenarios carrying their own seed data, so any state can be
+viewed without touching real data:
 
-States captured as runnable scenarios with codeyam-editor:
+```bash
+codeyam-editor editor scenarios       # list every registered scenario
+codeyam-editor editor refresh-tests   # run the test suite
+npx tsc --noEmit                      # type-check
+```
 
-### A board with pictures, a drawn shape and a shortlist
+## What it looks like
 
-<img src=".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png" alt="A board with pictures, a drawn shape and a shortlist" width="280">
+Each of these is a registered scenario — a real state of the app, captured.
 
-### A plan with a gap - one slice proves nothing
+### The way in
 
-<img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
+<img src=".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png" alt="A single yellow card on a black screen asking &quot;What are you trying to figure out?&quot;" width="420">
 
-### A brief, and nobody has picked it up yet
+One card, one free-text box. No structured fields. You can also attach a brief — browse
+for a `.pdf` / `.docx` / `.md` / `.txt` / `.html`, or point at a page — and with one
+attached the sentence becomes optional.
 
-<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png" alt="A brief, and nobody has picked it up yet" width="280">
+### The map mid-round
 
-### Complete - what to do next
+<img src=".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png" alt="A dark board with an idea card on the left and three coloured branches leading to question cards" width="420">
 
-<img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
+Your idea sits on the left. Each coloured branch is a theme the partner pulled out of
+it, and the cards hanging off it are what it wants to know. A question and the node it
+becomes are the same card — you answer inside the map rather than reading the question
+in one place and answering it in another. Down the right is what the partner is
+thinking: things to try, suggestions, risks.
 
-### All eight, the list expanded
+### Arriving with a brief
 
-<img src=".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png" alt="All eight, the list expanded" width="280">
+<img src=".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png" alt="The board with a brief-seeded idea card, and a chat panel showing the agent reading the brief's outline" width="420">
 
-### Weighing the alternatives against each other
+A twenty-page spec is stored whole as the map's source. The partner reads it the way
+anyone reads a long document — the outline first, then the passages that matter — so a
+long brief cannot quietly fill the context that ought to be spent thinking about it. The
+chat panel says what it read and what the brief does *not* answer.
 
-<img src=".codeyam/scenarios/screenshots/weighing-the-alternatives-against-each-other--desktop.png" alt="Weighing the alternatives against each other" width="280">
+### The conversation, over the map
 
-### An older question, three rounds up, still open
+<img src=".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png" alt="The board with the chat panel open, showing an exchange between the person and the agent" width="420">
 
-<img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
+The chat sits in a corner rather than across the middle: the map is the thing being
+talked about. The footer tracks the round — how many questions are answered, how many
+are still open — and offers the one action that ends it. Zoom with `+` / `−`, or `ALL`
+to fit the whole map.
 
-### Brief attached, nothing cited yet
+### The plan you leave with
 
-<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
-<!-- codeyam:scenario-gallery:end -->
+<img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A build sequence where one slice is marked &quot;proves nothing yet&quot;, above a five-step track" width="420">
+
+A plan is a build sequence, not a to-do list. Each increment names the assumption or
+open question that building it would settle — and one that settles nothing is marked
+**proves nothing yet** rather than sitting in the sequence looking like progress.
+
+### What to do next
+
+<img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="The summary screen: next five steps as a left-to-right track, with the activity log below" width="420">
+
+The end of the loop: what you know, what you don't, the directions worth taking, and
+five concrete steps in order — plus the activity log of everything that happened to the
+map, from both sides.
+
+## Notes for anyone picking this up
+
+- `package.json` runs `next dev --webpack`. Next 16 defaults to Turbopack, and
+  Turbopack's dev output does not hydrate through the codeyam preview proxy. This is
+  deliberate, not a leftover.
+- A plain `npm run dev` does not serve `/isolated-components/*`, the fixture pages
+  scenario captures render from — they would fill your dev session with convincing fake
+  maps. Use `CODEYAM_APP_PORT=1 npm run dev` if you want them.
+- Before adding a feature that touches auth, file uploads, email, or another external
+  service, read [`FEATURE_PATTERNS.md`](FEATURE_PATTERNS.md).
+
+## Contributing
+
+Issues and pull requests are welcome. [`CONTRIBUTING.md`](CONTRIBUTING.md) covers
+getting set up, the checks a change has to pass, and the few conventions here that
+look like mistakes and are not. Everyone taking part is expected to uphold the
+[Code of Conduct](CODE_OF_CONDUCT.md); to report a vulnerability, see
+[`SECURITY.md`](SECURITY.md) rather than opening an issue.
+
+## License
+
+[MIT](./LICENSE) © 2026 CodeYam.

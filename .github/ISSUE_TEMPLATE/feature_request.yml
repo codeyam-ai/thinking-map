@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest something Thinking Map should do.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thinking Map exists to help someone understand a problem well enough to
+        find a better answer — not to answer it for them. Proposals that sharpen
+        that are much more likely to land than proposals that add surface.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you running into?
+      description: >
+        Describe the situation, not the solution. What were you trying to do, and
+        where did the app get in your way?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What else did you consider?
+      description: Including "I worked around it by ..." — a workaround is useful signal.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true

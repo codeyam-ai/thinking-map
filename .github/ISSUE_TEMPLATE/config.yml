@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/codeyam-ai/thinking-map/security/advisories/new
+    about: Please report vulnerabilities privately, never as a public issue.
+  - name: Question or general discussion
+    url: https://github.com/codeyam-ai/thinking-map/discussions
+    about: Ask how something works, or talk through an idea before opening an issue.
