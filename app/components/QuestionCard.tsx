@@ -26,6 +26,7 @@
 // previous answer through the same path a first answer takes.
 
 import { useEffect, useState } from 'react';
+import { cardCopyLabel, cardCopyText } from '@/app/lib/boardCopyText';
 import { cardEyebrow } from '@/app/lib/cardEyebrow';
 import {
   isAnsweredCard,
@@ -37,6 +38,7 @@ import { themeColor } from '@/app/lib/themeHue';
 import CardDiagram from './CardDiagram';
 import CardChoiceList from './CardChoiceList';
 import AnswerComposer from './AnswerComposer';
+import CopyTextButton from './CopyTextButton';
 
 export default function QuestionCard({
   card,
@@ -117,7 +119,7 @@ export default function QuestionCard({
     <div
       onClick={onFocus}
       data-no-pan={focused ? '' : undefined}
-      className="relative flex h-full w-full flex-col rounded-[22px] p-7 text-left transition-all duration-300"
+      className="group relative flex h-full w-full flex-col rounded-[22px] p-7 text-left transition-all duration-300"
       style={{
         background: open ? accent : '#141416',
         border: `1.5px solid ${open ? accent : themeColor(card.hue, { a: 0.42 })}`,
@@ -128,6 +130,22 @@ export default function QuestionCard({
         cursor: 'pointer',
       }}
     >
+      {/* Top-right, because the bottom-right corner is already the pencil on an
+          answered card. Absent while the composer is open: a card being typed
+          into is a form, and its content is not finished being written yet.
+          The icon takes the eyebrow's treatment rather than the raw accent — on
+          an open card the accent IS the background, so an accent-coloured glyph
+          would be invisible on the very card it sits on. */}
+      {writing && composing ? null : (
+        <CopyTextButton
+          text={cardCopyText(card)}
+          label={cardCopyLabel(card)}
+          accent={open ? 'rgba(0,0,0,0.55)' : accent}
+          visible={focused}
+          className="absolute right-6 top-6"
+        />
+      )}
+
       {isInsight ? (
         <>
           {/* What the card CARRIES wins over what kind it is: a drawn shape and

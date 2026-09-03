@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useBoardCamera, type Camera } from './useBoardCamera';
 
@@ -43,6 +43,16 @@ function pointer(
 }
 
 const START: Camera = { scale: 1, x: 0, y: 0 };
+
+// The selection lock lives on `document.body`, which every test in this file
+// shares. Most of the pan cases above simulate a HALF gesture — a pointerdown
+// with no release, which is a thing no browser produces — and each one leaves
+// the lock on behind it. Without this reset a later test reads whatever the
+// previous one left, and the restore, which puts back the value it found,
+// faithfully puts back 'none'.
+beforeEach(() => {
+  document.body.style.userSelect = '';
+});
 
 describe('useBoardCamera panning', () => {
   // The bug, stated as the behaviour that must hold. A press and release with
@@ -127,6 +137,51 @@ describe('useBoardCamera panning', () => {
     act(() => result.current.handlers.onPointerMove(pointer(200, 200)));
 
     expect(result.current.camera).toEqual(START);
+  });
+});
+
+describe('useBoardCamera and text selection', () => {
+  // The reported complaint: a drag across a card paints a selection highlight
+  // that trails the cursor, because the browser reads the pan as a select.
+  //
+  // The lock goes on at pointerdown rather than at the pan threshold. Three
+  // pixels in, the browser already has a selection drag in flight and clearing
+  // its ranges leaves the anchor for it to keep extending from — so a test that
+  // only checked the state after a threshold-crossing move would pass over the
+  // very placement that does not work.
+  it('turns text selection off while a board gesture is running', () => {
+    const { result } = renderHook(() => useBoardCamera(START));
+
+    act(() => result.current.handlers.onPointerDown(pointer(100, 100)));
+    expect(document.body.style.userSelect).toBe('none');
+
+    act(() => result.current.handlers.onPointerUp(pointer(140, 120)));
+    expect(document.body.style.userSelect).toBe('');
+  });
+
+  // Selection inside a card's own controls is not the board's to suppress —
+  // the composer is a textarea, and text you cannot select in one is a
+  // regression traded for the fix rather than a fix.
+  it('leaves selection alone for a press inside a no-pan subtree', () => {
+    const { result } = renderHook(() => useBoardCamera(START));
+
+    const inControl = { closest: (s: string) => (s === '[data-no-pan]' ? {} : null) };
+    act(() => result.current.handlers.onPointerDown(pointer(100, 100, inControl)));
+
+    expect(document.body.style.userSelect).toBe('');
+  });
+
+  // A cancelled gesture — the pointer leaving the window, a touch interrupted
+  // by a system gesture — must not leave the page permanently unselectable.
+  // `onPointerCancel` is the same handler, so this pins the wiring rather than
+  // the restore itself.
+  it('restores selection when the gesture is cancelled rather than released', () => {
+    const { result } = renderHook(() => useBoardCamera(START));
+
+    act(() => result.current.handlers.onPointerDown(pointer(100, 100)));
+    act(() => result.current.handlers.onPointerCancel(pointer(100, 100)));
+
+    expect(document.body.style.userSelect).toBe('');
   });
 });
 

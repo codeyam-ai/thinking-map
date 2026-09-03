@@ -1,0 +1,12 @@
+{
+  "name": "CopyTextButton - OnTheCoreDisc",
+  "id": "23e65104-d355-4930-bb37-2a3fc66a0881",
+  "url": "/isolated-components/CopyTextButton?s=OnTheCoreDisc",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CopyTextButton",
+  "scenarioType": "component",
+  "description": "The core idea is the one object on the board that takes no colour - colour here means a line of thinking, and the idea is what the lines are about. So its control goes black too, rather than borrowing a hue that would make the disc read as one more theme."
+}

@@ -14,8 +14,10 @@
 // notice on the second look that it has moved — which is the difference between
 // a board that is alive and one that is animated at you.
 
+import { coreCopyText } from '@/app/lib/boardCopyText';
 import { CARD_SIZE } from '@/app/lib/galaxyLayout';
 import CoreAttachments, { type Attachment } from './CoreAttachments';
+import CopyTextButton from './CopyTextButton';
 
 const CORE_FILL = '#ffffff';
 const RING = '#333336';
@@ -51,7 +53,7 @@ export default function CoreIdeaCard({
       style={{ left: 0, top: 0, width: CORE_RADIUS * 2, height: CORE_RADIUS * 2 }}
     >
       <div
-        className="flex h-full w-full items-center justify-center rounded-full"
+        className="group relative flex h-full w-full items-center justify-center rounded-full"
         style={{
           background: CORE_FILL,
           border: `18px solid ${RING}`,
@@ -64,6 +66,28 @@ export default function CoreIdeaCard({
         >
           {seedIdea}
         </p>
+
+        {/* Dragging the board suppresses text selection, so the idea in the
+            person's own words can no longer be swiped over — this is what
+            replaces that. Inset from the rim by roughly the same amount in both
+            axes: on a circle, a corner offset that would be right for a
+            rectangle lands outside the shape.
+
+            Black rather than a theme hue, because the disc is the one object on
+            this board that takes no colour — see the note at the top of the
+            file — so an accent here would be the first thing to contradict it.
+
+            Only ONE button, not the two the plan described: the partner's
+            reading of the idea is no longer printed under the circle, it lives
+            at the far end of the board, and its copy button went with it onto
+            `InsightCard`. `coreCopyText` still takes the reading so the pairing
+            survives wherever it IS printed. */}
+        <CopyTextButton
+          text={coreCopyText({ seedIdea })}
+          label="Copy this idea"
+          accent="rgba(0,0,0,0.5)"
+          className="absolute bottom-[16%] right-[16%]"
+        />
       </div>
 
       {/* The orbit. The arm is centred on the disc and turns; the badge sits at

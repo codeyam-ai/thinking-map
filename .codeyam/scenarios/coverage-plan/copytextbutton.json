@@ -1,0 +1,30 @@
+{
+  "surface": "CopyTextButton",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "copied",
+      "value": "true",
+      "rationale": "source-derived state copied=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "copied",
+      "value": "false",
+      "rationale": "source-derived state copied=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "visible",
+      "value": "true",
+      "rationale": "source-derived state visible=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "visible",
+      "value": "false",
+      "rationale": "source-derived state visible=false",
+      "status": "covered"
+    }
+  ]
+}

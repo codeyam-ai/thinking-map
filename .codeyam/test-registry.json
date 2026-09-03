@@ -730,6 +730,51 @@
       "runner": "tests"
     },
     {
+      "description": "The confirmation is a swapped glyph, which a screen reader cannot see. The live region is the only channel that carries it.",
+      "file": "app/components/CopyTextButton.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyTextButton › announces the copy in a live region once it succeeds",
+      "line": 64,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case this component is most careful about. A browser can refuse clipboard access, and with selection suppressed on the board there is no fallback path — so a control that said \"Copied\" after copying nothing would send someone away to paste something that is not there.",
+      "file": "app/components/CopyTextButton.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyTextButton › does not claim success when the clipboard refuses",
+      "line": 82,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Hidden at rest and revealed on hover would make the control invisible in every captured scenario, so a card that is the board's focused one shows it outright. Both states have to be reachable or the reveal is not a reveal.",
+      "file": "app/components/CopyTextButton.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyTextButton › is hidden at rest and shown when its card is the focused one",
+      "line": 117,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The button sits ON a card that takes a click to focus itself, and ON a board that reads a drag as a pan. Both have to be held off: `data-no-pan` is what the camera's pointerdown guard looks for, and stopping propagation is what keeps the card underneath from grabbing the board's attention.",
+      "file": "app/components/CopyTextButton.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyTextButton › keeps the press to itself — no pan, no focus of the card underneath",
+      "line": 98,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing on screen shows what this button would copy — that is the whole difference from `CopyablePrompt` — so the string it was given reaching the clipboard unaltered is the only guarantee there is.",
+      "file": "app/components/CopyTextButton.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyTextButton › writes exactly the text it was given",
+      "line": 44,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "Promoted to the primary action, the confirmation cannot be a purely visual signal — a live region is what makes the flip reach a screen reader too.",
       "file": "app/components/CopyablePrompt.render.test.tsx",
       "format": "vitest",
@@ -2611,6 +2656,69 @@
       "runner": "tests"
     },
     {
+      "description": "The name has to promise exactly what the text delivers, which is why it branches on the same three faces rather than being written beside them.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyLabel › names each of the three faces distinctly",
+      "line": 100,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The promise, stated as an invariant: whenever the label says an answer is included, the text has to actually include it.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyLabel › promises the answer only when the text carries it",
+      "line": 110,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The pairing is the point. An answer pasted on its own has lost the question it was answering, and nothing downstream can recover it.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyText › copies an answered card as the question and the answer together",
+      "line": 42,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An insight is the partner's claim and its reasoning — the same two-block shape as an answered card, but arrived at the other way round.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyText › copies an insight as its claim and its reasoning",
+      "line": 55,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An open question has no answer yet, and its shortlist is a set of options rather than content — so the question alone is the whole of it.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyText › copies an open question as its question alone",
+      "line": 36,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty detail must not leave a label with a blank line hanging off it — that gap arrives in whatever the person pastes into.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyText › never trails a blank line when there is no detail",
+      "line": 89,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A card CARRYING something is showing it to you whatever its kind — the clause `isInsightCard` exists for. Branching on the kind list alone would read an `approach` with a diagram as an unanswered question.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "cardCopyText › treats a card carrying a diagram as an insight whatever its kind",
+      "line": 73,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "The order is fixed so the line reads the same way on every card, with the document reference last because it is the only fact not about the node.",
       "file": "app/lib/cardEyebrow.test.ts",
       "format": "vitest",
@@ -3133,6 +3241,33 @@
       "runner": "tests"
     },
     {
+      "description": "The far-end card is collapsed most of the time and shows neither the reasoning nor the routes. What you copy is the conclusion, not the current state of the panel, so both come along regardless.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "conclusionCopyText › copies the claim alone when it has neither reasoning nor routes",
+      "line": 187,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ways forward come as a list because that is what they are on screen: a column of buttons, not a comma-separated sentence.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "conclusionCopyText › lists the ways forward under the conclusion",
+      "line": 154,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A conclusion with no routes on offer is still a conclusion. An empty \"Where next\" heading would say the opposite — that there were options and they went missing.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "conclusionCopyText › omits the heading entirely when no ways forward were offered",
+      "line": 171,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "A second root would read as a second idea rather than a contribution to this one, so an unparented node hangs off the root.",
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
@@ -3238,6 +3373,33 @@
       "key": "contributionEvents — leaving a note › logs the note and changes nothing on the map",
       "line": 225,
       "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reading never travels alone: \"what that tells us\" pasted by itself has lost the idea it is about.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "coreCopyText › carries the idea along with its reading",
+      "line": 130,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The state a board spends its first minutes in: an idea and nothing said about it yet. Copying it must be the person's own sentence, with no scaffolding around it.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "coreCopyText › copies the idea on its own when there is no reading of it yet",
+      "line": 122,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An explicitly absent reading is the same as none at all. Passing null through would put a trailing blank line into whatever the person pastes into, which is the one thing the joiner exists to prevent.",
+      "file": "app/lib/boardCopyText.test.ts",
+      "format": "vitest",
+      "key": "coreCopyText › ignores a null reading rather than pasting a gap",
+      "line": 144,
+      "registeredAt": "2026-09-03T10:03:57Z",
       "runner": "tests"
     },
     {
@@ -8470,11 +8632,38 @@
       "runner": "tests"
     },
     {
+      "description": "Selection inside a card's own controls is not the board's to suppress — the composer is a textarea, and text you cannot select in one is a regression traded for the fix rather than a fix.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera and text selection › leaves selection alone for a press inside a no-pan subtree",
+      "line": 165,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A cancelled gesture — the pointer leaving the window, a touch interrupted by a system gesture — must not leave the page permanently unselectable. `onPointerCancel` is the same handler, so this pins the wiring rather than the restore itself.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera and text selection › restores selection when the gesture is cancelled rather than released",
+      "line": 178,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported complaint: a drag across a card paints a selection highlight that trails the cursor, because the browser reads the pan as a select. The lock goes on at pointerdown rather than at the pan threshold. Three pixels in, the browser already has a selection drag in flight and clearing its ranges leaves the anchor for it to keep extending from — so a test that only checked the state after a threshold-crossing move would pass over the very placement that does not work.",
+      "file": "app/hooks/useBoardCamera.test.ts",
+      "format": "vitest",
+      "key": "useBoardCamera and text selection › turns text selection off while a board gesture is running",
+      "line": 152,
+      "registeredAt": "2026-09-03T10:03:57Z",
+      "runner": "tests"
+    },
+    {
       "description": "A hand tremor during a click is a click, not a pan. Below the threshold the board must not creep — a board that nudges every time you answer a card feels broken in a way that is hard to name.",
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera panning › does not pan for movement below the threshold",
-      "line": 67,
+      "line": 77,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8483,7 +8672,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera panning › ignores a non-primary button",
-      "line": 122,
+      "line": 132,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8492,7 +8681,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera panning › never captures the pointer on a click that does not move",
-      "line": 52,
+      "line": 62,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8501,7 +8690,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera panning › pans and captures once the pointer has travelled far enough",
-      "line": 81,
+      "line": 91,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8510,7 +8699,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera panning › refuses to start a drag from inside a control",
-      "line": 111,
+      "line": 121,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8519,7 +8708,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera panning › tracks the cursor identically at every zoom level",
-      "line": 96,
+      "line": 106,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8528,7 +8717,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › clamps a zoom asked for through focusOn",
-      "line": 181,
+      "line": 236,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8537,7 +8726,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › focuses on a point, optionally changing zoom with it",
-      "line": 169,
+      "line": 224,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8546,7 +8735,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › holds the zoom inside its limits at both ends",
-      "line": 137,
+      "line": 192,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -8555,7 +8744,7 @@
       "file": "app/hooks/useBoardCamera.test.ts",
       "format": "vitest",
       "key": "useBoardCamera zooming › never lets the scale reach zero or go negative",
-      "line": 157,
+      "line": 212,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },

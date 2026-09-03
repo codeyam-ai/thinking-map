@@ -1,0 +1,36 @@
+{
+  "surface": "CoreIdeaCard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "seedIdea",
+      "value": "empty",
+      "rationale": "source-derived state seedIdea=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "seedIdea",
+      "value": "one",
+      "rationale": "source-derived state seedIdea=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "seedIdea",
+      "value": "many",
+      "rationale": "source-derived state seedIdea=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "mapId",
+      "value": "true",
+      "rationale": "source-derived state mapId=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "mapId",
+      "value": "false",
+      "rationale": "source-derived state mapId=false",
+      "status": "covered"
+    }
+  ]
+}

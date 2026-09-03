@@ -1,0 +1,12 @@
+{
+  "name": "CopyTextButton - OnADarkCard",
+  "id": "58708b11-c829-4571-ad5e-8dca278531c5",
+  "url": "/isolated-components/CopyTextButton?s=OnADarkCard",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CopyTextButton",
+  "scenarioType": "component",
+  "description": "The ordinary ground: a near-black answered card, where the theme hue reads cleanly and the control sits in the corner the pencil does not use. What it copies is the question AND the answer, which is why the accessible name says so - an answer pasted without its question has lost what it was answering."
+}

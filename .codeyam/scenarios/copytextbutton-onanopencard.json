@@ -1,0 +1,12 @@
+{
+  "name": "CopyTextButton - OnAnOpenCard",
+  "id": "4964c9c3-c71a-4e9f-9959-7252a8008413",
+  "url": "/isolated-components/CopyTextButton?s=OnAnOpenCard",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CopyTextButton",
+  "scenarioType": "component",
+  "description": "An open question is saturated in its theme colour, so the accent IS the background. This is the frame that shows why the accent is passed in rather than derived: handed the card's own hue, the glyph would be invisible on the very card it sits on, so an open card passes ink instead."
+}

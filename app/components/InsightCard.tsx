@@ -13,8 +13,10 @@
 // board, and the composer underneath is what sends.
 
 import { useState } from 'react';
+import CopyTextButton from './CopyTextButton';
 import InsightCardEyebrow from './InsightCardEyebrow';
 import InsightDetail from './InsightDetail';
+import { conclusionCopyText } from '../lib/boardCopyText';
 import type { Insight } from '../lib/insightStream';
 
 /** An insight as the BOARD holds one.
@@ -57,7 +59,7 @@ export default function InsightCard({
       // out. `data-no-pan` beside it is the board's own drag guard.
       data-insight-card
       data-no-pan={open ? '' : undefined}
-      className="w-full rounded-[20px] border p-5 text-left transition-colors"
+      className="group relative w-full rounded-[20px] border p-5 text-left transition-colors"
       style={{
         background: '#0b0b0c',
         borderColor: open
@@ -74,6 +76,29 @@ export default function InsightCard({
       <p className="mt-2.5 text-[17px] font-semibold leading-snug text-white">
         {insight.label}
       </p>
+
+      {/* The far end of the board is the one claim about the whole idea, so it
+          is the thing most worth taking somewhere else — and the board's drag
+          gesture means it can no longer be selected by hand.
+
+          It copies the reasoning and the ways forward even while the card is
+          collapsed and showing neither. What you are copying is the conclusion,
+          not the current state of this card, and a paste that dropped the
+          "where next" options because a panel happened to be shut would be a
+          silent loss. The ways-forward buttons live inside `InsightWaysForward`,
+          whose <section> is already `data-no-pan`; this carries its own, so it
+          sits outside that section without changing it. */}
+      <CopyTextButton
+        text={conclusionCopyText({
+          label: insight.label,
+          detail: insight.detail,
+          choices: insight.choices,
+        })}
+        label="Copy this conclusion"
+        accent={`hsl(${hue} 80% 62%)`}
+        visible={open}
+        className="absolute right-3 top-3"
+      />
 
       {open ? (
         <InsightDetail

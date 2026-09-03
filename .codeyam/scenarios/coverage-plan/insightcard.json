@@ -1,0 +1,18 @@
+{
+  "surface": "InsightCard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "open",
+      "value": "true",
+      "rationale": "source-derived state open=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "open",
+      "value": "false",
+      "rationale": "source-derived state open=false",
+      "status": "planned"
+    }
+  ]
+}

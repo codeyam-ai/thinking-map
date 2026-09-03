@@ -1,0 +1,132 @@
+{
+  "surface": "QuestionCard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "key",
+      "value": " ",
+      "rationale": "source-derived state key= ",
+      "status": "planned"
+    },
+    {
+      "dimension": "key",
+      "value": "Enter",
+      "rationale": "source-derived state key=Enter",
+      "status": "planned"
+    },
+    {
+      "dimension": "choices",
+      "value": "empty",
+      "rationale": "source-derived state choices=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "choices",
+      "value": "one",
+      "rationale": "source-derived state choices=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "choices",
+      "value": "many",
+      "rationale": "source-derived state choices=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "editing",
+      "value": "true",
+      "rationale": "source-derived state editing=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "editing",
+      "value": "false",
+      "rationale": "source-derived state editing=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "hasChoices",
+      "value": "true",
+      "rationale": "source-derived state hasChoices=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "hasChoices",
+      "value": "false",
+      "rationale": "source-derived state hasChoices=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "cancellable",
+      "value": "true",
+      "rationale": "source-derived state cancellable=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "cancellable",
+      "value": "false",
+      "rationale": "source-derived state cancellable=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "isInsight",
+      "value": "true",
+      "rationale": "source-derived state isInsight=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "isInsight",
+      "value": "false",
+      "rationale": "source-derived state isInsight=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "open",
+      "value": "true",
+      "rationale": "source-derived state open=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "open",
+      "value": "false",
+      "rationale": "source-derived state open=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "focused",
+      "value": "true",
+      "rationale": "source-derived state focused=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "focused",
+      "value": "false",
+      "rationale": "source-derived state focused=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "writing",
+      "value": "true",
+      "rationale": "source-derived state writing=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "writing",
+      "value": "false",
+      "rationale": "source-derived state writing=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "answered",
+      "value": "true",
+      "rationale": "source-derived state answered=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "answered",
+      "value": "false",
+      "rationale": "source-derived state answered=false",
+      "status": "covered"
+    }
+  ]
+}

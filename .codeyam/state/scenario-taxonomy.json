@@ -179,6 +179,38 @@
         "reason": "The icon is aria-hidden decoration and binds no handlers. It restates the family that the card eyebrow beneath it already names in words."
       }
     },
+    "CopyTextButton": {
+      "empty": {
+        "status": "n-a",
+        "reason": "An empty string is not a state this control can be put in: every caller derives its text from a card that has a label, and cardCopyText never returns empty for a card that has one. The at-rest transparent state is a different thing and is recorded under key-interaction."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "This renders one icon button, never a collection. It takes a single string to copy and has no list, so there is no empty-to-many boundary for a count to cross."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Same reason as single: there is nothing here that can overflow from data. The copied string can be any length, but it never renders — it goes to the clipboard — so length is not a visual boundary on this surface."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The clipboard write is a promise, but there is no pending affordance — the icon does not change until the write RESOLVES. That is deliberate: a spinner on a call that completes in microseconds would flicker, and a control that looked busy before it had succeeded would be claiming progress it cannot see."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The failure — a browser refusing clipboard access — is defined by nothing changing on screen, so it is not picturable. A scenario for it captured a frame byte-identical to OnADarkCard and was retired. It is asserted instead by the render test 'does not claim success when the clipboard refuses'."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The key action is pressing it, and both outcomes are invisible to a capture: the success tick needs a clipboard write the capture browser refuses, and the at-rest-to-revealed transition needs a hover that the capture harness applies to every frame indiscriminately. Both are asserted in CopyTextButton.render.test.tsx, which can read computed opacity and the live region."
+      }
+    },
     "CopyablePrompt": {
       "empty": {
         "status": "n-a",

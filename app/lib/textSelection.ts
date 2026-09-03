@@ -5,9 +5,16 @@
  *
  * A pointer dragged across a pill or the canvas is a gesture about the map, but
  * the browser reads it as "select this text" and paints a highlight trailing
- * the cursor. Selecting a node's text is worth keeping — it is how you copy a
- * label out — so this suppresses selection only while a drag is actually
- * running, rather than making the map permanently unselectable.
+ * the cursor. This suppresses selection for the duration of that gesture rather
+ * than making the map permanently unselectable.
+ *
+ * Its one caller, `useBoardCamera`, takes the lock out on POINTERDOWN — not
+ * when the drag passes the pan threshold, which is what an earlier version of
+ * this comment described. Three pixels in, the browser already has a selection
+ * drag in flight, and clearing the ranges below leaves its anchor behind for it
+ * to keep extending from. Pointerdown is the only seam where the highlight
+ * never starts at all. Selecting a card's text by dragging is therefore gone;
+ * the copy button on each board surface is what replaces it.
  *
  * Returns the restore function. Call it when the gesture ends; calling it twice
  * is harmless.

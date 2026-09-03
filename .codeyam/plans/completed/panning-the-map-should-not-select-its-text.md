@@ -158,12 +158,20 @@ explicitly.
 
 ### 6. The conclusion
 
-**File**: `app/components/ConvergenceNode.tsx`
+**File**: `app/components/InsightCard.tsx`
 
-Add `group` to the ready-state panel's root div and a `CopyTextButton` at its
-top-right, copying `conclusionCopyText(state)`. The panel already keeps its
-choice buttons in a `data-no-pan` block; the copy button carries its own, so it
-sits outside that block without changing it.
+(This section originally named `app/components/ConvergenceNode.tsx`. That
+component no longer exists: the far end of the board is now `InsightStack`,
+which took the convergence node's coordinates and renders each conclusion as an
+`InsightCard`, with `InsightWaysForward` supplying the "Where next" options.
+`InsightCard` is the panel this section describes.)
+
+Add `group` to the card's root div and a `CopyTextButton` at its top-right,
+copying `conclusionCopyText(insight)` — `BoardInsight` already carries `label`,
+`detail` and `choices`, which is exactly the shape the builder takes. The choice
+buttons live in `InsightWaysForward`, whose `<section>` is already `data-no-pan`;
+the copy button carries its own `data-no-pan`, so it sits outside that section
+without changing it.
 
 ## Reused existing code
 
@@ -185,6 +193,9 @@ sits outside that block without changing it.
   re-deriving them, or the copied text and the drawn card can disagree.
 - The `group` / `group-hover` hover-reveal idiom already used in
   `app/components/SavedMapRow.tsx`.
+- `InsightCard` / `BoardInsight` from `app/components/InsightCard.tsx` — the
+  far-end conclusion panel the copy button is added to, and the type whose
+  `label` / `detail` / `choices` fields `conclusionCopyText` reads.
 
 **Existing-implementation survey.** Grepped `app/` for the CSS user-select
 property in all three spellings: the only hits are `app/lib/textSelection.ts`

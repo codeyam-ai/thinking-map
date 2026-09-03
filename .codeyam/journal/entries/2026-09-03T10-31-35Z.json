@@ -1,0 +1,999 @@
+{
+  "timestamp": "2026-09-03T10:31:35Z",
+  "title": "Panning the Map Should Not Select Its Text",
+  "type": "feature",
+  "userRequest": "## Summary\n\nDragging the board paints a text highlight that trails the cursor: press on a\nquestion card, drag to pan, and the browser reads the gesture as \"select this\ntext\" instead of \"move the map\". The helper that fixes this already exists and\nis already tested — `suppressTextSelection` in `app/lib/textSelection.ts` — but\nnothing calls it. It is dead code: `useBoardCamera` never imports it. Wire it\ninto the camera's pointer gesture, and then close the hole that creates: because\na drag on a card pans the board, selecting a card's text by dragging was never\npossible in the first place, so the map's words have no copy path at all. Add a\nsmall copy button to each text surface on the board — every question card, the\ncore idea circle, the \"What that tells us\" insight, and the conclusion — so\nanywhere you would have wanted to select, there is a button instead.\n\n## Key Decisions\n\n- **Suppress on `pointerdown`, not at the pan threshold.** The helper's own\n  doc-comment imagines suppression starting when the drag becomes a pan, but the\n  threshold is `PAN_THRESHOLD = 3` pixels, and by then Chrome has an in-flight\n  selection drag that setting `user-select: none` mid-gesture does not reliably\n  abort — `removeAllRanges()` clears what exists, and the browser keeps\n  extending from the same anchor. Suppressing at `pointerdown` is the seam where\n  the highlight never starts. The cost is that double-click-to-select-a-word on\n  card text stops working; the copy buttons are what pays for it, which is why\n  the two halves are one plan and not two.\n- **Skip suppression for `[data-no-pan]` subtrees.** `onPointerDown` already\n  returns early when the target is inside `[data-no-pan]` — the answer composer,\n  the choice pills, the chat panel, the zoom controls. Selection inside a\n  textarea must keep working, so the suppression call goes *after* that guard,\n  not before it.\n- **Restore in the existing `onPointerUp`/`onPointerCancel` path.** The camera\n  already routes both to one handler, and `suppressTextSelection` returns an\n  idempotent restore, so the ref holding it can be cleared unconditionally. No\n  new lifecycle.\n- **The copied string is a rule, not a template in JSX.** What a card copies\n  differs by face — an open question copies the question, an answered one copies\n  the question and your answer, an insight copies its label and detail — and\n  that is the same kind of decision `cardPresentation` and `cardEyebrow` already\n  own. It goes in a new pure module with tests rather than three inline template\n  literals that can drift.\n- **Reveal on hover, on keyboard focus, and on the focused card.** Hover-only\n  would make the control invisible in every scenario screenshot, which on this\n  project means the affordance is undocumented. Tying visibility to the board's\n  own `focused` state as well means a scenario that focuses a card demonstrates\n  the button without needing a synthetic hover.\n- **A new `CopyTextButton`, not a reuse of `CopyablePrompt`.** `CopyablePrompt`\n  renders the text *and* a button — it is the block whose whole purpose is to be\n  copied. Here the text is already on the card and the button is an icon beside\n  it. The clipboard call, the `catch` that refuses to claim success, and the\n  `aria-live` label flip are copied from `CopyablePrompt` deliberately; the\n  layout is not.\n\n## Implementation\n\n### 1. Hold selection off for the duration of a board gesture\n\n**File**: `app/hooks/useBoardCamera.ts`\n\nImport `suppressTextSelection` from `@/app/lib/textSelection`. Add a ref beside\n`drag` holding the restore function (`useRef<(() => void) | null>(null)`).\n\nIn `onPointerDown`, after the `e.button !== 0` and `el.closest('[data-no-pan]')`\nguards return early, call `restore.current = suppressTextSelection()` alongside\nsetting `drag.current`.\n\nIn `onPointerUp` (which also serves `onPointerCancel`), call\n`restore.current?.()` and null the ref, next to clearing `drag.current` and\nreleasing the pointer capture. Restoring is idempotent, so a doubled\n`pointerup` is safe.\n\nNote in a comment why the call sits at `pointerdown` rather than at the pan\nthreshold — the in-flight-selection reason from Key Decisions. The helper's own\ndoc-comment currently describes the threshold-based placement; update that\nparagraph so the two files agree.\n\n### 2. What each board surface copies\n\n**New file**: `app/lib/boardCopyText.ts`\n\nPure functions, no React, matching the shape of `cardPresentation` and\n`handoffCopy`:\n\n- `cardCopyText(card)` — takes the fields `PlacedCard` already carries (`label`,\n  `detail`, `kind`, `status`). Returns the question alone for an open card; the\n  question and the answer, separated by a blank line, for an answered one; the\n  label and detail for an insight. Never returns a trailing blank line and never\n  returns an empty string for a card that has a label.\n- `coreCopyText({ seedIdea, insight })` — the idea on its own, or the idea\n  followed by the current reading when one exists.\n- `conclusionCopyText({ label, detail, choices })` — the conclusion, its detail,\n  and the \"Where next\" options as a list when there are any.\n\n**New file**: `app/lib/boardCopyText.test.ts` — one test per branch above,\nincluding the empty-detail and no-choices cases.\n\n### 3. The button itself\n\n**New file**: `app/components/CopyTextButton.tsx`\n\nA small icon button. Props: `text` (what lands on the clipboard), `label` (its\naccessible name, e.g. \"Copy this question\"), `accent` (the theme colour, so it\nreads as part of the card it sits on), and `className` for placement.\n\nBehaviour, taken from `CopyablePrompt`:\n\n- `navigator.clipboard?.writeText(text)`, `.then` sets copied, `.catch` leaves\n  it false — a refused clipboard must not claim success.\n- The confirmation is an `aria-live=\"polite\"` span holding a visually-hidden\n  \"Copied\" so the flip is audible as well as visual; the icon swaps to a check\n  for a couple of seconds and then back.\n- `data-no-pan` on the button, plus `onClick={(e) => e.stopPropagation()}`\n  before the copy, so pressing it neither pans the board nor focuses the card\n  underneath.\n- Visibility: `opacity-0` at rest, `group-hover:opacity-100`,\n  `focus-visible:opacity-100`, and an explicit `visible` prop the caller sets\n  when its card is the focused one.\n\n**New file**: `app/components/CopyTextButton.render.test.tsx` — that it copies\nthe exact string it was given, that a rejected clipboard does not flip the\nlabel, that the click does not bubble, and that it carries `data-no-pan`.\n\n### 4. Cards\n\n**File**: `app/components/QuestionCard.tsx`\n\nAdd `group` to the root div's className. Render `CopyTextButton` positioned\ntop-right (`absolute right-6 top-6`) — the bottom-right corner is already the\npencil on an answered card. Text comes from `cardCopyText(card)`; `accent` is\nthe existing `accent`; `visible` is the existing `focused`. Suppress it while\nthe composer is open (`writing && composing`), where the card is a form rather\nthan something to copy.\n\n### 5. The core idea and its reading\n\n**File**: `app/components/CoreIdeaCard.tsx`\n\nTwo buttons, because they are two pieces of text a person would want\nseparately:\n\n- One on the disc, inside the circle's padding at the bottom-right, copying\n  `coreCopyText({ seedIdea, insight: null })` — the idea in the person's own\n  words.\n- One on the \"What that tells us\" panel, top-right, copying\n  `coreCopyText({ seedIdea, insight })` so the reading arrives with the idea it\n  is about.\n\nThe disc currently has no `group` wrapper and no hover state; add `group` to the\ncircle div and to the insight panel div respectively. Accent for the disc is the\ncard's black-on-white palette rather than a theme hue, so pass the ink colour\nexplicitly.\n\n### 6. The conclusion\n\n**File**: `app/components/ConvergenceNode.tsx`\n\nAdd `group` to the ready-state panel's root div and a `CopyTextButton` at its\ntop-right, copying `conclusionCopyText(state)`. The panel already keeps its\nchoice buttons in a `data-no-pan` block; the copy button carries its own, so it\nsits outside that block without changing it.\n\n## Reused existing code\n\n- `suppressTextSelection` from `app/lib/textSelection.ts` (glossary entry:\n  `suppressTextSelection`) — already written and already covered by\n  `app/lib/textSelection.test.ts`; this plan is largely about calling it.\n- `useBoardCamera` from `app/hooks/useBoardCamera.ts` (glossary entry:\n  `useBoardCamera`) — the gesture the suppression is scoped to.\n- `CopyablePrompt` from `app/components/CopyablePrompt.tsx` (glossary entry:\n  `CopyablePrompt`) — the clipboard call, the `catch`-means-no-success rule and\n  the `aria-live` confirmation are lifted from it. Not reused as a component:\n  it renders the text as well as the button, which is the opposite of what the\n  board needs.\n- `PlacedCard` from `app/lib/galaxyLayout.ts` — the new copy-text builder reads\n  only fields it already carries.\n- `isAnsweredCard` / `isInsightCard` / `isOpenCard` from\n  `app/lib/cardPresentation.ts` — the copy-text builder branches on the same\n  three faces the card renders, and must use these predicates rather than\n  re-deriving them, or the copied text and the drawn card can disagree.\n- The `group` / `group-hover` hover-reveal idiom already used in\n  `app/components/SavedMapRow.tsx`.\n\n**Existing-implementation survey.** Grepped `app/` for the CSS user-select\nproperty in all three spellings: the only hits are `app/lib/textSelection.ts`\nand `app/lib/textSelection.test.ts`. There is no second, competing suppression\nanywhere in the app, and no global select-none on the board shell. Grepped for\nthe clipboard API: exactly one call site, in\n`app/components/CopyablePrompt.tsx`. There is no existing generic copy-icon\nbutton component and no existing copy-text builder, so both new files in the\nImplementation section are genuinely new rather than duplicates.\n\n## Reproduction Test\n\nDragging the board leaves text selection on, so the browser paints a highlight\ntrailing the cursor while the map pans.\n\n**Target**: `app/hooks/useBoardCamera.test.ts` — run with\n`codeyam-editor editor refresh-tests --test board_pan_suppresses_text_selection`.\n\nThe file is already `// @vitest-environment jsdom` and already has the `pointer()`\nfake-event helper this test reuses. Add a new describe block:\n\n```ts\ndescribe('useBoardCamera and text selection', () => {\n  // The reported complaint: a drag across a card paints a selection highlight\n  // that trails the cursor, because the browser reads the pan as a select.\n  it('turns text selection off while a board gesture is running', () => {\n    const { result } = renderHook(() => useBoardCamera(START));\n\n    act(() => result.current.handlers.onPointerDown(pointer(100, 100)));\n    expect(document.body.style.userSelect).toBe('none');\n\n    act(() => result.current.handlers.onPointerUp(pointer(140, 120)));\n    expect(document.body.style.userSelect).toBe('');\n  });\n\n  // Selection inside a card's own controls is not the board's to suppress.\n  it('leaves selection alone for a press inside a no-pan subtree', () => {\n    const { result } = renderHook(() => useBoardCamera(START));\n\n    const inControl = pointer(100, 100, { closest: (s: string) => (s === '[data-no-pan]' ? {} : null) });\n    act(() => result.current.handlers.onPointerDown(inControl));\n    expect(document.body.style.userSelect).toBe('');\n  });\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: the first test\nfails on its first assertion — `useBoardCamera` never calls\n`suppressTextSelection`, so `document.body.style.userSelect` is still `''` after\n`onPointerDown`, and `expect('').toBe('none')` fails. The second test passes\nbefore the fix and is there to pin the `[data-no-pan]` carve-out afterwards.\n\n## Scenarios to Demonstrate\n\n- A board mid-pan with a card under the cursor — nothing highlighted, the map\n  moving.\n- An open question card with the copy button revealed (the focused card).\n- An answered card, where the copy button and the pencil share the card without\n  colliding.\n- An insight card carrying a detail paragraph.\n- A card with its composer open — the copy button is deliberately absent.\n- The core idea circle with a long idea (the 26px type size) and its button.\n- The core with a \"What that tells us\" panel, so both copy buttons are on\n  screen at once.\n- A finished board showing the conclusion with its \"Where next\" options and the\n  panel's copy button.\n- The board zoomed out below `LABEL_ONLY_BELOW`, where the cards are gone and\n  there is nothing to copy — the labels-only state must stay unchanged.",
+  "description": "Dragging the board painted a text highlight that trailed the cursor: press on a card, drag to pan, and the browser read the gesture as \"select this text\" instead of \"move the map\". The helper that fixes it already existed and was already tested — suppressTextSelection in app/lib/textSelection.ts — but nothing called it. useBoardCamera now takes the selection lock on pointerdown and releases it from the single handler that serves both pointerup and pointercancel. The lock goes on at pointerdown rather than at the three-pixel pan threshold, and that placement is the whole decision: three pixels in, the browser already has a selection drag in flight, and clearing its ranges leaves the anchor behind for it to keep extending from. The call sits AFTER the existing [data-no-pan] guard, so selection inside a card's composer and the chat panel is untouched.\n\nThat fix closes a hole, because a drag on a card pans the board, so selecting a card's text by dragging was never really possible — and after this it is impossible on purpose, leaving the map's words with no copy path at all. So the second half of the change is a copy button on each text surface: every question card, the core idea disc, and the conclusion at the far end. What each one copies is a rule rather than three inline templates — an open question copies the question, an answered one copies the question AND the answer (an answer pasted alone has lost what it was answering), an insight copies its claim and its reasoning — so it lives in a new pure module, app/lib/boardCopyText.ts, branching on cardPresentation's own predicates so the copied text and the drawn card cannot disagree about what kind of card it is. The accessible name branches there too, beside the text, so a button cannot promise an answer the text omits. The control itself is a new CopyTextButton: the clipboard call, the catch that refuses to claim a success that did not happen, and the aria-live confirmation are taken from CopyablePrompt deliberately — that refusal matters more here, because with selection suppressed there is no select-and-copy path left underneath it.\n\nSCOPE VERDICT — this cycle DELIVERED no project deliverable and DEFERRED none. All ten were already resolved before it began (nine delivered, one deferred: registering the MCP server in a client, an assist-track item the user themselves deferred, untouched here). This was a reported bug plus the affordance its fix made necessary, so it closes a defect rather than advancing a deliverable, and there is no unmet deliverable this entry is silent about.\n\nTwo places the plan was written against code that had moved, both corrected against the tree before building: it pointed the conclusion work at app/components/ConvergenceNode.tsx, which no longer exists — the far end of the board is now InsightStack, rendering each conclusion as an InsightCard — and it asked for two buttons on the core, but the \"what that tells us\" panel has since moved off the core to that same far end, so the core has one and the reading's button lives on InsightCard. The branch was also three commits behind its upstream when the cycle started, including a 496-file visual redesign touching CoreIdeaCard, and was fast-forwarded before any code was written.\n\nTests: 72 passing. The reproduction test is PROVEN red rather than merely claimed — prove-red reverted app/hooks/useBoardCamera.ts and confirmed \"turns text selection off while a board gesture is running\" genuinely fails without the fix; the [data-no-pan] carve-out and the pointercancel path are recorded as survival guards, green both ways by design. Writing it also surfaced real pollution in the existing camera suite: several pan tests simulate a pointerdown with no release, which no browser produces, and each left the shared document's selection lock on for the next test — now reset in a beforeEach.\n\nTwo states were deliberately NOT captured as scenarios, and the reasons are recorded in app/isolated-components/CopyTextButton/page.tsx so neither gets added back. The control hidden at rest is genuinely opacity 0 — verified in a plain browser — but the capture harness hovers every frame it photographs, so the screenshot came back showing a button under a caption saying it was gone. The confirmation tick is the mirror image: navigator.clipboard.writeText rejects with NotAllowedError in the capture browser, so a driven capture exercises the REFUSED path, and a refusal is defined by nothing changing on screen — a scenario for it came back byte-identical to OnADarkCard and was retired with the user's confirmation. Both behaviours are asserted in CopyTextButton.render.test.tsx, which can read computed opacity and the live region where a screenshot cannot.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/panning-the-map-should-not-select-its-text.md\t.codeyam/plans/completed/panning-the-map-should-not-select-its-text.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-claimalone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-nocitations--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/636b174be3df264abd2bd1653edd40000c5a9ae45b1f32ad0c203f101b4150e0.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b2a9b0ef4cb54a8b077ca3eebedf916e04c0f0996c1d18e3bfe40146bf64f482.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CoreIdeaCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/InsightCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/QuestionCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useBoardCamera.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useBoardCamera.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/textSelection.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/copytextbutton-onadarkcard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/copytextbutton-onanopencard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/copytextbutton-onthecoredisc.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/copytextbutton.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/coreideacard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/insightcard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/questioncard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copytextbutton-onadarkcard--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copytextbutton-onadarkcard--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copytextbutton-onanopencard--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copytextbutton-onanopencard--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copytextbutton-onthecoredisc--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/copytextbutton-onthecoredisc--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/panning-the-map-should-not-select-its-text.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/362c488c0663cb99e5696418725c791ffa902ca24759a3bab08e896cf96ad4d9.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3867cb45206bfad9ddff5c5ba2886546ecdfcd5b68fa4c2930c63bcaae8ab4d0.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5e232078191035294819238e237fa83415d880927a530c0ecd383407f1d6a8f0.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/96c39e47ce384bf188e5a166b17f9ab34fc11a70420788545762d4057640f35e.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CopyTextButton.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CopyTextButton.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/CopyTextButton/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardCopyText.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardCopyText.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round ends itself, on a real board",
+      "screenshotPath": "the-round-ends-itself-on-a-real-board--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - RoundHeldOpen",
+      "screenshotPath": "boardworkspace-roundheldopen--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "CopyTextButton - OnADarkCard",
+      "screenshotPath": "copytextbutton-onadarkcard--tablet.png"
+    },
+    {
+      "name": "CopyTextButton - OnAnOpenCard",
+      "screenshotPath": "copytextbutton-onanopencard--tablet.png"
+    },
+    {
+      "name": "CopyTextButton - OnTheCoreDisc",
+      "screenshotPath": "copytextbutton-onthecoredisc--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne",
+      "screenshotPath": "coreideacard-dayone--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - Default",
+      "screenshotPath": "coreideacard-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea",
+      "screenshotPath": "coreideacard-longidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea",
+      "screenshotPath": "coreideacard-shortidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments",
+      "screenshotPath": "coreideacard-withattachments--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "InsightCard - Default",
+      "screenshotPath": "insightcard-default--tablet.png"
+    },
+    {
+      "name": "InsightCard - Experiment",
+      "screenshotPath": "insightcard-experiment--tablet.png"
+    },
+    {
+      "name": "InsightCard - LongLabel",
+      "screenshotPath": "insightcard-longlabel--tablet.png"
+    },
+    {
+      "name": "InsightCard - Stale",
+      "screenshotPath": "insightcard-stale--tablet.png"
+    },
+    {
+      "name": "InsightCard - StaleByOne",
+      "screenshotPath": "insightcard-stalebyone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - AgentWorking",
+      "screenshotPath": "insightdetail-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightDetail - ClaimAlone",
+      "screenshotPath": "insightdetail-claimalone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - Default",
+      "screenshotPath": "insightdetail-default--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoAgent",
+      "screenshotPath": "insightdetail-noagent--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoCitations",
+      "screenshotPath": "insightdetail-nocitations--tablet.png"
+    },
+    {
+      "name": "InsightStack - CardOpened",
+      "screenshotPath": "insightstack-cardopened--tablet.png"
+    },
+    {
+      "name": "InsightStack - EdgeLabels",
+      "screenshotPath": "insightstack-edgelabels--tablet.png"
+    },
+    {
+      "name": "InsightStack - OneInsight",
+      "screenshotPath": "insightstack-oneinsight--tablet.png"
+    },
+    {
+      "name": "InsightStack - Overflowing",
+      "screenshotPath": "insightstack-overflowing--tablet.png"
+    },
+    {
+      "name": "InsightStack - ThreeInsights",
+      "screenshotPath": "insightstack-threeinsights--tablet.png"
+    },
+    {
+      "name": "InsightStack - Waiting",
+      "screenshotPath": "insightstack-waiting--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Answered",
+      "screenshotPath": "questioncard-answered--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Choices",
+      "screenshotPath": "questioncard-choices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Diagram",
+      "screenshotPath": "questioncard-diagram--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Focused",
+      "screenshotPath": "questioncard-focused--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Insight",
+      "screenshotPath": "questioncard-insight--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Open",
+      "screenshotPath": "questioncard-open--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Reference",
+      "screenshotPath": "questioncard-reference--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 72,
+    "passed": 72,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 72,
+        "passed": 72
+      }
+    ]
+  }
+}

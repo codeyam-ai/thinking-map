@@ -13,6 +13,7 @@
 // type registry and an edge system to replace about sixty lines.
 
 import { useCallback, useRef, useState } from 'react';
+import { suppressTextSelection } from '@/app/lib/textSelection';
 
 export interface Camera {
   /** Board units per screen pixel. 1 is "actual size". */
@@ -44,6 +45,10 @@ export function useBoardCamera(initial: Camera) {
      *  than a pan that starts three pixels late. */
     panning: boolean;
   } | null>(null);
+  // The undo for the selection lock the gesture takes out, held for as long as
+  // the gesture lasts. A ref rather than state for the same reason as `drag`:
+  // nothing renders from it.
+  const restoreSelection = useRef<(() => void) | null>(null);
 
 /** How far the pointer must travel before the gesture is a pan rather than a
  *  click. Three pixels is below the noise floor of a normal click but well
@@ -68,6 +73,14 @@ const PAN_THRESHOLD = 3;
       if (e.button !== 0) return;
       const el = e.target as HTMLElement;
       if (el.closest('[data-no-pan]')) return;
+      // Here, and not at PAN_THRESHOLD, even though only a pan needs it. By the
+      // time three pixels have passed the browser has a selection drag in
+      // flight, and `user-select: none` set mid-gesture does not reliably abort
+      // one: clearing the ranges leaves the anchor, and the browser keeps
+      // extending from it. Pointerdown is the seam where the highlight never
+      // starts. It costs double-click-to-select on card text, which is what the
+      // copy buttons on each surface exist to pay for.
+      restoreSelection.current = suppressTextSelection();
       drag.current = {
         px: e.clientX,
         py: e.clientY,
@@ -100,6 +113,10 @@ const PAN_THRESHOLD = 3;
 
   const onPointerUp = useCallback((e: React.PointerEvent) => {
     drag.current = null;
+    // Restoring is idempotent, so a doubled pointerup — or a cancel arriving
+    // after an up — costs nothing.
+    restoreSelection.current?.();
+    restoreSelection.current = null;
     const el = e.currentTarget as HTMLElement;
     if (el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
   }, []);

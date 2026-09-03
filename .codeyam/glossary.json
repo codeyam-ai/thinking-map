@@ -564,6 +564,16 @@
     ]
   },
   {
+    "description": "The small copy control that sits on top of something already drawn - a question card, the core idea disc, the conclusion at the far end. It exists because panning the board now suppresses text selection: a drag on a card moves the map, so the map's words cannot be swiped over any more, and this is what replaces that everywhere someone would have wanted to select. Not CopyablePrompt, which renders the text AND a button because it IS the block to be copied; here the text is already on the card and this is an icon beside it. What is taken from CopyablePrompt deliberately is the behaviour: the clipboard call, the catch that refuses to claim a success that did not happen, and the aria-live confirmation so the flip is audible rather than only a swapped glyph. That refusal matters more here than it did there - with selection suppressed, a control that said Copied after copying nothing would send someone away to paste something that is not there. It takes its accent from its caller rather than deriving one, because on a saturated open card the accent IS the background and a glyph in it would be invisible on the very card it sits on. It carries data-no-pan so the press does not start a board gesture and stops propagation so it does not also focus the card underneath. Visible on hover, on keyboard focus, and whenever its card is the board's focused one - the last of those is what lets the affordance appear in a captured scenario at all, since a hover-only control is invisible in every screenshot.",
+    "filePath": "app/components/CopyTextButton.tsx",
+    "name": "CopyTextButton",
+    "scenarios": [
+      "copytextbutton-onadarkcard",
+      "copytextbutton-onanopencard",
+      "copytextbutton-onthecoredisc"
+    ]
+  },
+  {
     "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original outlined secondary appearance and promotes to an ink-filled primary with light text for the handoff band, so promoting that one caller cannot restyle the others; the fill was lime until lime became reserved for the node ring and the agent status dot, and it now follows the paper-surface rule of ink fill with paper text. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation. Every tone states a wrapping rule and none leaves it unset: default and primary carry break-words so an origin-bearing command, which is one unbreakable token wider than its box, wraps inside the border instead of overflowing it, while inline carries truncate because that tone exists to hold exactly one row.",
     "filePath": "app/components/CopyablePrompt.tsx",
     "name": "CopyablePrompt",
@@ -1627,6 +1637,12 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
+    "description": "Joins the parts of a copied string that are actually present, separating two blocks of prose with a blank line - the separator that survives a paste into anything. Module-private to boardCopyText, and the reason every builder there routes through it: an absent part must contribute NOTHING rather than a gap, so a card with no detail copies its label alone instead of a label with a blank line hanging off it, and a conclusion with no ways forward omits the heading entirely instead of leaving an empty one. That trailing-gap rule is the single thing all four copy builders share, and it arrives in whatever document the person pastes into, which is why it is one tested function rather than repeated concatenation.",
+    "filePath": "app/lib/boardCopyText.ts",
+    "name": "block",
+    "testFile": "app/lib/boardCopyText.test.ts"
+  },
+  {
     "description": "The insight stream as the BOARD computes it, from the nodes it already lays out. insightStream is shared with the server door that renders read_map, so it takes rows where every node carries createdAt and updatedAt; the board is passed GalaxyNodeInputs, where those are optional because an isolated fixture mounts the board with hand-written nodes and has no reason to invent timestamps. Bridging the two is a decision rather than a cast, which is why it is a named function: every undated node gets the SAME epoch stand-in, so an undated map is one cohort in which nothing was written after anything and nothing reads as stale - the right answer for a fixture, where staleness would be a claim about answers the person never gave. Date.now() was the alternative and is worse twice: a new value every render defeats the memo, and on a partly-dated map it sorts every undated node to the front. Deliberately not a second query - the board and the agent's read_map read the same rule over the same nodes, which is the disagreement insightStream was extracted to prevent.",
     "filePath": "app/lib/boardInsights.ts",
     "name": "boardInsightStream",
@@ -1666,6 +1682,18 @@
     "scenarios": [
       "mid-exchange-agent-and-human-on-one-map"
     ]
+  },
+  {
+    "description": "The accessible name a card's copy control gives itself - 'Copy this question', 'Copy this question and your answer', or 'Copy this insight'. It lives beside cardCopyText and branches on the same three faces because it is the same decision made twice: the name has to promise exactly what the text delivers, and split across two files they can drift. A button announcing 'Copy this question' while copying the question and the answer is worse than either being wrong alone, and it is a mismatch only somebody navigating by label would ever meet. Specific rather than a shared 'Copy' for the same reason: a dozen cards are on the board at once, and a dozen controls with one name between them is a list of identical rows to a screen reader.",
+    "filePath": "app/lib/boardCopyText.ts",
+    "name": "cardCopyLabel",
+    "testFile": "app/lib/boardCopyText.test.ts"
+  },
+  {
+    "description": "What one board card puts on the clipboard, which is not the same as what it draws. An open question copies its question alone: there is no answer yet, and the shortlist beneath it is a set of options rather than content. An answered card copies the question AND the answer together, because an answer pasted on its own has lost what it was answering and nothing downstream can recover it. An insight copies its claim and its reasoning, the same two-block shape arrived at from the other direction. It branches on cardPresentation's own isInsightCard / isAnsweredCard predicates rather than re-deriving the three faces, so the text you copied and the card you copied it from cannot disagree about what kind of card it was - which also means a card CARRYING a diagram or a picture is treated as an insight whatever its kind, the same clause the card itself renders by. Exists at all because dragging the board now suppresses text selection: the map's words cannot be swiped over any more, so the copy button is the only path from the board to anywhere else, and three inline template literals in three components would have drifted the first time one of the faces changed.",
+    "filePath": "app/lib/boardCopyText.ts",
+    "name": "cardCopyText",
+    "testFile": "app/lib/boardCopyText.test.ts"
   },
   {
     "description": "The line a card uses to say what it is: the node's kind, then who wrote it, then whether it has been asked about, then the brief section it came from, in that fixed order. The rule with teeth is that an answered question stops calling itself Open — leaving the kind's default would have the card label the answer printed directly beneath it as unanswered.",
@@ -1731,10 +1759,22 @@
     "testFile": "app/lib/briefCoverage.test.ts"
   },
   {
+    "description": "The conclusion at the far end of the board - its claim, its reasoning, and the ways forward it offers. The ways forward are rendered as a list under a 'Where next' heading because that is what they are on screen, a column of buttons rather than a comma-separated sentence; when none were offered the heading is omitted entirely, since an empty 'Where next' would say there had been options and they went missing. It copies the reasoning and the routes even while the card is collapsed and showing neither, because what is being copied is the conclusion rather than the current state of the panel - a paste that silently dropped the options because a panel happened to be shut would be a loss nobody could see.",
+    "filePath": "app/lib/boardCopyText.ts",
+    "name": "conclusionCopyText",
+    "testFile": "app/lib/boardCopyText.test.ts"
+  },
+  {
     "description": "Turns one contribution from the page into the events that should be recorded for it, performing the map writes it implies. A note is only ever an event; an answer also closes its question, and a node is created first so the event can carry its real id.",
     "filePath": "app/lib/contributions.ts",
     "name": "contributionEvents",
     "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
+    "description": "The idea at the centre of the board, optionally with the partner's current reading of it. The rule worth having a function for is that the reading never travels alone: 'what that tells us' pasted into a document by itself has lost the idea it is about, and nobody reading it later can recover that. An absent or explicitly null reading contributes nothing rather than a trailing blank line, so the person's own sentence copies clean on a board where nothing has been said about it yet.",
+    "filePath": "app/lib/boardCopyText.ts",
+    "name": "coreCopyText",
+    "testFile": "app/lib/boardCopyText.test.ts"
   },
   {
     "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title. The seed idea is the person's, so the root node and opening message are user-origin - an agent reading the log must not mistake the human's starting idea for something it wrote. Records the root as the map's first event, leaving it at revision 1: a new map at revision 0 with an empty log would give an agent no way to tell it from one it had already read to the end.",
@@ -2732,7 +2772,7 @@
     "testFile": "app/lib/summarizeMap.test.ts"
   },
   {
-    "description": "Holds text selection off for the duration of a drag and returns the restore function. Scoped to the gesture rather than the map, because selecting a node's label is worth keeping — it is how you copy one out.",
+    "description": "Holds text selection off for the duration of a board gesture and returns an idempotent restore function. Its one caller, useBoardCamera, takes the lock out on POINTERDOWN rather than when the drag passes the pan threshold - three pixels in, the browser already has a selection drag in flight, and clearing its ranges leaves the anchor behind for it to keep extending from, so pointerdown is the only seam where the highlight never starts at all. Scoped to the gesture rather than made permanent on the map, and skipped entirely for a press inside a [data-no-pan] subtree so selection in a card's own composer and in the chat panel keeps working. It used to say that selecting a node's label was worth keeping because that was how you copied one out; that is no longer true, and the copy button on each board surface - see CopyTextButton and cardCopyText - is what replaced it.",
     "filePath": "app/lib/textSelection.ts",
     "name": "suppressTextSelection",
     "testFile": "app/lib/textSelection.test.ts"
@@ -2795,7 +2835,7 @@
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
-    "description": "Pan and zoom over the board, held as one piece of state so a scale and a translation landing in different renders cannot make the board visibly shear. The load-bearing detail is that the pointer is NOT captured on pointerdown but only after a few pixels of travel: capturing early retargets the eventual click to the canvas, which silently made every card on the board unclickable. Drag deltas are divided by the current scale so the board tracks the cursor identically at every zoom, and the scale is clamped at both ends so it can never invert or collapse.",
+    "description": "Pan and zoom over the board, held as one piece of state so a scale and a translation landing in different renders cannot make the board visibly shear. The load-bearing detail is that the pointer is NOT captured on pointerdown but only after a few pixels of travel: capturing early retargets the eventual click to the canvas, which silently made every card on the board unclickable. Drag deltas are divided by the current scale so the board tracks the cursor identically at every zoom, and the scale is clamped at both ends so it can never invert or collapse. It also owns the board's text-selection lock: pointerdown calls suppressTextSelection, so a drag across a card moves the map instead of painting a highlight that trails the cursor, and the restore runs from the single handler that serves both pointerup and pointercancel. The call sits AFTER the [data-no-pan] guard, so a press inside a composer or the chat panel is left alone; it sits at pointerdown rather than at the pan threshold for the reason recorded on suppressTextSelection.",
     "filePath": "app/hooks/useBoardCamera.ts",
     "name": "useBoardCamera",
     "testFile": "app/hooks/useBoardCamera.test.ts"

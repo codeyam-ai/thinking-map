@@ -1,0 +1,39 @@
+{
+  "provenAt": "2026-09-03T10:03:45Z",
+  "slug": "panning-the-map-should-not-select-its-text",
+  "paths": [
+    "app/hooks/useBoardCamera.ts"
+  ],
+  "runScope": [
+    "app/hooks/useBoardCamera.ts"
+  ],
+  "tests": {
+    "leaves selection alone for a press inside a no-pan subtree": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "restores selection when the gesture is cancelled rather than released": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "turns text selection off while a board gesture is running": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "turns text selection off while a board gesture is running"
+    ]
+  }
+}
