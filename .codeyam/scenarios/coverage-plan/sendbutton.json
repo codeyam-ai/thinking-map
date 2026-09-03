@@ -1,0 +1,18 @@
+{
+  "surface": "SendButton",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "large",
+      "value": "true",
+      "rationale": "source-derived state large=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "large",
+      "value": "false",
+      "rationale": "source-derived state large=false",
+      "status": "covered"
+    }
+  ]
+}

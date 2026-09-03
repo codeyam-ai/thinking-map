@@ -96,7 +96,7 @@ export default function BridgeReadout({
             onClick={() =>
               answer(Object.fromEntries(pending.map((q) => [q.id, 'Almost never'])))
             }
-            className="rounded-full bg-lime px-4 py-1.5 text-[13px] font-medium text-ink"
+            className="rounded-full bg-ink px-4 py-1.5 text-[13px] font-medium text-paper"
           >
             Answer and release the agent
           </button>

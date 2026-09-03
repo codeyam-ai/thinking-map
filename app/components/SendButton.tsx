@@ -1,6 +1,18 @@
 /**
- * The lime circular send button with its ↗ arrow — the only place lime appears
- * on the landing screen, and the same control the conversation panel uses.
+ * The circular send button with its ↗ arrow — the landing screen's control, and
+ * the same one every composer on the board reaches for.
+ *
+ * Ink, not lime. Lime now says exactly two things in this product: the ring on
+ * the node that just changed, and the agent's status dot. A call to action
+ * wearing it would compete with the one mark on a screen that is meant to be
+ * found by colour alone.
+ *
+ * There is deliberately no second tone, and the reason is worth recording. The
+ * rule for calls to action is surface-dependent — ink on paper, white on the
+ * board — but every caller of THIS button renders it over a `bg-surface` field.
+ * The composers sit on dark cards; the field under the button is white in all
+ * four. So the pill is ink everywhere it appears, and a board tone would have
+ * had no caller.
  */
 export default function SendButton({
   disabled,
@@ -17,7 +29,7 @@ export default function SendButton({
       type="submit"
       disabled={disabled}
       aria-label={label}
-      className={`absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full bg-lime text-ink transition hover:bg-lime-deep disabled:opacity-40 ${
+      className={`absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full bg-ink text-paper transition hover:bg-ink-soft disabled:opacity-40 ${
         large ? 'right-4 h-[52px] w-[52px]' : 'right-2.5 h-[38px] w-[38px]'
       }`}
     >

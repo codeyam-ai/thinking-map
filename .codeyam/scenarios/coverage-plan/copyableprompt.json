@@ -12,7 +12,7 @@
       "dimension": "copied",
       "value": "false",
       "rationale": "source-derived state copied=false",
-      "status": "planned"
+      "status": "covered"
     }
   ]
 }

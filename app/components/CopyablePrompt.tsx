@@ -33,8 +33,12 @@ const PROMPT_CLASS = {
 
 const BUTTON_CLASS = {
   default: 'mt-3 rounded-full border border-ink px-4 py-2 text-[13px] font-semibold',
+  // Ink fill, light text. `primary` is the one tone that fills rather than
+  // outlines, and filling it with lime made it the loudest thing on a paper
+  // screen — which is now the node ring's job alone. The border stays because
+  // it is what makes all three tones read as the same control.
   primary:
-    'mt-3 rounded-full border border-ink bg-lime px-5 py-2.5 text-[14px] font-semibold hover:bg-lime-deep',
+    'mt-3 rounded-full border border-ink bg-ink px-5 py-2.5 text-[14px] font-semibold text-paper hover:bg-ink-soft',
   inline:
     'shrink-0 rounded-full border border-ink px-3 py-1 text-[11px] font-semibold',
 } as const;

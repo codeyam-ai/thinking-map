@@ -743,8 +743,17 @@
       "file": "app/components/CopyablePrompt.render.test.tsx",
       "format": "vitest",
       "key": "CopyablePrompt › does not wrap the inline tone, which is a deliberate one-row control",
-      "line": 117,
+      "line": 139,
       "registeredAt": "2026-09-02T21:03:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The other half of the same rule, and the half that would go quiet if the ink treatment were reverted: the promoted tone is a filled ink pill with light text on it, because it sits on the paper surfaces where an outline would not read as the one thing to do.",
+      "file": "app/components/CopyablePrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyablePrompt › fills the primary tone with ink and light text",
+      "line": 109,
+      "registeredAt": "2026-09-03T00:57:01Z",
       "runner": "tests"
     },
     {
@@ -757,20 +766,20 @@
       "runner": "tests"
     },
     {
+      "description": "The tone prop exists so promoting the handoff caller cannot restyle the others, which only holds if the default is genuinely unchanged. This used to assert the default carried no `bg-lime`, which distinguished the two tones only while `primary` was the lime one. Now that no call to action in the product is lime, that assertion passes for BOTH tones and so pins nothing — it would survive the default being handed the primary's fill, which is the one regression it exists to catch. What separates th",
+      "file": "app/components/CopyablePrompt.render.test.tsx",
+      "format": "vitest",
+      "key": "CopyablePrompt › leaves the default tone unfilled",
+      "line": 97,
+      "registeredAt": "2026-09-03T00:57:01Z",
+      "runner": "tests"
+    },
+    {
       "description": "The deliberate failure behaviour. A browser can refuse clipboard access, and when it does the button must neither throw nor claim it worked — the prompt stays on screen and the label stays as an offer.",
       "file": "app/components/CopyablePrompt.render.test.tsx",
       "format": "vitest",
       "key": "CopyablePrompt › neither throws nor claims success when the clipboard is refused",
       "line": 68,
-      "registeredAt": "2026-09-02T11:13:46Z",
-      "runner": "tests"
-    },
-    {
-      "description": "The tone prop exists so promoting the handoff caller cannot restyle the others, which only holds if the default is genuinely unchanged.",
-      "file": "app/components/CopyablePrompt.render.test.tsx",
-      "format": "vitest",
-      "key": "CopyablePrompt › renders the default tone when none is given",
-      "line": 89,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -788,7 +797,7 @@
       "file": "app/components/CopyablePrompt.render.test.tsx",
       "format": "vitest",
       "key": "CopyablePrompt › wraps a long command inside the default tone box",
-      "line": 106,
+      "line": 128,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },

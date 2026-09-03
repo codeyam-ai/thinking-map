@@ -14,6 +14,22 @@
   --ink-soft: #4a4a45;
   --muted: #8a8a85;
   --line: #e2e0d9;
+  /* Lime is a SIGNAL, never a call to action. It has exactly two jobs: the ring
+     and glow on the one node that just changed (nodeShellClasses in
+     app/lib/nodeAppearance.ts), and the agent's status dot (AgentStatusDot).
+     Both are places where the colour IS the message — a black ring is what an
+     ordinary subject card already wears, and a black status dot is
+     indistinguishable from the grey "unavailable" one beside it.
+
+     A button never takes it. Calls to action are surface-dependent instead:
+     `--ink` fill with `--paper` text on the paper screens, `--surface` fill
+     with `--ink` text on the black board. Reaching for lime on a new button
+     would cost the node ring the thing that makes it findable.
+
+     One thing on screen is lime and is NOT this token: the landing card
+     (FirstCard and its controls) is a hardcoded #e4ec4b, and predates the rule
+     rather than following it. Named here so the next reader knows the gap is
+     known and not a counter-example to the rule above. */
   --lime: #d5f560;
   --lime-deep: #c6ec44;
   --thread: #8b8bc8;

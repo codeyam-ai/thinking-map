@@ -86,10 +86,32 @@ describe('CopyablePrompt', () => {
 
   // The tone prop exists so promoting the handoff caller cannot restyle the
   // others, which only holds if the default is genuinely unchanged.
-  it('renders the default tone when none is given', () => {
+  //
+  // This used to assert the default carried no `bg-lime`, which distinguished
+  // the two tones only while `primary` was the lime one. Now that no call to
+  // action in the product is lime, that assertion passes for BOTH tones and so
+  // pins nothing — it would survive the default being handed the primary's
+  // fill, which is the one regression it exists to catch. What separates them
+  // now is that `primary` FILLS and `default` only outlines, so that is what
+  // is asserted: an absent fill on one, a present fill on the other.
+  it('leaves the default tone unfilled', () => {
     stubClipboard(() => Promise.resolve());
     const { container } = render(<CopyablePrompt text={PROMPT} />);
     const button = container.querySelector('button');
+    expect(button?.className).toMatch(/border-ink/);
+    expect(button?.className).not.toMatch(/bg-/);
+  });
+
+  // The other half of the same rule, and the half that would go quiet if the
+  // ink treatment were reverted: the promoted tone is a filled ink pill with
+  // light text on it, because it sits on the paper surfaces where an outline
+  // would not read as the one thing to do.
+  it('fills the primary tone with ink and light text', () => {
+    stubClipboard(() => Promise.resolve());
+    const { container } = render(<CopyablePrompt text={PROMPT} tone="primary" />);
+    const button = container.querySelector('button');
+    expect(button?.className).toMatch(/bg-ink/);
+    expect(button?.className).toMatch(/text-paper/);
     expect(button?.className).not.toMatch(/bg-lime/);
   });
 

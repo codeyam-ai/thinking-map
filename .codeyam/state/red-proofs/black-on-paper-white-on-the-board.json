@@ -1,0 +1,32 @@
+{
+  "provenAt": "2026-09-03T00:47:48Z",
+  "slug": "black-on-paper-white-on-the-board",
+  "paths": [
+    "app/components/CopyablePrompt.tsx"
+  ],
+  "runScope": [
+    "app/components/CopyablePrompt.tsx"
+  ],
+  "tests": {
+    "fills the primary tone with ink and light text": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "leaves the default tone unfilled": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "fills the primary tone with ink and light text"
+    ]
+  }
+}

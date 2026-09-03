@@ -56,7 +56,9 @@ export default function BoardChatComposer({
         onClick={send}
         disabled={!draft.trim()}
         aria-label="Send"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e4ec4b] text-black transition-opacity disabled:opacity-25"
+        // White on the board, matching the round control in the same bar — the
+        // two sit inches apart and used to be two different limes.
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-ink transition-opacity disabled:opacity-25"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path

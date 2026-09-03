@@ -1,0 +1,20 @@
+{
+  "name": "BoardChatComposer - Typed",
+  "id": "08a7b5d9-9120-4b18-83ff-49bd82597d03",
+  "url": "/isolated-components/BoardChatComposer?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChatComposer",
+  "scenarioType": "component",
+  "pageFilePath": "app/components/BoardChatComposer.tsx",
+  "description": "With words in the box, which is the only state that shows the send control at full strength. On the black bar a call to action is a white pill with ink text - the mirror of the black pill the paper screens use - and the resting scenario cannot show it, because an empty box holds the button at a quarter opacity where white and grey are the same thing.",
+  "interactions": [
+    {
+      "action": "fill",
+      "selector": "input",
+      "value": "Push back on the age range"
+    }
+  ]
+}

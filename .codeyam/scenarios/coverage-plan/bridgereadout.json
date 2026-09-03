@@ -1,0 +1,54 @@
+{
+  "surface": "BridgeReadout",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "pending",
+      "value": "empty",
+      "rationale": "source-derived state pending=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "pending",
+      "value": "one",
+      "rationale": "source-derived state pending=one",
+      "status": "planned"
+    },
+    {
+      "dimension": "pending",
+      "value": "many",
+      "rationale": "source-derived state pending=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "tools",
+      "value": "empty",
+      "rationale": "source-derived state tools=empty",
+      "status": "planned"
+    },
+    {
+      "dimension": "tools",
+      "value": "one",
+      "rationale": "source-derived state tools=one",
+      "status": "planned"
+    },
+    {
+      "dimension": "tools",
+      "value": "many",
+      "rationale": "source-derived state tools=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "reason",
+      "value": "true",
+      "rationale": "source-derived state reason=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "reason",
+      "value": "false",
+      "rationale": "source-derived state reason=false",
+      "status": "planned"
+    }
+  ]
+}

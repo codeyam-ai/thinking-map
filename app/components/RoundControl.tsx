@@ -118,7 +118,10 @@ export default function RoundControl({
         type="button"
         onClick={onNext}
         disabled={waiting}
-        className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-[#d9f27e] px-5 py-2.5 text-[13px] font-semibold text-black transition-opacity disabled:opacity-45"
+        // White pill, ink text: this bar sits on the black board, where the ink
+        // treatment the paper screens use would disappear into its background.
+        // Both are the same rule read off two different surfaces.
+        className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-surface px-5 py-2.5 text-[13px] font-semibold text-ink transition-opacity disabled:opacity-45"
       >
           {waiting ? (
             <>
