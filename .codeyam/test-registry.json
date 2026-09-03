@@ -2255,7 +2255,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › cannot touch another map’s attachment",
-      "line": 367,
+      "line": 369,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2264,7 +2264,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › clears to nothing when the list is empty",
-      "line": 321,
+      "line": 323,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2273,7 +2273,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › drops an entry with no usable name",
-      "line": 350,
+      "line": 352,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2282,7 +2282,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › keeps the file itself, not just the name",
-      "line": 293,
+      "line": 295,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2291,7 +2291,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › keeps what was attached across a re-read",
-      "line": 278,
+      "line": 280,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2300,7 +2300,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › refuses a body that is not a list of attachments",
-      "line": 395,
+      "line": 397,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2309,7 +2309,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › removes what the list no longer names",
-      "line": 306,
+      "line": 308,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2318,7 +2318,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › renames in place and drops everything else sent with it",
-      "line": 332,
+      "line": 334,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2327,7 +2327,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › reports a missing map instead of silently saving nothing",
-      "line": 385,
+      "line": 387,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -3281,7 +3281,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › attaches to the root when no parent is named",
-      "line": 150,
+      "line": 152,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3290,7 +3290,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › creates the node and logs it with the real id",
-      "line": 120,
+      "line": 122,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3299,7 +3299,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › falls back to a drawable kind when the requested one is not real",
-      "line": 173,
+      "line": 175,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3308,7 +3308,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › honours an explicit parent",
-      "line": 161,
+      "line": 163,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3317,7 +3317,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › marks the node as the person’s",
-      "line": 140,
+      "line": 142,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3326,7 +3326,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › orders a new sibling after the existing ones",
-      "line": 196,
+      "line": 198,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3335,7 +3335,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › writes nothing for an empty label",
-      "line": 185,
+      "line": 187,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3344,7 +3344,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › closes the answered question and logs both halves",
-      "line": 72,
+      "line": 74,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3353,7 +3353,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › does not report a second close when the question is already answered",
-      "line": 85,
+      "line": 87,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3362,7 +3362,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › keeps the answer when the question node is gone",
-      "line": 98,
+      "line": 100,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3371,7 +3371,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › tolerates a malformed answers payload",
-      "line": 108,
+      "line": 110,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3380,7 +3380,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — leaving a note › logs the note and changes nothing on the map",
-      "line": 216,
+      "line": 218,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
