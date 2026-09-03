@@ -1,0 +1,165 @@
+{
+  "name": "The board's bottom-right corner, uncovered",
+  "id": "0a699ebf-cc1d-4cf7-9067-b545fa793d39",
+  "url": "/map/map-game?agentPanel=1",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "user",
+        "payload": "{\"id\": \"n-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game for kids\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-game-2",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-who\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"Who is it for?\", \"status\": \"open\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-game-3",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-what\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the problem?\", \"status\": \"open\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-game-4",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"n-goal\", \"parentId\": \"n-idea\", \"kind\": \"open-question\", \"label\": \"What's the goal?\", \"status\": \"open\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-game-5",
+        "kind": "phase.set",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"phase\": \"deconstruct\"}",
+        "revision": 5
+      },
+      {
+        "id": "ev-map-game-chat-1",
+        "kind": "user.note",
+        "mapId": "map-game",
+        "origin": "user",
+        "payload": "{\"text\": \"Mostly seven and eight year olds, in a classroom rather than at home. The teacher is in the room.\"}",
+        "revision": 6
+      },
+      {
+        "id": "ev-map-game-chat-2",
+        "kind": "agent.note",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"text\": \"That changes the shape of it. A classroom round has to finish inside a lesson, and the teacher needs to see who is stuck without stopping everyone.\"}",
+        "revision": 7
+      },
+      {
+        "id": "ev-map-game-chat-3",
+        "kind": "user.note",
+        "mapId": "map-game",
+        "origin": "user",
+        "payload": "{\"text\": \"Right, and they already use a vocabulary worksheet for this. That is the thing I would be replacing.\"}",
+        "revision": 8
+      },
+      {
+        "id": "ev-map-game-chat-4",
+        "kind": "agent.note",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"text\": \"Then the worksheet is the benchmark, not other games. I will keep pulling on that.\"}",
+        "revision": 9
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "n-idea",
+        "kind": "idea",
+        "label": "Educational game for kids",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "n-who",
+        "kind": "open-question",
+        "label": "Who is it for?",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open",
+        "themeId": "t-who"
+      },
+      {
+        "id": "n-what",
+        "kind": "open-question",
+        "label": "What's the problem?",
+        "mapId": "map-game",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open",
+        "themeId": "t-problem"
+      },
+      {
+        "id": "n-goal",
+        "kind": "open-question",
+        "label": "What's the goal?",
+        "mapId": "map-game",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "n-idea",
+        "status": "open",
+        "themeId": "t-goal"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-who",
+        "label": "Who it is for",
+        "mapId": "map-game",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-problem",
+        "label": "The problem",
+        "mapId": "map-game",
+        "order": 1
+      },
+      {
+        "hue": 233,
+        "id": "t-goal",
+        "label": "What good looks like",
+        "mapId": "map-game",
+        "order": 2
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-game",
+        "phase": "map",
+        "revision": 9,
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The whole board with the conversation open and the dev agent panel present — the only state that shows the corner this change cleared. The Agent panel pill sits bottom-LEFT above the zoom stack while the transcript keeps the bottom-right to itself. It used to sit bottom-right at a higher stacking order than the chat, leaving about 12px between them and covering this transcript outright once opened, which is why this scenario seeds an exchange worth covering rather than an empty one."
+}

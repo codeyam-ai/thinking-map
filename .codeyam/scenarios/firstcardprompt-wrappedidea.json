@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardPrompt - WrappedIdea",
+  "id": "62feafac-fac5-4081-b10f-c454f64773e3",
+  "url": "/isolated-components/FirstCardPrompt?s=WrappedIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardPrompt",
+  "scenarioType": "component",
+  "description": "A sentence long enough to wrap to three lines, every line starting at the same x and aligned with the question above it. The card used to recentre this text on every keystroke, so the words already typed slid sideways while the next ones were still being written."
+}

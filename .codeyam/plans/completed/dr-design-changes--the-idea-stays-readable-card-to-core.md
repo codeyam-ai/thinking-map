@@ -62,12 +62,18 @@ split the way the grouping rule would normally split them.
   object on a board of white and coloured cards, and it now carries the
   question "What are you trying to figure out?" as a label above the words,
   which says what it is more plainly than a shape ever did.
-- **The orbiting "Idea" badge goes with the circle.** It travels a circular
-  path of radius `CORE_RADIUS`, which on a card taller than it is wide would
-  cut straight through the card's own edges. The reference image has no badge,
-  and the eyebrow now does the labelling. The alternative — parking the badge
-  at a corner — is worth raising at the Confirm gate if the loss of the one
-  moving thing on the board is felt.
+- **The orbiting "Idea" badge stops orbiting and parks at a corner.**
+  DECIDED AT THE CONFIRM GATE (2026-09-03, by the requester). The badge travels
+  a circular path of radius `CORE_RADIUS`, which on a card taller than it is
+  wide would cut straight through the card's own edges, so the orbit cannot
+  survive the shape change. The reference image has no badge at all and the
+  eyebrow now does the labelling — but the requester chose to KEEP the badge
+  rather than drop it, pinned stationary to a corner of the card. So: drop the
+  `rotate(-135deg) translate(CORE_RADIUS) rotate(135deg)` transform (line 83)
+  and position the badge statically against the card's own top edge instead,
+  where it does not move as the card's height varies. This is a deliberate,
+  small departure from the reference image: the eyebrow and the badge both
+  appear.
 - **The bottom-right overlap named in the request is partly already fixed.**
   The screenshot shows the chat composer sitting on top of the zoom stack; that
   exact collision was resolved by `59bad53`, which moved the zoom controls to

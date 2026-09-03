@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaBody - LongIdea",
+  "id": "3d2138bb-49aa-46fd-b0a1-e64786b13992",
+  "url": "/isolated-components/CoreIdeaBody?s=LongIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaBody",
+  "scenarioType": "component",
+  "description": "The case this whole change was made for. Under the old rule this idea was crammed into a fixed circle at shrinking type and then spilled out of it onto the black board; here the type steps down one notch and the card grows to display every word of it."
+}

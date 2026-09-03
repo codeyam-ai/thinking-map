@@ -3403,6 +3403,69 @@
       "runner": "tests"
     },
     {
+      "description": "The ordinary case: the length someone actually types on the first card. A sentence or two lands at the ceiling, because there is nothing to trade.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › gives a short idea the largest type",
+      "line": 22,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The empty card. Not a state the board renders for long, but the function must not divide, index, or otherwise fall over on it.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › gives an empty idea the largest type rather than failing",
+      "line": 28,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Length is measured in characters of the idea itself, so the caller can pass the string and not think about it. A multi-byte character counts once the way JavaScript counts it — the point is that it does not throw.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › handles a non-ASCII idea",
+      "line": 69,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "It steps, rather than scaling continuously — two ideas a few characters apart must not render at visibly different sizes on the same board.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › holds one size across a band rather than changing per character",
+      "line": 62,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The floor is the whole point. This is the case that used to render at a size nobody could read, and the assertion that would have caught it.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › never goes below the readable floor, however long the idea",
+      "line": 34,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Monotonic: a longer idea is never set LARGER than a shorter one. Written as a sweep rather than as one pair, because a hand-written ternary chain is exactly the kind of thing that gets a threshold transposed.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › never sets a longer idea in larger type than a shorter one",
+      "line": 41,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every size it can return has to sit inside the declared range, so the constants stay the honest description of the scale rather than two numbers that drifted away from the ternary beneath them.",
+      "file": "app/lib/coreIdeaType.test.ts",
+      "format": "vitest",
+      "key": "coreIdeaFontSize › stays within the declared floor and ceiling at every length",
+      "line": 52,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
       "description": "The cheap cursor read the waiting tools report from.",
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
@@ -5380,6 +5443,78 @@
       "key": "isResearchRound › never bands the opening round",
       "line": 360,
       "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Scrolled to the very bottom. The text still overflows the box, but there is nothing further down, so dimming the last line would be a lie.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › is false once scrolled to the end, even though it still overflows",
+      "line": 35,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Before layout has happened at all — the first render, and jsdom always. Zeroes must read as \"nothing to point at\", never as an overflow.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › is false when nothing has been laid out yet",
+      "line": 67,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Overshoot. Elastic scrolling can report a scrollTop past the true end, and that must not flip the answer back to \"there is more\".",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › is false when the scroll overshoots the end",
+      "line": 75,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The common case by far: an idea that fits. No fade, because there is nothing below to point at.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › is false when the text fits inside the box",
+      "line": 27,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Part-way through. Still more to come, so the cue stays.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › is true part-way through a scroll",
+      "line": 42,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary overflowing case: a long idea at the card's height cap, not yet scrolled. This is the state the fade exists for.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › is true when the text overflows and has not been scrolled",
+      "line": 19,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The mirror of the case above, at the end of a scroll: landing a fraction short of the bottom still counts as the bottom.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › treats a sub-pixel gap at the end as the end",
+      "line": 59,
+      "registeredAt": "2026-09-03T10:53:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Sub-pixel rounding. A browser will report a scrollHeight a fraction taller than clientHeight on text that fits perfectly well; without slack that renders a fade on every card on the board.",
+      "file": "app/lib/clippedText.test.ts",
+      "format": "vitest",
+      "key": "isTextClipped › treats a sub-pixel overflow as fitting",
+      "line": 51,
+      "registeredAt": "2026-09-03T10:53:06Z",
       "runner": "tests"
     },
     {

@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaCard - OverflowingIdea",
+  "id": "17b6b636-5325-4490-85ec-bb1eee7e9b4c",
+  "url": "/isolated-components/CoreIdeaCard?s=OverflowingIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaCard",
+  "scenarioType": "component",
+  "description": "The whole card at its height cap, which CoreIdeaBody's own clipped frame cannot show: the badge still parked on a corner that has stopped moving, and Brought along still hanging off the card's real bottom edge rather than the constant it used to be measured from. The extreme that proves the attachments follow a height that varies."
+}

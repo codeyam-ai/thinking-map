@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaBadge - Default",
+  "id": "cd2cf41f-e246-488c-921f-2efad1086d6c",
+  "url": "/isolated-components/CoreIdeaBadge?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaBadge",
+  "scenarioType": "component",
+  "description": "The marker, parked on the card's top-left corner and shown against the black board so that corner is visible at all. It used to orbit on a circular path of the old disc's radius, which on a card taller than it is wide would cut through the card's own edges — so what this frame displays is a position, not a decoration."
+}

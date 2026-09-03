@@ -117,7 +117,13 @@ export default function AgentSimulator() {
   if (!open) return <AgentPanelLauncher onOpen={() => setOpen(true)} />;
 
   return (
-    <aside className="fixed bottom-4 right-4 z-40 flex max-h-[70vh] w-[340px] flex-col rounded-[16px] border border-line bg-surface p-4 shadow-lg">
+    // Bottom-LEFT, above the zoom stack, for the reason written on
+    // AgentPanelLauncher: open in the bottom-RIGHT this 340px-wide, 70vh-tall
+    // panel covered the conversation outright, and its z-40 against BoardChat's
+    // z-30 guaranteed it won. The height is additionally capped against the
+    // viewport so that growing upward from the 208px offset cannot push the
+    // panel's head off the top of a short screen.
+    <aside className="fixed bottom-[208px] left-12 z-40 flex max-h-[min(70vh,calc(100vh-240px))] w-[340px] flex-col rounded-[16px] border border-line bg-surface p-4 shadow-lg">
       <header className="mb-2 flex shrink-0 items-center justify-between">
         <span className="eyebrow">Agent panel · dev</span>
         <button

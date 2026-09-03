@@ -161,6 +161,17 @@ export function layOutGalaxy(
   // Seed the bounds with the idea and the convergence so a map with no themes
   // yet still frames on something real rather than on an inverted-infinity box.
   let minX = core.x - CORE_RADIUS;
+  // KNOWN GAP, deliberately not closed here. The core is no longer a disc: its
+  // WIDTH is still `CORE_RADIUS * 2`, so minX/maxX stay exact, but its HEIGHT
+  // now grows with the length of the idea and these vertical bounds do not know
+  // it. A long idea therefore extends a little past what "frame the whole board"
+  // fits to.
+  //
+  // This is a widening of a gap that already existed rather than a new class of
+  // problem — the attachments hung below the core have always sat outside these
+  // same bounds. Teaching the layout the core's real height is its own change
+  // with its own tests in `galaxyLayout.test.ts`, and it needs the height to
+  // come from measurement rather than from a constant duplicated here.
   let minY = core.y - CORE_RADIUS;
   // Wide enough for the insight stack that stands here. It is a 460-unit
   // column starting 40 to the LEFT of the convergence point, so the board runs

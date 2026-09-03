@@ -598,7 +598,26 @@
     ]
   },
   {
-    "description": "The idea at the centre of the board — the thing every galaxy orbits, and the only card with nothing to answer. A long idea gets smaller type rather than a bigger circle: the circle's size is what marks it as the centre, so it stays put while the text it holds does not, and growing it would move every galaxy on the board to accommodate one sentence.",
+    "description": "The marker on the core, parked at a corner. It used to orbit, on a circular path of the core's radius, which only worked while the core WAS a circle of that radius — on a card taller than it is wide the same path cuts straight through the card's own edges, so the orbit could not survive the core becoming paper. It sits on the corner the orbit used to start from, overlapping enough to read as attached but pulled back far enough to clear the card's padding and stay off the eyebrow's first word.",
+    "filePath": "app/components/CoreIdeaBadge.tsx",
+    "name": "CoreIdeaBadge",
+    "scenarios": [
+      "coreideabadge-default"
+    ]
+  },
+  {
+    "description": "What is written on the core's paper: the question, and the answer to it. The eyebrow is the label that replaced the shape — the core used to be the one ROUND object on a board of rectangles, and that is how you knew at any zoom what everything else was about; a card cannot say that with its outline, so it says it in words, quoting the first card's question back so the idea reads as an ANSWER rather than a caption. The idea itself steps down only to a readable floor and fades out at the bottom when the card's height cap actually cuts it off.",
+    "filePath": "app/components/CoreIdeaBody.tsx",
+    "name": "CoreIdeaBody",
+    "scenarios": [
+      "coreideabody-default",
+      "coreideabody-shortidea",
+      "coreideabody-longidea",
+      "coreideabody-clippedidea"
+    ]
+  },
+  {
+    "description": "The idea at the centre of the board — the thing every galaxy orbits, and the only card with nothing to answer. It is PAPER, and the only paper object on a board of white and coloured cards, which is how it reads as the centre now that it is no longer the only round one. Its WIDTH is fixed, because every horizontal relationship on the board is built from that radius; only its HEIGHT responds, growing to hold a longer idea rather than shrinking the words to fit. It carries the first card's question as its own label, and hangs the attachments off its real bottom edge instead of a constant.",
     "filePath": "app/components/CoreIdeaCard.tsx",
     "name": "CoreIdeaCard",
     "scenarios": [
@@ -751,6 +770,17 @@
       "firstcardlinkbox-default",
       "firstcardlinkbox-filled",
       "firstcardlinkbox-reading"
+    ]
+  },
+  {
+    "description": "The ask on the landing card: the question, and the space to answer it. Left-aligned, and that is the substance of this component rather than a detail of it — this was the one surface in the product whose copy was centred, and centring a field you are typing into moves the words you have already written on every keystroke. It is also the card that becomes the core, which has always been left-aligned, so making the two agree is the first card agreeing with what it turns into. The card's own centring on the black screen is untouched: that is position, not alignment.",
+    "filePath": "app/components/FirstCardPrompt.tsx",
+    "name": "FirstCardPrompt",
+    "scenarios": [
+      "firstcardprompt-default",
+      "firstcardprompt-shortidea",
+      "firstcardprompt-wrappedidea",
+      "firstcardprompt-busy"
     ]
   },
   {
@@ -1777,6 +1807,12 @@
     "testFile": "app/lib/boardCopyText.test.ts"
   },
   {
+    "description": "How large the idea is set on the core card. Encodes the rule this change INVERTED: the core used to shrink the words to protect a fixed-size circle, and past a few hundred characters it stopped even doing that and spilled the sentence onto the black board. Now the type steps down only to a readable floor and the card grows to take up the slack. Steps rather than scaling continuously, so two ideas a few characters apart never read at visibly different sizes on the same board.",
+    "filePath": "app/lib/coreIdeaType.ts",
+    "name": "coreIdeaFontSize",
+    "testFile": "app/lib/coreIdeaType.test.ts"
+  },
+  {
     "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title. The seed idea is the person's, so the root node and opening message are user-origin - an agent reading the log must not mistake the human's starting idea for something it wrote. Records the root as the map's first event, leaving it at revision 1: a new map at revision 0 with an empty log would give an agent no way to tell it from one it had already read to the end.",
     "filePath": "app/lib/mapStore.ts",
     "name": "createMap",
@@ -2255,6 +2291,12 @@
     "filePath": "app/lib/mapRounds.ts",
     "name": "isResearchRound",
     "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Whether a scrolling box is hiding text below its bottom edge AND the reader has not already scrolled to it — the decision behind the fade on the core card. Both halves matter: a fade over the last line of a sentence that already fits claims there is more when there is not, and one that stayed on at the end would dim a finished sentence. Kept as a predicate over three numbers rather than inside the hook that reads them, because jsdom has no layout engine and a DOM-driven test would assert nothing.",
+    "filePath": "app/lib/clippedText.ts",
+    "name": "isTextClipped",
+    "testFile": "app/lib/clippedText.test.ts"
   },
   {
     "description": "Guard for the three kinds a browser is allowed to write. This is a trust boundary rather than a convenience: the page posts these directly, so accepting an agent-side kind here would let a page forge the other half of the conversation.",
@@ -2947,6 +2989,12 @@
     "filePath": "app/hooks/useBoundedWait.ts",
     "name": "useBoundedWait",
     "testFile": "app/hooks/useBoundedWait.test.ts"
+  },
+  {
+    "description": "Watches a scrolling element and reports whether it is currently hiding text below its bottom edge, re-measuring on scroll, on resize, and when the content changes. All the reasoning lives in isTextClipped; this is the DOM wiring around it — the resize half matters because the same idea clips at one card width and not at another, and the board it sits on is zoomable.",
+    "filePath": "app/components/useClippedText.ts",
+    "name": "useClippedText",
+    "testFile": "app/lib/clippedText.test.ts"
   },
   {
     "description": "Closes an open overlay on the two gestures that both mean 'not this' - a pointer down outside its element, or Escape. Extracted because three surfaces had each grown their own copy of the effect: AgentStatus's presence panel, BoardMenu, and BriefMenu. Uses mousedown rather than click so a drag that starts inside the panel and ends outside it - selecting the prompt text - is not read as a dismissal. Listens only while open, so the document carries listeners just for as long as there is something to dismiss.",

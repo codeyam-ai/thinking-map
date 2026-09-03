@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardPrompt - Default",
+  "id": "514da032-a2d5-4eaf-acc6-c559f3916dcb",
+  "url": "/isolated-components/FirstCardPrompt?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardPrompt",
+  "scenarioType": "component",
+  "description": "The empty card as someone arriving meets it. The question sits at the top left and the Type here placeholder sits under it on the same left edge — the frame that shows the centring is gone."
+}

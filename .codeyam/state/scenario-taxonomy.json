@@ -242,6 +242,94 @@
         "reason": "The copied label is reachable only through a successful navigator.clipboard write, which the capture browser refuses - a registered interaction scenario captured the pre-click state and was deleted rather than shipped as a misleading duplicate of Default. The state is covered instead by app/components/AgentHandoff.render.test.tsx and the CopyablePrompt behaviour is asserted there rather than pictured."
       }
     },
+    "CoreIdeaBadge": {
+      "empty": {
+        "status": "n-a",
+        "reason": "It takes no props and renders one fixed word. There is no data that can be absent, so there is no empty state distinct from the component itself."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It renders no list and no text that can grow — the label is the literal constant Idea. Nothing about it can exceed its own fixed 88px circle."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Static markup with no data source. There is nothing to wait for."
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "Its only text is a hardcoded constant, so there is no long, missing, or unicode value it could ever receive."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "No input, no request, nothing that can fail."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "It is pointer-events-none by design — scenery, not a target. There is deliberately no action to take on it."
+      }
+    },
+    "CoreIdeaBody": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The idea is a string handed down as a prop from a server-rendered board. There is nothing for this component to fetch, so it has no pending phase to picture."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "It renders a string it is given. There is no input it can reject and no request that can fail; an absent idea renders as the empty state, which is the empty archetype rather than a failure."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
+    "FirstCardPrompt": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "The field is rows=3 and resize-none, so it does not grow; a longer value scrolls within the fixed field rather than producing a distinct overflow layout. WrappedIdea already shows the field at its full three lines, which is the most that renders."
+      },
+      "loading": {
+        "status": "covered"
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The error line lives on FirstCard, outside this component — this one renders only the question and the field, and has no failure of its own to show."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
     "Home": {
       "empty": {
         "status": "covered"

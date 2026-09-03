@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaBody - ClippedIdea",
+  "id": "001be6ef-4a31-435e-8248-b73fae3f888d",
+  "url": "/isolated-components/CoreIdeaBody?s=ClippedIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaBody",
+  "scenarioType": "component",
+  "description": "Past the height cap. The type is at its floor and cannot go lower, so the card stops growing and the text scrolls inside it — and the last lines visibly fade out, which is the only thing on screen that shows there is more. The frame that proves the cap does not silently swallow the end of a sentence."
+}

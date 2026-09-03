@@ -1,0 +1,1211 @@
+{
+  "timestamp": "2026-09-03T11:26:55Z",
+  "title": "The Idea Stays Readable, Card to Core",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe idea a person types is the one thing on this product that is entirely\ntheirs, and right now it is hard to read at both ends of its life. On the\nlanding screen the first card centres its question and centres what you type,\nso a sentence drifts sideways as you write it and reads at a size the rest of\nthe board would never use for body copy. Then you press send and that same\nsentence is crammed into a 500px white disc that shrinks the type to fit and,\npast a few hundred words, simply overflows the circle onto the black board —\nthe state in the \"not this\" screenshot below, where the idea is unreadable at\nany zoom. This plan makes the idea read at both ends: the first card\nleft-aligns and steps up in size, and the core stops being a disc that\nsqueezes text and becomes a paper card that grows to hold it, with the card's\nown question carried over as its label. A bottom-right collision between the\nagent panel and the conversation is fixed along the way.\n\nReference images, all supplied with the request:\n\n- ![The first card, left-aligned](assets/dr-design-changes--the-idea-stays-readable-card-to-core/first-card-reference.png)\n- ![The completed idea: how it should look](assets/dr-design-changes--the-idea-stays-readable-card-to-core/core-idea-wanted.png)\n- ![The completed idea: how it looks now](assets/dr-design-changes--the-idea-stays-readable-card-to-core/core-idea-current.png)\n\nThese are three changes to one object seen at two moments, plus one rider, and\nthey are deliberately in one plan at the requester's instruction rather than\nsplit the way the grouping rule would normally split them.\n\n## Key Decisions\n\n- **The first card and the core are the same object, so they get the same\n  treatment.** `QuestionCard` and today's `CoreIdeaCard` text are already\n  `text-left`; the first card is the only surface in the product that centres\n  its copy. Making it left-aligned is not a preference, it is the card\n  agreeing with what it is about to become.\n- **Contents left, card centred.** Only the `text-center` classes on the first\n  card's *contents* change. The wrapper that floats the card in the middle of\n  the black screen is untouched, and so is the vertical centring of the typing\n  area inside a deliberately empty card.\n- **The core grows instead of the type shrinking.** Today the rule is the\n  reverse and it is stated explicitly in the code: \"Long ideas get smaller type\n  rather than a bigger circle: the circle's size is what marks it as the\n  centre.\" That rule is what produces the unreadable state. The new rule is\n  that the type has a readable floor and the card grows downward to hold what\n  it must.\n- **The core's WIDTH stays at `2 × CORE_RADIUS`; only its height changes.**\n  This is what keeps the change cheap. `fanPath(CORE_SIZE.radius, …)` starts\n  every connector at the core's horizontal edge, and `layOutGalaxy` builds its\n  bounds from the same radius, so a fixed width means every horizontal\n  relationship on the board — hub distance, fan curves, frame-all's left and\n  right — is untouched.\n- **A rounded rectangle, not a disc — and the eyebrow takes over the disc's\n  job.** The circle exists so that \"the thing that is not a card is the thing\n  everything else is about\", which is a real argument and the reason to\n  replace it rather than just stretch it: the core is still the only PAPER\n  object on a board of white and coloured cards, and it now carries the\n  question \"What are you trying to figure out?\" as a label above the words,\n  which says what it is more plainly than a shape ever did.\n- **The orbiting \"Idea\" badge goes with the circle.** It travels a circular\n  path of radius `CORE_RADIUS`, which on a card taller than it is wide would\n  cut straight through the card's own edges. The reference image has no badge,\n  and the eyebrow now does the labelling. The alternative — parking the badge\n  at a corner — is worth raising at the Confirm gate if the loss of the one\n  moving thing on the board is felt.\n- **The bottom-right overlap named in the request is partly already fixed.**\n  The screenshot shows the chat composer sitting on top of the zoom stack; that\n  exact collision was resolved by `59bad53`, which moved the zoom controls to\n  the bottom-left, and the screenshot predates it. What is still in that corner\n  is the agent panel. It is included here as a small rider rather than as its\n  own plan, at the requester's instruction.\n- **Sizes below are starting points to confirm on screen, not measurements.**\n  The reference images come from a different implementation whose card\n  geometry does not match this board's, so treating their pixel sizes as\n  specifications would be false precision. Every number below is a proposal to\n  look at and adjust in the preview.\n\n## Implementation\n\n### 1. Left-align the first card's contents\n\n**File**: `app/components/FirstCard.tsx`\n\nThree `text-center` classes come off. The heading `<p>` (line 119) and the\nerror `<p>` (line 194) simply lose theirs — left is the default. The\n`<textarea>` (line 140) gets an explicit `text-left` instead, because a\ntextarea reads its alignment from inherited CSS and an explicit class is what\nkeeps the field from following whatever a future ancestor sets. The\n`placeholder:text-black/40` styling follows the same alignment automatically,\nso \"Type here…\" lands on the left too, under the question.\n\nThis is the change that matters most in use: today the sentence recentres\nitself on every keystroke, so the words you already typed move while you are\nstill typing.\n\n### 2. Make the first card's type bigger\n\n**File**: `app/components/FirstCard.tsx`\n\nThe question is `text-[19px]` and the typing area `text-[17px]` — body sizes,\non a card that holds exactly one sentence and has room to spare. Step the\nquestion up to roughly `24px` and the typing area to roughly `19px`, keeping\nthe question the heavier of the two. Check the result against the wrapped\nquestion at the card's narrow end (`max-w-[88vw]`): the heading must still fit\nin two lines at a phone width rather than three.\n\nLeave the card's own `w-[440px]` and `minHeight: 520` alone unless the larger\ntype visibly crowds them, in which case widening the card is preferable to\nwalking the type back — the ask is legibility.\n\n### 3. Explicitly out of scope on the first card\n\n**File**: `app/components/FirstCard.tsx`\n\nThe outer wrapper (line 110, `flex flex-1 flex-col items-center\njustify-center`) and the field's vertical centring (line 126, `flex flex-1\nitems-center`) both stay exactly as they are. Both are position, not\nalignment. Noted here so the change is not read as \"un-centre the card\".\n\n### 4. Turn the core from a disc into a paper card\n\n**File**: `app/components/CoreIdeaCard.tsx`\n\nThe substantive change. Today the core is a `rounded-full` white disc of fixed\n`CORE_RADIUS * 2` in both dimensions, with an 18px ring, holding a single `<p>`\nwhose font size steps down at 60 and 120 characters. Past a few hundred\ncharacters the text runs out of the circle entirely.\n\nReplace it with a rounded rectangle, still centred on the board's origin:\n\n- **Width fixed at `CORE_RADIUS * 2`**, height driven by content — see the\n  decision above for why the width must not move.\n- **Fill `--paper` (`#f1efea`), text `--ink`** — the tokens already defined in\n  `app/globals.css`. This is the product's own paper, and it makes the core the\n  only paper object on a board whose other cards are white and coloured. Drop\n  the heavy `#333336` ring, which existed to stop a white disc dissolving into\n  its own glow; a large paper rectangle on black does not need it. Keep a soft\n  shadow if the edge reads as cut out.\n- **An eyebrow above the words**: the literal question the first card asked,\n  \"What are you trying to figure out?\", in a muted grey at a small size,\n  semibold. This is the label that replaces the shape.\n- **The idea itself as body copy**: left-aligned, generous line height,\n  starting around `26px` and stepping DOWN only to a readable floor (roughly\n  `18px`) for very long ideas, with the card's height taking up the slack\n  instead. Generous padding — the reference has roughly 40px of it.\n- **A height cap** past which the card stops growing and the text scrolls or\n  clamps, so one 2000-word idea cannot become a mile of paper. Around\n  `900–1000` units is a reasonable first try; confirm against the \"not this\"\n  reference, whose idea is the real failing case.\n\n### 5. Hang the attachments and the insight off the card's real bottom\n\n**File**: `app/components/CoreIdeaCard.tsx`\n\n`CoreAttachments` is positioned at `top: CORE_RADIUS * 2 + 26` and the insight\npanel at `top: CORE_RADIUS * 2 + (mapId ? 110 : 40)` — both hardcode the disc's\n500-unit height. Once the core's height varies, those two land on top of the\ncard or float away from it depending on the length of the idea. Anchor them to\nthe card's actual bottom edge instead (a flow-positioned column under the card,\nor `top: 100%` on a wrapper that is the card's real height), keeping the same\ngaps. This is a bug that falls out of the change rather than a separate one:\nthe reference \"how it looks now\" screenshot already shows the \"BROUGHT ALONG\"\nlabel colliding with the overflowing idea text.\n\n### 6. Frame-all's vertical bounds — record, do not fix\n\n**File**: `app/lib/galaxyLayout.ts`\n\n`layOutGalaxy` builds `minY` / `maxY` from `CORE_RADIUS`, so a core taller than\n500 units extends past the bounds \"Frame the whole board\" fits to. Note that\nthis limitation already exists today — the attachments and the insight panel\nare hung below the disc and outside those same bounds — so a taller core makes\nan existing gap slightly wider rather than introducing a new class of problem.\nLeave the bounds alone in this plan and say so in the commit; teaching the\nlayout the core's real height is its own change, with its own tests in\n`app/lib/galaxyLayout.test.ts`.\n\n### 7. Get the agent panel out of the conversation's corner\n\n**File**: `app/components/AgentPanelLauncher.tsx`\n\n**File**: `app/components/AgentSimulator.tsx`\n\nThe rider. `BoardChat` sits at `absolute bottom-6 right-6 z-30` inside a board\ninset by the map screen's `py-8`, while `AgentPanelLauncher` (line 11) and the\nopen `AgentSimulator` panel (line 120) are both `fixed bottom-4 right-4 z-40`\nagainst the viewport. That leaves about 12px between the launcher pill and the\nchat above it, and when the panel is actually open its 340px-wide, up-to-70vh\nbody covers the conversation completely — the higher `z-40` guaranteeing it\nwins. Move both to a corner the conversation does not own. Bottom-left, above\nthe zoom stack, is the natural home and matches the reasoning already written\ninto `app/components/BoardZoomControls.tsx` about the two not sharing a corner.\n\nBefore building this step, look at the running board and confirm which\ncollision the requester is seeing. If it is the composer sitting on the zoom\nbuttons, that one already landed in `59bad53` and this step is a no-op worth\nreporting rather than a change worth making.\n\n## Reused existing code\n\n- `QuestionCard` from `app/components/QuestionCard.tsx` (glossary entry:\n  `QuestionCard`) — the board's existing left-aligned card, and the sibling the\n  core card should sit beside without looking like a different product.\n- `CoreAttachments` from `app/components/CoreAttachments.tsx` (glossary entry:\n  `CoreAttachments`) — repositioned, not rewritten.\n- `CORE_SIZE` and `CARD_SIZE` from `app/lib/galaxyLayout.ts` (glossary entry:\n  `layOutGalaxy`) — the radius the core's width must keep and the card size it\n  is judged against.\n- `BoardZoomControls` from `app/components/BoardZoomControls.tsx` (glossary\n  entry: `BoardZoomControls`) — the corner-ownership argument step 7 follows,\n  already written in that file's header.\n- `BoardChat` from `app/components/BoardChat.tsx` (glossary entry: `BoardChat`)\n  — the bottom-right occupant the agent panel must stop covering.\n- `FirstCardControls` from `app/components/FirstCardControls.tsx` (glossary\n  entry: `FirstCardControls`), `FirstCardAttachments` from\n  `app/components/FirstCardAttachments.tsx` (glossary entry:\n  `FirstCardAttachments`), and `FirstCardLinkBox` from\n  `app/components/FirstCardLinkBox.tsx` (glossary entry: `FirstCardLinkBox`) —\n  the rest of the first card's body. All three already lay out left-to-right\n  and need no change; listed so a reader knows they were checked.\n\n**Existing-implementation survey:** there is no alignment token, type scale, or\nshared card-layout helper to extend — alignment and font size are written as\nTailwind classes directly on each element throughout `app/components/`, and the\ncore's geometry is two hand-written constants (`CORE_RADIUS`, duplicated in\n`app/components/CoreIdeaCard.tsx` and `app/lib/galaxyLayout.ts`). Nothing\nequivalent to a \"core height\" concept exists anywhere, which is exactly why\nstep 6 records the frame-all gap instead of pretending there is a seam to use.\n\n## Reproduction Test\n\nThe bug half of this plan is the core cramming and then overflowing a long\nidea outside its own circle.\n\nNo unit-level reproduction is writable: the failure is geometric — text\nescaping a fixed-size element — and nothing about it is observable from the\nDOM that a render test reads. The honest reproduction is the scenario that\nalready exists for exactly this case, LongIdea in\n`app/isolated-components/CoreIdeaCard/page.tsx`, whose 340-character idea is\nthe state that breaks. Confirm the overflow in its captured screenshot before\nbuilding, and treat the same capture as the proof afterwards. Note that this\nscenario's own comment asserts the OLD rule (\"A long one gets smaller type\ninstead of a bigger circle\") — that comment is part of what this plan changes,\nand its wording should be updated with the behaviour it describes.\n\nStatus: NO UNIT REPRO — visual regression, demonstrated by scenario capture.\n\n## Scenarios to Demonstrate\n\n- **First card at rest** — the empty card as someone arrives: the question at\n  the top left, \"Type here…\" beneath it, both at the new size.\n  `app/isolated-components/FirstCard/page.tsx` already declares a `Default`\n  scenario, but nothing is registered under `.codeyam/scenarios/`. Capture it,\n  and it becomes this plan's before/after for the landing screen.\n- **A typed idea that wraps** — long enough to run to a second and third line,\n  so the fixed left edge and the new type size are both visible.\n- **The core with a short idea** — the existing `ShortIdea` state: a card that\n  is mostly paper, proving the shape reads as the centre even when it holds\n  almost nothing.\n- **The core with the ordinary idea** — the existing `Default` state, the\n  length people actually type.\n- **The core with a long idea** — the existing `LongIdea` state, the failing\n  case. This is the capture the whole core change is judged on.\n- **The core with attachments** — the existing `WithAttachments` state, which\n  is what proves step 5: \"Brought along\" must sit under the card's real bottom\n  edge, at a short idea and at a long one.\n- **The core with an insight** — the existing `WithInsight` state, same\n  question one row further down.\n- **The board's bottom-right corner** — the conversation and the agent\n  launcher in one frame, not overlapping.",
+  "description": "Made the idea a person types readable at both ends of its life. The first card's contents are left-aligned and stepped up in size, so a sentence no longer recentres itself on every keystroke while it is being written; and the core stops being a fixed 500px disc that shrank the type to fit and became a paper card that keeps its WIDTH (so no board geometry moves) and grows in HEIGHT to hold the whole idea, carrying the first card's question over as its label. Past a height cap the text scrolls and the last lines fade out, so a very long idea is never silently cut mid-word; the attachments now hang off the card's real bottom edge instead of the disc's hardcoded 500-unit height; and the dev agent panel moved from the conversation's corner to the bottom-left above the zoom stack, where it no longer covers the transcript.\n\nSCOPE VERDICT — this cycle DELIVERED no new project deliverable and DEFERRED none. It is a design change to surfaces belonging to deliverables already marked delivered ('enter a vague idea as free text' and 'a live visual map that grows'), so the deliverable ledger is unchanged: 9 delivered, 1 deferred, and that single deferral ('assist track, not this build flow') was decided by the user in an earlier cycle, not by the agent. No deliverable row carries an unconfirmed agent deferral.\n\nKNOWN GAPS, recorded deliberately rather than fixed. layOutGalaxy still builds its vertical bounds from CORE_RADIUS, so a tall core extends slightly past what 'frame the whole board' fits to — a pre-existing gap widened (the attachments have always sat outside those bounds), left for its own change with its own tests, and noted in a comment at the site. The plan also cited a 'WithInsight' scenario that does not exist (the insight panel was removed from this component in an earlier change), so the re-anchoring of things hung below the card was proven on the attachments alone. The plan's step 7 escape hatch did not apply: the zoom controls were already bottom-left, so the agent panel was genuinely the remaining occupant of that corner.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/dr-design-changes--the-idea-stays-readable-card-to-core/core-idea-current.png\t.codeyam/plans/completed/assets/dr-design-changes--the-idea-stays-readable-card-to-core/core-idea-current.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/dr-design-changes--the-idea-stays-readable-card-to-core/core-idea-wanted.png\t.codeyam/plans/completed/assets/dr-design-changes--the-idea-stays-readable-card-to-core/core-idea-wanted.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/dr-design-changes--the-idea-stays-readable-card-to-core/first-card-reference.png\t.codeyam/plans/completed/assets/dr-design-changes--the-idea-stays-readable-card-to-core/first-card-reference.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/dr-design-changes--the-idea-stays-readable-card-to-core.md\t.codeyam/plans/completed/dr-design-changes--the-idea-stays-readable-card-to-core.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentpanellauncher-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentpanellauncher-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentsimulator-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-nothemesyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/636b174be3df264abd2bd1653edd40000c5a9ae45b1f32ad0c203f101b4150e0.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b2a9b0ef4cb54a8b077ca3eebedf916e04c0f0996c1d18e3bfe40146bf64f482.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentPanelLauncher.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AgentSimulator.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CoreIdeaCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/CoreIdeaCard/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/galaxyLayout.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideabadge-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideabody-clippedidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideabody-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideabody-longidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideabody-shortidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideacard-overflowingidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/agentsimulator.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/coreideacard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/firstcard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardprompt-busy.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardprompt-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardprompt-shortidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardprompt-wrappedidea.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabadge-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabadge-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-clippedidea--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-clippedidea--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-longidea--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-longidea--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-shortidea--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideabody-shortidea--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-overflowingidea--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-overflowingidea--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-busy--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-busy--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-shortidea--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-shortidea--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-wrappedidea--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardprompt-wrappedidea--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-board-s-bottom-right-corner-uncovered--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-board-s-bottom-right-corner-uncovered--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/the-board-s-bottom-right-corner-uncovered.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/0044701da081f8ffa9ba18dce6be7685c197df7b2e8db97990cc370cd116efee.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/07d2f51b4df49eb59c408a3df6b45701b94a983f78dea0fb5638f13d0dfee99c.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/cc03ee413c28c29b848440ae8c4662a307351b1185ef4d040217b76bbd534454.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CoreIdeaBadge.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/CoreIdeaBody.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardPrompt.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/useClippedText.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/CoreIdeaBadge/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/CoreIdeaBody/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardPrompt/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/clippedText.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/clippedText.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/coreIdeaType.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/coreIdeaType.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The board's bottom-right corner, uncovered",
+      "screenshotPath": "the-board-s-bottom-right-corner-uncovered--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round ends itself, on a real board",
+      "screenshotPath": "the-round-ends-itself-on-a-real-board--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentPanelLauncher - Default",
+      "screenshotPath": "agentpanellauncher-default--tablet.png"
+    },
+    {
+      "name": "AgentSimulator - Default",
+      "screenshotPath": "agentsimulator-default--tablet.png"
+    },
+    {
+      "name": "AgentSimulator - Open",
+      "screenshotPath": "agentsimulator-open--tablet.png"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly",
+      "screenshotPath": "boardchat-boardvisibleonly--tablet.png"
+    },
+    {
+      "name": "BoardChat - Default",
+      "screenshotPath": "boardchat-default--tablet.png"
+    },
+    {
+      "name": "BoardChat - DeletedTheme",
+      "screenshotPath": "boardchat-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChat - Empty",
+      "screenshotPath": "boardchat-empty--tablet.png"
+    },
+    {
+      "name": "BoardChat - JustOpened",
+      "screenshotPath": "boardchat-justopened--tablet.png"
+    },
+    {
+      "name": "BoardChat - LongAnswer",
+      "screenshotPath": "boardchat-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChat - ThreeThemes",
+      "screenshotPath": "boardchat-threethemes--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Default",
+      "screenshotPath": "boardchattranscript-default--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - DeletedTheme",
+      "screenshotPath": "boardchattranscript-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - LongAnswer",
+      "screenshotPath": "boardchattranscript-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - NoThemesYet",
+      "screenshotPath": "boardchattranscript-nothemesyet--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Overflowing",
+      "screenshotPath": "boardchattranscript-overflowing--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - RoundHeldOpen",
+      "screenshotPath": "boardworkspace-roundheldopen--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "CoreIdeaBadge - Default",
+      "screenshotPath": "coreideabadge-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaBody - ClippedIdea",
+      "screenshotPath": "coreideabody-clippedidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaBody - Default",
+      "screenshotPath": "coreideabody-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaBody - LongIdea",
+      "screenshotPath": "coreideabody-longidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaBody - ShortIdea",
+      "screenshotPath": "coreideabody-shortidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne",
+      "screenshotPath": "coreideacard-dayone--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - Default",
+      "screenshotPath": "coreideacard-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea",
+      "screenshotPath": "coreideacard-longidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - OverflowingIdea",
+      "screenshotPath": "coreideacard-overflowingidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea",
+      "screenshotPath": "coreideacard-shortidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments",
+      "screenshotPath": "coreideacard-withattachments--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - Busy",
+      "screenshotPath": "firstcardprompt-busy--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - Default",
+      "screenshotPath": "firstcardprompt-default--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - ShortIdea",
+      "screenshotPath": "firstcardprompt-shortidea--tablet.png"
+    },
+    {
+      "name": "FirstCardPrompt - WrappedIdea",
+      "screenshotPath": "firstcardprompt-wrappedidea--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "InsightStack - CardOpened",
+      "screenshotPath": "insightstack-cardopened--tablet.png"
+    },
+    {
+      "name": "InsightStack - EdgeLabels",
+      "screenshotPath": "insightstack-edgelabels--tablet.png"
+    },
+    {
+      "name": "InsightStack - OneInsight",
+      "screenshotPath": "insightstack-oneinsight--tablet.png"
+    },
+    {
+      "name": "InsightStack - Overflowing",
+      "screenshotPath": "insightstack-overflowing--tablet.png"
+    },
+    {
+      "name": "InsightStack - ThreeInsights",
+      "screenshotPath": "insightstack-threeinsights--tablet.png"
+    },
+    {
+      "name": "InsightStack - Waiting",
+      "screenshotPath": "insightstack-waiting--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Answered",
+      "screenshotPath": "questioncard-answered--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Choices",
+      "screenshotPath": "questioncard-choices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Diagram",
+      "screenshotPath": "questioncard-diagram--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Focused",
+      "screenshotPath": "questioncard-focused--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Insight",
+      "screenshotPath": "questioncard-insight--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Open",
+      "screenshotPath": "questioncard-open--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Reference",
+      "screenshotPath": "questioncard-reference--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 47,
+    "passed": 47,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 47,
+        "passed": 47
+      }
+    ]
+  }
+}

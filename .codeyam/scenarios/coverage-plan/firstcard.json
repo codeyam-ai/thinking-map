@@ -1,0 +1,90 @@
+{
+  "surface": "FirstCard",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "files",
+      "value": "empty",
+      "rationale": "source-derived state files=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "files",
+      "value": "one",
+      "rationale": "source-derived state files=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "files",
+      "value": "many",
+      "rationale": "source-derived state files=many",
+      "status": "covered"
+    },
+    {
+      "dimension": "picked",
+      "value": "empty",
+      "rationale": "source-derived state picked=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "picked",
+      "value": "one",
+      "rationale": "source-derived state picked=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "picked",
+      "value": "many",
+      "rationale": "source-derived state picked=many",
+      "status": "covered"
+    },
+    {
+      "dimension": "error",
+      "value": "true",
+      "rationale": "source-derived state error=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "error",
+      "value": "false",
+      "rationale": "source-derived state error=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "linking",
+      "value": "true",
+      "rationale": "source-derived state linking=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "linking",
+      "value": "false",
+      "rationale": "source-derived state linking=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "dragging",
+      "value": "true",
+      "rationale": "source-derived state dragging=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "dragging",
+      "value": "false",
+      "rationale": "source-derived state dragging=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "brief",
+      "value": "true",
+      "rationale": "source-derived state brief=true",
+      "status": "planned"
+    },
+    {
+      "dimension": "brief",
+      "value": "false",
+      "rationale": "source-derived state brief=false",
+      "status": "covered"
+    }
+  ]
+}

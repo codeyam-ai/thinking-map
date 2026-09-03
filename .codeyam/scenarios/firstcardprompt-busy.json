@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardPrompt - Busy",
+  "id": "c11e3820-caad-481c-aed8-25f870b48443",
+  "url": "/isolated-components/FirstCardPrompt?s=Busy",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardPrompt",
+  "scenarioType": "component",
+  "description": "Mid-submit. The field locks so a second return cannot start a second board, and the text has to stay readable while disabled rather than greying out into the yellow."
+}

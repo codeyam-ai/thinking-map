@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardPrompt - ShortIdea",
+  "id": "5a053ed1-abd7-4b0f-b8b4-ee234257606d",
+  "url": "/isolated-components/FirstCardPrompt?s=ShortIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardPrompt",
+  "scenarioType": "component",
+  "description": "One line, the shortest real thing anyone types. Nothing wraps yet, so this is the frame where left and centred would look nearly alike — which is exactly why it is not the only one here."
+}

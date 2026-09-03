@@ -5,27 +5,42 @@ type Props = ComponentProps<typeof Component>;
 
 // The idea at the centre of the board — the thing every galaxy orbits.
 //
-// The circle's size is what marks it as the centre, so it stays put while the
-// text inside it shrinks to fit. That is the rule most of these scenarios are
-// here to hold: a long idea must not grow the circle.
+// The card's WIDTH is what keeps the board's geometry stable, so it never
+// moves; the HEIGHT grows with the idea. That is the rule most of these
+// scenarios are here to hold, and the reason they run from one line to past the
+// height cap: the words stay readable and the paper takes up the slack.
 
 const SHORT = "Handover between shifts at a small vet practice";
 const MEDIUM =
   "Our vets lose things between the morning and evening shift — a dog that needed re-checking, an owner who was promised a call back.";
 const LONG =
   "Our vets lose things between the morning and evening shift — a dog that needed re-checking, an owner who was promised a call back, a lab result nobody chased. Everyone blames the whiteboard but I don't think the whiteboard is the problem, and every time I try to describe what would replace it I end up describing a practice management system nobody wants.";
+// Someone who empties their head into the box in one go. Long enough that even
+// at the type floor the card hits its height cap, which is the state the cap
+// exists for and the only one that proves it holds.
+const OVERFLOWING = `${LONG} ${LONG} ${LONG} ${LONG} ${LONG} ${LONG}`;
 
 const scenarios: Record<string, Props> = {
   // The ordinary case: an idea of the length someone actually types.
   Default: { seedIdea: MEDIUM, mapId: "map-galaxy" },
 
-  // A short idea gets the largest type. The circle is the same size as every
-  // other scenario here — that is the point.
+  // A short idea gets the largest type, on a card that is mostly paper. The
+  // WIDTH is the same as every other scenario here — that is the point, and it
+  // is the only dimension that is still fixed.
   ShortIdea: { seedIdea: SHORT, mapId: "map-galaxy" },
 
-  // A long one gets smaller type instead of a bigger circle. Growing the
-  // circle would move every galaxy on the board to accommodate one sentence.
+  // A long one steps the type down to a readable floor and the CARD GROWS to
+  // hold the rest. The old rule was the reverse — shrink the words, protect the
+  // shape — and past a few hundred characters it stopped working and spilled
+  // the sentence onto the black board. The width still never moves, so no
+  // galaxy has to shift to accommodate one long idea.
   LongIdea: { seedIdea: LONG, mapId: "map-galaxy" },
+
+  // Past the height cap: the one idea long enough that the card stops growing
+  // and the words scroll inside it. Without this frame the cap is a number
+  // nobody has ever seen take effect, and the failure it prevents — a mile of
+  // paper down the middle of the board — only shows up on somebody's real idea.
+  OverflowingIdea: { seedIdea: OVERFLOWING, mapId: "map-galaxy" },
 
   // What the person brought along with the idea, listed under it. The board
   // holds the FILE now, so a picture shows as a picture — and an attachment

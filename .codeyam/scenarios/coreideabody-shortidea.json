@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaBody - ShortIdea",
+  "id": "e83b2839-63e9-435b-b773-b87c8dba7fdb",
+  "url": "/isolated-components/CoreIdeaBody?s=ShortIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaBody",
+  "scenarioType": "component",
+  "description": "One line, on a card that is mostly paper. This is the frame that shows the core still reads as the centre of the board while holding almost nothing — the job the circle used to do with its shape, now done by the surface and the label instead."
+}

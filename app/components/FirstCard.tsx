@@ -25,6 +25,7 @@ import { admitFiles } from '@/app/lib/attachments';
 import FirstCardAttachments from './FirstCardAttachments';
 import FirstCardControls from './FirstCardControls';
 import FirstCardLinkBox from './FirstCardLinkBox';
+import FirstCardPrompt from './FirstCardPrompt';
 
 export default function FirstCard() {
   const router = useRouter();
@@ -186,53 +187,13 @@ export default function FirstCard() {
           minHeight: 520,
         }}
       >
-        <p className="text-center text-[19px] font-semibold text-black">
-          What are you trying to figure out?
-        </p>
-
-        {/* The field sits in the middle of the card rather than under the
-            heading: the card is mostly empty on purpose, and the empty space is
-            what says "this is yours to fill". */}
-        <div className="flex flex-1 items-center">
-          <textarea
-            autoFocus
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                void start();
-              }
-            }}
-            // ⌘V is the whole interface for attaching a screenshot. There is
-            // deliberately no "paste an image here" box: the clipboard lands
-            // wherever focus is, and focus on this screen is this field.
-            //
-            // Only an IMAGE is intercepted, and only then is the default
-            // prevented — pasting text still types into the card exactly as it
-            // always has. Swallowing a pasted sentence to serve a pasted
-            // screenshot would break the primary use of this field for the
-            // secondary one.
-            onPaste={(e) => {
-              const images = Array.from(e.clipboardData?.items ?? [])
-                .filter(
-                  (item) =>
-                    item.kind === 'file' && item.type.startsWith('image/'),
-                )
-                .flatMap((item) => {
-                  const file = item.getAsFile();
-                  return file ? [file] : [];
-                });
-              if (images.length === 0) return;
-              e.preventDefault();
-              addFiles(images);
-            }}
-            rows={3}
-            placeholder="Type here…"
-            disabled={busy}
-            className="w-full resize-none bg-transparent text-center text-[17px] text-black outline-none placeholder:text-black/40"
-          />
-        </div>
+        <FirstCardPrompt
+          value={value}
+          busy={busy}
+          onChange={setValue}
+          onSubmit={() => void start()}
+          onPasteFiles={addFiles}
+        />
 
         {linking ? (
           <FirstCardLinkBox
@@ -279,7 +240,7 @@ export default function FirstCard() {
         />
 
         {error ? (
-          <p className="mt-3 text-center text-[12px] text-red-700">{error}</p>
+          <p className="mt-3 text-[12px] text-red-700">{error}</p>
         ) : null}
       </div>
     </div>

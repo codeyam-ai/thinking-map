@@ -1,0 +1,12 @@
+{
+  "name": "CoreIdeaBody - Default",
+  "id": "7a40b416-0582-4519-81b7-54d2e3ea5ee0",
+  "url": "/isolated-components/CoreIdeaBody?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CoreIdeaBody",
+  "scenarioType": "component",
+  "description": "The length people actually type. The question is quoted back above the words in sentence case, and the idea sits at the top of the type scale on a card that is a comfortable rectangle. The baseline the three frames beside it are read against."
+}
