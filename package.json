@@ -4,16 +4,17 @@
   "private": true,
   "scripts": {
     "postinstall": "node scripts/postinstall.mjs",
-    "setup": "npm install && npm run db:push && npm run db:seed",
-    "dev": "next dev --webpack -H 127.0.0.1",
+    "setup": "npm install && npm run db:ensure && npm run db:push && npm run db:seed",
+    "dev": "npm run db:ensure && next dev --webpack -H 127.0.0.1",
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:push": "npx prisma db push && npx prisma generate",
+    "db:ensure": "npx tsx scripts/ensureDevDatabase.ts",
+    "db:push": "npx prisma generate && npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
-    "db:reset": "npx prisma db push --force-reset && npx prisma generate && npx tsx prisma/seed.ts",
+    "db:reset": "npx prisma generate && npx prisma db push --force-reset && npx tsx prisma/seed.ts",
     "mcp": "NODE_OPTIONS=--conditions=react-server npx tsx mcp/stdio.ts"
   },
   "dependencies": {

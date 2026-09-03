@@ -50,9 +50,14 @@ well enough to find a better answer.**
 ## Setup
 
 ```bash
-npm run setup   # install dependencies, create the SQLite database
+npm run setup   # install dependencies, provision PostgreSQL, push the schema, seed
 npm run dev     # start the dev server on http://localhost:3000
 ```
+
+Nothing has to be installed or hosted first. With no `DATABASE_URL` set, `setup`
+starts a local PostgreSQL server of its own and writes the connection string to
+`.env.local` — see DATABASE.md, "The Local Development Database". Set
+`DATABASE_URL` yourself and that database is used instead, untouched.
 
 The production database starts **empty** by design — you see the day-one state and
 populate it by using the app. Each registered scenario carries its own seed data, so

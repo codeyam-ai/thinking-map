@@ -13,6 +13,9 @@ run the app itself; see "Where Credentials Go".
 ## Quick Reference
 
 ```bash
+# Everything, from a fresh clone: install, provision, push, seed
+npm run setup
+
 # Edit your schema
 vim prisma/schema.prisma
 
@@ -43,6 +46,47 @@ Every name becomes a row with no `bytes` — a legacy attachment stays exactly w
 it was, a recorded name with nothing to open, rather than being dropped. The
 script is idempotent and clears the old column as it goes, so a second run is a
 no-op. A fresh database created by `db:push` or `db:reset` needs nothing.
+
+## The Local Development Database
+
+**`npm run setup` and `npm run dev` bring their own PostgreSQL.** Both begin with
+`npm run db:ensure` (`scripts/ensureDevDatabase.ts`), which:
+
+1. does nothing at all when `DATABASE_URL` is already set to a database it did
+   not provision — a hosted project, a system Postgres, CI, a deployment;
+2. otherwise starts a PostgreSQL server under `.dev-postgres/` (gitignored)
+   using the binaries `embedded-postgres` ships, the same engine the tests use;
+3. writes the connection string to `.env.local`, and to the `env` block of
+   `.codeyam/stack.local.json` — codeyam resolves the `${DATABASE_URL}` in
+   `.codeyam/stack.json` from the process environment, its own `*.local.json`
+   files, and `.env`, but **not** from `.env.local`, so writing only the one
+   leaves scenarios failing to activate while the app works;
+4. creates codeyam's capture database (`thinking_map_codeyam_capture`) and
+   pushes the schema into it. codeyam does this itself only when `psql` is on
+   PATH, which it is not when Postgres comes from `node_modules`.
+
+It is idempotent: a cluster that exists is reused on its recorded port, and a
+server already running is left alone.
+
+To go back to a hosted database, put its URL in `.env.local` and the local
+cluster is never started again. To throw the local one away entirely, stop it
+and delete the directory:
+
+```bash
+node_modules/@embedded-postgres/*/native/bin/pg_ctl -D .dev-postgres/cluster stop
+rm -rf .dev-postgres
+```
+
+### Why setup owns this
+
+`setup` used to be `npm install && npm run db:push && npm run db:seed`, which
+assumed a database that a fresh clone does not have. `prisma db push` then
+failed on the missing URL — and because `db:push` ran `prisma generate` *after*
+the push, the client was never generated either. `next dev` still started and
+bound its port, so the app looked healthy while every request returned 500
+`Cannot find module '.prisma/client/default'`. `db:push` now generates first,
+for the same reason: a generate that does not need the database should not be
+downstream of one that does.
 
 ## Where Credentials Go
 

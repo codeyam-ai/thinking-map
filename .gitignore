@@ -42,6 +42,10 @@ next-env.d.ts
 dev.db
 dev.db-journal
 
+# The local PostgreSQL cluster `npm run db:ensure` provisions when no
+# DATABASE_URL is set. Data files and a server log — never project state.
+/.dev-postgres/
+
 # CodeYam - local dev database (stack-specific; the codeyam-internal block is
 # managed by `codeyam-editor` and supplied at scaffold time)
 .codeyam/db.sqlite3
