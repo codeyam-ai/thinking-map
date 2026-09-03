@@ -57,7 +57,7 @@ function payloadPhase(event: ExchangeEvent): string | null {
  */
 function depthOf(node: FlatNode, byId: Map<string, FlatNode>): number {
   let depth = 0;
-  let seen = new Set<string>([node.id]);
+  const seen = new Set<string>([node.id]);
   let current = node;
   while (current.parentId) {
     const parent = byId.get(current.parentId);

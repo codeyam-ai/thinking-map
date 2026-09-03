@@ -37,6 +37,7 @@ const scenarios: Record<string, Props> = {
     message:
       "Either it was never here or it has since been deleted. Whatever you were thinking about is still worth mapping.",
     action: (
+      // eslint-disable-next-line @next/next/no-html-link-for-pages -- the preview proxy rewrites `href` in the server HTML, so `next/link` would hydrate against a different href on every scenario capture
       <a
         href="/"
         suppressHydrationWarning

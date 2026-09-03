@@ -81,6 +81,7 @@ describe('ErrorScreen', () => {
       <ErrorScreen
         title="No map with that link"
         message="It may have been deleted."
+        // eslint-disable-next-line @next/next/no-html-link-for-pages -- mirrors the plain anchor the app really renders; see `not-found.tsx`
         action={<a href="/">Start a new map</a>}
       />,
     );

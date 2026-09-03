@@ -81,6 +81,7 @@ export default function BoardMenu({
           role="menu"
           className="absolute right-0 top-[calc(100%+10px)] z-50 w-[330px] overflow-hidden rounded-[16px] border border-white/12 bg-[#0b0b0c] shadow-[0_28px_80px_rgba(0,0,0,0.7)]"
         >
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- the preview proxy rewrites `href` in the server HTML, so `next/link` would hydrate against a different href on every scenario capture */}
           <a
             href="/"
             role="menuitem"

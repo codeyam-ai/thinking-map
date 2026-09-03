@@ -21,6 +21,7 @@ export default function NotFound() {
           // and `SavedMapRow`: the preview proxy serves the app under a path
           // prefix and rewrites `href` in the server HTML, so a `next/link`
           // here hydrates against a different href and warns on every capture.
+          // eslint-disable-next-line @next/next/no-html-link-for-pages -- the preview proxy rewrites `href` in the server HTML, so `next/link` would hydrate against a different href on every scenario capture
           <a
             href="/"
             suppressHydrationWarning

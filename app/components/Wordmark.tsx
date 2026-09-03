@@ -89,6 +89,7 @@ const LOCKUP_NAME = (
 
 export default function Wordmark() {
   return (
+    // eslint-disable-next-line @next/next/no-html-link-for-pages -- the preview proxy rewrites `href` in the server HTML, so `next/link` would hydrate against a different href on every scenario capture
     <a
       href="/"
       suppressHydrationWarning
