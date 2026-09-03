@@ -1,18 +1,7 @@
 {
-  "lastFinalizedAt": "2026-09-03T00:46:28Z",
-  "lastFinalizedSha": "79a1b1f07bf65f5d96e4f6f48296a3b07b452e1d",
-  "lastFullFinalizeSha": "4e17a694ec396e81c96615f941613a522b33bd8e",
-  "lastFullFinalizeTree": "798eb72491086fff7944b41fec364dd89b6cd93127995384abc1b8dd797947bc",
-  "deferred": [
-    {
-      "sha": "b29669ccf04c6c1fa84414b5b85ee19110b958ea",
-      "shortSha": "b29669c",
-      "subject": "feat: Reach the Browser Agent, and Say What It Can Do",
-      "deferredAt": "2026-09-03T00:09:26Z"
-    }
-  ],
-  "drained": {
-    "screenshots": 160,
-    "at": "2026-09-03T01:10:02Z"
-  }
+  "lastFinalizedAt": "2026-09-03T01:22:36Z",
+  "lastFinalizedSha": "663b071e1b0048d5b2e54a39682f6ed828431521",
+  "lastFullFinalizeSha": "663b071e1b0048d5b2e54a39682f6ed828431521",
+  "lastFullFinalizeTree": "2f862c692c2199dbedaaf6f60c1c36c79b90356041b3927b9656d5e4c5d2ef6a",
+  "deferred": []
 }
