@@ -15,9 +15,9 @@ import { useDismissOnOutside } from '../hooks/useDismissOnOutside';
  * The trigger says what it takes rather than showing a bare `+`. That `+` was
  * the reason drag-and-drop read as missing when it had worked all along: a
  * symbol with no noun invites nobody to drop anything on it. The label states
- * what is TRUE today — a doc or a link — and will have to change again when
- * images land, which is the correct trade against advertising a door that is
- * not built yet.
+ * what is TRUE today — docs, images or a link — which is the change the
+ * previous version of this comment said would have to happen when images
+ * landed. They have.
  *
  * Drag-and-drop is unaffected: the form itself is the drop target, and this
  * menu is the advertisement the dashed panel used to be.
@@ -26,6 +26,7 @@ export default function BriefMenu({
   busy,
   attachedName = null,
   onChooseFile,
+  onChooseImage,
   onPaste,
   onLink,
 }: {
@@ -33,6 +34,10 @@ export default function BriefMenu({
   /** The attached brief's source name, or null when nothing is attached. */
   attachedName?: string | null;
   onChooseFile: () => void;
+  /** Absent where nothing is holding attachments — the isolated-component
+   *  scenarios, for one — and the item is simply not offered there rather than
+   *  offered and inert. */
+  onChooseImage?: () => void;
   onPaste: () => void;
   onLink: () => void;
 }) {
@@ -87,7 +92,9 @@ export default function BriefMenu({
             fill="none"
           />
         </svg>
-        <span className="truncate">{attachedName ?? 'Add a doc or link'}</span>
+        <span className="truncate">
+          {attachedName ?? 'Add docs, images or a link'}
+        </span>
       </button>
 
       {open ? (
@@ -106,6 +113,20 @@ export default function BriefMenu({
           >
             Upload a file
           </button>
+          {/* Second, not first: the file item is the brief, which is what this
+              menu has always been for. An image is brought ALONG with the idea
+              rather than being the document it is about, and the ordering says
+              so without a heading. */}
+          {onChooseImage ? (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => choose(onChooseImage)}
+              className="block w-full px-4 py-2.5 text-left text-[13.5px] text-ink-soft transition hover:bg-paper hover:text-ink"
+            >
+              Add an image
+            </button>
+          ) : null}
           <button
             type="button"
             role="menuitem"

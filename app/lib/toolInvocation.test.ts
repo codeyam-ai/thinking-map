@@ -6,6 +6,7 @@ import {
   jsonSchemaFor,
   pendingQuestions,
   serializationProblem,
+  textOf,
   toolSummaries,
   validateToolInput,
 } from './toolInvocation';
@@ -24,7 +25,7 @@ describe('validateToolInput', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.response.isError).toBe(true);
-      expect(result.response.content[0].text).toContain('No tool named drop_database');
+      expect(textOf(result.response)).toContain('No tool named drop_database');
     }
   });
 
@@ -51,7 +52,7 @@ describe('validateToolInput', () => {
     const result = validateToolInput('add_nodes', { nodes: 'not-an-array' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.response.content[0].text).toContain('nodes');
+      expect(textOf(result.response)).toContain('nodes');
       expect(result.response.isError).toBe(true);
     }
   });
@@ -143,9 +144,9 @@ describe('answeredResponse', () => {
       { id: 'q-1', text: 'Do you reread your notes?', answer: 'Almost never' },
       { id: 'q-2', text: 'Alone or shared?', answer: 'Alone' },
     ]);
-    expect(response.content[0].text).toContain('Do you reread your notes?');
-    expect(response.content[0].text).toContain('Almost never');
-    expect(response.content[0].text).toContain('Alone or shared?');
+    expect(textOf(response)).toContain('Do you reread your notes?');
+    expect(textOf(response)).toContain('Almost never');
+    expect(textOf(response)).toContain('Alone or shared?');
   });
 
   // An answered call is a success, and its status is what an agent branches on.
@@ -165,6 +166,7 @@ describe('toolSummaries', () => {
       'read_map',
       'create_themes',
       'read_brief',
+      'read_attachment',
       'add_nodes',
       'update_node',
       'set_phase',
@@ -377,6 +379,6 @@ describe('errorResponse', () => {
   it('marks the response as an error carrying the message', () => {
     const response = errorResponse('something broke');
     expect(response.isError).toBe(true);
-    expect(response.content[0].text).toBe('something broke');
+    expect(textOf(response)).toBe('something broke');
   });
 });

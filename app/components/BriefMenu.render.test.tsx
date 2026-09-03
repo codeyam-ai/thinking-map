@@ -85,7 +85,7 @@ describe('BriefMenu', () => {
       />,
     );
 
-    expect(screen.getByText('Add a doc or link')).toBeTruthy();
+    expect(screen.getByText('Add docs, images or a link')).toBeTruthy();
   });
 
   // The file picker is the panel's "Choose a file" button, one level deeper.

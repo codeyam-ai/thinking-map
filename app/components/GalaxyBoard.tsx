@@ -28,6 +28,7 @@ import InsightStack from './InsightStack';
 import type { BoardInsight } from './InsightCard';
 import type { BridgeStatus } from './WebMcpBridge';
 import BoardZoomControls from './BoardZoomControls';
+import type { Attachment } from '@/app/lib/attachments';
 
 /** Below this scale the cards give way to the cluster labels alone.
  *
@@ -52,7 +53,7 @@ export default function GalaxyBoard({
 }: {
   seedIdea: string;
   mapId?: string;
-  attachments?: { name: string }[];
+  attachments?: Attachment[];
   themes: GalaxyTheme[];
   nodes: GalaxyNodeInput[];
   /** The stack at the far end, newest first, as `insightStream` returns it.

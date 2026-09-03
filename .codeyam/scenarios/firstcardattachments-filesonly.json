@@ -1,6 +1,6 @@
 {
   "name": "FirstCardAttachments - FilesOnly",
-  "id": "ed41e416-d70b-4f8d-987e-eb17be20ec25",
+  "id": "25a56a7a-e1d9-473b-9430-f45404ae153e",
   "url": "/isolated-components/FirstCardAttachments?s=FilesOnly",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "FirstCardAttachments",
   "scenarioType": "component",
-  "description": "Browsed files and no page: the pre-existing state, unchanged by the link door. It is the contrast that makes the inverted link chip mean something - these are washes of the card's own yellow, because nothing reads them yet."
+  "description": "Browsed files and no link, which is the contrast that makes the inverted brief chip mean something. Neither file here is an image, so both read as names — the state that proves a missing thumbnail is a fact about the file rather than a picture that failed to load."
 }

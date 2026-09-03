@@ -256,11 +256,30 @@ describe('attachments', () => {
     );
   }
 
-  const storedNames = async (id: string) => {
-    const map = await prisma.thinkingMap.findUnique({ where: { id } });
-    const raw = map?.attachments;
-    return raw === null || raw === undefined ? null : JSON.parse(raw);
-  };
+  /** Send one file through the upload route the way the browser does. */
+  async function postAttachment(
+    mapId: string,
+    name: string,
+    body: string,
+    type = 'text/plain',
+  ) {
+    const { POST } = await import('@/app/api/maps/[id]/attachments/route');
+    const form = new FormData();
+    form.append('file', new File([body], name, { type }));
+    return POST(
+      new Request('http://test/attachments', { method: 'POST', body: form }),
+      { params: Promise.resolve({ id: mapId }) },
+    );
+  }
+
+  const storedNames = async (id: string) =>
+    (
+      await prisma.mapAttachment.findMany({
+        where: { mapId: id },
+        orderBy: { createdAt: 'asc' },
+        select: { name: true },
+      })
+    ).map((row) => row.name);
 
   // The round trip the hand-found bug was about: what the person browsed for
   // has to still be there when the board is re-read, not just while the tab
@@ -268,88 +287,126 @@ describe('attachments', () => {
   it('keeps what was attached across a re-read', async () => {
     const id = await freshMap();
 
-    await putAttachments(id, [
-      { name: 'shift-handover-notes.pdf' },
-      { name: 'whiteboard-photo.jpg' },
-    ]);
+    await postAttachment(id, 'shift-handover-notes.txt', 'handover');
+    await postAttachment(id, 'whiteboard-photo.png', 'pixels', 'image/png');
 
     expect(await storedNames(id)).toEqual([
-      { name: 'shift-handover-notes.pdf' },
-      { name: 'whiteboard-photo.jpg' },
+      'shift-handover-notes.txt',
+      'whiteboard-photo.png',
     ]);
   });
 
-  // A whole-list PUT REPLACES. If it appended, removing an attachment would be
-  // impossible through the only endpoint there is, and every save would
-  // duplicate the list the client sent.
-  it('replaces the list rather than appending to it', async () => {
+  // The bytes are the whole point of the model: a name the partner cannot open
+  // is not a contribution to the thinking. Storing the file and then handing
+  // back a row with nothing behind it would look identical from the board.
+  it('keeps the file itself, not just the name', async () => {
     const id = await freshMap();
 
-    await putAttachments(id, [{ name: 'first.pdf' }, { name: 'second.pdf' }]);
-    await putAttachments(id, [{ name: 'only.pdf' }]);
+    await postAttachment(id, 'notes.txt', 'the actual words');
 
-    expect(await storedNames(id)).toEqual([{ name: 'only.pdf' }]);
+    const row = await prisma.mapAttachment.findFirst({ where: { mapId: id } });
+    expect(Buffer.from(row!.bytes!).toString('utf8')).toBe('the actual words');
+    expect(row?.byteSize).toBe('the actual words'.length);
   });
 
-  // Clearing has to leave NOTHING, not an empty JSON array. `[]` is truthy as a
-  // stored string, so the board would go on rendering the "brought along" strip
-  // with no items in it — a stray empty row where the attachments used to be.
-  it('clears to nothing rather than to an empty list', async () => {
+  // A whole-list PUT REPLACES. An item's absence from the list is a removal —
+  // if it appended, removing an attachment would be impossible through the only
+  // endpoint that edits the list.
+  it('removes what the list no longer names', async () => {
     const id = await freshMap();
 
-    await putAttachments(id, [{ name: 'temporary.pdf' }]);
+    await postAttachment(id, 'first.txt', 'a');
+    await postAttachment(id, 'second.txt', 'b');
+    const rows = await prisma.mapAttachment.findMany({ where: { mapId: id } });
+    const keep = rows.find((r) => r.name === 'second.txt')!;
+
+    await putAttachments(id, [{ id: keep.id, name: keep.name }]);
+
+    expect(await storedNames(id)).toEqual(['second.txt']);
+  });
+
+  // Clearing has to leave NOTHING behind — an orphaned row would go on
+  // rendering in the "brought along" strip with no file behind it.
+  it('clears to nothing when the list is empty', async () => {
+    const id = await freshMap();
+
+    await postAttachment(id, 'temporary.txt', 'x');
     await putAttachments(id, []);
 
-    const map = await prisma.thinkingMap.findUnique({ where: { id } });
-    expect(map?.attachments ?? null).toBeNull();
+    expect(await storedNames(id)).toEqual([]);
   });
 
-  // Names are the only thing stored. The board is a place to point AT things,
-  // not to hold them, and a column that quietly grew a second shape is one the
-  // rest of the app does not know how to read.
-  it('stores names and drops everything else sent with them', async () => {
+  // The list is keyed by id, so the name is the one thing on it that an edit
+  // can change. Everything else sent alongside is ignored rather than stored.
+  it('renames in place and drops everything else sent with it', async () => {
     const id = await freshMap();
 
+    await postAttachment(id, 'notes.txt', 'x');
+    const row = (await prisma.mapAttachment.findFirst({ where: { mapId: id } }))!;
+
     await putAttachments(id, [
-      { name: 'notes.pdf', size: 91_234, url: 'https://example.test/notes.pdf' },
+      { id: row.id, name: 'renamed.txt', url: 'https://example.test/notes.txt' },
     ]);
 
-    expect(await storedNames(id)).toEqual([{ name: 'notes.pdf' }]);
+    const after = await prisma.mapAttachment.findFirst({ where: { mapId: id } });
+    expect(after?.name).toBe('renamed.txt');
+    expect(after?.id).toBe(row.id);
   });
 
   // A blank name would render as an unlabelled row that cannot be identified or
-  // removed, so it is dropped the way an unlabelled theme is.
+  // removed. An item with no usable name is not a rename — it is dropped from
+  // the list, and dropping it from the list is a removal.
   it('drops an entry with no usable name', async () => {
     const id = await freshMap();
 
+    await postAttachment(id, 'real.txt', 'x');
+    const row = (await prisma.mapAttachment.findFirst({ where: { mapId: id } }))!;
+
     await putAttachments(id, [
+      { id: row.id, name: 'real.txt' },
       { name: '   ' },
       {},
-      { name: 'real.pdf' },
     ]);
 
-    expect(await storedNames(id)).toEqual([{ name: 'real.pdf' }]);
+    expect(await storedNames(id)).toEqual(['real.txt']);
+  });
+
+  // An id is a cuid, not a secret. A list carrying one from another map must be
+  // ignored rather than reach that map's rows — the scoping is the access rule.
+  it('cannot touch another map’s attachment', async () => {
+    const id = await freshMap();
+    await postAttachment(id, 'mine.txt', 'x');
+    const mine = (await prisma.mapAttachment.findFirst({ where: { mapId: id } }))!;
+
+    const other = await prisma.thinkingMap.create({
+      data: { title: 'Other', seedIdea: 'other' },
+    });
+
+    // The other map's list names MY attachment. It must not be renamed, and
+    // it must not be deleted for being absent from a list that is not its own.
+    await putAttachments(other.id, [{ id: mine.id, name: 'stolen.txt' }]);
+
+    expect(await storedNames(id)).toEqual(['mine.txt']);
   });
 
   // Attaching to a map that does not exist is a 404 rather than a silent
-  // success — `updateMany` matches zero rows without complaining, so without
-  // the count check the client would be told its files were saved.
+  // success — without the lookup the client would be told its files were saved.
   it('reports a missing map instead of silently saving nothing', async () => {
     await freshMap();
 
-    const res = await putAttachments('no-such-map', [{ name: 'a.pdf' }]);
+    const res = await putAttachments('no-such-map', []);
 
     expect(res.status).toBe(404);
   });
 
-  // Malformed input is refused rather than stored. Anything that reached the
-  // column in a shape the reader cannot parse would make the board unable to
-  // open its own attachment list.
+  // Malformed input is refused rather than acted on. A body that is not a list
+  // must not be read as "the list is empty", which would delete everything.
   it('refuses a body that is not a list of attachments', async () => {
     const id = await freshMap();
+    await postAttachment(id, 'keep.txt', 'x');
 
     expect((await putAttachments(id, 'nope')).status).toBe(400);
     expect((await putAttachments(id, { name: 'a.pdf' })).status).toBe(400);
-    expect(await storedNames(id)).toBeNull();
+    expect(await storedNames(id)).toEqual(['keep.txt']);
   });
 });

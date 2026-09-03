@@ -1,0 +1,12 @@
+{
+  "name": "AttachmentStrip - DocumentsOnly",
+  "id": "76e2c74d-3bb0-4d09-9d44-98a814d67a18",
+  "url": "/isolated-components/AttachmentStrip?s=DocumentsOnly",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachmentStrip",
+  "scenarioType": "component",
+  "description": "No pictures at all: two documents, each identified by its extension disc. This is what the strip looked like before images, and it still has to read as a list of things rather than as thumbnails that failed to load."
+}

@@ -29,6 +29,8 @@ export default function IdeaForm({
   onLink,
   onDropFile,
   onDropLink,
+  onImages,
+  onChooseAttachment,
 }: {
   value: string;
   busy: boolean;
@@ -43,6 +45,12 @@ export default function IdeaForm({
   /** A link dragged out of another tab. Separate from `onDropFile` because it
    *  arrives as an address rather than bytes, and is fetched rather than read. */
   onDropLink: (url: string) => void;
+  /** Images that arrived by paste or drop. Plural because a drop can carry
+   *  several at once and refusing all but the first would be a silent loss. */
+  onImages?: (files: File[]) => void;
+  /** Pick images to attach; anything else is a brief. Optional so the form
+   *  still renders in isolation, where no parent is holding attachments. */
+  onChooseAttachment?: () => void;
 }) {
   const [dragging, setDragging] = useState(false);
 
@@ -62,9 +70,21 @@ export default function IdeaForm({
       onDrop={(e) => {
         e.preventDefault();
         setDragging(false);
-        const file = e.dataTransfer.files?.[0];
-        if (file) {
-          onDropFile(file);
+        const files = Array.from(e.dataTransfer.files ?? []);
+        if (files.length) {
+          // Images and documents part ways here. A dropped image is something
+          // brought ALONG with the idea and joins the strip; a dropped document
+          // is what the idea is ABOUT and becomes the brief, exactly as it did
+          // before. The split is by media type rather than by which door the
+          // file came through, because a person dropping a screenshot and a
+          // scope doc together means both, and taking only the first would lose
+          // one of them silently.
+          const images = files.filter((f) => f.type.startsWith('image/'));
+          const documents = files.filter((f) => !f.type.startsWith('image/'));
+          if (images.length) onImages?.(images);
+          // Still one brief. It is write-once per map by design, so the second
+          // document in a drop has nowhere to go.
+          if (documents.length) onDropFile(documents[0]);
           return;
         }
         // Dragging a tab, a bookmark or a link out of another window yields no
@@ -96,6 +116,28 @@ export default function IdeaForm({
         id="idea"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        // The clipboard gesture lands wherever focus is, and on this screen
+        // focus is the input — so the handler sits on the input rather than
+        // behind a control of its own. There is deliberately no "paste an
+        // image here" box: ⌘V is the whole interface, and a box advertising it
+        // would be a second place to do the thing you just did.
+        //
+        // It inspects the items for an image and ignores everything else, so
+        // pasting TEXT still types into the field exactly as it always has.
+        // Only an image calls preventDefault, and only then, because a paste
+        // that swallowed a pasted sentence would break the primary use of this
+        // input to serve the secondary one.
+        onPaste={(e) => {
+          const images = Array.from(e.clipboardData?.items ?? [])
+            .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
+            .flatMap((item) => {
+              const file = item.getAsFile();
+              return file ? [file] : [];
+            });
+          if (images.length === 0) return;
+          e.preventDefault();
+          onImages?.(images);
+        }}
         disabled={busy}
         placeholder={
           hasBrief
@@ -114,6 +156,7 @@ export default function IdeaForm({
         busy={busy}
         attachedName={attachedName}
         onChooseFile={onChooseFile}
+        onChooseImage={onChooseAttachment}
         onPaste={onPaste}
         onLink={onLink}
       />

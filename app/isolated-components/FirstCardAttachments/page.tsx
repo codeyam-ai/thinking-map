@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Component from '../../components/FirstCardAttachments';
 import type { FetchedBrief } from '../../lib/briefFetch';
+import { pastedScreenshot } from '../fixtures';
 
 // A client component, not a server one: the props below are event handlers, and
 // a server component cannot pass a function across the boundary.
@@ -27,6 +28,19 @@ function Harness() {
     // A page attached and nothing else — the ordinary result of the link door,
     // and the state that shows the name truncating rather than growing.
     LinkAttached: { brief: PAGE_BRIEF, files: [] },
+    // The headline state this whole change exists for: a screenshot pasted onto
+    // the first card, showing as a picture BEFORE the board is created. A
+    // pasted image has no useful filename — the clipboard supplies
+    // "Screenshot <date>.png" — so the thumbnail is the only thing that says
+    // what was attached, and the only way to catch a mis-paste.
+    PastedScreenshot: { brief: null, files: [pastedScreenshot()] },
+    // A screenshot alongside a document, which is the realistic arrival: the
+    // spec AND the picture of the thing being replaced. The two chips have to
+    // stay tellable apart at a glance.
+    ScreenshotAndDoc: {
+      brief: null,
+      files: [pastedScreenshot(), new File(['notes'], 'board-notes.txt')],
+    },
     // A short source name, which is what an untitled page or a bare domain
     // gives you. Truncation is for names that need it, not a house style.
     ShortName: {

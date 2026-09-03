@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachments - ScreenshotAndDoc",
+  "id": "f8aefc73-f9a0-4641-898e-d9ad0fd3ef10",
+  "url": "/isolated-components/FirstCardAttachments?s=ScreenshotAndDoc",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "description": "A screenshot alongside a document, which is the realistic arrival: the spec AND the picture of the thing being replaced. The two chips have to stay tellable apart at a glance, which is what the thumbnail buys over a second row of identical text."
+}

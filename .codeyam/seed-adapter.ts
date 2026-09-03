@@ -175,6 +175,39 @@ function ownsForeignKey(model: PrismaModel, field: PrismaField): boolean {
  * SQLite's `PRAGMA foreign_key_list` instead would work but would
  * lose the model-name → table-name mapping the seed uses.
  */
+/**
+ * Turn a base64 string into the bytes a `Bytes` column expects.
+ *
+ * JSON has no binary literal, so a seed file carrying a real image can only
+ * carry it as base64 — and Prisma wants a Uint8Array, which it would otherwise
+ * reject as a string. Scoped by the schema's own `Bytes` fields rather than by
+ * guessing at a field name, so a base64-looking String column is untouched.
+ *
+ * Added for MapAttachment, whose whole point is holding a picture a person
+ * attached; a seed that could not carry one could not demonstrate the feature.
+ */
+export function decodeBytesFields(
+  table: string,
+  rows: Record<string, unknown>[],
+  models: PrismaModel[],
+): Record<string, unknown>[] {
+  const model = models.find((m) => lowerFirst(m.name) === table);
+  const byteFields = (model?.fields ?? [])
+    .filter((f) => String(f.type) === 'Bytes')
+    .map((f) => f.name);
+  if (byteFields.length === 0) return rows;
+
+  return rows.map((row) => {
+    const next = { ...row };
+    for (const field of byteFields) {
+      if (typeof next[field] === 'string') {
+        next[field] = Buffer.from(next[field] as string, 'base64');
+      }
+    }
+    return next;
+  });
+}
+
 export function getPrismaFkEdges(
   models: PrismaModel[],
 ): Array<{ child: string; parent: string }> {
@@ -398,7 +431,9 @@ export async function main() {
         const rows = seed[table];
         if (!Array.isArray(rows) || rows.length === 0) continue;
         try {
-          await tx[table].createMany({ data: rows });
+          await tx[table].createMany({
+            data: decodeBytesFields(table, rows, models),
+          });
           actualRows += rows.length;
           console.error(
             `[codeyam-seed] inserted ${rows.length} rows into ${table}`,

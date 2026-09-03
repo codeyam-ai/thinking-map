@@ -37,12 +37,14 @@ model ThinkingMap {
   /// Which stage of the loop this map has reached:
   /// idea | deconstruct | map | research | explore | next-steps
   phase    String @default("idea")
-  /// What the person attached alongside the idea, as JSON: [{ name }].
-  /// Names, not bytes. The board's job is to record that a scope doc or a
-  /// screenshot is part of this thinking — storing the file itself is a
-  /// different product with a different set of problems (size, privacy,
-  /// expiry), and none of them are the one being solved here.
-  attachments String?
+  /// LEGACY. What the person attached, as JSON: [{ name }] — names and nothing
+  /// else. Superseded by the `attachments` relation below, which holds the file
+  /// itself, and read only by the one-off backfill in `prisma/backfill-attachments.ts`.
+  /// Kept for exactly as long as it takes an existing database to run that
+  /// backfill; nothing in the app reads it. `@map` holds the underlying column
+  /// name still — the rename is in Prisma only, so no existing row moves and
+  /// the backfill has something to read.
+  attachmentsJson String? @map("attachments")
   /// Monotonic change counter, bumped once per committed change in the same
   /// transaction as the write. This is the cursor an agent reads with, and the
   /// only shared notion of "now" across all three front doors. It is a column
@@ -59,6 +61,65 @@ model ThinkingMap {
   themes   Theme[]
   events   MapEvent[]
   brief    MapBrief?
+
+  attachments MapAttachment[]
+}
+
+// ──────────────────────────────────────────────
+// What the person brought along
+//
+// A whiteboard photo, a screenshot of the flow being replaced, a diagram
+// somebody sketched. These are briefs too — and until this model existed the
+// board could only record that one HAD been attached. A filename an agent
+// cannot open is not a contribution to the thinking.
+//
+// This reverses the position the `attachments` column above used to state in as
+// many words: names, not bytes, because storing the file was "a different
+// product with a different set of problems (size, privacy, expiry)". Those
+// three problems are real, and each is answered here rather than waived:
+//
+//   size    — hard server-side caps, enforced in the upload route: 5MB per
+//             attachment, 4 per map, 10MB per map in total. A cap only the
+//             client enforces is not a cap.
+//   privacy — the bytes live in this same SQLite file as everything else, so
+//             one dev.db is still the whole state, backup and teardown story.
+//             Nothing is written to a directory nobody is serving.
+//   expiry  — the cascade below. Deleting a map really deletes what came with
+//             it, with no orphaned file left behind to expire.
+//
+// What changed to make the reversal worth it: an agent with vision can read a
+// diagram. `read_attachment` is the point of the whole model.
+//
+// Its own model rather than a wider JSON column because base64 image data does
+// not belong in a column whose contract (see `app/lib/attachments.ts`) is that
+// a board must still open when the column is garbage — and because a
+// per-attachment id is what both the byte-serving route and `read_attachment`
+// address a single file by.
+// ──────────────────────────────────────────────
+
+model MapAttachment {
+  id    String      @id @default(cuid())
+  mapId String
+  map   ThinkingMap @relation(fields: [mapId], references: [id], onDelete: Cascade)
+
+  /// The filename as it arrived. This is what the board shows and what the
+  /// agent is told it is looking at.
+  name      String
+  /// What kind of file it is, so a reader can decide whether it can be looked
+  /// at without sniffing the bytes.
+  mediaType String
+  /// The file itself. NULLABLE, and permanently so: every attachment recorded
+  /// before this model existed migrates as a row with no bytes rather than
+  /// being dropped. Such a row renders on the board exactly as it always did
+  /// and simply has nothing to look at — which `read_attachment` says plainly.
+  bytes     Bytes?
+  /// Denormalised length, so the per-map total can be summed and the strip can
+  /// state a size without the bytes being read. Zero for a legacy row.
+  byteSize  Int         @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([mapId])
 }
 
 // ──────────────────────────────────────────────

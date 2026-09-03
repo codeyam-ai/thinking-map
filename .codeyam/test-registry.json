@@ -1562,7 +1562,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › accepts the sources an insight cites and passes them through",
-      "line": 116,
+      "line": 119,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -1571,7 +1571,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › accepts the two kinds an insight is usually written as",
-      "line": 132,
+      "line": 135,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -1580,7 +1580,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › leaves the field off entirely when the agent cites nothing",
-      "line": 125,
+      "line": 128,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -1589,8 +1589,53 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › states the target, what a themeless node means, and how to cite",
-      "line": 140,
+      "line": 143,
       "registeredAt": "2026-09-02T22:52:12Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The common case, and the one that proves this is a filter rather than a gate: a file that fits arrives with no message attached to it.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "admitFiles › admits files that fit",
+      "line": 249,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Already at the cap. There is no room to partially fill, so the answer is nothing plus a sentence — never a silent no-op, which would look to the person like the paste simply failed.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "admitFiles › admits nothing once the map is already full",
+      "line": 290,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Browsing twice for the same file is an ordinary slip, and listing it twice would leave two chips that both claim to be the same thing.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "admitFiles › ignores a file already in hand",
+      "line": 257,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An oversize file is dropped but its companions still land — refusing the whole batch over one member would lose files the person can keep.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "admitFiles › keeps the rest of a batch when one file is too big",
+      "line": 264,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "At the cap, the ones that fit are kept and the person is told what happened rather than silently losing the overflow.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "admitFiles › takes only what there is room for, and says so",
+      "line": 275,
+      "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
     {
@@ -1751,7 +1796,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "answeredResponse › marks the result answered and is not an error",
-      "line": 152,
+      "line": 153,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -1760,7 +1805,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "answeredResponse › reports each question with the answer it received",
-      "line": 141,
+      "line": 142,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -2080,12 +2125,84 @@
       "runner": "tests"
     },
     {
-      "description": "Clearing has to leave NOTHING, not an empty JSON array. `[]` is truthy as a stored string, so the board would go on rendering the \"brought along\" strip with no items in it — a stray empty row where the attachments used to be.",
+      "description": "An unknown id — including one belonging to a different board, which is deliberately indistinguishable — is answered with the way to find a real one, so the agent's next move is obvious rather than a retry.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentNotFound › names the tool that lists the real ids",
+      "line": 118,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A text document is text. No image block, because there is no picture — returning an empty one would make every caller check for a block that is never populated.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentToolResult › hands a text document back as its text",
+      "line": 51,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The headline. An image has to arrive as an image block carrying its media type and base64 that round-trips — a caption alone would be the exact failure this feature exists to fix.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentToolResult › hands an image back as a picture the agent can look at",
+      "line": 18,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The picture still needs saying what it is. An image block with no caption is a thing with no provenance — the agent should know what it is looking at before it looks at it.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentToolResult › names the picture in text alongside it",
+      "line": 36,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every branch is an ordinary answer, never a fault. An `isError` result invites the blind retry that a permanent condition can never satisfy — which is exactly what a legacy row and a PDF both are.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentToolResult › never reports any of these as a fault",
+      "line": 101,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A PDF is the one accepted type that is neither picture nor text. Rather than hand over bytes that read as noise, it names the door that DOES read documents properly — otherwise this tool quietly becomes a second, worse brief pipeline.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentToolResult › points a PDF at read_brief instead of dumping its bytes",
+      "line": 85,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The legacy row: a name recorded before the board could hold files. It must say the file was never stored AND tell the agent to ask rather than infer, because guessing at a whiteboard photo from its filename is worse than admitting there is nothing there.",
+      "file": "app/lib/attachmentTool.test.ts",
+      "format": "vitest",
+      "key": "attachmentToolResult › says plainly when there is nothing behind the name",
+      "line": 67,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An id is a cuid, not a secret. A list carrying one from another map must be ignored rather than reach that map's rows — the scoping is the access rule.",
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
-      "key": "attachments › clears to nothing rather than to an empty list",
-      "line": 297,
-      "registeredAt": "2026-09-02T17:40:53Z",
+      "key": "attachments › cannot touch another map’s attachment",
+      "line": 376,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Clearing has to leave NOTHING behind — an orphaned row would go on rendering in the \"brought along\" strip with no file behind it.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › clears to nothing when the list is empty",
+      "line": 330,
+      "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
     {
@@ -2093,8 +2210,17 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › drops an entry with no usable name",
-      "line": 322,
+      "line": 359,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bytes are the whole point of the model: a name the partner cannot open is not a contribution to the thinking. Storing the file and then handing back a row with nothing behind it would look identical from the board.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › keeps the file itself, not just the name",
+      "line": 302,
+      "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
     {
@@ -2102,7 +2228,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › keeps what was attached across a re-read",
-      "line": 268,
+      "line": 287,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2111,17 +2237,26 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › refuses a body that is not a list of attachments",
-      "line": 348,
+      "line": 404,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
     {
-      "description": "A whole-list PUT REPLACES. If it appended, removing an attachment would be impossible through the only endpoint there is, and every save would duplicate the list the client sent.",
+      "description": "A whole-list PUT REPLACES. An item's absence from the list is a removal — if it appended, removing an attachment would be impossible through the only endpoint that edits the list.",
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
-      "key": "attachments › replaces the list rather than appending to it",
-      "line": 285,
-      "registeredAt": "2026-09-02T17:40:53Z",
+      "key": "attachments › removes what the list no longer names",
+      "line": 315,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The list is keyed by id, so the name is the one thing on it that an edit can change. Everything else sent alongside is ignored rather than stored.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "attachments › renames in place and drops everything else sent with it",
+      "line": 341,
+      "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
     {
@@ -2129,16 +2264,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › reports a missing map instead of silently saving nothing",
-      "line": 337,
-      "registeredAt": "2026-09-02T17:40:53Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Names are the only thing stored. The board is a place to point AT things, not to hold them, and a column that quietly grew a second shape is one the rest of the app does not know how to read.",
-      "file": "app/lib/contributions.integration.test.ts",
-      "format": "vitest",
-      "key": "attachments › stores names and drops everything else sent with them",
-      "line": 310,
+      "line": 394,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2408,7 +2534,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › attaches annotations only to the tools that declare them",
-      "line": 250,
+      "line": 252,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2417,7 +2543,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › binds each descriptor to its own tool name",
-      "line": 258,
+      "line": 260,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2426,7 +2552,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › carries each tool’s description and schema through",
-      "line": 195,
+      "line": 197,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2435,7 +2561,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › describes every catalog tool",
-      "line": 187,
+      "line": 189,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2444,7 +2570,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › describes every tool with a schema that survives a structured clone",
-      "line": 209,
+      "line": 211,
       "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
@@ -2453,7 +2579,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › gives read_map a JSON Schema an agent can fill in",
-      "line": 218,
+      "line": 220,
       "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
@@ -2462,7 +2588,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › names the offending field when a schema cannot be cloned",
-      "line": 240,
+      "line": 242,
       "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
@@ -2471,7 +2597,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › reports no serialization problem for any catalog tool",
-      "line": 230,
+      "line": 232,
       "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
@@ -3443,7 +3569,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "errorResponse › marks the response as an error carrying the message",
-      "line": 377,
+      "line": 379,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -3826,6 +3952,114 @@
       "runner": "tests"
     },
     {
+      "description": "The boundary. A cap stated as \"up to 5MB\" has to actually admit 5MB — an off-by-one here refuses the exact file the message promises to accept.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › admits a file exactly at the per-attachment cap",
+      "line": 187,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The boundary of the total cap: landing exactly on it is within it.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › admits a file that lands exactly on the total cap",
+      "line": 228,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The path almost every upload takes. It is worth pinning because the three caps below are all refusals, and a rule set that only ever says no would pass its own tests while blocking the feature entirely.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › admits an ordinary image onto an empty map",
+      "line": 150,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The per-file cap. The sentence has to offer a way forward — a smaller version, or a crop — because \"too big\" alone leaves the person stuck.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › refuses a file over the per-attachment cap",
+      "line": 173,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The total cap catches what the per-file cap cannot: four files each under 5MB can still add up past what one map should hold.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › refuses a file that would put the map over the total cap",
+      "line": 214,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A type nothing downstream can open is refused at the door rather than stored and discovered later by a tool that cannot read it.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › refuses a type nothing can open, and names the type",
+      "line": 158,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The count cap. It names the way out — remove one — rather than only the limit, because the limit alone is not an action.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "fitsAttachmentCaps › refuses one past the count cap",
+      "line": 199,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The id is the whole point of the line: without it the agent can see that a picture exists and has no way to open it — a dead end.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatAttachmentLines › names the tool and the id that opens each attachment",
+      "line": 273,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Most maps have nothing attached. A bare \"Brought along\" heading over an empty list would read as something that failed to load, so there is no section at all rather than an empty one.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatAttachmentLines › renders no section at all when nothing is attached",
+      "line": 267,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Saying WHICH kind it is lets the agent decide whether the call is worth making before it spends the context on one.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatAttachmentLines › says what kind of thing each attachment is",
+      "line": 282,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The load-bearing claim: this is metadata. If a size can be stated without the bytes, the bytes were never fetched — which is what keeps read_map cheap however large the attachments are.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatAttachmentLines › states a size without carrying any file content",
+      "line": 311,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A legacy row has nothing to open, so it must NOT offer an id — sending the agent to read_attachment only to be told there is nothing there spends a call to learn what this line already knew.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatAttachmentLines › withholds the id from a row with no file behind it",
+      "line": 300,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
       "description": "An empty section is a real state — a heading with nothing under it.",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
@@ -3857,7 +4091,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatInsightStanding › names how many answers have landed since the newest insight",
-      "line": 206,
+      "line": 207,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -3866,7 +4100,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatInsightStanding › reads as an invitation rather than a shortfall when there are none",
-      "line": 221,
+      "line": 222,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -3875,7 +4109,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatInsightStanding › states the budget as figures the agent can measure itself against",
-      "line": 194,
+      "line": 195,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -3884,7 +4118,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › includes the title, phase and verbatim seed idea",
-      "line": 74,
+      "line": 75,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3893,7 +4127,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › marks an empty conversation explicitly",
-      "line": 92,
+      "line": 93,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3902,7 +4136,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › renders a map with no nodes",
-      "line": 98,
+      "line": 99,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3911,7 +4145,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › renders the conversation and the node tree under their own headings",
-      "line": 82,
+      "line": 83,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3920,7 +4154,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › leads each row with the id in brackets",
-      "line": 32,
+      "line": 33,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3929,7 +4163,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › puts each map on its own line",
-      "line": 45,
+      "line": 46,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3938,7 +4172,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › reports the phase and the node and message counts",
-      "line": 37,
+      "line": 38,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3947,7 +4181,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › says so plainly when there are no maps",
-      "line": 27,
+      "line": 28,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -3956,7 +4190,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › hands back the cursor to resume from",
-      "line": 163,
+      "line": 164,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3965,7 +4199,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › keeps the count singular for a single map",
-      "line": 157,
+      "line": 158,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3974,7 +4208,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › leads each row with the map id",
-      "line": 119,
+      "line": 120,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3983,7 +4217,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › renders every map when several arrive at once",
-      "line": 145,
+      "line": 146,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -3992,7 +4226,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › reports an empty result as normal rather than as a failure",
-      "line": 169,
+      "line": 170,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4001,7 +4235,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › says so explicitly when a map has no seed idea",
-      "line": 139,
+      "line": 140,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4010,7 +4244,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › spells out read_brief as the next call for a brief-started map",
-      "line": 131,
+      "line": 132,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4019,8 +4253,44 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › spells out read_map as the next call for a sentence-started map",
-      "line": 124,
+      "line": 125,
       "registeredAt": "2026-09-01T17:36:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A handful of bytes is still something rather than nothing: \"0KB\" beside a file that plainly exists reads as a bug.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "formatSize › never rounds a real file down to zero",
+      "line": 317,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The size an actual screenshot tends to be. Megabytes with a decimal would render most real attachments as \"0.0MB\", which says nothing.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "formatSize › reads kilobytes below a megabyte",
+      "line": 311,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The unit the caps are stated in, so the refusal sentence and the chip beside it agree about what \"5MB\" looks like.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "formatSize › reads megabytes for a file measured in them",
+      "line": 305,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing at all is the legacy row, which should say nothing rather than claim a size it does not have.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "formatSize › says nothing for a row with no file behind it",
+      "line": 323,
+      "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
     {
@@ -4028,7 +4298,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › carries the resolved ids on the node.added event as an array",
-      "line": 138,
+      "line": 139,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4037,7 +4307,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › leaves the column null when the agent named no sources",
-      "line": 104,
+      "line": 105,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4046,7 +4316,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › turns refs from the same call into the ids the database just minted",
-      "line": 85,
+      "line": 86,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4055,7 +4325,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › writes an unresolvable ref through, and the read side drops it",
-      "line": 118,
+      "line": 119,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4973,7 +5243,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "jsonSchemaFor › describes the input side, so defaulted fields stay optional",
-      "line": 296,
+      "line": 298,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -4982,7 +5252,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "jsonSchemaFor › gives different tools their own schemas",
-      "line": 312,
+      "line": 314,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -4991,7 +5261,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "jsonSchemaFor › produces a plain object schema for every catalog tool",
-      "line": 277,
+      "line": 279,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -5000,7 +5270,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "jsonSchemaFor › produces a schema that survives a structured clone",
-      "line": 287,
+      "line": 289,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -5009,7 +5279,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "jsonSchemaFor › returns the same object on a second call for one tool",
-      "line": 304,
+      "line": 306,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -5675,7 +5945,7 @@
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
       "key": "parseAttachments › drops entries with no usable name",
-      "line": 60,
+      "line": 70,
       "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
       "runner": "tests"
     },
@@ -5684,7 +5954,7 @@
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
       "key": "parseAttachments › keeps the name and drops everything else on the row",
-      "line": 52,
+      "line": 62,
       "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
       "runner": "tests"
     },
@@ -5693,7 +5963,7 @@
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
       "key": "parseAttachments › reads no attachments as an empty list",
-      "line": 27,
+      "line": 37,
       "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
       "runner": "tests"
     },
@@ -5702,7 +5972,7 @@
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
       "key": "parseAttachments › reads the names the endpoint stored",
-      "line": 14,
+      "line": 24,
       "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
       "runner": "tests"
     },
@@ -5711,7 +5981,7 @@
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
       "key": "parseAttachments › survives a column it cannot parse",
-      "line": 36,
+      "line": 46,
       "registeredAt": "2026-09-02T18:34:00.312564612+00:00",
       "runner": "tests"
     },
@@ -5999,7 +6269,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › asks nothing when the call failed",
-      "line": 98,
+      "line": 99,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -6008,7 +6278,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › asks nothing when the result carries no questions",
-      "line": 110,
+      "line": 111,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -6017,7 +6287,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › drops entries that are not a well-formed question",
-      "line": 121,
+      "line": 122,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -6026,7 +6296,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › reads the questions out of a pending ask_user result",
-      "line": 85,
+      "line": 86,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -6589,6 +6859,42 @@
       "runner": "tests"
     },
     {
+      "description": "The ordinary case. Every field here is one the board actually consults: the id addresses the byte route, the media type and hasBytes decide between a thumbnail and a paperclip, the size labels the chip.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "readAttachments › carries through what the board needs to render a row",
+      "line": 93,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A row with no usable name could not be identified or removed, so it is dropped rather than rendered blank.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "readAttachments › drops a row with no usable name",
+      "line": 118,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unknown media type is named rather than left undefined, so a caller deciding whether to show a thumbnail never has to handle a missing field.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "readAttachments › falls back to a generic media type",
+      "line": 124,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A legacy row: recorded when the board stored names and nothing else. It must render as an ordinary attachment, distinguishable only by having no file behind it — that is a fact about its age, not a failure.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "readAttachments › keeps a row that has no file behind it",
+      "line": 108,
+      "registeredAt": "2026-09-03T00:22:33Z",
+      "runner": "tests"
+    },
+    {
       "description": "A warning is the whole reason a scanned PDF does not silently become an empty brief, so it has to survive the trip.",
       "file": "app/lib/briefFetch.test.ts",
       "format": "vitest",
@@ -6782,7 +7088,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "read_map carries the standing ask › reads as an invitation on a map with no insights yet",
-      "line": 209,
+      "line": 214,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -6791,7 +7097,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "read_map carries the standing ask › reports the budget on a full read",
-      "line": 177,
+      "line": 182,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -6800,7 +7106,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "read_map carries the standing ask › reports the same budget on a delta read",
-      "line": 194,
+      "line": 199,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7448,7 +7754,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "serializationProblem › reports a missing description, which clones fine but is useless",
-      "line": 347,
+      "line": 349,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -7457,7 +7763,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "serializationProblem › reports an input schema that is not an object at all",
-      "line": 363,
+      "line": 365,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -7466,7 +7772,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "serializationProblem › reports an input schema that is not an object schema",
-      "line": 355,
+      "line": 357,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -7475,7 +7781,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "serializationProblem › reports null for a well-formed descriptor",
-      "line": 330,
+      "line": 332,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -7484,8 +7790,44 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "serializationProblem › reports the clone failure when the schema carries a function",
-      "line": 336,
+      "line": 338,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The boundary: exactly at the limit still fits, so it must not be cut.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "shortenName › does not truncate a name exactly at the limit",
+      "line": 350,
+      "registeredAt": "2026-09-03T01:02:45.036906593+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A name that fits is returned untouched. Truncation is for names that need it, not a house style applied to every chip.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "shortenName › leaves a name that fits alone",
+      "line": 335,
+      "registeredAt": "2026-09-03T01:02:45.036906593+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The budget INCLUDES the ellipsis — a chip sized for 24 characters that renders 25 is the bug this arithmetic exists to avoid. It cuts to two under the limit and spends one of those on the ellipsis, so the result lands just inside rather than exactly on it.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "shortenName › never returns more characters than the limit",
+      "line": 343,
+      "registeredAt": "2026-09-03T01:02:45.036906593+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "One past it is the first name that gets cut.",
+      "file": "app/lib/attachments.test.ts",
+      "format": "vitest",
+      "key": "shortenName › truncates the first name past the limit",
+      "line": 356,
+      "registeredAt": "2026-09-03T01:02:45.036906593+00:00",
       "runner": "tests"
     },
     {
@@ -7736,7 +8078,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "standingAskSentence › asks for provenance and for something small enough to run",
-      "line": 241,
+      "line": 242,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7745,7 +8087,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "standingAskSentence › names every kind the stream actually counts",
-      "line": 233,
+      "line": 234,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7862,7 +8204,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › finds a tool by name and reports nothing for an unknown one",
-      "line": 53,
+      "line": 56,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7871,7 +8213,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › gives every tool a title and a description",
-      "line": 60,
+      "line": 63,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7880,7 +8222,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › leaves the whole-collection tools out of the shared set",
-      "line": 35,
+      "line": 38,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7889,7 +8231,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "the shared tool catalog › marks the three read-only tools as read-only",
-      "line": 44,
+      "line": 47,
       "registeredAt": "2026-09-01T14:26:57Z",
       "runner": "tests"
     },
@@ -7961,7 +8303,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › caps a timeout longer than the ceiling",
-      "line": 81,
+      "line": 84,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7970,7 +8312,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › falls back to the default when the agent names no timeout",
-      "line": 71,
+      "line": 74,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7979,7 +8321,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › floors a zero or negative timeout at one second",
-      "line": 86,
+      "line": 89,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7988,7 +8330,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
-      "line": 76,
+      "line": 79,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7997,7 +8339,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "toolSummaries › summarises every catalog tool with a name, title and description",
-      "line": 162,
+      "line": 163,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8564,7 +8906,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › accepts a missing payload for a tool that needs no arguments",
-      "line": 44,
+      "line": 45,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8573,7 +8915,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › accepts input that fits the tool and hands back the parsed value",
-      "line": 33,
+      "line": 34,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8582,7 +8924,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › names the field that did not fit",
-      "line": 50,
+      "line": 51,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8591,7 +8933,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a call missing a required field",
-      "line": 60,
+      "line": 61,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8600,7 +8942,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a node kind the map cannot draw",
-      "line": 67,
+      "line": 68,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8609,7 +8951,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a phase outside the loop",
-      "line": 76,
+      "line": 77,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -8618,7 +8960,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a tool the catalog does not define",
-      "line": 22,
+      "line": 23,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },

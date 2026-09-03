@@ -139,7 +139,7 @@ describe('bindTools', () => {
     bindTools({ mapId: 'm' });
     expect(registered).toContain('read_map');
     expect(registered).toContain('await_user_activity');
-    expect(registered).toHaveLength(9);
+    expect(registered).toHaveLength(CATALOG_SIZE);
   });
 
   // Disposal must remove exactly what was registered, or re-binding the same
@@ -153,7 +153,7 @@ describe('bindTools', () => {
       },
     });
     bindTools({ mapId: 'm' })();
-    expect(removed).toHaveLength(9);
+    expect(removed).toHaveLength(CATALOG_SIZE);
     expect(removed).toContain('post_note');
   });
 
@@ -171,7 +171,7 @@ describe('bindTools', () => {
       },
     });
     expect(() => bindTools({ mapId: 'm' })).not.toThrow();
-    expect(calls).toBe(9);
+    expect(calls).toBe(CATALOG_SIZE);
   });
 
   // The pre-March-2026 convention the @mcp-b/global polyfill still ships:
@@ -185,7 +185,7 @@ describe('bindTools', () => {
     });
     const dispose = bindTools({ mapId: 'm' });
     dispose();
-    expect(sets).toEqual([9, 0]);
+    expect(sets).toEqual([CATALOG_SIZE, 0]);
   });
 
   // Registration used to fail silently, so a page could report an attached
@@ -297,7 +297,7 @@ describe('publishAgentDriver', () => {
     };
     expect(driver.mapId).toBe('map-1');
     expect(driver.listTools().map((t) => t.name)).toContain('read_map');
-    expect(driver.listTools()).toHaveLength(9);
+    expect(driver.listTools()).toHaveLength(CATALOG_SIZE);
   });
 
   // Disposal removes the driver so a stale one cannot answer for a map the

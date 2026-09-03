@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardFileChip - Image",
+  "id": "2f012d17-6fba-467b-b5c6-27126b1a7f92",
+  "url": "/isolated-components/FirstCardFileChip?s=Image",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardFileChip",
+  "scenarioType": "component",
+  "description": "A pasted screenshot on the first card, before there is a board to put it on. The picture is the point: a pasted image has no useful filename — the clipboard supplies Screenshot and a timestamp — so the thumbnail is the only thing identifying it, and the only way to catch a mis-paste before it becomes part of the thinking. The preview comes from the real hook, in the browser, exactly as it does on the landing screen."
+}

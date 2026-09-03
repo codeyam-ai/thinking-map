@@ -1,7 +1,7 @@
 [
   {
     "name": "ThinkingMap",
-    "description": "One session of thinking. Holds the user's original unstructured idea verbatim and tracks which stage of the loop the session has reached. Everything else hangs off this root, so a saved map can be reopened and continued later. 'revision' is a monotonic counter bumped once per committed change, in the same transaction as the write \u2014 it is the cursor an agent reads with and the only shared notion of \"now\" across all three front doors (in-page WebMCP, HTTP, stdio).",
+    "description": "One session of thinking. Holds the user's original unstructured idea verbatim and tracks which stage of the loop the session has reached. Everything else hangs off this root, so a saved map can be reopened and continued later. 'revision' is a monotonic counter bumped once per committed change, in the same transaction as the write \u2014 it is the cursor an agent reads with and the only shared notion of \"now\" across all three front doors (in-page WebMCP, HTTP, stdio). The legacy 'attachments' JSON column records names only and is superseded by MapAttachment rows, which can hold the file itself.",
     "category": "datastore",
     "order": 1,
     "fields": [
@@ -333,6 +333,50 @@
       },
       {
         "name": "charCount",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "datetime",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "MapAttachment",
+    "description": "A file the person brought along with the idea \u2014 a whiteboard photo, a screenshot, a scope doc. Held as its own model rather than as names in ThinkingMap.attachments because bytes do not belong in a JSON column whose contract is that the board must open even when the column is garbage, and because a per-attachment id is what both the byte-serving route and the agent's read_attachment tool address a single file by. 'bytes' is nullable so every legacy name-only attachment migrates as a row rather than being dropped \u2014 such a row renders on the board and simply has nothing to look at. The bytes live in the same SQLite file as everything else, which keeps one database as the whole backup and teardown story and makes a cascade delete off the map a real delete; the size objection that answers is met by hard server-side caps (5MB per attachment, 4 per map, 10MB per map total) rather than waived.",
+    "category": "datastore",
+    "order": 7,
+    "fields": [
+      {
+        "name": "id",
+        "type": "string",
+        "isId": true,
+        "required": true
+      },
+      {
+        "name": "mapId",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "mediaType",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "bytes",
+        "type": "bytes",
+        "required": false
+      },
+      {
+        "name": "byteSize",
         "type": "number",
         "required": true
       },

@@ -1,0 +1,12 @@
+{
+  "name": "AttachmentAddButton - Default",
+  "id": "9c12aed8-f5e5-4816-ac85-050115689298",
+  "url": "/isolated-components/AttachmentAddButton?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachmentAddButton",
+  "scenarioType": "component",
+  "description": "The way to bring something else along, at rest. Dashed rather than solid because it is an invitation to add something, not an action on something that already exists."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AttachmentStrip - OnePastedImage",
+  "id": "d67a72bb-4eda-45d5-bce4-ee2356a298e0",
+  "url": "/isolated-components/AttachmentStrip?s=OnePastedImage",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachmentStrip",
+  "scenarioType": "component",
+  "description": "The state a person lands in the instant after pressing the paste shortcut, and the one the thumbnail exists for. Nothing else on the screen says which screenshot just arrived."
+}

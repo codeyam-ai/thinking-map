@@ -8,6 +8,11 @@ import InlineError from './InlineError';
 export const ACCEPT =
   '.pdf,.docx,.md,.txt,.html,application/pdf,text/plain,text/markdown,text/html';
 
+/** The image half, kept beside it for the same reason: this is what the upload
+ *  route accepts, and a picker offering a type the route refuses is a refusal
+ *  the person only meets after choosing. */
+export const ACCEPT_IMAGES = '.png,.jpg,.jpeg,.gif,.webp,image/*';
+
 /**
  * The intake, with the panel taken off it.
  *

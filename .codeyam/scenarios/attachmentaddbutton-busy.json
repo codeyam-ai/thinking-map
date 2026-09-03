@@ -1,0 +1,12 @@
+{
+  "name": "AttachmentAddButton - Busy",
+  "id": "cff9a2f2-af45-429a-8679-431f17339d7f",
+  "url": "/isolated-components/AttachmentAddButton?s=Busy",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachmentAddButton",
+  "scenarioType": "component",
+  "description": "Disabled while a save is in flight, so a second file cannot be chosen into a list that is mid-write. Its third state — gone entirely at the cap — is not capturable here, because the absence is CoreAttachments' decision and is shown in that component's Full frame."
+}

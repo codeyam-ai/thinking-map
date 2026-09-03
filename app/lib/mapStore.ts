@@ -165,6 +165,15 @@ export async function getMap(id: string) {
       // and pulling it in here would put tens of thousands of characters into
       // every page render and every full `read_map`.
       brief: { select: { sourceName: true, mediaType: true, charCount: true } },
+      // Metadata only, on exactly the reasoning above it: an attachment is a
+      // megabyte where a brief is forty thousand characters, so selecting
+      // `bytes` here would put a picture into every page render and every full
+      // `read_map`. `byteSize` is the denormalised column that lets this say
+      // whether there is a file without touching the file.
+      attachments: {
+        orderBy: { createdAt: 'asc' },
+        select: { id: true, name: true, mediaType: true, byteSize: true },
+      },
     },
   });
 }
@@ -172,6 +181,22 @@ export async function getMap(id: string) {
 /** The brief's text, for the one caller that is allowed to want it. */
 export async function getBrief(mapId: string) {
   return prisma.mapBrief.findUnique({ where: { mapId } });
+}
+
+/**
+ * One attachment WITH its bytes, for the one caller that is allowed to want
+ * them — `read_attachment`.
+ *
+ * The map-scoped lookup is the access rule and not a convenience: an id is a
+ * cuid rather than a secret, so a query keyed on the attachment alone would let
+ * an id learned from one board fetch a file off another. A mismatched pair
+ * comes back null, which is the same answer as an id that never existed.
+ */
+export async function getAttachment(mapId: string, attachmentId: string) {
+  return prisma.mapAttachment.findFirst({
+    where: { id: attachmentId, mapId },
+    select: { id: true, name: true, mediaType: true, bytes: true, byteSize: true },
+  });
 }
 
 /**
@@ -251,7 +276,23 @@ export async function createMap(
     data: {
       title,
       seedIdea: trimmed,
-      attachments: attachments.length ? JSON.stringify(attachments) : null,
+      // Rows now, not a JSON column — but still names and no bytes. This door
+      // is the one that creates a map and its attachments in a single
+      // transaction, and bytes cannot travel in a JSON body alongside the
+      // idea; the upload route is what carries a file, after the map exists.
+      // A row with no bytes is exactly what it always was: a record that
+      // something is part of this thinking, with nothing to look at.
+      ...(attachments.length
+        ? {
+            attachments: {
+              create: attachments.map((a) => ({
+                name: a.name,
+                mediaType: 'application/octet-stream',
+                byteSize: 0,
+              })),
+            },
+          }
+        : {}),
       phase: 'map',
       ...(brief
         ? {

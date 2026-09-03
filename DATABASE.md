@@ -23,6 +23,21 @@ npm run db:reset
 npx prisma studio
 ```
 
+## One-Off: Attachments Backfill
+
+Databases created before attachments held their files store them as names in a
+JSON column on `ThinkingMap`. If yours is one, run this once after `db:push` to
+turn those names into `MapAttachment` rows:
+
+```bash
+npx tsx prisma/backfill-attachments.ts
+```
+
+Every name becomes a row with no `bytes` — a legacy attachment stays exactly what
+it was, a recorded name with nothing to open, rather than being dropped. The
+script is idempotent and clears the old column as it goes, so a second run is a
+no-op. A fresh database created by `db:push` or `db:reset` needs nothing.
+
 ## Where Credentials Go
 
 **Real values go in `.env.local`. `.env` holds committed placeholders.**

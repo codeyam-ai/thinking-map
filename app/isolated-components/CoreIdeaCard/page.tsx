@@ -27,14 +27,28 @@ const scenarios: Record<string, Props> = {
   // circle would move every galaxy on the board to accommodate one sentence.
   LongIdea: { seedIdea: LONG, mapId: "map-galaxy" },
 
-  // What the person brought along with the idea, listed under it. Names only —
-  // the board is a place to point AT things, not to hold them.
+  // What the person brought along with the idea, listed under it. The board
+  // holds the FILE now, so a picture shows as a picture — and an attachment
+  // recorded before it could do that still shows as a paperclip, which is what
+  // this frame carries both of.
   WithAttachments: {
     seedIdea: MEDIUM,
     mapId: "map-galaxy",
     attachments: [
-      { name: "shift-handover-notes.pdf" },
-      { name: "whiteboard-photo.jpg" },
+      {
+        id: "att-whiteboard",
+        name: "whiteboard-photo.png",
+        mediaType: "image/png",
+        byteSize: 1563,
+        hasBytes: true,
+      },
+      {
+        id: "att-handover-notes",
+        name: "shift-handover-notes.pdf",
+        mediaType: "application/octet-stream",
+        byteSize: 0,
+        hasBytes: false,
+      },
     ],
   },
 

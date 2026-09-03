@@ -1,0 +1,12 @@
+{
+  "name": "AttachmentStrip - Full",
+  "id": "c1b4a205-6313-4458-9203-2631207484d0",
+  "url": "/isolated-components/AttachmentStrip?s=Full",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachmentStrip",
+  "scenarioType": "component",
+  "description": "At the cap of four, which is the widest this strip ever gets and therefore the frame where wrapping is actually decided. Two screenshots taken minutes apart are also the case that proves the thumbnails are doing work — their names differ only by a timestamp."
+}

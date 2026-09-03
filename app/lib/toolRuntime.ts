@@ -9,7 +9,8 @@ import 'server-only';
 // a tool means the same thing whichever way it was called.
 
 import type { z } from 'zod';
-import { applyToolCalls, getBrief, getMap } from './mapStore';
+import { applyToolCalls, getAttachment, getBrief, getMap } from './mapStore';
+import { attachmentNotFound, attachmentToolResult } from './attachmentTool';
 import { splitIntoSections } from './briefSections';
 import { computeBriefCoverage } from './briefCoverage';
 import { formatInsightStanding, formatMapDetail } from './mcpFormat';
@@ -202,6 +203,22 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
         charCount: found.charCount,
       },
     };
+  },
+
+  async read_attachment(ctx, input: { attachmentId: string }) {
+    const attachment = await getAttachment(ctx.mapId, input.attachmentId);
+
+    // Scoped by map, so an id belonging to another board is indistinguishable
+    // from one that never existed — and both are an ordinary answer rather
+    // than a fault, in the manner read_brief already sets for a map with no
+    // brief.
+    if (!attachment) return attachmentNotFound(input.attachmentId);
+
+    // What an attachment IS to a reader that can look at pictures — a picture,
+    // readable text, a PDF, or a name with nothing behind it — is a decision
+    // that needs no database, so it lives in `attachmentTool.ts` where each
+    // branch can be checked directly.
+    return attachmentToolResult(attachment);
   },
 
   async add_nodes(ctx, input: { nodes: unknown[]; requestId?: string }) {
@@ -477,7 +494,13 @@ export async function runTool(
   try {
     const result = await impl(ctx, parsed.data as never);
     return {
-      content: [{ type: 'text', text: result.text }],
+      // Text first, then any pictures. The order is the point: an agent should
+      // read what it is looking at before it looks at it, and a bare image
+      // block with no caption is a thing with no provenance.
+      content: [
+        { type: 'text', text: result.text } as const,
+        ...(result.images ?? []),
+      ],
       ...(result.structured ? { structuredContent: result.structured } : {}),
     };
   } catch (err) {

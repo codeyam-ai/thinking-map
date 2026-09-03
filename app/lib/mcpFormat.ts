@@ -29,6 +29,15 @@ export interface MapDetail {
   /** Metadata only, never the text. `read_map` is called constantly; the brief
    *  is read deliberately, through its own tool. */
   brief?: { sourceName: string; charCount: number } | null;
+  /** The same rule, and an even stronger case for it: inlining an image here
+   *  would put a megabyte of base64 into every turn. The list says what is
+   *  there and hands over the ids; `read_attachment` is what opens one. */
+  attachments?: {
+    id: string;
+    name: string;
+    mediaType: string;
+    byteSize: number;
+  }[];
 }
 
 /**
@@ -86,6 +95,55 @@ export function formatNewMaps(rows: NewMapRow[], cursor: string): string {
   });
 
   return `${rows.length} new map${rows.length === 1 ? '' : 's'}:\n${lines.join('\n')}\n\nResume with since "${cursor}".`;
+}
+
+/** What an attachment IS, in the one word that decides whether an agent should
+ *  spend a call opening it. The media type itself is in the structured result
+ *  for anything that needs the exact string. */
+function describeKind(mediaType: string): string {
+  if (mediaType.startsWith('image/')) return 'a picture you can look at';
+  if (mediaType === 'application/pdf') return 'a PDF';
+  return 'a text document';
+}
+
+/**
+ * The "Brought along" section of a full map read: one line per attachment,
+ * never the attachment itself.
+ *
+ * The brief's rule above, applied where it matters most. `read_map` is called
+ * constantly, and a picture inlined here would put a megabyte of base64 into
+ * every turn — which is exactly why `read_attachment` is a separate tool rather
+ * than a field on this one.
+ *
+ * Every line carries the id, because a list an agent cannot act on is a dead
+ * end in the same way `formatMapList` avoids. A row with no bytes says so
+ * instead of offering an id that would only lead to "there is nothing to look
+ * at" — the answer belongs where the agent is deciding, not one call later.
+ *
+ * Returns an empty list, not an empty heading, for a map with nothing attached:
+ * most maps, and a bare heading would read as something failing to load.
+ */
+export function formatAttachmentLines(
+  attachments: {
+    id: string;
+    name: string;
+    mediaType: string;
+    byteSize: number;
+  }[],
+): string[] {
+  if (attachments.length === 0) return [];
+
+  return [
+    '',
+    '## Brought along',
+    ...attachments.map((a) => {
+      const openable =
+        a.byteSize > 0
+          ? `${describeKind(a.mediaType)}, ${Math.max(1, Math.round(a.byteSize / 1024))}KB — read_attachment with id "${a.id}"`
+          : 'recorded before this board could hold files — there is nothing to look at';
+      return `• ${a.name} — ${openable}`;
+    }),
+  ];
 }
 
 /**
@@ -167,11 +225,14 @@ export function formatMapDetail(map: MapDetail): string {
       ]
     : [];
 
+  const attachments = formatAttachmentLines(map.attachments ?? []);
+
   return [
     `# ${map.title}`,
     `phase: ${map.phase}`,
     `seed idea: ${map.seedIdea || '(none — this map started from the brief)'}`,
     ...brief,
+    ...attachments,
     '',
     '## Conversation',
     conversation || '(none)',

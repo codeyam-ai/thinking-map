@@ -5,7 +5,7 @@ import ErrorScreen from '@/app/components/ErrorScreen';
 import MapScreen from '@/app/components/MapScreen';
 import { WebMcpBridge } from '@/app/components/WebMcpBridge';
 import { agentPanelRequested, type QueryParams } from '@/app/lib/agentPanel';
-import { parseAttachments } from '@/app/lib/attachments';
+import { readAttachments } from '@/app/lib/attachments';
 import { getMap, listMaps } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
 import { classifyLoadError } from '@/app/lib/loadError';
@@ -97,7 +97,9 @@ export default async function MapPage({ params, searchParams }: MapPageProps) {
         seedIdea={map.seedIdea}
         maps={maps.map((m) => ({ id: m.id, title: m.title }))}
         currentId={map.id}
-        attachments={parseAttachments(map.attachments)}
+        attachments={readAttachments(
+          map.attachments.map((a) => ({ ...a, hasBytes: a.byteSize > 0 })),
+        )}
         themes={map.themes}
         nodes={map.nodes}
         brief={brief}

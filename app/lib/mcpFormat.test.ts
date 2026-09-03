@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  formatAttachmentLines,
   formatInsightStanding,
   formatMapDetail,
   formatMapList,
@@ -242,5 +243,74 @@ describe('standingAskSentence', () => {
     const out = standingAskSentence();
     expect(out).toContain('fromRefs');
     expect(out).toContain('small enough to actually run');
+  });
+});
+
+// What a full map read says about the things brought along with the idea.
+//
+// The rule being defended is the same one the brief already follows and states:
+// read_map carries metadata, never contents. An image is the strongest case for
+// it — inlining one would put a megabyte of base64 into a call the agent makes
+// every turn — so these assert that the lines describe and point, and never
+// carry the file.
+describe('formatAttachmentLines', () => {
+  const picture = {
+    id: 'att-whiteboard',
+    name: 'whiteboard-photo.png',
+    mediaType: 'image/png',
+    byteSize: 1563,
+  };
+
+  // Most maps have nothing attached. A bare "Brought along" heading over an
+  // empty list would read as something that failed to load, so there is no
+  // section at all rather than an empty one.
+  it('renders no section at all when nothing is attached', () => {
+    expect(formatAttachmentLines([])).toEqual([]);
+  });
+
+  // The id is the whole point of the line: without it the agent can see that a
+  // picture exists and has no way to open it — a dead end.
+  it('names the tool and the id that opens each attachment', () => {
+    const lines = formatAttachmentLines([picture]).join('\n');
+    expect(lines).toContain('whiteboard-photo.png');
+    expect(lines).toContain('read_attachment');
+    expect(lines).toContain('att-whiteboard');
+  });
+
+  // Saying WHICH kind it is lets the agent decide whether the call is worth
+  // making before it spends the context on one.
+  it('says what kind of thing each attachment is', () => {
+    const image = formatAttachmentLines([picture]).join('\n');
+    expect(image).toContain('a picture you can look at');
+
+    const pdf = formatAttachmentLines([
+      { ...picture, name: 'scope.pdf', mediaType: 'application/pdf' },
+    ]).join('\n');
+    expect(pdf).toContain('a PDF');
+
+    const text = formatAttachmentLines([
+      { ...picture, name: 'notes.txt', mediaType: 'text/plain' },
+    ]).join('\n');
+    expect(text).toContain('a text document');
+  });
+
+  // A legacy row has nothing to open, so it must NOT offer an id — sending the
+  // agent to read_attachment only to be told there is nothing there spends a
+  // call to learn what this line already knew.
+  it('withholds the id from a row with no file behind it', () => {
+    const lines = formatAttachmentLines([
+      { ...picture, name: 'shift-handover-notes.pdf', byteSize: 0 },
+    ]).join('\n');
+    expect(lines).toContain('nothing to look at');
+    expect(lines).not.toContain('read_attachment');
+  });
+
+  // The load-bearing claim: this is metadata. If a size can be stated without
+  // the bytes, the bytes were never fetched — which is what keeps read_map
+  // cheap however large the attachments are.
+  it('states a size without carrying any file content', () => {
+    const lines = formatAttachmentLines([picture]).join('\n');
+    expect(lines).toContain('2KB');
+    expect(lines.length).toBeLessThan(200);
   });
 });

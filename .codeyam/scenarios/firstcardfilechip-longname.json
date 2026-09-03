@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardFileChip - LongName",
+  "id": "453c42e7-8308-4592-9531-b798d1929200",
+  "url": "/isolated-components/FirstCardFileChip?s=LongName",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardFileChip",
+  "scenarioType": "component",
+  "description": "A filename far longer than its chip. It truncates rather than widening, because the card's own controls sit on the row below and a chip that grows pushes them out of line — the constraint that decides whether either chip can live in a 440px card at all."
+}

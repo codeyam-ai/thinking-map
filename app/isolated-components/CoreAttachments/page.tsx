@@ -5,18 +5,37 @@ type Props = ComponentProps<typeof Component>;
 
 // What the person brought along with the idea, listed under the core.
 //
-// Names only — the board is a place to point AT things rather than to hold
-// them, and storing the files themselves is a different product with a
-// different set of problems. So what these frames show is the list and the way
-// to add to it, never a file.
+// The board holds the file now, not just its name, so an image shows the
+// picture and everything else shows a paperclip. The two are not a styling
+// choice: a thumbnail means there is something the partner can open, and the
+// paperclip means there is not. Both states are real and both are here — a
+// legacy attachment, recorded when the board stored names and nothing else,
+// renders exactly as it always did.
+//
+// `att-whiteboard` is a real row in the `map-galaxy` seed, so the thumbnail in
+// these frames is served by the byte route rather than mocked. An id that is
+// NOT in the seed would render as a broken image, which is the honest result
+// and the reason these ids are the seed's own.
 
 const scenarios: Record<string, Props> = {
-  // The ordinary case: a couple of things attached, and the way to add more.
+  // The ordinary case: a picture and a document, and the way to add more.
   Default: {
     mapId: "map-galaxy",
     attachments: [
-      { name: "shift-handover-notes.pdf" },
-      { name: "whiteboard-photo.jpg" },
+      {
+        id: "att-whiteboard",
+        name: "whiteboard-photo.png",
+        mediaType: "image/png",
+        byteSize: 1563,
+        hasBytes: true,
+      },
+      {
+        id: "att-handover-notes",
+        name: "shift-handover-notes.pdf",
+        mediaType: "application/octet-stream",
+        byteSize: 0,
+        hasBytes: false,
+      },
     ],
   },
 
@@ -25,19 +44,71 @@ const scenarios: Record<string, Props> = {
   Empty: { mapId: "map-galaxy", attachments: [] },
 
   // Exactly one — the boundary where the strip becomes a list.
-  Single: { mapId: "map-galaxy", attachments: [{ name: "scope-doc.pdf" }] },
-
-  // Enough to wrap, with a filename long enough to test how a name that will
-  // not fit is handled — a truncated name still has to be identifiable enough
-  // to remove the right one.
-  Many: {
+  Single: {
     mapId: "map-galaxy",
     attachments: [
-      { name: "shift-handover-notes.pdf" },
-      { name: "whiteboard-photo.jpg" },
-      { name: "practice-management-system-evaluation-2024-final-v3.xlsx" },
-      { name: "call-back-log.csv" },
-      { name: "rota.pdf" },
+      {
+        id: "att-whiteboard",
+        name: "whiteboard-photo.png",
+        mediaType: "image/png",
+        byteSize: 1563,
+        hasBytes: true,
+      },
+    ],
+  },
+
+  // An attachment from before the board could hold files: a name, and nothing
+  // behind it. It has to render as an ordinary part of the thinking rather
+  // than as something that failed — there is no picture because none was ever
+  // stored, which is a fact about its age, not an error.
+  LegacyNameOnly: {
+    mapId: "map-galaxy",
+    attachments: [
+      {
+        id: "att-handover-notes",
+        name: "shift-handover-notes.pdf",
+        mediaType: "application/octet-stream",
+        byteSize: 0,
+        hasBytes: false,
+      },
+    ],
+  },
+
+  // At the cap: four is the limit, so the "+ Add" control is gone rather than
+  // present-and-refusing. A filename long enough to be truncated is in here
+  // too — a shortened name still has to be identifiable enough to remove the
+  // right one.
+  Full: {
+    mapId: "map-galaxy",
+    attachments: [
+      {
+        id: "att-whiteboard",
+        name: "whiteboard-photo.png",
+        mediaType: "image/png",
+        byteSize: 1563,
+        hasBytes: true,
+      },
+      {
+        id: "att-2",
+        name: "practice-management-system-evaluation-2024-final-v3.md",
+        mediaType: "text/markdown",
+        byteSize: 48_210,
+        hasBytes: true,
+      },
+      {
+        id: "att-3",
+        name: "call-back-log.txt",
+        mediaType: "text/plain",
+        byteSize: 3_400,
+        hasBytes: true,
+      },
+      {
+        id: "att-handover-notes",
+        name: "shift-handover-notes.pdf",
+        mediaType: "application/octet-stream",
+        byteSize: 0,
+        hasBytes: false,
+      },
     ],
   },
 };

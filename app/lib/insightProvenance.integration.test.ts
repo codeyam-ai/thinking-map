@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { textOf } from './toolInvocation';
 
 // `toolRuntime` imports `server-only`, whose whole job is to throw when it is
 // pulled into a client bundle. Under Vitest there is no bundle to be in, so the
@@ -167,7 +168,11 @@ describe('read_map carries the standing ask', () => {
       origin: 'agent',
     });
     return {
-      text: out.content.map((c) => c.text).join('\n'),
+      // `textOf` rather than reading `c.text` off each block: a tool response's
+      // content became a text-or-image union when read_attachment landed, and
+      // an image block has no `text`. This reads the words and ignores any
+      // picture, which is what this test is asserting about.
+      text: textOf(out),
       structured: out.structuredContent,
     };
   };

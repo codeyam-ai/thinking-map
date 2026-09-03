@@ -52,7 +52,27 @@ export interface ToolClient {
 export interface ToolResult {
   text: string;
   structured?: Record<string, unknown>;
+  /**
+   * Pictures to hand the agent alongside the text.
+   *
+   * Optional so that adding the capability changed no existing handler: every
+   * tool that returns words keeps returning exactly what it did. Only
+   * `read_attachment` fills this in, and the marshalling in `runTool` appends
+   * these after the text block — so an agent reads what it is looking at
+   * before it looks at it.
+   */
+  images?: ImageBlock[];
 }
+
+/** MCP's image content block: base64 bytes and what they are. The wire shape,
+ *  not ours — it is what a vision-capable client already knows how to read. */
+export interface ImageBlock {
+  type: 'image';
+  data: string;
+  mimeType: string;
+}
+
+export type TextBlock = { type: 'text'; text: string };
 
 /**
  * The MCP-shaped response every door marshals its results into.
@@ -60,10 +80,15 @@ export interface ToolResult {
  * The index signature is what the MCP SDK's own result type requires — it is
  * how `_meta` and future fields pass through — so declaring it here lets this
  * one type satisfy the SDK handler and the browser binding alike.
+ *
+ * `content` is a union rather than text blocks alone because this type is the
+ * thing that decided an agent could only ever be handed words. A picture
+ * somebody attached is a brief too, and until this union existed there was no
+ * shape in which to give it to them.
  */
 export interface McpToolResponse {
   [key: string]: unknown;
-  content: { type: 'text'; text: string }[];
+  content: (TextBlock | ImageBlock)[];
   structuredContent?: Record<string, unknown>;
   isError?: boolean;
 }
@@ -210,6 +235,18 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
         .describe(
           'A section id from the outline, e.g. "s3". Omit to get the outline.',
         ),
+    }),
+    annotations: { readOnlyHint: true },
+  },
+  {
+    name: 'read_attachment',
+    title: 'Look at something the person attached',
+    description:
+      "Open one thing the person brought along — a whiteboard photo, a screenshot of the flow they want replaced, a diagram they sketched. An image comes back as a picture for you to actually look at; a text document comes back as its text. read_map lists what is attached with an id for each; call this with one id, deliberately, for the ones that look like they matter. Do not walk the whole list out of habit — a picture costs far more of your context than the line naming it does. Some attachments are just a recorded name with no file behind them, and you will be told so plainly rather than as an error.",
+    inputSchema: z.object({
+      attachmentId: z
+        .string()
+        .describe('The id of one attachment, as read_map listed it.'),
     }),
     annotations: { readOnlyHint: true },
   },

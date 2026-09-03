@@ -1,0 +1,1607 @@
+{
+  "timestamp": "2026-09-03T01:22:36Z",
+  "title": "An Image the Agent Can Look At",
+  "type": "feature",
+  "userRequest": "## Summary\n\nA whiteboard photo, a screenshot of the competitor's flow, a diagram someone\nsketched — these are briefs too, and today the product can only record that one\nexists. `ThinkingMap.attachments` stores names and nothing else, so an image\nsomeone attaches is a filename on a board and the agent has never seen it. Give\nattachments bytes, let a person add one by pasting from the clipboard or\ndropping it on the prompt, and — the whole point — give the agent a tool that\nhands it the picture to look at.\n\nThis is deliberately NOT part of the link plan. A link becomes text and reuses\nthe entire brief pipeline unchanged; an image cannot become text and reuses\nnone of it.\n\n## The stance this overturns, on purpose\n\n`prisma/schema.prisma` states the current position on the `attachments` column\nin as many words: *\"Names, not bytes. The board's job is to record that a scope\ndoc or a screenshot is part of this thinking — storing the file itself is a\ndifferent product with a different set of problems (size, privacy, expiry), and\nnone of them are the one being solved here.\"*\n\nThis plan reverses that, as an explicit product decision, because the reason\ngiven no longer holds: an agent with vision can read a diagram, and a filename\nit cannot open is not a contribution to the thinking. The three problems the\ncomment names are real and are answered below rather than waived — size by a\nhard cap, privacy by keeping the bytes inside the same SQLite file as\neverything else, expiry by cascading deletes off the map. The schema comment\nmust be rewritten in this change; leaving it would document a position the code\nno longer takes.\n\n## Key Decisions\n\n- **A `MapAttachment` table, not a wider JSON column.** The existing\n  `attachments` column is a JSON string parsed by `parseAttachments` in\n  `app/lib/attachments.ts`, whose stated rule is that a board must open even if\n  the column is garbage. Base64 image data does not belong in a column with\n  that contract, and a relation gives the per-attachment id the read tool and\n  the thumbnail route both need. `bytes` is nullable so every existing\n  name-only attachment migrates as a row rather than being dropped.\n\n- **Bytes in SQLite, not an uploads directory.** `app/lib/briefText.ts` opens\n  by noting the project \"has no uploads directory and no story about serving\n  one\", and that remains worth keeping: one `dev.db` is still the entire state,\n  backup and teardown story, and a cascade delete still really deletes. The\n  cost is that a large attachment sits in a row; the caps below are what make\n  that acceptable rather than a hope.\n\n- **Hard caps, enforced server-side: 5MB per attachment, 4 per map, 10MB\n  total.** Not advisory. This is the answer to the \"size\" objection the schema\n  comment raises, and a cap that only the client enforces is not one.\n\n- **Attachments are written AFTER the map exists, following the route that\n  already does this.** `PUT /api/maps/[id]/attachments` is already a\n  post-creation whole-list replace, and `IdeaPrompt` already routes to the map\n  once `POST /api/maps` returns an id. Pending images are held in browser\n  memory on the landing screen and uploaded between those two steps. The brief\n  keeps its own rule — it travels in the same POST as the idea, created\n  together or not at all — because a brief is the document the map is ABOUT and\n  an attachment is something brought along.\n\n- **A whole-list PUT cannot carry bytes; the route splits.** Replacing the list\n  every time would mean re-uploading every image on every edit. Keep the\n  existing PUT for renames and removals by id, and add a POST that appends one\n  attachment with its bytes. The existing route's own doc comment explains why\n  it is a whole-list PUT — that reasoning holds for names and breaks for bytes,\n  which is the thing to say when changing it.\n\n- **`McpToolResponse.content` has to widen, and that is the real work here.**\n  It is typed in `app/lib/toolCatalog.ts` as\n  `{ type: 'text'; text: string }[]` — text blocks only. An agent cannot be\n  handed a picture through it. Widen the union with MCP's image block\n  (`{ type: 'image'; data: string; mimeType: string }`), and update the places\n  that build one: `app/lib/toolInvocation.ts`, and the marshalling behind\n  `app/lib/mcpServer.ts` and `app/api/maps/[id]/tools/route.ts`. `ToolResult`\n  in the same file gains an optional images field so a handler can return one\n  without every handler changing shape.\n\n- **A separate `read_attachment` tool, not attachments inside `read_map`.**\n  `app/lib/mcpFormat.ts` already documents the principle for the brief:\n  `read_map` carries metadata only, \"never the text\", because it is called\n  constantly. An image is the strongest possible case of that — inlining one\n  would put a megabyte of base64 into every turn. `read_map` lists what is\n  attached; `read_attachment` fetches one deliberately.\n\n- **Paste is a form-level handler, not a new box.** The clipboard gesture lands\n  wherever focus is, so `IdeaForm` takes an `onPaste` that inspects\n  `clipboardData.items` for an image and ignores everything else — a pasted\n  screenshot attaches, pasted text still types into the input as it always did.\n\n## Implementation\n\n### 1. Give attachments bytes\n\n**File**: `prisma/schema.prisma`\n\nAdd a `MapAttachment` model: `id`, `mapId` with a cascade delete onto\n`ThinkingMap`, `name`, `mediaType`, `bytes Bytes?`, `byteSize Int`,\n`createdAt`. Replace the `attachments String?` column's doc comment with the\nnew position (see the section above); keep the column itself for the migration\nstep, then drop it.\n\nMigration: for every map with a non-null `attachments` JSON, create one\n`MapAttachment` per name with `bytes = null`. A legacy attachment stays exactly\nwhat it was — a recorded name — and simply has no picture to read.\n\n### 2. Read them back, and keep the board unbreakable\n\n**File**: `app/lib/attachments.ts`\n\n`parseAttachments` reads a JSON string today. Give it a sibling that maps\n`MapAttachment` rows to the `Attachment` shape the board renders, widened with\n`id`, `mediaType` and whether bytes are present. Keep the module's existing\nrule intact — an attachment that cannot be read must not take the board down —\nand keep `parseAttachments` itself until the column is dropped.\n\n**File**: `app/map/[id]/page.tsx`\n\nIt calls `parseAttachments(map.attachments)`. Point it at the relation instead.\n\n### 3. Accept an upload\n\n**File**: `app/api/maps/[id]/attachments/route.ts`\n\nKeep `PUT` for the name-only whole-list edit. Add `POST` accepting a\n`multipart/form-data` body with one file: enforce the three caps, accept\n`image/png`, `image/jpeg`, `image/gif`, `image/webp` plus the document types\n`ACCEPT` already lists, store the bytes, and return the created row's id and\nmetadata — never the bytes. Errors follow the house style already set by\n`app/api/briefs/extract/route.ts`: a sentence naming what to do instead.\n\n**New file**: `app/api/maps/[id]/attachments/[attachmentId]/route.ts`\n\n`GET` returning the bytes with the stored `Content-Type` and an immutable cache\nheader. This is what a thumbnail's `src` points at. Scope the lookup by BOTH\n`mapId` and `attachmentId`, so an id from one map cannot read another's file.\n\n### 4. Hand it to the agent\n\n**File**: `app/lib/toolCatalog.ts`\n\nWiden `McpToolResponse.content` to a union of the existing text block and MCP's\nimage block. Add an optional images field to `ToolResult`. Register a\n`read_attachment` tool taking an attachment id, described so an agent knows to\nlist first and fetch deliberately — the same discipline `read_brief`'s\ndescription already teaches for sections.\n\n**File**: `app/lib/toolRuntime.ts`\n\nImplement `read_attachment`: return the image as a base64 block with its media\ntype, a text block for a readable document, and a plain sentence for an\nattachment that has no bytes (a legacy name) — the `read_brief` handler's\nno-brief branch is the model for that, deliberately not an `isError`, so the\nagent moves on rather than retrying something that will never succeed.\n\n**File**: `app/lib/toolInvocation.ts`\n\nThe helpers here build `McpToolResponse` bodies with a text block. Extend them\nto pass an image block through.\n\n**File**: `app/lib/mcpFormat.ts`\n\n`MapDetail` grows an attachments list — id, name, media type, whether it can be\nlooked at — rendered into `read_map`'s output as metadata only, matching how\n`brief` is already handled there.\n\n### 5. Let a person add one\n\n**File**: `app/components/IdeaForm.tsx`\n\nAdd an `onPaste` reading `clipboardData.items` for an image and calling up to\nthe parent; leave ordinary text paste alone. The `onDrop` handler already takes\n`dataTransfer.files[0]` and routes it to the brief — route an image-typed file\nto attachments instead, and accept more than one file while there.\n\n**File**: `app/components/IdeaPrompt.tsx`\n\nHold pending attachments in state, upload them after `POST /api/maps` returns\nan id and before `router.push`, and surface a per-file error without losing the\nmap that was just created.\n\n**New file**: `app/components/AttachmentStrip.tsx`\n\nA row of thumbnails under the input — image preview or a document chip, name,\nsize, and a remove control. This is the only way a person can tell what they\nactually attached, and the only way to undo a mis-paste.\n\n**File**: `app/components/BriefMenu.tsx`\n\nThe label the link plan sets to \"Add a doc or link\" becomes \"Add docs, images\nor a link\", and the menu gains an item for images. This plan depends on that\none purely so the label is written once per capability rather than churned.\n\n**File**: `app/components/BriefFileInput.tsx`\n\n`ACCEPT` gains the image types, keeping it in step with what the upload route\naccepts — the constant exists for exactly that reason.\n\n## Reused existing code\n\n> Note on the citation check: it reports the three dynamic-route paths below\n> (`app/map/[id]/page.tsx`, `app/api/maps/[id]/attachments/route.ts`,\n> `app/api/maps/[id]/tools/route.ts`) as unresolved. That is a false positive —\n> the checker reads Next's `[id]` segment as a glob character class. All three\n> files exist and were read while writing this plan.\n\n- `parseAttachments` and the `Attachment` interface from\n  `app/lib/attachments.ts` (glossary entry: `parseAttachments`) — the\n  must-not-break-the-board rule is kept, not rewritten.\n- `app/api/maps/[id]/attachments/route.ts` — the existing PUT stays; POST is\n  added beside it.\n- `createMap` from `app/lib/mapStore.ts` and `app/api/maps/route.ts` — both\n  already thread an attachments list; unchanged by this plan.\n- `ToolResult` and `McpToolResponse` from `app/lib/toolCatalog.ts` — the two\n  types that gate whether an agent can be handed anything but text.\n- `read_brief` in `app/lib/toolRuntime.ts` — the model for a read tool that\n  degrades gracefully when there is nothing to read.\n- `formatMapList` / `MapDetail` from `app/lib/mcpFormat.ts` — and its stated\n  rule that `read_map` carries metadata, never contents.\n- `errorResponse` and `answeredResponse` from `app/lib/toolInvocation.ts` — the\n  response builders that widen.\n- `app/lib/mcpServer.ts` and `app/api/maps/[id]/tools/route.ts` — the two doors\n  that marshal a `ToolResult`; `app/lib/webmcp.ts` consumes the same type in\n  the browser.\n- `ACCEPT` from `app/components/BriefFileInput.tsx`.\n- `withFailure` from `app/lib/apiFailure.ts` and `readJson` from\n  `app/lib/readJson.ts`.\n\n**Existing-implementation survey.** An attachments concept ALREADY EXISTS and\nthis plan extends it rather than inventing one: the `attachments` column, the\nPUT route, `parseAttachments`, board rendering in `app/map/[id]/page.tsx`, and\nfixtures in `app/isolated-components/GalaxyBoard/page.tsx` already naming a\nwhiteboard photo. What does not exist anywhere in\nthe tree: any byte storage, any file-serving route, any image content block in\nthe MCP types, and any clipboard-paste handler. There is no OCR or vision\ndependency in `package.json` and none is added — the agent does the looking.\n\n## Scenarios to Demonstrate\n\n- A screenshot pasted onto the landing screen, showing as a thumbnail before\n  the map is created.\n- Two images and a PDF attached together, with the strip naming all three.\n- An image dropped on the prompt while a brief is already attached — the brief\n  is untouched, the image joins the strip.\n- A 12MB image refused by the cap, with the sentence the person sees.\n- A map opened later, its board listing what was brought along.\n- A legacy map whose attachment is a name with no bytes — it renders, and\n  `read_attachment` says plainly that there is nothing to look at.\n- The agent's view: `read_map` listing the attachments as metadata, then\n  `read_attachment` returning the picture.",
+  "description": "Attachments now hold the file, not just its name. A new MapAttachment table stores the bytes in the same SQLite file, cascading off the map; an upload route enforces three caps server-side — 5MB per attachment, 4 per map, 10MB in total — and a byte route serves the file scoped by BOTH map and attachment id, so an id learned from one board cannot read another's. On the way in, the first card takes a pasted or dropped screenshot and shows it as a thumbnail before the board exists, then uploads it once there is a map id to address. This deliberately reverses the position the schema stated in as many words — 'names, not bytes ... a different product with a different set of problems (size, privacy, expiry)' — and the rewritten comment answers those three rather than waiving them, because the reason they were declined no longer holds: an agent with vision can read a diagram, and a filename it cannot open is not a contribution to the thinking.\n\nThe agent half is the point. McpToolResponse.content was typed as text blocks only, which is what structurally prevented an agent from ever being handed a picture; it is now a text-or-image union, and a new read_attachment tool returns an MCP image block. read_map lists what is attached as metadata with the id for each and never inlines one — the same rule read_brief already sets, applied where it matters most, since one inlined picture would put a megabyte of base64 into a call made every turn. An attachment recorded before this change migrates as a row with no bytes and is told to the agent plainly rather than as an error, so a legacy board degrades to exactly what it always was.\n\nSCOPE VERDICT — delivered: the whole plan, including the MapAttachment model and its backfill, the upload/byte routes with caps, read_attachment and the widened MCP content union, read_map's attachment listing, and the paste/drop/thumbnail intake on both landing surfaces. Deferred by this cycle: none. All 10 project deliverables were already resolved before this cycle began and none were re-opened by it; the single 'deferred' row in the register is the MCP-client-registration item, deferred by the USER at an earlier cycle's plan gate, untouched here.\n\nTwo things a reader should know rather than discover. First, one visual state has no frame: the refusal sentence rendered in place after a rejected upload. The harness cannot put a file into a file picker, and adding a seam to the component purely to set that state would be product code changed to serve a screenshot — the sentences themselves are unit-tested and were verified live against the route, but no screenshot shows one. Second, the editor's preview proxy rewrites img src in the HTML it serves, so any page with a server-rendered thumbnail logs a React hydration warning under /__codeyam_preview only; the app is clean on its own origin, which client-errors confirms, and the user chose to keep the thumbnail and take the exception rather than reshape the code around a tooling artefact.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/an-image-the-agent-can-look-at.md\t.codeyam/plans/completed/an-image-the-agent-can-look-at.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/a-board-with-pictures-a-drawn-shape-and-a-shortlist.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coreattachments-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coreattachments-empty.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coreattachments-many.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/coreattachments-single.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideacard-withattachments.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-both.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-filesonly.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-linkattached.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-longfilename.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-shortname.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-attached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-busy--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-busy--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefmenu-longfilename--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-many--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-many--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-single--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-single--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withinsight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-both--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-both--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-filesonly--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-filesonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-linkattached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-longfilename--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-longfilename--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-shortname--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-busy--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-filled--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaform-withbrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-bad-gateway--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-bad-gateway--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift-in-production--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-schema-drift-in-production--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-server-failure--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/ideaprompt-server-failure--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/landingscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seed-adapter.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/83de3d1ac399a2f5d59ddb1b18bcaf97d09dd7d93cc8a3410d0b8f98a3cdecf8.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a553805f18b6a810cf99da7d2394864fe1ba8967c7e394d872ffcbc8a551e385.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "DATABASE.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/attachments/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefFileInput.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefMenu.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BriefMenu.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/CoreAttachments.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaForm.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/IdeaPrompt.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/CoreAttachments/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/CoreIdeaCard/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/FirstCardAttachments/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/attachments.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/attachments.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/contributions.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpFormat.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolInvocation.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolInvocation.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolRuntime.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/webmcp.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentaddbutton-busy.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentaddbutton-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentchip-busy.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentchip-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentchip-document.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentchip-legacynameonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentchip-longname.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentstrip-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentstrip-documentsonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentstrip-full.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/attachmentstrip-onepastedimage.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreattachments-full.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coreattachments-legacynameonly.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-pastedscreenshot.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-screenshotanddoc.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardfilechip-document.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardfilechip-image.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardfilechip-longname.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentaddbutton-busy--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentaddbutton-busy--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentaddbutton-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentaddbutton-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-busy--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-busy--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-document--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-document--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-legacynameonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-legacynameonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-longname--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentchip-longname--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-documentsonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-documentsonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-full--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-full--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-onepastedimage--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/attachmentstrip-onepastedimage--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-full--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-full--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-legacynameonly--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreattachments-legacynameonly--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-pastedscreenshot--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-pastedscreenshot--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-screenshotanddoc--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-screenshotanddoc--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardfilechip-document--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardfilechip-document--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardfilechip-image--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardfilechip-image--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardfilechip-longname--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardfilechip-longname--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/seed-assets/competitor-flow.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/seed-assets/competitor-flow.png.b64",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/seed-assets/whiteboard-photo.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/seed-assets/whiteboard-photo.png.b64",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/48567cb5bc7b909386da00f3340e3b6943fc31b82dde79833c0a8868e4522c87.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6c89e724f419e59bb453e9cf0739d571f37f71c4f9c416dafe3765622abfbd01.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/86f0ef2a4ccffb0d3e36e5c6f6deabc781bf710ca70a65bb8e9aaf71dd2cd44a.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/8ceb131fdabd0fe39da4b2550faa37257ff0f0af7d2d9ed04de8b498e512362c.json",
+      "status": "added"
+    },
+    {
+      "path": "app/api/maps/[id]/attachments/[attachmentId]/route.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AttachmentAddButton.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AttachmentChip.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/AttachmentStrip.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardFileChip.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/hooks/useFilePreviews.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AttachmentAddButton/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AttachmentChip/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/AttachmentStrip/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardFileChip/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/fixtures.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/attachmentTool.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/attachmentTool.ts",
+      "status": "added"
+    },
+    {
+      "path": "prisma/backfill-attachments.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "AttachmentAddButton - Busy",
+      "screenshotPath": "attachmentaddbutton-busy--tablet.png"
+    },
+    {
+      "name": "AttachmentAddButton - Default",
+      "screenshotPath": "attachmentaddbutton-default--tablet.png"
+    },
+    {
+      "name": "AttachmentChip - Busy",
+      "screenshotPath": "attachmentchip-busy--tablet.png"
+    },
+    {
+      "name": "AttachmentChip - Default",
+      "screenshotPath": "attachmentchip-default--tablet.png"
+    },
+    {
+      "name": "AttachmentChip - Document",
+      "screenshotPath": "attachmentchip-document--tablet.png"
+    },
+    {
+      "name": "AttachmentChip - LegacyNameOnly",
+      "screenshotPath": "attachmentchip-legacynameonly--tablet.png"
+    },
+    {
+      "name": "AttachmentChip - LongName",
+      "screenshotPath": "attachmentchip-longname--tablet.png"
+    },
+    {
+      "name": "AttachmentStrip - Default",
+      "screenshotPath": "attachmentstrip-default--tablet.png"
+    },
+    {
+      "name": "AttachmentStrip - DocumentsOnly",
+      "screenshotPath": "attachmentstrip-documentsonly--tablet.png"
+    },
+    {
+      "name": "AttachmentStrip - Full",
+      "screenshotPath": "attachmentstrip-full--tablet.png"
+    },
+    {
+      "name": "AttachmentStrip - OnePastedImage",
+      "screenshotPath": "attachmentstrip-onepastedimage--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BriefMenu - Attached",
+      "screenshotPath": "briefmenu-attached--tablet.png"
+    },
+    {
+      "name": "BriefMenu - Busy",
+      "screenshotPath": "briefmenu-busy--tablet.png"
+    },
+    {
+      "name": "BriefMenu - Default",
+      "screenshotPath": "briefmenu-default--tablet.png"
+    },
+    {
+      "name": "BriefMenu - LongFilename",
+      "screenshotPath": "briefmenu-longfilename--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "CoreAttachments - Default",
+      "screenshotPath": "coreattachments-default--tablet.png"
+    },
+    {
+      "name": "CoreAttachments - Empty",
+      "screenshotPath": "coreattachments-empty--tablet.png"
+    },
+    {
+      "name": "CoreAttachments - Full",
+      "screenshotPath": "coreattachments-full--tablet.png"
+    },
+    {
+      "name": "CoreAttachments - LegacyNameOnly",
+      "screenshotPath": "coreattachments-legacynameonly--tablet.png"
+    },
+    {
+      "name": "CoreAttachments - Single",
+      "screenshotPath": "coreattachments-single--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne",
+      "screenshotPath": "coreideacard-dayone--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - Default",
+      "screenshotPath": "coreideacard-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea",
+      "screenshotPath": "coreideacard-longidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea",
+      "screenshotPath": "coreideacard-shortidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments",
+      "screenshotPath": "coreideacard-withattachments--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - WithInsight",
+      "screenshotPath": "coreideacard-withinsight--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - Both",
+      "screenshotPath": "firstcardattachments-both--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - FilesOnly",
+      "screenshotPath": "firstcardattachments-filesonly--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - LinkAttached",
+      "screenshotPath": "firstcardattachments-linkattached--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - LongFilename",
+      "screenshotPath": "firstcardattachments-longfilename--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - PastedScreenshot",
+      "screenshotPath": "firstcardattachments-pastedscreenshot--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - ScreenshotAndDoc",
+      "screenshotPath": "firstcardattachments-screenshotanddoc--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - ShortName",
+      "screenshotPath": "firstcardattachments-shortname--tablet.png"
+    },
+    {
+      "name": "FirstCardFileChip - Document",
+      "screenshotPath": "firstcardfilechip-document--tablet.png"
+    },
+    {
+      "name": "FirstCardFileChip - Image",
+      "screenshotPath": "firstcardfilechip-image--tablet.png"
+    },
+    {
+      "name": "FirstCardFileChip - LongName",
+      "screenshotPath": "firstcardfilechip-longname--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "IdeaForm - Busy",
+      "screenshotPath": "ideaform-busy--tablet.png"
+    },
+    {
+      "name": "IdeaForm - Default",
+      "screenshotPath": "ideaform-default--tablet.png"
+    },
+    {
+      "name": "IdeaForm - Filled",
+      "screenshotPath": "ideaform-filled--tablet.png"
+    },
+    {
+      "name": "IdeaForm - WithBrief",
+      "screenshotPath": "ideaform-withbrief--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Bad Gateway",
+      "screenshotPath": "ideaprompt-bad-gateway--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Default",
+      "screenshotPath": "ideaprompt-default--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift",
+      "screenshotPath": "ideaprompt-schema-drift--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift In Production",
+      "screenshotPath": "ideaprompt-schema-drift-in-production--tablet.png"
+    },
+    {
+      "name": "IdeaPrompt - Server Failure",
+      "screenshotPath": "ideaprompt-server-failure--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "LandingScreen - DayOne",
+      "screenshotPath": "landingscreen-dayone--tablet.png"
+    },
+    {
+      "name": "LandingScreen - Default",
+      "screenshotPath": "landingscreen-default--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 235,
+    "passed": 235,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 235,
+        "passed": 235
+      }
+    ]
+  }
+}

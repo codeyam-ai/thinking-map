@@ -19,6 +19,28 @@ export function errorResponse(text: string): McpToolResponse {
   return { content: [{ type: 'text', text }], isError: true };
 }
 
+// Nothing here builds an image block, and that is the finding rather than an
+// omission. The page forwards a tool call to the server and hands back what
+// came off the wire, so a picture reaches the agent already MCP-shaped — the
+// widened `content` union in `toolCatalog.ts` was the whole change this file
+// needed. A builder here would have no caller.
+
+/**
+ * What a response SAYS, as one string.
+ *
+ * `content` became a union the day an agent could be handed a picture, and
+ * every caller that only wanted the words would otherwise have to narrow it
+ * itself. Blocks are joined rather than the first one taken: a result is text
+ * followed by pictures, and taking `content[0]` would quietly hold only the
+ * caption once a tool started returning more than one text block.
+ */
+export function textOf(response: McpToolResponse): string {
+  return response.content
+    .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
+    .map((block) => block.text)
+    .join('\n');
+}
+
 export type Validated =
   | { ok: true; tool: ToolSpec; input: Record<string, unknown> }
   | { ok: false; response: McpToolResponse };

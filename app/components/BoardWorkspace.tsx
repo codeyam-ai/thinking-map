@@ -32,6 +32,7 @@ import { boardInsightStream } from '@/app/lib/boardInsights';
 import { roundEndNote, roundIsFinished } from '@/app/lib/roundEnd';
 import { PHASE_ASK, type Phase } from '@/app/lib/mapKinds';
 import type { GalaxyNodeInput, GalaxyTheme } from '@/app/lib/galaxyLayout';
+import type { Attachment } from '@/app/lib/attachments';
 
 /** How long the board waits before ending the round on its own.
  *
@@ -55,7 +56,7 @@ export default function BoardWorkspace({
    *  next step from a view nobody was rendering, and a wrong default here would
    *  send the agent a note naming a phase the map is not in. */
   mapPhase: Phase;
-  attachments?: { name: string }[];
+  attachments?: Attachment[];
   themes: GalaxyTheme[];
   nodes: GalaxyNodeInput[];
 }) {

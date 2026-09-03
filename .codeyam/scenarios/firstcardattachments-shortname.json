@@ -1,6 +1,6 @@
 {
   "name": "FirstCardAttachments - ShortName",
-  "id": "81a05d96-25d7-44c4-b8e9-4895a832ba07",
+  "id": "fb16123f-c3d7-4a18-8c5e-038b87ed7581",
   "url": "/isolated-components/FirstCardAttachments?s=ShortName",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "FirstCardAttachments",
   "scenarioType": "component",
-  "description": "The same chip holding a name that already fits, shown untruncated. Truncation is for names that need it rather than a house style, and an untitled page gives you exactly this - a bare host and path."
+  "description": "A short source name, which is what an untitled page or a bare domain gives you. Truncation is for names that need it, not a house style applied to every chip."
 }

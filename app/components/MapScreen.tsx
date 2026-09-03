@@ -7,6 +7,7 @@ import type { Phase } from '../lib/mapKinds';
 import type { FlatNode } from '../lib/mapLayout';
 import type { SummaryNode } from '../lib/summaryGroups';
 import type { GalaxyTheme } from '../lib/galaxyLayout';
+import type { Attachment } from '../lib/attachments';
 
 /**
  * The whole map surface: the header, and whichever view the phase calls for.
@@ -80,7 +81,7 @@ export default function MapScreen({
   /** Every board, for the menu. */
   maps?: { id: string; title: string }[];
   currentId?: string;
-  attachments?: { name: string }[];
+  attachments?: Attachment[];
   /** Main's brief: the document a map was derived from, when there is one.
    *  Only its PRESENCE is read, for `hasBrief` — the text has exactly one
    *  reader and it is not this screen. Typed by what is asked of it rather

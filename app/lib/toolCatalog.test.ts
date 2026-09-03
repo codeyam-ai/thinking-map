@@ -21,6 +21,9 @@ describe('the shared tool catalog', () => {
       'read_map',
       'create_themes',
       'read_brief',
+      // Beside read_brief, not inside read_map: both are things the map is
+      // carrying that are far too big to inline into a call made every turn.
+      'read_attachment',
       'add_nodes',
       'update_node',
       'set_phase',

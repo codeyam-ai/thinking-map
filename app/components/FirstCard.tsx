@@ -21,6 +21,7 @@
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { fetchBriefFromLink, type FetchedBrief } from '@/app/lib/briefFetch';
+import { admitFiles } from '@/app/lib/attachments';
 import FirstCardAttachments from './FirstCardAttachments';
 import FirstCardControls from './FirstCardControls';
 import FirstCardLinkBox from './FirstCardLinkBox';
@@ -37,6 +38,54 @@ export default function FirstCard() {
   const [url, setUrl] = useState('');
   const [reading, setReading] = useState(false);
   const [brief, setBrief] = useState<FetchedBrief | null>(null);
+  const [dragging, setDragging] = useState(false);
+
+  /**
+   * Take files in — browsed, pasted or dropped — and refuse the ones that
+   * cannot land.
+   *
+   * The rules themselves are `admitFiles`, shared with the upload route's own
+   * `fitsAttachmentCaps` so the two cannot word the same refusal differently.
+   * What is left here is the local part: which state to set.
+   */
+  function addFiles(picked: File[]) {
+    if (picked.length === 0) return;
+    setFiles((prev) => {
+      const { accepted, error: refused } = admitFiles(prev, picked);
+      setError(refused);
+      return [...prev, ...accepted];
+    });
+  }
+
+  /**
+   * Send the files to the board that was just created.
+   *
+   * This is the earliest moment they can go anywhere: the upload route is
+   * addressed by a map id, and until `POST /api/maps` answers there is no id.
+   * The brief keeps its own rule and travels in that POST, because a brief is
+   * the document the board is ABOUT and has to exist or not exist with it;
+   * an attachment is something brought along, and arriving a moment later
+   * costs nothing.
+   *
+   * A refusal is recorded and then gone past. The board exists by this point
+   * and is what the person asked for — holding them on this screen to complain
+   * about the third file would leave them looking at a start button that would
+   * create a SECOND board.
+   */
+  async function uploadFiles(mapId: string) {
+    for (const file of files) {
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        await fetch(`/api/maps/${mapId}/attachments`, {
+          method: 'POST',
+          body: form,
+        });
+      } catch {
+        // The board is already made. Nothing here is worth losing it over.
+      }
+    }
+  }
 
   /**
    * Hand the address to the server and keep what comes back.
@@ -79,13 +128,14 @@ export default function FirstCard() {
       const res = await fetch('/api/maps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Names travel, bytes do not. What the board needs to know is that a
-        // scope doc is part of this thinking, so the partner can ask about it.
-        // A fetched page is the exception: its words are already text, so they
-        // travel in full as the brief.
+        // Bytes travel now — but not here. Files go up in their own requests
+        // once this one has answered with an id, because a JSON body carrying
+        // a megabyte of base64 alongside the idea would make the one request
+        // the board cannot start without the slowest one on the screen.
+        // A fetched page is still the exception: its words are already text,
+        // so they travel in full as the brief.
         body: JSON.stringify({
           seedIdea,
-          attachments: files.map((f) => ({ name: f.name })),
           ...(brief
             ? {
                 brief: {
@@ -99,6 +149,7 @@ export default function FirstCard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Could not start a map.');
+      if (files.length) await uploadFiles(data.id);
       router.push(`/map/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start a map.');
@@ -109,10 +160,29 @@ export default function FirstCard() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center">
       <div
-        className="flex w-[440px] max-w-[88vw] flex-col rounded-[26px] p-9"
+        // The whole card is the drop target, not a dashed box inside it. A
+        // dashed box is an advertisement for a gesture; the card already reads
+        // as the one place on this screen where things go, so making it the
+        // target means the gesture works where people already aim.
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          addFiles(Array.from(e.dataTransfer.files ?? []));
+        }}
+        className="flex w-[440px] max-w-[88vw] flex-col rounded-[26px] p-9 transition-shadow"
         style={{
           background: '#e4ec4b',
-          boxShadow: '0 0 130px rgba(228,236,75,0.22)',
+          // The glow tightens while something is over the card — the only
+          // state change available on a surface that is already one flat
+          // colour, and enough to say the drop will land.
+          boxShadow: dragging
+            ? '0 0 0 3px rgba(0,0,0,0.35), 0 0 130px rgba(228,236,75,0.4)'
+            : '0 0 130px rgba(228,236,75,0.22)',
           minHeight: 520,
         }}
       >
@@ -133,6 +203,29 @@ export default function FirstCard() {
                 e.preventDefault();
                 void start();
               }
+            }}
+            // ⌘V is the whole interface for attaching a screenshot. There is
+            // deliberately no "paste an image here" box: the clipboard lands
+            // wherever focus is, and focus on this screen is this field.
+            //
+            // Only an IMAGE is intercepted, and only then is the default
+            // prevented — pasting text still types into the card exactly as it
+            // always has. Swallowing a pasted sentence to serve a pasted
+            // screenshot would break the primary use of this field for the
+            // secondary one.
+            onPaste={(e) => {
+              const images = Array.from(e.clipboardData?.items ?? [])
+                .filter(
+                  (item) =>
+                    item.kind === 'file' && item.type.startsWith('image/'),
+                )
+                .flatMap((item) => {
+                  const file = item.getAsFile();
+                  return file ? [file] : [];
+                });
+              if (images.length === 0) return;
+              e.preventDefault();
+              addFiles(images);
             }}
             rows={3}
             placeholder="Type here…"
@@ -179,13 +272,8 @@ export default function FirstCard() {
           accept="image/*,.pdf,.md,.txt"
           className="hidden"
           onChange={(e) => {
-            const picked = Array.from(e.target.files ?? []);
-            // De-duplicate by name so browsing twice for the same file does not
-            // list it twice.
-            setFiles((prev) => {
-              const names = new Set(prev.map((f) => f.name));
-              return [...prev, ...picked.filter((f) => !names.has(f.name))];
-            });
+            addFiles(Array.from(e.target.files ?? []));
+            // Reset so choosing the same file twice still fires a change.
             e.target.value = '';
           }}
         />

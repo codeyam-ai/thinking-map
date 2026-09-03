@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardFileChip - Document",
+  "id": "8bf6fad7-c479-45ae-9d9c-e8cc4efc869e",
+  "url": "/isolated-components/FirstCardFileChip?s=Document",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardFileChip",
+  "scenarioType": "component",
+  "description": "A document, which has a name worth reading and no picture worth showing. The absence of a thumbnail has to read as a different KIND of thing rather than as an image that failed to load, which is why the chip closes up around the name instead of leaving a gap where a disc would be."
+}

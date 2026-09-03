@@ -1,0 +1,12 @@
+{
+  "name": "AttachmentStrip - Default",
+  "id": "f3c0b77b-edd3-4e07-acd3-dcd5f6d16d53",
+  "url": "/isolated-components/AttachmentStrip?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AttachmentStrip",
+  "scenarioType": "component",
+  "description": "The realistic arrival: the picture of the thing being replaced, and the document describing it. An image is identified by its picture and anything else by a small disc carrying its extension, so the two kinds are tellable apart without reading either name."
+}

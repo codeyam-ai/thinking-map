@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachments - PastedScreenshot",
+  "id": "21c539ba-53d0-4cdd-a0b8-90088eeafa1b",
+  "url": "/isolated-components/FirstCardAttachments?s=PastedScreenshot",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "description": "The headline state this whole change exists for: a screenshot pasted onto the first card, showing as a picture BEFORE the board is created. A pasted image has no useful filename — the clipboard supplies Screenshot and a timestamp — so the thumbnail is the only thing that says what was attached, and the only way to catch a mis-paste."
+}

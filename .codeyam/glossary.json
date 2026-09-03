@@ -229,6 +229,38 @@
     ]
   },
   {
+    "description": "The way to bring something else along. Its own component because of the decision it owns: at the cap it DISAPPEARS rather than sitting there disabled. A control that is present and refuses teaches the limit by wasting a click; one that is gone says the same thing before anybody reaches for it, and the chips beside it already explain why. Dashed rather than solid, because it is an invitation rather than an action on something that exists — the same reason an empty strip has to read as an offer instead of as a row where something failed to load.",
+    "filePath": "app/components/AttachmentAddButton.tsx",
+    "name": "AttachmentAddButton",
+    "scenarios": [
+      "attachmentaddbutton-default",
+      "attachmentaddbutton-busy"
+    ]
+  },
+  {
+    "description": "One thing brought along, on the board's dark canvas. Its own component because of the decision it owns: whether to show the PICTURE or a paperclip. That is not a styling choice — a thumbnail means there is a file the partner can open, and the paperclip means a recorded name with nothing behind it, which is what every attachment made before this board could hold files looks like. The image is a plain img pointed at the byte route rather than bytes inlined into the page, so a board render never carries a megabyte per attachment; the route answers with an immutable cache header because an attachment's contents never change once stored. Dimensions are stated rather than left to the stylesheet, since the chip is laid out before the bytes arrive.",
+    "filePath": "app/components/AttachmentChip.tsx",
+    "name": "AttachmentChip",
+    "scenarios": [
+      "attachmentchip-default",
+      "attachmentchip-legacynameonly",
+      "attachmentchip-document",
+      "attachmentchip-longname",
+      "attachmentchip-busy"
+    ]
+  },
+  {
+    "description": "The row of things you are about to bring along, under the prompt. This is the only way a person can tell what they actually attached and the only way to undo a mis-paste — which matters more here than anywhere else in the intake, because pasting is a gesture with no file picker in front of it: press the shortcut over the wrong window and something arrives that you never chose by name. An image is identified by its picture and everything else by a small disc carrying its extension, since a pasted screenshot HAS no useful filename. Pre-creation only: once the map exists these are uploaded and the board's own strip takes over.",
+    "filePath": "app/components/AttachmentStrip.tsx",
+    "name": "AttachmentStrip",
+    "scenarios": [
+      "attachmentstrip-default",
+      "attachmentstrip-onepastedimage",
+      "attachmentstrip-documentsonly",
+      "attachmentstrip-full"
+    ]
+  },
+  {
     "description": "The conversation, in a corner of the map rather than across the middle of it. A bar reads as one more widget by the zoom buttons and what you typed into it vanished with no trace anyone had heard you; a panel says the true thing, that the map is what the conversation has produced so far. What is left in this file is the ARRANGEMENT — which of three states the panel is in (open, collapsed to the input row, closed to a pill) and what that state composes. The reading of the log moved to chatLines, the colour of a bubble to BoardChatBubble, and the draft to BoardChatComposer, because a transcript that grows until it covers the thing it is about has stopped being a conversation about anything you can see.",
     "filePath": "app/components/BoardChat.tsx",
     "name": "BoardChat",
@@ -544,14 +576,15 @@
     "testFile": "app/components/CopyablePrompt.render.test.tsx"
   },
   {
-    "description": "The list of things brought along with an idea, hanging beneath the core card. Names only — the board is a place to point AT things rather than to hold them. Edits are optimistic: the list is the person's own change, and making them wait on a round trip to see their own file appear would be slower than the thing it is recording.",
+    "description": "The list of things brought along with an idea, hanging beneath the core card. It holds the FILE now, not just the name — a picture shows as a thumbnail served from the byte route, and an attachment recorded before the board could hold files shows a paperclip, which is a fact about its age rather than a failure. Removals stay optimistic, because the list is the person's own change and waiting on a round trip to watch their own file disappear would feel broken rather than careful; an upload is NOT optimistic, because the caps can refuse it and showing a thumbnail before the server agrees to keep it would mean taking it away again.",
     "filePath": "app/components/CoreAttachments.tsx",
     "name": "CoreAttachments",
     "scenarios": [
       "coreattachments-default",
       "coreattachments-empty",
       "coreattachments-single",
-      "coreattachments-many"
+      "coreattachments-legacynameonly",
+      "coreattachments-full"
     ]
   },
   {
@@ -666,10 +699,12 @@
     }
   },
   {
-    "description": "What the landing card is carrying, named back to the person. Two kinds of chip, and the difference is real rather than decorative: a browsed file travels as a name only, while a link travels as text the board can quote - so the link chip inverts to black on the card's yellow. Renders nothing at all when the card is carrying nothing, which is almost every arrival. Names truncate rather than widening a chip, because the controls sit on the row below.",
+    "description": "What the landing card is carrying, named back to the person. Two kinds of chip, and the difference is real rather than decorative: a link travels as TEXT the board can quote, so its chip inverts to black on the card's yellow, while a browsed or pasted file is something brought ALONG with the idea. A file now travels with its bytes — uploaded once the board exists — and an image shows the picture, which is not decoration: a pasted screenshot has no useful filename, so the thumbnail is the only thing identifying it and the only way to catch a mis-paste. Renders nothing at all when the card is carrying nothing, which is almost every arrival.",
     "filePath": "app/components/FirstCardAttachments.tsx",
     "name": "FirstCardAttachments",
     "scenarios": [
+      "firstcardattachments-pastedscreenshot",
+      "firstcardattachments-screenshotanddoc",
       "firstcardattachments-linkattached",
       "firstcardattachments-shortname",
       "firstcardattachments-filesonly",
@@ -686,6 +721,16 @@
       "firstcardcontrols-ready",
       "firstcardcontrols-briefonly",
       "firstcardcontrols-busy"
+    ]
+  },
+  {
+    "description": "One file the first card is carrying, before there is a board to put it on. A separate component from AttachmentChip rather than one with a theme prop, deliberately: that chip sits on the board's near-black canvas and this one on the card's yellow, so every colour in the two is an inversion of the other's, and a single component parameterised over both would be a wash of conditionals around one shared shape. The picture comes from an object URL rather than a route, because at this point the file exists only in this browser and there is no id to fetch it by.",
+    "filePath": "app/components/FirstCardFileChip.tsx",
+    "name": "FirstCardFileChip",
+    "scenarios": [
+      "firstcardfilechip-image",
+      "firstcardfilechip-document",
+      "firstcardfilechip-longname"
     ]
   },
   {
@@ -1055,7 +1100,8 @@
       "the-agent-worked-here-then-left",
       "mid-exchange-agent-and-human-on-one-map",
       "nobody-has-picked-this-up-yet",
-      "the-round-ends-itself-on-a-real-board"
+      "the-round-ends-itself-on-a-real-board",
+      "a-board-with-pictures-a-drawn-shape-and-a-shortlist"
     ]
   },
   {
@@ -1468,6 +1514,12 @@
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
+    "description": "The same caps applied in the browser, before anything is uploaded — a courtesy that saves a round trip and lets a refusal appear the instant somebody pastes. Deliberately NOT the enforcement: fitsAttachmentCaps on the server is what decides, and both live in this one module so the two cannot drift into wording the same refusal differently, which is exactly what happened while this logic was copied into two components. A batch is admitted partially rather than refused whole, because one oversize file among four should cost you that one and not the other three.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "admitFiles",
+    "testFile": "app/lib/attachments.test.ts"
+  },
+  {
     "description": "Whether the dev agent panel has been deliberately asked for on this page, via `?agentPanel=1`. Replaces the old `NODE_ENV !== 'production'` render gate, which answered 'is this a dev build' when the question that matters is 'can a real agent reach this page' — every `npm run dev` session is a dev build, including the ones where a genuine agent is driving the browser. The production floor underneath the opt-in now comes from `devSurfacesPermitted` in `app/lib/codeyamOnly.ts` rather than an inline `NODE_ENV` check, so the rule that nothing dev-only reaches production is written once across every such surface; the query-param semantics are unchanged and stay here, because this predicate answers a different question from `codeyamLaunched` — whether a person asked for the panel in this tab, not whether codeyam started the server. Matches `=1` exactly rather than any truthy value, and reads the first entry of a repeated param.",
     "filePath": "app/lib/agentPanel.ts",
     "name": "agentPanelRequested",
@@ -1546,6 +1598,18 @@
     "filePath": "app/lib/handoffCopy.ts",
     "name": "attachedStartCopy",
     "testFile": "app/lib/handoffCopy.test.ts"
+  },
+  {
+    "description": "What to say when an attachment id names nothing on this map. The lookup is scoped by map, so an id belonging to another board is deliberately indistinguishable from one that never existed — that indistinguishability IS the access rule, since an id is a cuid rather than a secret. The answer names read_map, so the agent's next move is to find a real id rather than to retry this one.",
+    "filePath": "app/lib/attachmentTool.ts",
+    "name": "attachmentNotFound",
+    "testFile": "app/lib/attachmentTool.test.ts"
+  },
+  {
+    "description": "What an agent is handed when it opens one attachment: a picture, readable text, a PDF it is pointed away from, or a name with nothing behind it. Split from toolRuntime because the interesting part of read_attachment is this four-way decision rather than the lookup, and the decision needs no database. The through-line in all four branches is that none is an isError — a legacy name and a PDF are permanent conditions, and flagging either as a fault invites the blind retry that can never succeed.",
+    "filePath": "app/lib/attachmentTool.ts",
+    "name": "attachmentToolResult",
+    "testFile": "app/lib/attachmentTool.test.ts"
   },
   {
     "description": "Offers the exchange log as a subscribable MCP resource. Deliberately speculative: resource subscriptions are an open proposal, so this no-ops on every browser that exists today. Same feature-detection shape as bindTools, and kept in the only file allowed to name navigator.modelContext.",
@@ -1729,6 +1793,12 @@
     "testFile": "app/lib/exchangeRail.test.ts"
   },
   {
+    "description": "What an attachment IS, in the one phrase that decides whether an agent should spend a call opening it — a picture it can look at, a PDF, or a text document. Deliberately not the media type itself: the exact string is in the structured result for anything that needs it, while the line an agent reads should answer the question it is actually asking.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "describeKind",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
     "description": "The rail line for a collapsed run of node adds or updates. A run of one keeps the node's label, because naming the thing beats counting it; past one the count is the information.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "describeRun",
@@ -1766,6 +1836,15 @@
     "filePath": "app/lib/briefUrl.ts",
     "name": "expandIpv6",
     "testFile": "app/lib/briefUrl.test.ts"
+  },
+  {
+    "description": "Three letters at most from a filename, for the disc that stands in where a thumbnail would be. It exists because a document has no picture to identify it and a full filename is already shown beside the disc — so the disc's job is to say the KIND at a glance. A file with no extension gets a dot rather than a stray separator, and a long one is cut so a `.markdown` cannot stretch the circle out of round.",
+    "filePath": "app/components/AttachmentStrip.tsx",
+    "name": "extension",
+    "scenarios": [
+      "attachmentstrip-documentsonly",
+      "attachmentstrip-default"
+    ]
   },
   {
     "description": "The lower-cased extension of a filename, or empty when it has none. Needed because browsers are inconsistent about the media type they attach to a .md - several send application/octet-stream - so the extension is the fallback the type dispatch falls back to.",
@@ -1903,6 +1982,18 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "Whether one more file may land on a map, and what to say if not. This is the ENFORCEMENT — the answer to the size objection the schema comment used to raise, and the reason that objection could be answered rather than waived: 5MB per attachment, 4 per map, 10MB in total. It lives beside the reader rather than in the upload route because a rule reachable only through HTTP is a rule whose edges nobody checks. Every refusal names the file and a way forward, and carries a machine-readable reason so the route can pick a status without matching on prose written for a person.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "fitsAttachmentCaps",
+    "testFile": "app/lib/attachments.test.ts"
+  },
+  {
+    "description": "The 'Brought along' section of a full map read: one line per attachment, never the attachment itself. This is the brief's own metadata-not-contents rule applied where it matters most — read_map is called constantly, and one inlined picture would put a megabyte of base64 into every turn, which is precisely why read_attachment is a separate tool. Each line carries the id that opens it, except a row with no bytes, which says so rather than offering an id that leads only to 'there is nothing to look at'.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatAttachmentLines",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
     "description": "A character count with grouped thousands. A bare 12690 reads as an identifier sitting in a column of otherwise short numbers; grouped, it reads as an amount, which is the only reason it is shown.",
     "filePath": "app/lib/briefFormat.ts",
     "name": "formatCharCount",
@@ -1933,6 +2024,12 @@
     "testFile": "app/lib/mcpFormat.test.ts"
   },
   {
+    "description": "A file size as a person reads it, in the unit that makes the number mean something. Two edges carry the whole design: a few hundred bytes must not round to '0KB' beside a file that plainly exists, and a row with no file behind it says nothing at all rather than claiming a size it does not have. It is shared by the refusal sentences and the chips, so a cap stated as 5MB and a file labelled 5MB agree.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "formatSize",
+    "testFile": "app/lib/attachments.test.ts"
+  },
+  {
     "description": "Sends a page-side tool call to the tools route, where the shared runtime executes it. The page cannot run the catalog itself because every implementation ends in SQLite, so this one hop is the only difference between the page door and the two server doors.",
     "filePath": "app/lib/webmcp.ts",
     "name": "forward",
@@ -1946,6 +2043,12 @@
     "filePath": "app/map/[id]/page.tsx",
     "name": "generateMetadata",
     "testFile": "app/map/[id]/generateMetadata.test.ts"
+  },
+  {
+    "description": "One attachment WITH its bytes, for the single caller allowed to want them. Every other read of an attachment goes through getMap, which selects metadata only so a page render never pulls a megabyte out of SQLite. The map-scoped lookup here is the access rule rather than a convenience: keyed on the attachment alone, an id learned from one board would fetch a file off another.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "getAttachment",
+    "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
     "description": "Loads a map's brief including its text - the one reader allowed to want it. Everything else takes the metadata that getMap selects, so tens of thousands of characters never reach a page render or a full read_map.",
@@ -2024,6 +2127,12 @@
     "testFile": "app/lib/insightStream.test.ts"
   },
   {
+    "description": "Whether a map will hold this kind of file at all. The images are the point of the feature; the document types are the ones the brief intake already accepts, so a person who can attach a .pdf as a brief is not told a .pdf is unattachable here. Anything else is refused at the door rather than stored and discovered later by a tool that cannot read it.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "isAcceptedMediaType",
+    "testFile": "app/lib/attachments.test.ts"
+  },
+  {
     "description": "Whether a card should show your words as its content with the question demoted to their label. Only a question can reach this state: a settled insight carries an answered status all over the seed data and is still not something you answered, and drawing it with a pencil would invite editing the partner's own thinking as though it were your reply.",
     "filePath": "app/lib/cardPresentation.ts",
     "name": "isAnsweredCard",
@@ -2040,6 +2149,12 @@
     "filePath": "app/lib/exchange.ts",
     "name": "isEventKind",
     "testFile": "app/lib/exchange.test.ts"
+  },
+  {
+    "description": "Whether an attachment is something that can be looked at. It is the single branch point of the whole feature: it decides whether a chip shows a thumbnail or a paperclip, and whether read_attachment hands the agent a picture or words. Kept as a list of the exact types the upload route accepts rather than a `image/` prefix test, so the picker, the route and the renderer cannot disagree about what counts.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "isImage",
+    "testFile": "app/lib/attachments.test.ts"
   },
   {
     "description": "Whether a board card is showing you something rather than asking you something. Two clauses: the node's kind is one of the partner's own thinking - which now includes suggestion and experiment, since both are the partner telling you what it would do rather than asking you anything - OR the card carries a diagram or a picture, and the second clause is the one that was missing. The layout's widthFor already hands exactly those cards the wide column on that reasoning, so without the same rule here an approach with a diagram was laid out at the wide width, drawn as an answered question, and its diagram never rendered at all.",
@@ -2114,6 +2229,12 @@
     "testFile": "app/lib/chatLines.test.ts"
   },
   {
+    "description": "Metadata for every attachment on a map, in the order they arrived, as the whole-list PUT hands it back. It selects the columns and never `bytes`, reducing the file to a boolean before anything leaves the database — the same rule getMap follows, applied to the one route that answers with a list. Sending the bytes back to a caller that just uploaded them would put a megabyte through a JSON encoder for nothing.",
+    "filePath": "app/api/maps/[id]/attachments/route.ts",
+    "name": "listFor",
+    "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
     "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",
     "filePath": "app/lib/mapStore.ts",
     "name": "listMaps",
@@ -2129,6 +2250,15 @@
     "untestabilityReason": {
       "justification": "A process entrypoint: build the server, connect a stdio transport, log readiness to stderr because stdout is the JSON-RPC channel. No branching. Verified by driving a real initialize and tools/list handshake through the process over a pipe.",
       "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "The one-off that turns the legacy attachments JSON column into MapAttachment rows, for any database that predates the model. Every recorded name becomes a row with no bytes rather than being dropped — a migration is not allowed to lose data, and a legacy attachment stays exactly what it always was. Idempotent: a map that already has rows is skipped, and the old column is cleared as it goes, which is what makes a second run a no-op.",
+    "filePath": "prisma/backfill-attachments.ts",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "A run-once migration entry point, not application code: it is invoked by hand from the command line against a specific database and is deleted once every database has run it. Its logic is the loop plus parseAttachments, which is tested; a test for the script itself would be a test of Prisma's createMany against a temporary file, asserting the thing the integration suite already asserts.",
+      "kind": "scaffold"
     }
   },
   {
@@ -2240,7 +2370,7 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
-    "description": "Reads back the list of things brought along with an idea. Names only, and anything unreadable becomes an empty list — the rule is about availability rather than correctness: a board that cannot parse its own attachment column must still OPEN, because one stray string taking the whole page down is a far worse outcome than a board rendering without its attachments.",
+    "description": "Reads back the LEGACY attachments column: names only, and anything unreadable becomes an empty list. Superseded by readAttachments once attachments became their own table with bytes behind them, and kept for exactly as long as it takes an existing database to run prisma/backfill-attachments.ts, which reads through here. Nothing in the app calls it any more. The availability rule it established survives in its replacement: a board that cannot make sense of its own attachments must still OPEN.",
     "filePath": "app/lib/attachments.ts",
     "name": "parseAttachments",
     "testFile": "app/lib/attachments.test.ts"
@@ -2358,6 +2488,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "railEntries",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "Reads back the things brought along with an idea, now that they are rows rather than names in a JSON column. It inherits parseAttachments' rule unchanged, and the rule is about AVAILABILITY rather than correctness: a board that cannot make sense of one of its attachments must still OPEN. So a row with no usable name is dropped and an unknown media type is given a generic one — the list may come back shorter, never broken.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "readAttachments",
+    "testFile": "app/lib/attachments.test.ts"
   },
   {
     "description": "Reads whatever a brief route answered with, from the browser: status before body, the route's own sentence preferred over a generic one, an omitted warning spelled as null rather than undefined, and never a parse error reaching a person. A 200 whose body carries no text is treated as the failure it is. Exists because the landing card and the older intake were each doing this independently, and two copies of one contract is one copy away from drifting.",
@@ -2530,10 +2666,10 @@
     "testFile": "app/lib/pendingRow.test.ts"
   },
   {
-    "description": "Truncates an attachment name for a chip that must not grow wide enough to push the first card's own controls out of line, keeping the ellipsis inside the budget rather than adding it on top. A page title runs to a sentence far more often than a filename does, which is what made this necessary once links could be attached.",
-    "filePath": "app/components/FirstCardAttachments.tsx",
-    "name": "shorten",
-    "testFile": "app/components/FirstCardAttachments.render.test.tsx"
+    "description": "Truncate a filename for a chip that must not grow wide enough to push the controls beside it out of line. Two characters of headroom so the ellipsis is part of the budget rather than added on top of it — the difference between a chip that fits and one that is one character too wide. Shared by every chip that names a file, at whatever limit its own surface allows, so the three of them cannot drift into truncating at different points.",
+    "filePath": "app/lib/attachments.ts",
+    "name": "shortenName",
+    "testFile": "app/lib/attachments.test.ts"
   },
   {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
@@ -2600,6 +2736,12 @@
     "filePath": "app/lib/textSelection.ts",
     "name": "suppressTextSelection",
     "testFile": "app/lib/textSelection.test.ts"
+  },
+  {
+    "description": "What a tool response SAYS, as one string. `content` became a union the day an agent could be handed a picture, so every caller that only wants the words would otherwise narrow it itself. Blocks are joined rather than the first one taken: a result is text followed by pictures, and reading `content[0]` would quietly hold only the caption once a tool returned more than one text block.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "textOf",
+    "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
     "description": "Wraps a string in the content envelope every MCP tool response takes. A one-line shape adapter with no branches; the strings it wraps are built by mcpFormat.",
@@ -2675,6 +2817,15 @@
     "filePath": "app/hooks/useExchangeLog.ts",
     "name": "useExchangeLog",
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
+  },
+  {
+    "description": "Thumbnails for files that exist only in the browser, before there is a board to upload them to. A hook rather than a few lines in a component because what it owns is a LIFECYCLE: an object URL holds the whole file alive until it is revoked, so an intake somebody pastes into a dozen times would otherwise keep every one of them. Building the URLs in an effect also means the server renders no src at all, which is correct rather than a compromise — there is no object URL to server-render, so a component using it never disagrees with its own server output about an image's address.",
+    "filePath": "app/hooks/useFilePreviews.ts",
+    "name": "useFilePreviews",
+    "untestabilityReason": {
+      "justification": "Everything it does is a browser API with no return value worth asserting: URL.createObjectURL mints an opaque blob: address and revokeObjectURL is observable only by the absence of a leak. A test would have to stub both and then assert that the stubs were called, which restates the implementation rather than checking it. What is worth checking — that an image gets a preview and a PDF does not — is isImage, which is tested.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Keeping the bottom of a growing column in view, for a reader who is already at the bottom and nobody else. Two subtleties: it must not fire on first paint, because a page that jumps to its own bottom before the person has read the top is not reacting to anything; and 'have I run before' is the wrong way to express that, since StrictMode invokes effects twice on mount and would consume such a flag — so the refs are seeded with mount-time values during render and the effect compares against a transition instead.",
