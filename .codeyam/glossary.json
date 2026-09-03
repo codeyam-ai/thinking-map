@@ -2446,6 +2446,12 @@
     "testFile": "app/lib/conflict.test.ts"
   },
   {
+    "description": "Keeps embedded PostgreSQL running under the current developer account unless the test process is root, where PostgreSQL requires an unprivileged account. It avoids a needless OS-user creation failure before integration tests begin.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "needsPostgresUser",
+    "testFile": "app/lib/testDatabase.test.ts"
+  },
+  {
     "description": "Shapes the node.added event payload from the row that was just inserted. A translation, not a write: the database's vocabulary in, the exchange contract's vocabulary out. Both options and fromNodeIds are stored as JSON strings because SQLite has no array type, and the log speaks the contract's language rather than the column's, so they come back out as the arrays the tools take. The optional fields - testsNodeId, fromNodeIds, sourceRef, options - are OMITTED entirely when absent rather than sent as null, so a reader can treat presence as meaning and an ordinary node's event stays byte-for-byte what it has always been. fromNodeIds is omitted for an empty list too: an insight that cited nothing must be indistinguishable from one written before the field existed, where an empty array would instead read as 'this insight named its sources and they were none'. Pure, so it is unit-testable without a database; inline it could only be reached through a live insert.",
     "filePath": "app/lib/mapStore.ts",
     "name": "nodeAddedPayload",
