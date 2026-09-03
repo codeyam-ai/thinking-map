@@ -1616,7 +1616,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › accepts the sources an insight cites and passes them through",
-      "line": 125,
+      "line": 130,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -1625,7 +1625,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › accepts the two kinds an insight is usually written as",
-      "line": 141,
+      "line": 146,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -1634,7 +1634,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › leaves the field off entirely when the agent cites nothing",
-      "line": 134,
+      "line": 139,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -1643,7 +1643,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "add_nodes carries the ask for insights › states the target, what a themeless node means, and how to cite",
-      "line": 149,
+      "line": 154,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -2129,7 +2129,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "attachedStartCopy › carries no map id, unlike the unattached hand-off prompt",
-      "line": 301,
+      "line": 339,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -2138,7 +2138,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "attachedStartCopy › explains why an attached agent is still not working",
-      "line": 311,
+      "line": 349,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -2147,8 +2147,17 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "attachedStartCopy › fills every slot for both entry points",
-      "line": 319,
+      "line": 357,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The same instruction said in plain words, because an agent that follows tool names but still narrates its answer has not put anything on the map. The prompt now also asks for a chat note, which is the opposite-looking change and must not be allowed to dissolve this one: the note is a POINTER (\"here is what I put on the map\"), and the thinking still has to go on the map. So this pins the division of labour rather than the old sentence.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › keeps the deconstruction on the map, not in chat",
+      "line": 319,
+      "registeredAt": "2026-09-03T15:56:38.631769+00:00",
       "runner": "tests"
     },
     {
@@ -2156,7 +2165,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "attachedStartCopy › names the write tools, not just the read",
-      "line": 273,
+      "line": 306,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -2165,16 +2174,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "attachedStartCopy › reads the brief when there is one and the map when there is not",
-      "line": 291,
-      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
-      "runner": "tests"
-    },
-    {
-      "description": "The same instruction said in plain words, because an agent that follows tool names but still narrates its answer has not put anything on the map.",
-      "file": "app/lib/handoffCopy.test.ts",
-      "format": "vitest",
-      "key": "attachedStartCopy › tells the agent not to answer in chat",
-      "line": 281,
+      "line": 329,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
@@ -4298,7 +4298,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatAttachmentLines › names the tool and the id that opens each attachment",
-      "line": 307,
+      "line": 327,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -4307,7 +4307,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatAttachmentLines › renders no section at all when nothing is attached",
-      "line": 301,
+      "line": 321,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -4316,7 +4316,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatAttachmentLines › says what kind of thing each attachment is",
-      "line": 316,
+      "line": 336,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -4325,7 +4325,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatAttachmentLines › states a size without carrying any file content",
-      "line": 345,
+      "line": 365,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -4334,7 +4334,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatAttachmentLines › withholds the id from a row with no file behind it",
-      "line": 334,
+      "line": 354,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -4370,7 +4370,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatInsightStanding › names how many answers have landed since the newest insight",
-      "line": 208,
+      "line": 209,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4379,7 +4379,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatInsightStanding › reads as an invitation rather than a shortfall when there are none",
-      "line": 223,
+      "line": 224,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4388,7 +4388,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatInsightStanding › states the budget as figures the agent can measure itself against",
-      "line": 196,
+      "line": 197,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4397,7 +4397,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › includes the title, phase and verbatim seed idea",
-      "line": 76,
+      "line": 77,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4406,7 +4406,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › marks an empty conversation explicitly",
-      "line": 94,
+      "line": 95,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4415,7 +4415,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › renders a map with no nodes",
-      "line": 100,
+      "line": 101,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4424,7 +4424,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapDetail › renders the conversation and the node tree under their own headings",
-      "line": 84,
+      "line": 85,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4433,7 +4433,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › leads each row with the id in brackets",
-      "line": 34,
+      "line": 35,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4442,7 +4442,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › puts each map on its own line",
-      "line": 47,
+      "line": 48,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4451,7 +4451,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › reports the phase and the node and message counts",
-      "line": 39,
+      "line": 40,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4460,7 +4460,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatMapList › says so plainly when there are no maps",
-      "line": 29,
+      "line": 30,
       "registeredAt": "2026-08-31T23:30:54.001172449+00:00",
       "runner": "tests"
     },
@@ -4469,7 +4469,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › hands back the cursor to resume from",
-      "line": 165,
+      "line": 166,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4478,7 +4478,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › keeps the count singular for a single map",
-      "line": 159,
+      "line": 160,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4487,7 +4487,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › leads each row with the map id",
-      "line": 121,
+      "line": 122,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4496,7 +4496,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › renders every map when several arrive at once",
-      "line": 147,
+      "line": 148,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4505,7 +4505,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › reports an empty result as normal rather than as a failure",
-      "line": 171,
+      "line": 172,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4514,7 +4514,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › says so explicitly when a map has no seed idea",
-      "line": 141,
+      "line": 142,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4523,7 +4523,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › spells out read_brief as the next call for a brief-started map",
-      "line": 133,
+      "line": 134,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4532,7 +4532,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatNewMaps › spells out read_map as the next call for a sentence-started map",
-      "line": 126,
+      "line": 127,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4577,7 +4577,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatStandingWait › ignores open nodes that are not questions",
-      "line": 278,
+      "line": 298,
       "registeredAt": "2026-09-03T11:12:59Z",
       "runner": "tests"
     },
@@ -4586,8 +4586,17 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatStandingWait › names the open-question count and the revision to wait from",
-      "line": 253,
+      "line": 254,
       "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The wait it prescribes must fit inside the host's tool-call budget. This asserted 300 once, which is precisely the value that made every wait die in transit — so it is pinned against the shared default rather than retyped, and the old number is named as forbidden.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatStandingWait › prescribes a wait short enough for a host to actually return",
+      "line": 272,
+      "registeredAt": "2026-09-03T15:56:38.631769+00:00",
       "runner": "tests"
     },
     {
@@ -4595,8 +4604,17 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "formatStandingWait › returns no guidance when every question is answered",
-      "line": 270,
+      "line": 290,
       "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The agent is the only thing that reads this text, and the person is the only one who can answer. A reply that parks the agent without sending it to chat leaves someone staring at a map that never said anything was owed.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatStandingWait › sends the agent to chat to say what it did and what is needed",
+      "line": 282,
+      "registeredAt": "2026-09-03T15:56:38.631769+00:00",
       "runner": "tests"
     },
     {
@@ -4834,11 +4852,29 @@
       "runner": "tests"
     },
     {
+      "description": "The wait these prompts ask for has to be one a host will actually let return. Both carry the number as a literal — this module stays free of the catalog so a client bundle does not pull zod in for one integer — so the pinning has to happen here, where importing it is free.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › asks for a wait short enough for a host to return, in both prompts",
+      "line": 252,
+      "registeredAt": "2026-09-03T15:56:38.631769+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The prompt used to end \"do not summarise back to me in chat\", and an agent obeying it wrote questions and went silent — leaving the person who pasted the prompt with no idea anything was owed from them. Tool replies are invisible to them; chat is not. Both prompts must send the agent there.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › asks the agent to say in chat what it did and what is needed next",
+      "line": 268,
+      "registeredAt": "2026-09-03T15:56:38.631769+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "An agent reading this page needs a command it can RUN. The prose hint names the door; this is the door, and it has to name the origin the page is actually being served from or it points at the wrong machine.",
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › builds an MCP command naming the given origin",
-      "line": 119,
+      "line": 120,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -4847,7 +4883,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › degrades the endpoint to a relative path with no origin",
-      "line": 161,
+      "line": 162,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -4856,7 +4892,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › does not claim nobody is on a map an agent has already worked",
-      "line": 200,
+      "line": 201,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -4865,7 +4901,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › falls back to npm run mcp when no origin is known",
-      "line": 131,
+      "line": 132,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -4874,7 +4910,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › gives the browser route nothing to copy",
-      "line": 171,
+      "line": 172,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -4883,7 +4919,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › gives the same instruction and steps for a brief-only map",
-      "line": 110,
+      "line": 111,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -4892,7 +4928,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › hands any agent the bare endpoint for the given origin",
-      "line": 148,
+      "line": 149,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -4901,7 +4937,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › keeps the original wording for an untouched map",
-      "line": 208,
+      "line": 209,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -4910,7 +4946,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › leads with an instruction naming the agent handoff",
-      "line": 102,
+      "line": 103,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -4919,7 +4955,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › leaves no empty quotes in the prompt when there is no seed idea",
-      "line": 46,
+      "line": 47,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4928,7 +4964,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › names await_new_map as the way to stop copying prompts by hand",
-      "line": 71,
+      "line": 72,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4937,7 +4973,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › names the map id in the start prompt",
-      "line": 13,
+      "line": 14,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4946,7 +4982,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › never claims work is underway or an agent is coming",
-      "line": 53,
+      "line": 54,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4955,7 +4991,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › offers exactly the browser, any-agent and Claude Code routes",
-      "line": 140,
+      "line": 141,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -4964,7 +5000,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › points at read_brief when the map was started from a brief",
-      "line": 27,
+      "line": 28,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4973,7 +5009,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › points at read_map for a map started from a sentence",
-      "line": 19,
+      "line": 20,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -4982,7 +5018,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › points the Claude Code shortcut at the same endpoint as the any-agent tab",
-      "line": 182,
+      "line": 183,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -4991,7 +5027,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › puts the known revision in a worked map resume prompt",
-      "line": 223,
+      "line": 224,
       "registeredAt": "2026-09-03T11:12:59Z",
       "runner": "tests"
     },
@@ -5000,7 +5036,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › quotes the seed idea in the prompt when there is one",
-      "line": 35,
+      "line": 36,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -5009,7 +5045,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › returns non-empty copy for every field in both cases",
-      "line": 251,
+      "line": 284,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -5018,7 +5054,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › says the idea is saved",
-      "line": 61,
+      "line": 62,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -5027,7 +5063,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › states copying before pasting",
-      "line": 92,
+      "line": 93,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -5036,7 +5072,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › still names the map in the worked variant’s prompt",
-      "line": 216,
+      "line": 217,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -5045,7 +5081,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › tells the agent to keep waiting after it writes questions",
-      "line": 236,
+      "line": 237,
       "registeredAt": "2026-09-03T11:12:59Z",
       "runner": "tests"
     },
@@ -5054,7 +5090,7 @@
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
       "key": "handoffCopy › tells the person to paste the prompt into an agent chat window",
-      "line": 81,
+      "line": 82,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -8600,7 +8636,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "standingAskSentence › asks for provenance and for something small enough to run",
-      "line": 243,
+      "line": 244,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -8609,7 +8645,7 @@
       "file": "app/lib/mcpFormat.test.ts",
       "format": "vitest",
       "key": "standingAskSentence › names every kind the stream actually counts",
-      "line": 235,
+      "line": 236,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -8825,7 +8861,7 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › caps a timeout longer than the ceiling",
-      "line": 90,
+      "line": 95,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -8843,8 +8879,17 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › floors a zero or negative timeout at one second",
-      "line": 95,
+      "line": 100,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The one number in this file with a hard external constraint on it. The default must stay inside the SMALLEST tool-call budget an agent host imposes — tens of seconds for a browser agent, 60s for a stock MCP client — because a call the host aborts cannot deliver the `timedOut` result, and the agent reads a transport failure instead of looping. This was 300, and the loop was broken the whole time it was. Patience comes from re-calling.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "timeoutMsFrom › keeps a single wait well inside a host’s tool-call timeout",
+      "line": 84,
+      "registeredAt": "2026-09-03T15:56:38.631769+00:00",
       "runner": "tests"
     },
     {
@@ -8852,17 +8897,8 @@
       "file": "app/lib/toolCatalog.test.ts",
       "format": "vitest",
       "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
-      "line": 85,
+      "line": 90,
       "registeredAt": "2026-09-01T01:16:02Z",
-      "runner": "tests"
-    },
-    {
-      "description": "Five minutes is long enough for a thoughtful answer and remains below the hard cap that protects the server from an indefinitely parked connection.",
-      "file": "app/lib/toolCatalog.test.ts",
-      "format": "vitest",
-      "key": "timeoutMsFrom › waits five minutes by default",
-      "line": 80,
-      "registeredAt": "2026-09-03T11:12:59Z",
       "runner": "tests"
     },
     {
