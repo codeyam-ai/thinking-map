@@ -39,6 +39,24 @@
       "status": "covered"
     },
     {
+      "dimension": "id",
+      "value": "empty",
+      "rationale": "source-derived state id=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "id",
+      "value": "one",
+      "rationale": "source-derived state id=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "id",
+      "value": "many",
+      "rationale": "source-derived state id=many",
+      "status": "planned"
+    },
+    {
       "dimension": "currentId",
       "value": "true",
       "rationale": "source-derived state currentId=true",

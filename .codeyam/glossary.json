@@ -246,7 +246,7 @@
     "testFile": "app/components/BoardChatBubble.render.test.tsx"
   },
   {
-    "description": "Where you say something about the whole map. It owns the draft rather than lifting it, because nothing above needs to know what is half-typed and a draft held higher would be one more thing to preserve across the panel's three states. Enter and the button are one path, not two, so an empty message cannot be rejected by one route and accepted by the other.",
+    "description": "Where you say something about the whole map. It owns the draft rather than lifting it, because nothing above needs to know what is half-typed and a draft held higher would be one more thing to preserve across the panel's three states. Enter and the button are one path, not two, so an empty message cannot be rejected by one route and accepted by the other. It also reports that someone is TYPING, on every keystroke including the ones that empty the box again — a signal that a person is composing rather than that a draft exists, which is why it carries no text and fires on deletions too. The round's countdown listens for it: someone mid-sentence has not finished, whatever the board's counts say.",
     "filePath": "app/components/BoardChatComposer.tsx",
     "name": "BoardChatComposer",
     "testFile": "app/components/BoardChat.render.test.tsx"
@@ -282,14 +282,17 @@
     ]
   },
   {
-    "description": "The board and the conversation as one surface, and the owner of the live-refresh contract. WebMCP is pull-only — the page cannot be woken by an agent — so this watches the bridge's revision and calls router.refresh() when it advances, which is the whole of what makes an answer or a newly-written question appear without a reload. The first revision it sees only seeds the reference: refreshing on mount would re-fetch the page the person just loaded, and a repeated or lower revision must not refresh at all or a retried poll puts the page in a loop.",
+    "description": "The board and the conversation as one surface, and the owner of two contracts. FIRST, the live refresh: WebMCP is pull-only — the page cannot be woken by an agent — so this watches the bridge's revision and calls router.refresh() when it advances, which is the whole of what makes an answer or a newly-written question appear without a reload. The first revision it sees only seeds the reference: refreshing on mount would re-fetch the page the person just loaded, and a repeated or lower revision must not refresh at all or a retried poll puts the page in a loop. SECOND, the round ending itself: when the board runs out of open questions and the person has answered something in this sitting, a countdown starts and does what the Next round button did, with typing or an explicit press holding it open. Two phases meet here and they are not the same thing — the local RoundPhase is this component's idle/waiting, and mapPhase is where the whole map sits on its arc. The arc is what makes the loop terminate, since next-steps has no next, and it is also what decides the note the round's end sends and which step PhaseAdvance offers from the board.",
     "filePath": "app/components/BoardWorkspace.tsx",
     "name": "BoardWorkspace",
     "scenarios": [
       "boardworkspace-working",
       "boardworkspace-noagent",
       "boardworkspace-working_agent",
-      "boardworkspace-justarrived"
+      "boardworkspace-justarrived",
+      "boardworkspace-allanswered",
+      "boardworkspace-endofexplore",
+      "boardworkspace-roundheldopen"
     ]
   },
   {
@@ -1051,7 +1054,8 @@
       "an-older-question-three-rounds-up-still-open",
       "the-agent-worked-here-then-left",
       "mid-exchange-agent-and-human-on-one-map",
-      "nobody-has-picked-this-up-yet"
+      "nobody-has-picked-this-up-yet",
+      "the-round-ends-itself-on-a-real-board"
     ]
   },
   {
@@ -1171,14 +1175,16 @@
     ]
   },
   {
-    "description": "The one action worth taking when a phase's work is done, at the bottom of the round you just finished rather than up in the chrome — with the map drawn as a column you answer in place, the eye is already there. Sentence and label both come from PHASE_ASK beside the phase labels, so the step the nav names and the step this offers to leave cannot drift apart; what the press does lives in useAdvancePhase.",
+    "description": "The one action worth taking when a phase's work is done. Sentence and label both come from PHASE_ASK beside the phase labels, so the step the nav names and the step this offers to leave cannot drift apart; what the press does lives in useAdvancePhase. It now has TWO homes, which is what the tone prop is for: the map column is paper and the board's chat panel is near-black, where bg-ink would be a black button on a black panel. Reaching the board at all is the point of that second home — this was built and then wired into a view the galaxy board replaced, so until now nothing on the page a person actually looks at could move the map's phase, and the conclusion was reachable only by asking an agent in another window. Callers gate it on the board being ANSWERED rather than merely on the phase having a next step, because its sentence is written for the moment the work is done and would otherwise assert something untrue beside a board with open cards.",
     "filePath": "app/components/PhaseAdvance.tsx",
     "name": "PhaseAdvance",
     "scenarios": [
       "phaseadvance-endofmap",
       "phaseadvance-endofresearch",
       "phaseadvance-endofexplore",
-      "phaseadvance-nomaptoadvance"
+      "phaseadvance-nomaptoadvance",
+      "phaseadvance-ontheboard",
+      "phaseadvance-ontheboardendofexplore"
     ]
   },
   {
@@ -1241,7 +1247,7 @@
     }
   },
   {
-    "description": "The control that ends a round, riding inside the chat and appearing only once there is a round to end. It reports two things: how much of the round is still open, and whether the partner is already working. The wait shows elapsed seconds rather than a bare spinner, because under WebMCP the page cannot ask an agent to hurry or even know one is coming — and a spinner with no number reads the same at two seconds as at forty.",
+    "description": "The control that ends a round, riding inside the chat and appearing only once there is a round to end. It reports how much of the round is still open, whether the partner is already working, and — once the board is fully answered — how many seconds are left before the round ends on its own. The wait shows elapsed seconds rather than a bare spinner, because under WebMCP the page cannot ask an agent to hurry or even know one is coming, and a spinner with no number reads the same at two seconds as at forty. The countdown state is the one where the round ends WITHOUT a press, so it counts down in the open rather than firing on the last answer: the seconds after finishing are when the general remark that fits nowhere on the board arrives, and automation that takes that moment away is a thing done TO someone. Hence a visible number, a quiet way to stop it, and Go now for the press that skips the wait — three things in a row narrow enough that the countdown copy is deliberately terser than the resting line.",
     "filePath": "app/components/RoundControl.tsx",
     "name": "RoundControl",
     "scenarios": [
@@ -1249,7 +1255,9 @@
       "roundcontrol-nothinganswered",
       "roundcontrol-allanswered",
       "roundcontrol-oneleft",
-      "roundcontrol-waiting"
+      "roundcontrol-waiting",
+      "roundcontrol-countdown",
+      "roundcontrol-countdownfinalsecond"
     ]
   },
   {
@@ -2424,10 +2432,22 @@
     "testFile": "app/lib/agentDemo.test.ts"
   },
   {
+    "description": "The note the board leaves when a round ends, and the reason it is not a constant: it NAMES THE FORK. The note it replaced said only 'Ready for the next round — bring what you have made of this', which gives an agent no reason to ever stop adding cards, since more questions is always a valid response to 'your turn'. Whether the thinking needs another row or is ready to be concluded is a judgement the page cannot make — but the page can say that a judgement is due and which two answers are on offer. The words come from PHASE_ASK, the same place the button's sentence and label come from, so what the page shows a person and what it tells their partner cannot drift apart. The terminal phase gets the opposite instruction rather than a missing clause: next-steps has no next, so an invitation to move on would point at nothing.",
+    "filePath": "app/lib/roundEnd.ts",
+    "name": "roundEndNote",
+    "testFile": "app/lib/roundEnd.test.ts"
+  },
+  {
     "description": "The line above a row, naming what the round was. A round that is entirely questions says so, because the question count is what the person is being asked to deal with; a mixed round counts nodes instead, since naming the majority kind would misdescribe it. The opening round is named for the idea rather than numbered. A research round is the exception that says what it IS rather than how many of anything it holds - what already exists is the thing somebody scanning the column is looking for, and a node count is not.",
     "filePath": "app/lib/mapRounds.ts",
     "name": "roundEyebrow",
     "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Whether the person has just FINISHED a round, as opposed to merely looking at a finished one — the rule the board's self-ending countdown is armed by. Three clauses, and the middle one is the load-bearing one: a board with nothing open is the ordinary resting state of every map someone reopens, so `open === 0` alone would end a round on behalf of somebody who had not touched anything yet, firing the automation at a reader rather than at a participant. Requiring an answer given in THIS sitting is what makes it the conclusion of work instead of a greeting. The wait clause is not redundant with either: a round already handed to the partner is over, and re-satisfying the condition while waiting would write the same note onto the log again and again.",
+    "filePath": "app/lib/roundEnd.ts",
+    "name": "roundIsFinished",
+    "testFile": "app/lib/roundEnd.test.ts"
   },
   {
     "description": "How far through a round the person is — the definition the whole feature gates on: the footer's count, whether the next row is reached for, and whether the phase's action appears. Counts only ANSWERABLE cards: a goal or assumption the agent has not filled in carries status 'open' and shows in the map caption, but has no answer box, so counting it would leave the loop permanently one short and the next row never reached for.",
@@ -2676,6 +2696,12 @@
       "justification": "a single useContext read with no branching logic; the state it returns is exercised through the components that consume it",
       "kind": "trivial-wrapper"
     }
+  },
+  {
+    "description": "The countdown that ends a round without anyone pressing anything. It owns only the delay and the ways out of it — the round ends because the board ran out of questions (roundIsFinished), and the seconds are just how long the person gets to change their mind, because the moments after answering the last card are exactly when the general remark that fits on no card arrives. The deadline is a REF and that is load-bearing: the board calls router.refresh() on every revision bump, so an agent writing anything re-renders this with a fresh onExpire identity and restarts the effect — held in state, the deadline would reset on each of those and never reach zero while a partner was working. Each tick re-reads that ref rather than closing over it, so a hold landing between two ticks makes the queued tick a no-op; expiry clears it before firing so a tick slipping in before React re-renders cannot end the round twice. NOT useBoundedWait, which reports a step and deliberately resets on exactly the identity changes this must survive.",
+    "filePath": "app/hooks/useSelfEndingRound.ts",
+    "name": "useSelfEndingRound",
+    "testFile": "app/hooks/useSelfEndingRound.test.ts"
   },
   {
     "description": "Reads the bridge state - connection status, the questions an agent is waiting on, the current revision, and the two writers - from context. Throws outside a provider rather than returning a null the caller would have to guard at every use site.",

@@ -57,6 +57,10 @@ const { default: BoardWorkspace } = await import('./BoardWorkspace');
 const props = {
   seedIdea: 'Handover between shifts',
   mapId: 'map-galaxy',
+  // Where the map is on its arc, which the board now needs: it decides what the
+  // round's closing note tells the partner is due, and which step the phase
+  // action offers. `map` is the phase these refresh cases are set during.
+  mapPhase: 'map' as const,
   themes: [],
   nodes: [],
 };

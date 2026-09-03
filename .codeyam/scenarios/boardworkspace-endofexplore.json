@@ -1,0 +1,12 @@
+{
+  "name": "BoardWorkspace - EndOfExplore",
+  "id": "ae192efc-ab30-40e9-bb6b-a5f3e1cdaa8b",
+  "url": "/isolated-components/BoardWorkspace?s=EndOfExplore",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWorkspace",
+  "scenarioType": "component",
+  "description": "The same fully-answered board further along its arc, where the fork on offer is the last one before the plan. Set beside AllAnswered it shows that the board reads the map's phase rather than assuming one: the action becomes 'Draw up the plan' instead of 'Ready to research', and the note the round's end sends names the phase it is due to reach."
+}

@@ -1,0 +1,158 @@
+{
+  "name": "The round ends itself, on a real board",
+  "id": "22108337-224c-44ba-910c-e5094dbd8014",
+  "url": "/map/map-reaching",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-reaching-1",
+        "kind": "node.added",
+        "mapId": "map-reaching",
+        "origin": "user",
+        "payload": "{\"id\": \"r-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A repair cafe in the church hall\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-reaching-2",
+        "kind": "node.added",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "payload": "{\"id\": \"r-q-who\", \"parentId\": \"r-idea\", \"kind\": \"open-question\", \"label\": \"Who actually turns up to fix things?\", \"status\": \"open\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-reaching-3",
+        "kind": "node.added",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "payload": "{\"id\": \"r-q-liability\", \"parentId\": \"r-idea\", \"kind\": \"open-question\", \"label\": \"What happens when a repair fails and the thing is worse?\", \"status\": \"open\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-reaching-4",
+        "kind": "question.asked",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "payload": "{\"count\": 2}",
+        "revision": 4
+      },
+      {
+        "id": "ev-reaching-5",
+        "kind": "user.answer",
+        "mapId": "map-reaching",
+        "origin": "user",
+        "payload": "{\"answers\": [{\"id\": \"r-q-who\", \"answer\": \"A rota of two or three, plus whoever is curious\"}, {\"id\": \"r-q-liability\", \"answer\": \"Nobody has asked yet, and that worries me\"}]}",
+        "revision": 5
+      }
+    ],
+    "mapNode": [
+      {
+        "detail": "People throw away kettles and lamps that need one solder joint.",
+        "id": "r-idea",
+        "kind": "idea",
+        "label": "A repair cafe in the church hall",
+        "mapId": "map-reaching",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "r-q-who",
+        "kind": "open-question",
+        "label": "Who actually turns up to fix things?",
+        "mapId": "map-reaching",
+        "options": "[\"Retired engineers\", \"Anyone curious\", \"A rota of two or three\"]",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "r-idea",
+        "status": "answered",
+        "themeId": "t-who"
+      },
+      {
+        "id": "r-q-liability",
+        "kind": "open-question",
+        "label": "What happens when a repair fails and the thing is worse?",
+        "mapId": "map-reaching",
+        "options": "[\"A sign saying so\", \"Insurance\", \"Nobody has asked yet\"]",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "r-idea",
+        "status": "answered",
+        "themeId": "t-risk"
+      }
+    ],
+    "message": [
+      {
+        "content": "A repair cafe in the church hall, one Saturday a month. People throw away kettles and lamps that need one solder joint.",
+        "id": "rm-1",
+        "mapId": "map-reaching",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "Two things decide whether this is a nice idea or a real one: who fixes, and what happens when a fix goes wrong.",
+        "id": "rm-2",
+        "mapId": "map-reaching",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "t-who",
+        "label": "Who turns up",
+        "mapId": "map-reaching",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "t-risk",
+        "label": "When a repair fails",
+        "mapId": "map-reaching",
+        "order": 1
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-reaching",
+        "phase": "map",
+        "revision": 5,
+        "seedIdea": "A repair cafe in the church hall, one Saturday a month.",
+        "title": "A repair cafe in the church hall"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The same seeded board as 'The round is answered', driven. Amending an answer on a board with nothing left open arms the countdown that ends the round without anyone pressing anything — and then one keystroke in the chat holds it open again, which is the promise the automation is allowed to exist on. This is the app-route proof rather than the component one: the trigger reads real server-rendered nodes, and the phase action underneath is reachable from the board a person actually looks at. The conversation is collapsed to its input row because the transcript sits over the card being amended; the draft still in the composer is the reason the round did not go.",
+  "interactions": [
+    {
+      "action": "click",
+      "selector": "[aria-label=\"Hide the conversation\"]"
+    },
+    {
+      "action": "click",
+      "selector": "[aria-label=\"Edit this answer\"]"
+    },
+    {
+      "action": "fill",
+      "selector": "textarea",
+      "value": "A rota of two or three, plus whoever is curious that week."
+    },
+    {
+      "action": "click",
+      "text": "Save"
+    },
+    {
+      "action": "fill",
+      "selector": "input[placeholder^=\"Say anything\"]",
+      "value": "One more thought before we hand it back"
+    }
+  ]
+}

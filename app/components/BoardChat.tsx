@@ -36,14 +36,24 @@ type View = 'open' | 'collapsed' | 'closed';
 export default function BoardChat({
   events,
   onSend,
+  onTyping,
   trailing,
+  footer,
   themes = [],
   nodes = [],
 }: {
   events: ExchangeEvent[];
   onSend: (text: string) => void;
+  /** Fired on every keystroke in the composer, before anything is sent. The
+   *  round's countdown listens for it: someone mid-sentence has not finished,
+   *  whatever the board's counts say. */
+  onTyping?: () => void;
   /** The round control, when there is a round to end. */
   trailing?: React.ReactNode;
+  /** The phase's action, when the phase has one. Its own row rather than the
+   *  round's: ending a round and ending a phase are different sizes of move,
+   *  and the phase one carries a sentence of its own. */
+  footer?: React.ReactNode;
   /** The map's themes and nodes, so an answer can be traced back to the card it
    *  answered and wear that card's colour. Both default to empty: a bubble
    *  whose node cannot be resolved is an ordinary bubble, not an error. */
@@ -86,7 +96,7 @@ export default function BoardChat({
           <BoardChatTranscript lines={lines} hueByNode={hueByNode} />
         ) : null}
 
-        <BoardChatComposer onSend={send} />
+        <BoardChatComposer onSend={send} onTyping={onTyping} />
 
         {/* The round control gets its own row. In a 720px bar it rode beside the
             input; at this width "Next round →" and a text field cannot share a
@@ -95,6 +105,10 @@ export default function BoardChat({
           <div className="flex items-center justify-between gap-2 border-t border-white/8 px-4 py-2.5">
             {trailing}
           </div>
+        ) : null}
+
+        {footer ? (
+          <div className="border-t border-white/8 px-4 py-3">{footer}</div>
         ) : null}
       </div>
     </div>

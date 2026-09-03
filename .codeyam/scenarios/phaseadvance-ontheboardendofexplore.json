@@ -1,0 +1,12 @@
+{
+  "name": "PhaseAdvance - OnTheBoardEndOfExplore",
+  "id": "8ea5df61-09ae-45c5-96b3-8b5ee13ebb8b",
+  "url": "/isolated-components/PhaseAdvance?s=OnTheBoardEndOfExplore",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseAdvance",
+  "scenarioType": "component",
+  "description": "The last working phase, in board tone — the step immediately before the conclusion, which is the destination this whole route exists to reach. Set beside OnTheBoard it shows the sentence and label tracking the phase rather than being written once: 'deciding what to build first' and 'Draw up the plan', both read off PHASE_ASK."
+}

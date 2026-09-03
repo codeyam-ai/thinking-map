@@ -1,0 +1,30 @@
+{
+  "surface": "RoundControl",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "waiting",
+      "value": "true",
+      "rationale": "source-derived state waiting=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "waiting",
+      "value": "false",
+      "rationale": "source-derived state waiting=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "counting",
+      "value": "true",
+      "rationale": "source-derived state counting=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "counting",
+      "value": "false",
+      "rationale": "source-derived state counting=false",
+      "status": "covered"
+    }
+  ]
+}

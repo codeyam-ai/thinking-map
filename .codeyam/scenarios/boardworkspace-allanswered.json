@@ -1,0 +1,12 @@
+{
+  "name": "BoardWorkspace - AllAnswered",
+  "id": "872c532a-fb86-4a5c-a31d-f662000d4287",
+  "url": "/isolated-components/BoardWorkspace?s=AllAnswered",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardWorkspace",
+  "scenarioType": "component",
+  "description": "Nothing open, and nothing answered in this sitting — a board someone has come back to rather than one they have just finished. It has to sit STILL, and that is the point of the frame: the trigger is having finished a round, not arriving at a finished one, so a countdown here would end a round on behalf of somebody who has not touched anything yet. It is also where the phase action now appears on the board, under the round's row, offering the way out of the loop that this surface previously had no route to."
+}

@@ -455,7 +455,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace insight stream › hands the board an empty stream on a map with no insights",
-      "line": 206,
+      "line": 210,
       "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
@@ -464,7 +464,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace insight stream › hands the board an insight before any round is finished",
-      "line": 185,
+      "line": 189,
       "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
@@ -473,7 +473,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace insight stream › leaves a themed insight in its row rather than on the stack",
-      "line": 228,
+      "line": 232,
       "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
@@ -482,7 +482,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh on the first revision it sees",
-      "line": 74,
+      "line": 78,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -491,7 +491,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh when the revision goes backwards",
-      "line": 111,
+      "line": 115,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -500,7 +500,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh when the revision repeats",
-      "line": 96,
+      "line": 100,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -509,7 +509,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › ignores an unbound bridge rather than reading it as zero",
-      "line": 125,
+      "line": 129,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -518,7 +518,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › refreshes once per advance across a run of them",
-      "line": 137,
+      "line": 141,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -527,7 +527,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › refreshes once when the revision advances",
-      "line": 83,
+      "line": 87,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -536,7 +536,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › treats the first real revision after an unbound start as a seed",
-      "line": 152,
+      "line": 156,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -7021,6 +7021,51 @@
       "runner": "tests"
     },
     {
+      "description": "The failure this whole note exists to prevent: a partner that answers \"your turn\" with another row of questions, forever, because nothing ever told it a decision was due.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundEndNote › names BOTH branches of the fork, not just \"your turn\"",
+      "line": 45,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "\"Draw the conclusion\" alone is not actionable — which conclusion, of what? Naming the destination phase is what turns the note from an exhortation into an instruction the partner can act on.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundEndNote › names the phase the map is due to reach, so the ask is specific",
+      "line": 55,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case above pins `next-steps` by name; this holds the same rule for the whole arc, so a phase added later with no `next` cannot quietly start telling the partner to move on to nothing.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundEndNote › never invites a move for a phase that has nowhere to go",
+      "line": 82,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Sourced from PHASE_ASK rather than written a second time here, so the sentence the person reads on the button and the one the agent reads on the log cannot drift apart.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundEndNote › opens with the phase sentence the button already shows",
+      "line": 64,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The arc terminates. An invitation to move on would point at nothing here, and \"keep going\" is the exact instruction that must not be given.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundEndNote › tells the terminal phase to conclude rather than to move on",
+      "line": 72,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
       "description": "A mixed round counts nodes instead: naming the majority kind would misdescribe what is actually in the row.",
       "file": "app/lib/mapRounds.test.ts",
       "format": "vitest",
@@ -7090,6 +7135,42 @@
       "key": "roundEyebrow › uses the singular for a round holding one question",
       "line": 266,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The clause most likely to be dropped as redundant, and the one that decides whether this is automation for a participant or at a reader. Every map someone reopens is in exactly this state.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundIsFinished › is false on a board that merely ARRIVES fully answered",
+      "line": 25,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A round already handed over is over. Without this the board would keep re-satisfying the condition while it waited and write the same note onto the log again and again.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundIsFinished › is false once the round has already been handed to the partner",
+      "line": 34,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Answering a lot is not the same as answering everything — the trigger is the board running out of questions, so a busy round with one card left must not end on the strength of the count alone.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundIsFinished › is false while anything is still open, however much was answered",
+      "line": 16,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The moment the feature exists for.",
+      "file": "app/lib/roundEnd.test.ts",
+      "format": "vitest",
+      "key": "roundIsFinished › is true once the last open question is answered in this sitting",
+      "line": 7,
+      "registeredAt": "2026-09-03T01:18:22Z",
       "runner": "tests"
     },
     {
@@ -8386,6 +8467,78 @@
       "key": "useMapAnswers › takes the answer back off the card when the write fails",
       "line": 71,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Cancelling ends THIS round's countdown, not the feature. The next round has to arrive with a fresh one or the board silently stops ending itself for the rest of the session.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › arms again for the next round after a hold",
+      "line": 133,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The number is the whole point of counting down in the open rather than firing at once — someone has to be able to see how long they have.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › counts down in whole seconds once armed",
+      "line": 33,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Ticks keep arriving after expiry until the caller disarms. Firing on each one would write a fresh note onto the shared log four times a second.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › does not fire again on the ticks after it expires",
+      "line": 58,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The headline behaviour: left alone, the round ends on its own.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › fires once when the countdown runs out",
+      "line": 46,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The race the tick's ref re-read exists for: a hold landing between two scheduled ticks must make the already-queued tick a no-op, not end a round the person just cancelled.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › ignores a tick already scheduled when the hold landed",
+      "line": 89,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "THE PRODUCTION FAILURE THIS HOOK IS SHAPED AROUND. The board calls router.refresh() on every revision bump, so an agent writing anything at all re-renders it with a fresh onExpire identity and restarts the effect. Held in state instead of a ref, the deadline would reset on each of those and the round would never end while a partner was working.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › keeps counting across re-renders that change the callback identity",
+      "line": 107,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing counts down until the board says the round is finished. This is what keeps a board with open questions on it completely still.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › reports nothing while disarmed",
+      "line": 20,
+      "registeredAt": "2026-09-03T01:18:22Z",
+      "runner": "tests"
+    },
+    {
+      "description": "\"A visible cancel\" is the promise the countdown is allowed to exist on. If holding open did not actually hold, the automation would be a thing done TO the person rather than for them.",
+      "file": "app/hooks/useSelfEndingRound.test.ts",
+      "format": "vitest",
+      "key": "useSelfEndingRound › stops for good once the round is held open",
+      "line": 72,
+      "registeredAt": "2026-09-03T01:18:22Z",
       "runner": "tests"
     },
     {

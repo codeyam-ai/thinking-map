@@ -14,11 +14,16 @@ import { useState } from 'react';
 
 export default function BoardChatComposer({
   onSend,
+  onTyping,
 }: {
   /** Called with the trimmed text. Never called with an empty string — a blank
    *  turn in the transcript reads as the person having said nothing on
    *  purpose. */
   onSend: (text: string) => void;
+  /** Called on every keystroke, including the ones that empty the box again.
+   *  It is a signal that someone is composing, not that a draft exists — which
+   *  is why it carries no text and fires on deletions too. */
+  onTyping?: () => void;
 }) {
   const [draft, setDraft] = useState('');
 
@@ -33,7 +38,10 @@ export default function BoardChatComposer({
     <div className="flex items-center gap-2 border-t border-white/8 px-4 py-2.5">
       <input
         value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={(e) => {
+          setDraft(e.target.value);
+          onTyping?.();
+        }}
         onKeyDown={(e) => {
           if (e.key !== 'Enter') return;
           e.preventDefault();

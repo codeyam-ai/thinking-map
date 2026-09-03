@@ -1,0 +1,12 @@
+{
+  "name": "PhaseAdvance - OnTheBoard",
+  "id": "9db45dfa-5ebf-477d-a6b7-25911463e3ca",
+  "url": "/isolated-components/PhaseAdvance?s=OnTheBoard",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "PhaseAdvance",
+  "scenarioType": "component",
+  "description": "The same control in its second home, and the reason this feature exists at all: it was built and then wired into a view the galaxy board replaced, so until now nothing on the page a person actually looks at could move the map's phase — the conclusion was reachable only by asking an agent in another window. The board's chat panel is near-black, where the paper tone's filled ink button would be black on black, so the fill goes and an outline takes its place. That also reads correctly as the secondary move beside the round's lime primary: ending a round and ending a phase are different sizes of decision."
+}

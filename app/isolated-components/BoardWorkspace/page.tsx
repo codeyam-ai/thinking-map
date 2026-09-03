@@ -2,6 +2,7 @@ import Component from "../../components/BoardWorkspace";
 import BridgeFixture from "../BridgeFixture";
 import type { ExchangeEvent } from "../../lib/exchange";
 import type { GalaxyNodeInput, GalaxyTheme } from "../../lib/galaxyLayout";
+import type { Phase } from "../../lib/mapKinds";
 
 // The board and the conversation together, which is the surface a person
 // actually uses — the map is what the conversation has produced so far, and the
@@ -107,6 +108,18 @@ const EXCHANGE: ExchangeEvent[] = [
   }),
 ];
 
+// The same board with nothing left open. Every scenario above it has two
+// questions still waiting, which is the ordinary state and deliberately the
+// default — the round only ends itself when the board runs out of questions, so
+// a fixture that is always full could never show it happening.
+const ANSWERED_NODES: GalaxyNodeInput[] = NODES.map((n) =>
+  n.id === "g-ctx-2"
+    ? { ...n, status: "answered", detail: "After the verbal handover, before the task is done." }
+    : n.id === "g-ppl-1"
+      ? { ...n, status: "answered", detail: "Nobody. That is the actual gap." }
+      : n,
+);
+
 const scenarios: Record<
   string,
   {
@@ -116,6 +129,10 @@ const scenarios: Record<
     status: "unavailable" | "connected" | "working";
     revision: number;
     attachments?: { name: string }[];
+    /** Where the map is on its arc. Drives both the note the round's end sends
+     *  and which step the phase action offers, so it is per-scenario rather
+     *  than fixed — `map` and `explore` are genuinely different screens. */
+    phase?: Phase;
   }
 > = {
   // The whole surface with an agent attached: the board underneath, the
@@ -159,6 +176,33 @@ const scenarios: Record<
     status: "unavailable",
     revision: 0,
   },
+
+  // Nothing open, and nothing answered in THIS sitting — a board someone has
+  // come back to rather than one they have just finished. It must sit still:
+  // the trigger is having finished a round, not arriving at a finished one, and
+  // a countdown here would end a round on behalf of someone who has not
+  // touched anything yet. Answering is what starts the clock, and the pencil on
+  // an answered card is a real way to do that with no question left open.
+  AllAnswered: {
+    themes: THEMES,
+    nodes: ANSWERED_NODES,
+    events: EXCHANGE,
+    status: "connected",
+    revision: 5,
+  },
+
+  // Further along the arc, where the step on offer is the last one before the
+  // plan. Same board, different fork: the phase action reads "Draw up the plan"
+  // rather than "Ready to research", and the note the round sends names the
+  // phase it is due to reach.
+  EndOfExplore: {
+    themes: THEMES,
+    nodes: ANSWERED_NODES,
+    events: EXCHANGE,
+    status: "connected",
+    revision: 5,
+    phase: "explore",
+  },
 };
 
 export default async function Page({
@@ -190,6 +234,7 @@ export default async function Page({
         <Component
           seedIdea={SEED_IDEA}
           mapId="map-galaxy"
+          mapPhase={fixture.phase ?? "map"}
           attachments={fixture.attachments}
           themes={fixture.themes}
           nodes={fixture.nodes}

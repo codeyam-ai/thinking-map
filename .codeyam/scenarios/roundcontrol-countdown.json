@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - Countdown",
+  "id": "7b585eca-3291-4d2c-befe-b1de15106b35",
+  "url": "/isolated-components/RoundControl?s=Countdown",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "The round ending itself. Set beside AllAnswered — identical counts, identical phase — it is the whole difference the countdown makes: the resting state offers a way on, this one is already taking it and saying how long you have to object. Three things share the row here where every other state has two, which is why the message is terser than 'Everything on the board is answered'; that copy and this row are the same fit problem, and the shorter line is what keeps 'Go now' inside the panel."
+}

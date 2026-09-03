@@ -62,6 +62,33 @@
         "reason": "The header binds no handlers itself. Both actions belong to children and are captured there - opening the map list on BoardMenu, and following the lockup home on Wordmark."
       }
     },
+    "BoardWorkspace": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "covered"
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The board has no failure surface of its own. A bridge that cannot bind is the ORDINARY state here, not an error — every capture produces it, because WebMCP is unreachable inside a frame by definition — and it is covered by NoAgent. A failed phase write draws its message inside PhaseAdvance, which owns that state and has its own scenario for it."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
     "BriefDrop": {
       "empty": {
         "status": "covered"
@@ -416,6 +443,34 @@
       },
       "key-interaction": {
         "status": "added"
+      }
+    },
+    "RoundControl": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "The control reports two counts and a countdown, never a list — there is nothing here that can overflow or truncate, so a 'far more than fits' state cannot occur."
+      },
+      "loading": {
+        "status": "covered"
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "It writes nothing itself: the round's note goes through the board, and a failed write surfaces on the board rather than on this row. The control has no failure of its own to draw."
+      },
+      "key-interaction": {
+        "status": "covered"
       }
     },
     "RowThreads": {

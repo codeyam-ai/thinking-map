@@ -263,7 +263,7 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     name: 'set_phase',
     title: 'Move the map to a new phase',
     description:
-      'Advance the map through the loop once the conversation has genuinely reached the next phase.',
+      'Advance the map through the loop once the conversation has genuinely reached the next phase. The arc runs map → research → explore → next-steps and it ENDS: `next-steps` is the destination, and this tool is the only way a map reaches it. When the person says everything on the board is answered, that is a fork, not a cue for another round — either add the questions that are genuinely still missing, or move the map on. Reaching `next-steps` means writing the conclusion: what this comes to, what it would take to build, in what order, and what it depends on. Rounds that only ever add more questions never arrive anywhere.',
     inputSchema: z.object({
       phase: z
         .enum(ACCEPTED_PHASE_NAMES)

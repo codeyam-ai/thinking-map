@@ -137,6 +137,11 @@ export default function MapScreen({
         <BoardWorkspace
           seedIdea={seedIdea}
           mapId={currentId ?? ''}
+          // The board needs the arc, not just the cards on it: which phase this
+          // is decides what "move on" means and what the round's closing note
+          // tells the partner is due. This screen has held the phase all along
+          // and only ever used it for its own layout.
+          mapPhase={phase}
           attachments={attachments}
           themes={themes}
           nodes={nodes.map((n) => ({

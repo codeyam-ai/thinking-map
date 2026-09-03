@@ -12,6 +12,14 @@
 // That is also why the button is not disabled while questions are unanswered.
 // Deciding a round is over is the person's call, not a completeness check —
 // "I don't know yet" is a real answer to give by moving on.
+//
+// `countdown` is the one state where the round ends WITHOUT a press: the board
+// is fully answered, so the thing this control existed to ask for has already
+// happened. It still counts down in the open rather than firing on the last
+// answer, because the seconds after finishing are exactly when someone thinks
+// of the general remark that fits nowhere on the board — and automation that
+// takes that moment away is a thing done TO them. Hence a visible number and a
+// visible way to stop it.
 
 import { useEffect, useRef, useState } from 'react';
 
@@ -22,6 +30,8 @@ export default function RoundControl({
   answered,
   phase,
   onNext,
+  countdown = null,
+  onCancel,
 }: {
   /** Unanswered questions currently on the board. */
   open: number;
@@ -29,8 +39,14 @@ export default function RoundControl({
   answered: number;
   phase: RoundPhase;
   onNext: () => void;
+  /** Seconds until the round ends on its own, or null when nothing is armed. */
+  countdown?: number | null;
+  /** Stop the countdown and leave the round open. */
+  onCancel?: () => void;
 }) {
   const waiting = phase === 'waiting';
+  // A wait that has already begun outranks a countdown to starting one.
+  const counting = !waiting && countdown !== null;
 
   // Elapsed seconds, shown once the wait stops feeling instant. A spinner with
   // no number reads the same at two seconds and at forty; the count is what
@@ -64,6 +80,17 @@ export default function RoundControl({
               Your partner is thinking
               {seconds > 2 ? ` · ${seconds}s` : ''}
             </>
+          ) : counting ? (
+            // Deliberately terser than the resting line below it. This is the
+            // one state where the row carries THREE things — the message, the
+            // way out, and the way on — and the panel is not wide enough for
+            // the full sentence plus both. The number is the part that has to
+            // survive; "everything is answered" is already why the countdown
+            // is on screen at all.
+            <>
+              Back to your partner ·{' '}
+              <span className="tabular-nums text-white/80">{countdown}s</span>
+            </>
           ) : open > 0 ? (
             <>
               {answered} answered · {open} still open
@@ -72,6 +99,20 @@ export default function RoundControl({
             'Everything on the board is answered'
           )}
       </span>
+
+      {/* The cancel sits BEFORE the primary and is deliberately quiet. It is
+          the rarer choice — most rounds should just end — but it has to be
+          reachable without aiming, because the person reaching for it is
+          racing a number. */}
+      {counting && onCancel ? (
+        <button
+          type="button"
+          onClick={onCancel}
+          className="shrink-0 whitespace-nowrap rounded-full px-2 py-2.5 text-[12px] text-white/55 underline-offset-2 transition hover:text-white/85 hover:underline"
+        >
+          Not yet
+        </button>
+      ) : null}
 
       <button
         type="button"
@@ -86,6 +127,8 @@ export default function RoundControl({
               <span className="h-3 w-3 animate-spin rounded-full border-2 border-black/25 border-t-black" />
               Waiting
             </>
+          ) : counting ? (
+            <>Go now →</>
           ) : (
           <>Next round →</>
         )}

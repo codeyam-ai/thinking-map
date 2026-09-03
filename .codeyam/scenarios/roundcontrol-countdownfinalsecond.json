@@ -1,0 +1,12 @@
+{
+  "name": "RoundControl - CountdownFinalSecond",
+  "id": "f26f9f01-64ee-405c-b032-d37f342a7570",
+  "url": "/isolated-components/RoundControl?s=CountdownFinalSecond",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "RoundControl",
+  "scenarioType": "component",
+  "description": "The last second before the round goes. Its own frame because a shrinking number is exactly where a row can reflow and push the primary out of reach — the seconds are set in tabular figures so the width holds from 10 down to 1, and this is the end of that range."
+}

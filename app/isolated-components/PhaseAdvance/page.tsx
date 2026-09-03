@@ -21,6 +21,23 @@ const scenarios: Record<string, Props> = {
   // is disabled rather than absent, so the step is still legible as the next
   // thing even where it cannot be taken.
   NoMapToAdvance: { phase: "map" },
+
+  // The same control in its second home. Reaching the board at all is the
+  // point: this was built and then wired into a view the galaxy board replaced,
+  // so until now nothing on the page a person actually looks at could move the
+  // map's phase. The board's chat panel is near-black, where the paper tone's
+  // filled ink button would be black on black — so the fill goes and an outline
+  // takes its place, which also reads correctly as the secondary move beside
+  // the round's lime primary.
+  OnTheBoard: { phase: "map", mapId: "map-game", tone: "board" },
+
+  // The last working phase, in board tone: the step immediately before the
+  // conclusion, which is the destination this whole route exists to reach.
+  OnTheBoardEndOfExplore: {
+    phase: "explore",
+    mapId: "map-game",
+    tone: "board",
+  },
 };
 
 export default async function Page({
@@ -33,8 +50,16 @@ export default async function Page({
   if (!props) {
     return <div>Unknown scenario: {s}</div>;
   }
+  // The board tone is only legible on the ground it was drawn for. Captured on
+  // the page's paper white it would look like a broken paper variant rather
+  // than a correct board one, so the harness supplies the chat panel's ground.
+  const board = props.tone === "board";
+
   return (
-    <div id="codeyam-capture">
+    <div
+      id="codeyam-capture"
+      style={board ? { background: "#0a0a0b", padding: 28 } : undefined}
+    >
       <div style={{ width: "100%", maxWidth: 620 }}>
         <Component {...props} />
       </div>

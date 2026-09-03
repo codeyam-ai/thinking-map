@@ -6,13 +6,13 @@
       "dimension": "status",
       "value": "answered",
       "rationale": "source-derived state status=answered",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "status",
       "value": "open",
       "rationale": "source-derived state status=open",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "showRound",
