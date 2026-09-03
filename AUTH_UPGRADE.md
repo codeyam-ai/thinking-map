@@ -148,7 +148,7 @@ export interface Session {
 }
 
 const auth = betterAuth({
-  database: prismaAdapter(prisma, { provider: 'sqlite' }),
+  database: prismaAdapter(prisma, { provider: 'postgresql' }),
   emailAndPassword: { enabled: true },
 });
 

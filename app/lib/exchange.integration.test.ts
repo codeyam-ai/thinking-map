@@ -1,11 +1,8 @@
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync } from 'fs';
-import { tmpdir } from 'os';
-import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { setUpTestSchema } from './testDatabase';
 
-// The database-bound half of the exchange spine, against a real (temporary)
-// SQLite file. These four functions cannot be covered by a pure test — minting
+// The database-bound half of the exchange spine, against a real PostgreSQL
+// schema of its own. These four functions cannot be covered by a pure test — minting
 // a revision, deduplicating a retry, and waking a waiter are all things that
 // only mean anything against a real transaction — and they are the heart of the
 // feature, so they get a real database rather than a hand-waved exemption.
@@ -15,7 +12,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 // Node exit with the promise unsettled — "wait, then time out cleanly" silently
 // became "the agent's call never returns".
 
-let dir: string;
+let teardown: (() => Promise<void>) | undefined;
 let exchange: typeof import('./exchange');
 let mapStore: typeof import('./mapStore');
 let prisma: typeof import('./prisma').prisma;
@@ -23,18 +20,10 @@ let prisma: typeof import('./prisma').prisma;
 const MAP = 'map-under-test';
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(tmpdir(), 'exchange-test-'));
-  const url = `file:${path.join(dir, 'test.db')}`;
-  // Set before the modules load: app/lib/prisma.ts reads DATABASE_URL at import
-  // time, so a later assignment would be ignored.
-  process.env.DATABASE_URL = url;
-
-  // `--url` rather than the env alone: this Prisma reads its datasource from
-  // prisma.config.ts, so DATABASE_URL by itself would push to the dev database.
-  execFileSync('npx', ['prisma', 'db', 'push', '--url', url], {
-    env: { ...process.env, DATABASE_URL: url },
-    stdio: 'pipe',
-  });
+  // Assigns DATABASE_URL and pushes the schema. Must complete before the
+  // imports below: app/lib/prisma.ts reads DATABASE_URL at import time, so a
+  // later assignment would be ignored.
+  ({ teardown } = await setUpTestSchema('exchange'));
 
   exchange = await import('./exchange');
   mapStore = await import('./mapStore');
@@ -43,7 +32,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await prisma?.$disconnect();
-  if (dir) rmSync(dir, { recursive: true, force: true });
+  await teardown?.();
 });
 
 async function freshMap(id = MAP) {

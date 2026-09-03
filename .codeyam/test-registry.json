@@ -1085,7 +1085,7 @@
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
       "key": "POST /api/maps/:id/exchange — user.question › accepts user.question as a user-writable kind",
-      "line": 169,
+      "line": 160,
       "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
       "runner": "tests"
     },
@@ -1094,7 +1094,7 @@
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
       "key": "POST /api/maps/:id/exchange — user.question › leaves the node it asks about untouched",
-      "line": 155,
+      "line": 146,
       "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
       "runner": "tests"
     },
@@ -1103,7 +1103,7 @@
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
       "key": "POST /api/maps/:id/exchange — user.question › records the question with the node label resolved",
-      "line": 96,
+      "line": 87,
       "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
       "runner": "tests"
     },
@@ -1112,7 +1112,7 @@
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
       "key": "POST /api/maps/:id/exchange — user.question › refuses a node that belongs to a different map",
-      "line": 117,
+      "line": 108,
       "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
       "runner": "tests"
     },
@@ -1121,7 +1121,7 @@
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
       "key": "POST /api/maps/:id/exchange — user.question › refuses a nodeId that names nothing",
-      "line": 130,
+      "line": 121,
       "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
       "runner": "tests"
     },
@@ -1130,7 +1130,7 @@
       "file": "app/api/maps/[id]/exchange/route.integration.test.ts",
       "format": "vitest",
       "key": "POST /api/maps/:id/exchange — user.question › refuses a question with no nodeId",
-      "line": 142,
+      "line": 133,
       "registeredAt": "2026-09-01T15:00:20.297480910+00:00",
       "runner": "tests"
     },
@@ -1931,7 +1931,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "applyToolCalls › does not duplicate nodes when a call is retried with the same requestId",
-      "line": 177,
+      "line": 166,
       "registeredAt": "2026-09-02T21:34:40Z",
       "runner": "tests"
     },
@@ -1940,7 +1940,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "applyToolCalls › keys on the requestId rather than the content",
-      "line": 196,
+      "line": 185,
       "registeredAt": "2026-09-02T21:34:40Z",
       "runner": "tests"
     },
@@ -1949,7 +1949,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "applyToolCalls › leaves nothing behind when a write fails partway through the batch",
-      "line": 258,
+      "line": 247,
       "registeredAt": "2026-09-02T21:34:40Z",
       "runner": "tests"
     },
@@ -1958,7 +1958,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "applyToolCalls › leaves one theme and one set of nodes when a multi-write call is retried",
-      "line": 221,
+      "line": 210,
       "registeredAt": "2026-09-02T21:34:40Z",
       "runner": "tests"
     },
@@ -1967,7 +1967,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "applyToolCalls › writes on every call when no requestId is given",
-      "line": 209,
+      "line": 198,
       "registeredAt": "2026-09-02T21:34:40Z",
       "runner": "tests"
     },
@@ -2246,7 +2246,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › cannot touch another map’s attachment",
-      "line": 376,
+      "line": 367,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2255,7 +2255,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › clears to nothing when the list is empty",
-      "line": 330,
+      "line": 321,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2264,7 +2264,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › drops an entry with no usable name",
-      "line": 359,
+      "line": 350,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2273,7 +2273,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › keeps the file itself, not just the name",
-      "line": 302,
+      "line": 293,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2282,7 +2282,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › keeps what was attached across a re-read",
-      "line": 287,
+      "line": 278,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2291,7 +2291,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › refuses a body that is not a list of attachments",
-      "line": 404,
+      "line": 395,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -2300,7 +2300,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › removes what the list no longer names",
-      "line": 315,
+      "line": 306,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2309,7 +2309,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › renames in place and drops everything else sent with it",
-      "line": 341,
+      "line": 332,
       "registeredAt": "2026-09-03T00:22:33Z",
       "runner": "tests"
     },
@@ -2318,7 +2318,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "attachments › reports a missing map instead of silently saving nothing",
-      "line": 394,
+      "line": 385,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -3272,7 +3272,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › attaches to the root when no parent is named",
-      "line": 159,
+      "line": 150,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3281,7 +3281,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › creates the node and logs it with the real id",
-      "line": 129,
+      "line": 120,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3290,7 +3290,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › falls back to a drawable kind when the requested one is not real",
-      "line": 182,
+      "line": 173,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3299,7 +3299,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › honours an explicit parent",
-      "line": 170,
+      "line": 161,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3308,7 +3308,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › marks the node as the person’s",
-      "line": 149,
+      "line": 140,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3317,7 +3317,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › orders a new sibling after the existing ones",
-      "line": 205,
+      "line": 196,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3326,7 +3326,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — adding a node › writes nothing for an empty label",
-      "line": 194,
+      "line": 185,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3335,7 +3335,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › closes the answered question and logs both halves",
-      "line": 81,
+      "line": 72,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3344,7 +3344,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › does not report a second close when the question is already answered",
-      "line": 94,
+      "line": 85,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3353,7 +3353,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › keeps the answer when the question node is gone",
-      "line": 107,
+      "line": 98,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3362,7 +3362,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — answering › tolerates a malformed answers payload",
-      "line": 117,
+      "line": 108,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3371,7 +3371,7 @@
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
       "key": "contributionEvents — leaving a note › logs the note and changes nothing on the map",
-      "line": 225,
+      "line": 216,
       "registeredAt": "2026-09-01T11:37:21Z",
       "runner": "tests"
     },
@@ -3407,7 +3407,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "currentRevision › reports the map’s revision without reading the log",
-      "line": 342,
+      "line": 331,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3416,7 +3416,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "currentRevision › throws for a map that does not exist",
-      "line": 353,
+      "line": 342,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -3436,6 +3436,51 @@
       "key": "curve › starts and ends on the points it was given",
       "line": 44,
       "registeredAt": "2026-09-01T21:31:13Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bug this function exists to prevent, stated directly: `?schema=` is a Prisma convention that the `pg` driver does not parse, so unless it is lifted out and handed to the adapter separately, every query silently runs against `public` while the tables live somewhere else.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "databaseConnection › lifts the schema out of the connection string",
+      "line": 45,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The adapter still needs the whole string to connect with — host, database, credentials and any pooler parameters must survive untouched.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "databaseConnection › passes the connection string through intact",
+      "line": 65,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary deployment case. No schema parameter means the default search_path, and forcing one would be wrong.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "databaseConnection › reports no schema when the URL does not name one",
+      "line": 55,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Inherits the guard from requireDatabaseUrl rather than re-implementing it.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "databaseConnection › throws when DATABASE_URL is missing",
+      "line": 79,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Not every valid connection string is a parseable URL (libpq key/value form is legal). That should mean \"no schema\", not a crash on startup.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "databaseConnection › treats an unparseable connection string as naming no schema",
+      "line": 72,
+      "registeredAt": "2026-09-03T10:26:11Z",
       "runner": "tests"
     },
     {
@@ -4469,7 +4514,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › carries the resolved ids on the node.added event as an array",
-      "line": 139,
+      "line": 128,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4478,7 +4523,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › leaves the column null when the agent named no sources",
-      "line": 105,
+      "line": 94,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4487,7 +4532,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › turns refs from the same call into the ids the database just minted",
-      "line": 86,
+      "line": 75,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -4496,7 +4541,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "fromRefs resolution › writes an unresolvable ref through, and the read side drops it",
-      "line": 119,
+      "line": 108,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7223,7 +7268,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › decodes stored payloads back into objects",
-      "line": 329,
+      "line": 318,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7232,7 +7277,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › reports the current revision even when the delta is empty",
-      "line": 317,
+      "line": 306,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7241,7 +7286,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › returns only what happened after the cursor",
-      "line": 304,
+      "line": 293,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7250,7 +7295,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "readSince › returns the whole log when given no cursor",
-      "line": 291,
+      "line": 280,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7259,7 +7304,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "read_map carries the standing ask › reads as an invitation on a map with no insights yet",
-      "line": 214,
+      "line": 203,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7268,7 +7313,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "read_map carries the standing ask › reports the budget on a full read",
-      "line": 182,
+      "line": 171,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7277,7 +7322,7 @@
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
       "key": "read_map carries the standing ask › reports the same budget on a delta read",
-      "line": 199,
+      "line": 188,
       "registeredAt": "2026-09-02T22:52:12Z",
       "runner": "tests"
     },
@@ -7286,7 +7331,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › leaves the map at the revision of its last event",
-      "line": 74,
+      "line": 63,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7295,7 +7340,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › mints one revision per event and returns them in order",
-      "line": 61,
+      "line": 50,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7304,7 +7349,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › records nothing and holds the revision for an empty batch",
-      "line": 124,
+      "line": 113,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7313,7 +7358,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › refuses to write against an unknown map",
-      "line": 136,
+      "line": 125,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7322,7 +7367,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › returns every event the original call wrote on a retry",
-      "line": 103,
+      "line": 92,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7331,7 +7376,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "recordEvents › treats a repeated requestId as a no-op and returns the original revision",
-      "line": 85,
+      "line": 74,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -7432,6 +7477,42 @@
       "key": "requestUserInteraction › runs the work directly when there is no model context",
       "line": 501,
       "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The message is the only instruction a developer gets at the moment the app refuses to boot, so it has to name the file that explains what to do.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "requireDatabaseUrl › points at the file that explains how to fix it",
+      "line": 35,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The happy path still has to work: a configured string is passed through unchanged, with no normalising or rewriting that could corrupt a DSN.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "requireDatabaseUrl › returns the configured connection string",
+      "line": 11,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The core guarantee. Before this migration a missing value silently opened a local SQLite file; on a serverless host that is a file no other function instance can see, so the failure looked like missing data instead.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "requireDatabaseUrl › throws when DATABASE_URL is absent",
+      "line": 20,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty value is the shape a committed `.env` placeholder actually takes, and it is the one most likely to reach a deploy. Treating it as \"set\" would hand the adapter an empty string and move the failure somewhere unreadable.",
+      "file": "app/lib/databaseUrl.test.ts",
+      "format": "vitest",
+      "key": "requireDatabaseUrl › treats an empty DATABASE_URL as unset",
+      "line": 27,
+      "registeredAt": "2026-09-03T10:26:11Z",
       "runner": "tests"
     },
     {
@@ -7894,6 +7975,42 @@
       "runner": "tests"
     },
     {
+      "description": "The failure this exists to prevent: a hosted DSN arrives carrying its own query parameters, and naive concatenation would produce a URL with two `?` — dropping pgbouncer settings that the connection actually depends on.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "schemaUrl › keeps query parameters the base connection string already carries",
+      "line": 52,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Only the schema parameter may change. Rewriting the host or database would silently point the whole suite at somewhere it was never meant to reach.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "schemaUrl › leaves the host and database untouched",
+      "line": 75,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The base case: a local DSN with no query string gains exactly one.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "schemaUrl › points a plain connection string at the schema",
+      "line": 43,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Two `schema` parameters would leave which one wins up to the driver, so a base that already names one must be overridden rather than appended to.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "schemaUrl › replaces a schema the base already specifies rather than adding a second",
+      "line": 66,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
       "description": "Ids are sequential and a long brief runs past nine, so the transform must not assume a single digit.",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
@@ -7999,6 +8116,51 @@
       "key": "shortenName › truncates the first name past the limit",
       "line": 356,
       "registeredAt": "2026-09-03T01:02:45.036906593+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The default must stay \"install\", or a fresh clone loses scenario capture with no error to explain why.",
+      "file": "scripts/postinstall.test.mjs",
+      "format": "vitest",
+      "key": "shouldSkipBrowserInstall › installs on a developer machine",
+      "line": 12,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Vercel sets both. The reported reason should be the specific one, since it is the only explanation a reader gets in the build log.",
+      "file": "scripts/postinstall.test.mjs",
+      "format": "vitest",
+      "key": "shouldSkipBrowserInstall › reports VERCEL rather than CI when both are set",
+      "line": 30,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Not Vercel-specific: any CI installing dependencies to run the test suite has the same reason to skip, and the suite needs no browser.",
+      "file": "scripts/postinstall.test.mjs",
+      "format": "vitest",
+      "key": "shouldSkipBrowserInstall › skips on CI generally",
+      "line": 24,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reason this script exists: a ~150MB browser download on every production build, for a devDependency the deployed app never imports.",
+      "file": "scripts/postinstall.test.mjs",
+      "format": "vitest",
+      "key": "shouldSkipBrowserInstall › skips on Vercel, where the browser is never loaded",
+      "line": 18,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An unset variable arrives as an empty string often enough that treating it as truthy would silently disable capture on developer machines.",
+      "file": "scripts/postinstall.test.mjs",
+      "format": "vitest",
+      "key": "shouldSkipBrowserInstall › treats an empty value as not set",
+      "line": 36,
+      "registeredAt": "2026-09-03T10:26:11Z",
       "runner": "tests"
     },
     {
@@ -8512,6 +8674,42 @@
       "key": "toolSummaries › summarises every catalog tool with a name, title and description",
       "line": 163,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Uniqueness is what lets the same test file run twice concurrently — two runs sharing a schema would see each other's rows and fail intermittently.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "uniqueSchemaName › gives two calls with the same label different names",
+      "line": 36,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Two files that differ only by case would collide: an unquoted Postgres identifier folds to lower case, so `Test_A` and `test_a` are one schema.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "uniqueSchemaName › lowercases the label",
+      "line": 20,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The fixed `test_` prefix is what makes a stray schema identifiable as test debris on a database that may also hold someone's real data.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "uniqueSchemaName › prefixes the label so test schemas are recognisable on a shared server",
+      "line": 12,
+      "registeredAt": "2026-09-03T10:26:11Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The name reaches a DROP SCHEMA statement. A label carrying a quote should produce a dull name rather than a broken — or dangerous — statement.",
+      "file": "app/lib/testDatabase.test.ts",
+      "format": "vitest",
+      "key": "uniqueSchemaName › reduces anything outside [a-z0-9_] to an underscore",
+      "line": 28,
+      "registeredAt": "2026-09-03T10:26:11Z",
       "runner": "tests"
     },
     {
@@ -9212,7 +9410,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › does not re-deliver a map through the cursor it handed back",
-      "line": 483,
+      "line": 472,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -9221,7 +9419,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › releases when a map is created during the wait",
-      "line": 450,
+      "line": 439,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -9230,7 +9428,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › reports whether each map was started from a brief",
-      "line": 526,
+      "line": 515,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -9239,7 +9437,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › returns immediately when a map already exists after the cursor",
-      "line": 437,
+      "line": 426,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -9248,7 +9446,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › returns several maps in creation order when they arrive together",
-      "line": 505,
+      "line": 494,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -9257,7 +9455,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForNewMap › times out cleanly with a usable cursor when nobody starts anything",
-      "line": 467,
+      "line": 456,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -9266,7 +9464,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › does not wake on the agent’s own writes",
-      "line": 374,
+      "line": 363,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -9275,7 +9473,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › returns immediately when the person already acted",
-      "line": 362,
+      "line": 351,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -9284,7 +9482,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › times out cleanly with a resume cursor when nobody acts",
-      "line": 406,
+      "line": 395,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },
@@ -9293,7 +9491,7 @@
       "file": "app/lib/exchange.integration.test.ts",
       "format": "vitest",
       "key": "waitForUserActivity › wakes and returns the user’s events when they act during the wait",
-      "line": 389,
+      "line": 378,
       "registeredAt": "2026-09-01T01:23:52.487963175+00:00",
       "runner": "tests"
     },

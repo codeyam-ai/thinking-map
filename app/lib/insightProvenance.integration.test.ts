@@ -1,9 +1,6 @@
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync } from 'fs';
-import { tmpdir } from 'os';
-import path from 'path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { textOf } from './toolInvocation';
+import { setUpTestSchema } from './testDatabase';
 
 // `toolRuntime` imports `server-only`, whose whole job is to throw when it is
 // pulled into a client bundle. Under Vitest there is no bundle to be in, so the
@@ -14,7 +11,7 @@ import { textOf } from './toolInvocation';
 vi.mock('server-only', () => ({}));
 
 // The database-bound half of "insights the agent keeps supplying", against a
-// real (temporary) SQLite file.
+// real PostgreSQL schema of its own.
 //
 // A pure test cannot reach any of it. `fromRefs` becomes `fromNodeIds` only by
 // being resolved against ids the database just minted inside the same
@@ -23,7 +20,7 @@ vi.mock('server-only', () => ({}));
 // so they get a real database rather than a hand-waved exemption — the same
 // call `exchange.integration.test.ts` makes for the same reason.
 
-let dir: string;
+let teardown: (() => Promise<void>) | undefined;
 let mapStore: typeof import('./mapStore');
 let toolRuntime: typeof import('./toolRuntime');
 let prisma: typeof import('./prisma').prisma;
@@ -31,18 +28,10 @@ let prisma: typeof import('./prisma').prisma;
 const MAP = 'insight-map-under-test';
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(tmpdir(), 'insight-test-'));
-  const url = `file:${path.join(dir, 'test.db')}`;
-  // Set before the modules load: app/lib/prisma.ts reads DATABASE_URL at import
-  // time, so a later assignment would be ignored.
-  process.env.DATABASE_URL = url;
-
-  // `--url` rather than the env alone: this Prisma reads its datasource from
-  // prisma.config.ts, so DATABASE_URL by itself would push to the dev database.
-  execFileSync('npx', ['prisma', 'db', 'push', '--url', url], {
-    env: { ...process.env, DATABASE_URL: url },
-    stdio: 'pipe',
-  });
+  // Assigns DATABASE_URL and pushes the schema. Must complete before the
+  // imports below: app/lib/prisma.ts reads DATABASE_URL at import time, so a
+  // later assignment would be ignored.
+  ({ teardown } = await setUpTestSchema('insight'));
 
   mapStore = await import('./mapStore');
   toolRuntime = await import('./toolRuntime');
@@ -51,7 +40,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await prisma?.$disconnect();
-  if (dir) rmSync(dir, { recursive: true, force: true });
+  await teardown?.();
 });
 
 async function freshMap(id = MAP) {

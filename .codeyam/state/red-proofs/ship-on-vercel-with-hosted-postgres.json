@@ -1,0 +1,24 @@
+{
+  "provenAt": "2026-09-03T10:23:53Z",
+  "slug": "ship-on-vercel-with-hosted-postgres",
+  "paths": [],
+  "tests": {
+    "databaseConnection › lifts the schema out of the connection string": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "Semantic revert, observed live in this session rather than reconstructed. Before databaseConnection() existed, app/lib/prisma.ts built the adapter from the connection string alone (new PrismaPg({connectionString})), which is exactly the reverted world: pg does not parse Prisma's ?schema= parameter, so the session stayed on the default search_path. prove-red cannot take this by revert — reverting app/lib/prisma.ts restores its better-sqlite3 form, which does not compile against the postgresql schema, and reverting app/lib/databaseUrl.ts deletes the symbol the test imports.",
+        "evidence": "Measured across two full suite runs. With the connection string passed alone: 62 failed / 979 passed, every one of the 61 integration failures resolving to the same Postgres 42P01 — 'relation \"public.ThinkingMap\" does not exist' — captured directly from a tsx probe of setUpTestSchema, with the tables verifiably present in the test_* schema that db push had created. After lifting ?schema= out and passing it as PrismaPg's schema option, with no other change: 0 failed / 1046 passed."
+      }
+    }
+  },
+  "proof": {
+    "verdict": "provenByHand",
+    "attested": [
+      "databaseConnection › lifts the schema out of the connection string"
+    ],
+    "method": "Semantic revert, observed live in this session rather than reconstructed. Before databaseConnection() existed, app/lib/prisma.ts built the adapter from the connection string alone (new PrismaPg({connectionString})), which is exactly the reverted world: pg does not parse Prisma's ?schema= parameter, so the session stayed on the default search_path. prove-red cannot take this by revert — reverting app/lib/prisma.ts restores its better-sqlite3 form, which does not compile against the postgresql schema, and reverting app/lib/databaseUrl.ts deletes the symbol the test imports.",
+    "evidence": "Measured across two full suite runs. With the connection string passed alone: 62 failed / 979 passed, every one of the 61 integration failures resolving to the same Postgres 42P01 — 'relation \"public.ThinkingMap\" does not exist' — captured directly from a tsx probe of setUpTestSchema, with the tables verifiably present in the test_* schema that db push had created. After lifting ?schema= out and passing it as PrismaPg's schema option, with no other change: 0 failed / 1046 passed."
+  }
+}

@@ -1,4 +1,4 @@
-// Prisma 7 with SQLite via better-sqlite3 driver adapter.
+// Prisma 7 with PostgreSQL via the `pg` driver adapter.
 //
 // IMPORTANT: Use "prisma-client-js" (NOT "prisma-client").
 // The "prisma-client" generator requires a custom output path which
@@ -11,7 +11,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ──────────────────────────────────────────────
@@ -22,9 +22,12 @@ datasource db {
 // visual view of the same thinking. The conversation and the map are two
 // renderings of one process, so they hang off the same root.
 //
-// SQLite has no enum support in Prisma, so `kind`, `phase`, and `status`
-// are Strings. Their allowed values live in app/lib/mapKinds.ts, which is
-// the single place they are defined.
+// `kind`, `phase`, and `status` are Strings. This began as a SQLite
+// constraint — Prisma has no enum support there — but it is now a
+// deliberate choice, kept when the datasource moved to PostgreSQL. Their
+// allowed values live in app/lib/mapKinds.ts, which is the single place
+// they are defined, and native enums would split that definition in two
+// and make every added value a migration.
 // ──────────────────────────────────────────────
 
 model ThinkingMap {

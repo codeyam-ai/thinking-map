@@ -1803,6 +1803,12 @@
     "testFile": "app/lib/threadGeometry.test.ts"
   },
   {
+    "description": "Splits DATABASE_URL into the connection string and the schema the Prisma adapter must be given separately. `?schema=` is a Prisma datasource convention that the pg driver does not parse, so without lifting it out the adapter queries the default search_path while the CLI built the tables elsewhere.",
+    "filePath": "app/lib/databaseUrl.ts",
+    "name": "databaseConnection",
+    "testFile": "app/lib/databaseUrl.test.ts"
+  },
+  {
     "description": "Turns a stored row into a readable event. SQLite has no JSON column, so payloads are strings that could be anything; a payload that will not parse degrades to null rather than throwing, because one bad row must not take down the whole catch-up read an agent depends on. The revision and kind survive regardless.",
     "filePath": "app/lib/exchange.ts",
     "name": "decodeEvent",
@@ -1855,6 +1861,15 @@
     "filePath": "app/lib/loadError.ts",
     "name": "diagnosisLine",
     "testFile": "app/lib/loadError.test.ts"
+  },
+  {
+    "description": "Removes a test run's schema and everything in it, quoting the identifier so the statement can never become an injection site.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "dropSchema",
+    "untestabilityReason": {
+      "justification": "Connects to a live PostgreSQL server and issues DDL. Run in the teardown of every integration test file.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Marks a response as a genuine fault. Deliberately narrow: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
@@ -2075,6 +2090,15 @@
     "name": "forward",
     "untestabilityReason": {
       "justification": "A single fetch plus a non-2xx guard that turns a transport failure into a readable message. What it sends is decided by validateToolInput and what it receives is produced by runTool, both covered by their own entries.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Claims an unused localhost port by binding to port 0 and reading the assigned port back, so a test-run PostgreSQL server cannot collide with anything already listening.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "freePort",
+    "untestabilityReason": {
+      "justification": "Binds a real TCP socket to ask the kernel for a port. Asserting on the result would only restate what the OS assigned.",
       "kind": "platform-glue"
     }
   },
@@ -2311,6 +2335,15 @@
     }
   },
   {
+    "description": "The postinstall entry point: skips or runs the Playwright browser download, and warns rather than failing the whole install when the download does not succeed. Guarded so it runs only as a script, never on import.",
+    "filePath": "scripts/postinstall.mjs",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "Spawns the playwright CLI and writes to the console. The decision it delegates to is extracted and unit-tested as shouldSkipBrowserInstall.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Derives the line beside LIVE MAP from the current nodes so the map narrates itself truthfully: a bare seed, a count of open questions, an answered/open split, or the reassurance that nothing was lost after a direction change. Excludes the root idea from the answered count, and lets a just-updated node outrank the arithmetic.",
     "filePath": "app/lib/mapCaption.ts",
     "name": "mapCaption",
@@ -2518,6 +2551,15 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
+    "description": "Creates the schema and the app's tables inside it by running prisma db push against an explicit --url, and rethrows a failed push with its captured stdout and stderr so the real Prisma error survives instead of an opaque beforeAll throw.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "pushSchema",
+    "untestabilityReason": {
+      "justification": "Shells out to the Prisma CLI against a live database. Run by every integration test file's setup.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "The node ids a question.asked event announced. Tolerates a malformed or absent payload, because the log carries untrusted JSON that may predate the current shape.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "questionIds",
@@ -2582,6 +2624,12 @@
     "filePath": "app/lib/webmcp.ts",
     "name": "requestUserInteraction",
     "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
+    "description": "Returns the configured PostgreSQL connection string, throwing when DATABASE_URL is unset or empty. There is deliberately no fallback: on a serverless host a default would open a local file no other function instance can see, so a missing value must stop the process rather than silently produce missing data.",
+    "filePath": "app/lib/databaseUrl.ts",
+    "name": "requireDatabaseUrl",
+    "testFile": "app/lib/databaseUrl.test.ts"
   },
   {
     "description": "Closes the open questions an answer resolved, logging one node.updated per node that actually moved. Answering the same question twice logs the second answer without inventing a second change, and a node the agent has since deleted is skipped rather than failing the write.",
@@ -2670,6 +2718,12 @@
     "testFile": "app/lib/mapRounds.test.ts"
   },
   {
+    "description": "Points a base connection string at one schema, built through URL rather than concatenation so a hosted DSN keeps the query parameters it already carries instead of losing them behind a second question mark.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "schemaUrl",
+    "testFile": "app/lib/testDatabase.test.ts"
+  },
+  {
     "description": "Builds one BriefSection from an index, a heading and a body - trimming the body and deriving its character count so the outline can be trusted without any passage being read.",
     "filePath": "app/lib/briefSections.ts",
     "name": "section",
@@ -2700,6 +2754,15 @@
     "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
+    "description": "Gives one test file its own empty schema with the app's tables pushed into it, plus a teardown that drops it and stops the server. Assigns DATABASE_URL as a side effect and must be awaited before the modules under test are imported, since the Prisma client reads that variable at import time.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "setUpTestSchema",
+    "untestabilityReason": {
+      "justification": "Composes process spawning and live database connections, and mutates process.env for the importing module. Its two pure halves are extracted and unit-tested as uniqueSchemaName and schemaUrl; the composition is exercised by all four integration test files.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "The sentence the bounded shimmer resolves into, for each of the three things that can be true about who can hear the log: an agent mid-turn has what was added, an agent is attached but not in a turn, or nothing can reach the page at all. The three are deliberately distinct claims — collapsing them would make the page sound more attended-to than it is. Says what you have added rather than your answers, because the same row appears on a day-one map that has only a seed idea. Exported so the isolated-component fixtures cite the real sentence instead of a hand-copy that can drift.",
     "filePath": "app/lib/pendingRow.ts",
     "name": "settledNote",
@@ -2710,6 +2773,12 @@
     "filePath": "app/lib/attachments.ts",
     "name": "shortenName",
     "testFile": "app/lib/attachments.test.ts"
+  },
+  {
+    "description": "Decides whether postinstall should download the Playwright browser, returning the variable that caused a skip or null to install. Skips on Vercel and CI, where the browser is a devDependency the deployed app never loads.",
+    "filePath": "scripts/postinstall.mjs",
+    "name": "shouldSkipBrowserInstall",
+    "testFile": "scripts/postinstall.test.mjs"
   },
   {
     "description": "Splits an assistant reply into renderable lines and marks the ones that are questions, so the conversation panel can give them typographic weight. Only a line ending in a question mark counts; a mid-sentence question mark is usually the partner quoting the person back.",
@@ -2760,6 +2829,24 @@
     "testFile": "app/lib/mcpFormat.test.ts"
   },
   {
+    "description": "Starts a real PostgreSQL server as a subprocess on an ephemeral port with a temporary data directory, and translates the root-container EACCES failure on spawn initdb into a message naming the actual cause and its fix.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "startEmbeddedPostgres",
+    "untestabilityReason": {
+      "justification": "Spawns a PostgreSQL server process and initialises a data directory on disk. Exercised for real by every integration test run, which is what proves it works.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Stops the embedded PostgreSQL server if this process started one, and removes its temporary data directory. A no-op when TEST_DATABASE_URL supplied the database, so both modes tear down correctly.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "stopTestDatabase",
+    "untestabilityReason": {
+      "justification": "Terminates a subprocess and deletes a directory. A green suite that leaves no stray postgres behind is the observable evidence.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Picks the one readable field worth showing for an event, in preference order - label, then text, then phase, then answer. Each event kind carries its human-readable part under a different name, and an agent reading a wall of bare kinds learns nothing about what changed.",
     "filePath": "app/lib/exchangeFormat.ts",
     "name": "summarize",
@@ -2776,6 +2863,15 @@
     "filePath": "app/lib/textSelection.ts",
     "name": "suppressTextSelection",
     "testFile": "app/lib/textSelection.test.ts"
+  },
+  {
+    "description": "The base connection string the integration tests build their per-file schema onto. Returns TEST_DATABASE_URL verbatim when set, and otherwise starts the embedded PostgreSQL server once and reuses it.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "testDatabaseUrl",
+    "untestabilityReason": {
+      "justification": "Its whole job is starting and memoising a database server process. Exercised for real by all four integration test files.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "What a tool response SAYS, as one string. `content` became a union the day an agent could be handed a picture, so every caller that only wants the words would otherwise narrow it itself. Blocks are joined rather than the first one taken: a result is text followed by pictures, and reading `content[0]` would quietly hold only the caption once a tool returned more than one text block.",
@@ -2815,6 +2911,12 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "toolSummaries",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "Builds the per-run PostgreSQL schema name for one test file: a fixed test_ prefix, the label reduced to [a-z0-9_], and a random suffix. Lowercased because an unquoted Postgres identifier folds to lower case, and sanitised because the name reaches a DROP SCHEMA statement.",
+    "filePath": "app/lib/testDatabase.ts",
+    "name": "uniqueSchemaName",
+    "testFile": "app/lib/testDatabase.test.ts"
   },
   {
     "description": "The sentence a person sends the agent when they notice a brief section nobody has dealt with. It rides the existing user.note channel, so the wording IS the whole message - nothing else carries the intent. It names the section twice over, by mark and by heading, so the agent can go straight to it rather than re-reading the outline, and it asks a question rather than only reporting an absence, because the point is to get the section dealt with on the next turn.",

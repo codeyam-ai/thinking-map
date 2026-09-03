@@ -1,8 +1,5 @@
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync } from 'fs';
-import { tmpdir } from 'os';
-import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { setUpTestSchema } from '@/app/lib/testDatabase';
 
 // The page's write path, at the point where it decides whether a question is
 // about a real node.
@@ -10,10 +7,10 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 // This is the check that makes a node-scoped question worth having: the id has
 // to name a node on THIS map, or the whole premise — that the agent no longer
 // has to guess which pill you meant — collapses into a question pointing at
-// nothing. It is database-bound by nature, so it runs against a real temporary
-// SQLite file like the exchange spine's own integration suite.
+// nothing. It is database-bound by nature, so it runs against a real
+// PostgreSQL schema like the exchange spine's own integration suite.
 
-let dir: string;
+let teardown: (() => Promise<void>) | undefined;
 let route: typeof import('./route');
 let prisma: typeof import('@/app/lib/prisma').prisma;
 
@@ -21,16 +18,10 @@ const MAP = 'map-under-test';
 const OTHER = 'someone-elses-map';
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(tmpdir(), 'exchange-route-test-'));
-  const url = `file:${path.join(dir, 'test.db')}`;
-  // Set before the modules load: app/lib/prisma.ts reads DATABASE_URL at import
-  // time, so a later assignment would be ignored.
-  process.env.DATABASE_URL = url;
-
-  execFileSync('npx', ['prisma', 'db', 'push', '--url', url], {
-    env: { ...process.env, DATABASE_URL: url },
-    stdio: 'pipe',
-  });
+  // Assigns DATABASE_URL and pushes the schema. Must complete before the
+  // imports below: app/lib/prisma.ts reads DATABASE_URL at import time, so a
+  // later assignment would be ignored.
+  ({ teardown } = await setUpTestSchema('exchange_route'));
 
   route = await import('./route');
   prisma = (await import('@/app/lib/prisma')).prisma;
@@ -38,7 +29,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await prisma?.$disconnect();
-  if (dir) rmSync(dir, { recursive: true, force: true });
+  await teardown?.();
 });
 
 /** Two maps, each with one node, so "belongs to this map" is falsifiable. */

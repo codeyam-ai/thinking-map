@@ -1,0 +1,1567 @@
+{
+  "timestamp": "2026-09-03T10:54:36Z",
+  "title": "Ship on Vercel with Hosted Postgres",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe app persists to a local SQLite file through `better-sqlite3`, which cannot survive\na hosted deployment: on Vercel the filesystem is read-only and ephemeral, and no two\nfunction instances share it, so the agent's writes and the judge's reads would land in\ndifferent places or vanish between requests. Move the datasource to hosted Postgres\n(Supabase), swap the Prisma driver adapter, and clear the two build-time obstacles that\nwould otherwise break or badly slow a Vercel build. SQLite is named in only three\nproduction places — the schema's `datasource` block, `app/lib/prisma.ts` and\n`prisma/seed.ts` — so the application code is untouched; the real work beyond those is\nthe four integration tests that each stand up a temporary SQLite *file*.\n\n## Key Decisions\n\n- **Supabase Postgres, reached server-side through Prisma.** Not `supabase-js` in the\n  browser, and not RLS. Every read in this app already happens on the server —\n  `app/page.tsx` and `app/map/[id]/page.tsx` are server components that call `mapStore`\n  directly, and six route handlers do the same — so a client-held database would mean\n  rewriting every surface, plus inventing anonymous auth for RLS to scope against. That\n  is a different product, not a deployment.\n\n- **A static site is not an option, for a specific reason rather than a stylistic one.**\n  Three surfaces are irreducibly server-side: `/api/maps/[id]/tools`, which is where\n  every WebMCP tool the page registers actually executes; `/api/mcp`, the remote MCP\n  front door; and `/api/briefs/extract` + `/api/briefs/fetch`, which parse PDF/DOCX with\n  `unpdf`/`mammoth` and fetch cross-origin pages the browser could not. Storing maps in\n  the browser would take the tools with them and leave the other two doors with nothing\n  behind them.\n\n- **Pooled connection string.** Serverless functions open many short-lived connections,\n  so `DATABASE_URL` points at Supabase's pooler (port 6543), not the direct 5432 host.\n\n- **`@prisma/adapter-pg`, keeping the driver-adapter pattern.** Prisma 7 requires an\n  adapter — the note at the top of `prisma/seed.ts` says so explicitly — so this is a\n  substitution inside an existing shape, not a new one.\n\n- **Postgres in tests too, rather than a dual-provider schema.** Prisma fixes the\n  provider at generate time, so \"SQLite locally, Postgres in production\" is not\n  available. `@prisma/adapter-pglite` is not published, so an in-process Postgres is not\n  available either. The four integration tests therefore point at a real Postgres via\n  `TEST_DATABASE_URL`, each run isolated in its own schema. This is the one genuinely\n  unpleasant consequence of the migration and it is named here rather than discovered\n  mid-build.\n\n- **`db push`, not migrations.** `prisma/` has no `migrations/` directory and the\n  production database starts empty by design, so `db push` against the Supabase instance\n  is the whole deployment step.\n\n## Implementation\n\n### 1. Change the datasource provider\n\n**File**: `prisma/schema.prisma`\n\nChange `datasource db { provider = \"sqlite\" }` to `provider = \"postgresql\"`. The schema\nneeds no other edit: the comment above `ThinkingMap` notes that `kind`, `phase` and\n`status` are `String` because SQLite has no enum support, and they should **stay**\n`String` — their allowed values live in `app/lib/mapKinds.ts`, which is the single place\nthey are defined, and converting them to native enums now would be a second change\nriding along on this one. Update that comment to say the strings are kept deliberately\nrather than forced.\n\n### 2. Swap the driver adapter\n\n**File**: `app/lib/prisma.ts`\n\nReplace `PrismaBetterSqlite3` with `PrismaPg` from `@prisma/adapter-pg`, constructed\nfrom `process.env.DATABASE_URL`. Drop the `'file:./dev.db'` fallback — a missing\nconnection string should fail loudly at startup rather than silently open a local file\nthat will never be the right database. The file's own header comment says it is \"the\nONLY file that changes when upgrading to a hosted database\"; that promise is very nearly\ntrue and should be updated to name `prisma/seed.ts` as the second.\n\n### 3. Match the adapter in the seed script\n\n**File**: `prisma/seed.ts`\n\nSame substitution, for the reason its header already gives: the seed must use the same\nadapter pattern as `app/lib/prisma.ts`. The `main()` body is still a no-op placeholder\nand should stay one — the production database starting empty is a deliberate product\ndecision, not an oversight.\n\n### 4. Clear the two build-time obstacles\n\n**File**: `next.config.ts`\n\nRemove `better-sqlite3` from `serverExternalPackages`; with the native module gone there\nis nothing to exclude from bundling.\n\n**File**: `package.json`\n\nRemove `better-sqlite3`, `@prisma/adapter-better-sqlite3` and `@types/better-sqlite3`\nfrom dependencies, add `@prisma/adapter-pg` and `pg`, and drop the matching\n`allowScripts` entry. Separately, gate the `postinstall` script — it currently runs\n`playwright install chromium` unconditionally, which downloads a browser on every Vercel\nbuild to serve a devDependency the deployed app never uses. Make it a no-op when\n`process.env.VERCEL` (or CI generally) is set, keeping the local behaviour intact.\n\n### 5. Point the integration tests at Postgres\n\n**File**: `app/lib/exchange.integration.test.ts`\n\n**File**: `app/lib/contributions.integration.test.ts`\n\n**File**: `app/lib/insightProvenance.integration.test.ts`\n\n**File**: `app/api/maps/[id]/exchange/route.integration.test.ts`\n\nEach of these creates a temp directory with `mkdtempSync`, sets `DATABASE_URL` to a\n`file:` URL *before* importing the modules (deliberately — `app/lib/prisma.ts` reads the\nvariable at import time), runs `npx prisma db push --url <url>`, and deletes the\ndirectory in `afterAll`. Replace the temp-file dance with a per-run Postgres schema:\nread a base `TEST_DATABASE_URL`, append a unique `?schema=test_<random>` to it, push to\nthat, and drop the schema in `afterAll` instead of `rmSync`. The import-time ordering\nconstraint and the `--url` flag both still apply and their comments should be kept —\nthe reason for `--url` (Prisma reads its datasource from `prisma.config.ts`, so the env\nvariable alone would push to the dev database) is unchanged.\n\nGive the four files one shared helper rather than four copies of the schema-per-run\nlogic; the current duplication is tolerable for four identical `mkdtempSync` calls and\nmuch less so once it involves creating and dropping schemas.\n\n### 6. Document the deployment\n\n**File**: `DATABASE.md`\n\nThe file already has a \"Where Credentials Go\" section that `.env` points at. Add what\nthe deploy actually needs: the pooled `DATABASE_URL` in Vercel's environment, the direct\nURL for one-off `db push` runs, `TEST_DATABASE_URL` for the integration suite, and the\nfact that the production database is expected to be empty on first boot.\n\n**File**: `.env`\n\nThis file is committed and holds placeholders only. Replace the SQLite `DATABASE_URL`\ndefault with a commented Postgres placeholder plus a `TEST_DATABASE_URL` placeholder, so\na fresh clone is told what it needs rather than silently opening `dev.db`.\n\n## Reused existing code\n\n- `prisma` singleton from `app/lib/prisma.ts` — the adapter swap happens inside it and\n  every caller is unaffected.\n- `loadEnv` from `app/lib/loadEnv.ts` (imported by `prisma/seed.ts` and\n  `prisma.config.ts`) — the dotenv cascade that makes `.env.local` win over `.env`\n  already covers a hosted connection string; nothing new is needed to read it.\n- `classifyLoadError` from `app/lib/loadError.ts` (glossary entry: `classifyLoadError`,\n  tested by `app/lib/loadError.test.ts`) — already turns a Prisma failure into a readable\n  screen on both `app/page.tsx` and the map page. Its `prismaCode` branch (glossary\n  entry: `prismaCode`) matches on Prisma error codes rather than SQLite text, so it\n  carries over; confirm at execution that a Postgres connection failure still lands in a\n  sensible branch rather than the generic one.\n- `withFailure` from `app/lib/apiFailure.ts` (glossary entry: `withFailure`, tested by\n  `app/lib/apiFailure.test.ts`) — every route handler is already wrapped, so a database\n  outage reaches the browser as `{ error }` rather than an unparseable body. No change.\n- **Existing-implementation survey:** nothing in the repo currently abstracts over\n  database providers — no `provider` switch, no adapter factory, no second\n  `PrismaClient` construction beyond `app/lib/prisma.ts` and `prisma/seed.ts`. There is\n  no existing seam to extend, so the substitution is made in place in both files.\n\n## Scenarios to Demonstrate\n\n- Landing page against an empty hosted database — the day-one state, one card and no\n  saved-map strip.\n- Landing page with several saved maps, so the strip and its \"Show all\" affordance are\n  exercised against Postgres.\n- A map page rendering a rich map (themes, nodes, an attached brief) read from Postgres.\n- Database unreachable — the `ErrorScreen` path through `classifyLoadError`, which is the\n  one failure a judge is most likely to hit and the one most likely to look like the app\n  is gone.\n- A WebMCP tool call arriving at `/api/maps/[id]/tools` and committing a write, proving\n  the agent's half works against the hosted store.",
+  "description": "Moved the datasource from a local SQLite file to hosted PostgreSQL through Prisma's `pg` driver adapter, so the app can run on Vercel — where the filesystem is read-only and ephemeral and no two function instances share it. SQLite was named in only three production places (the schema's datasource block, app/lib/prisma.ts, prisma/seed.ts), so no application code changed: every page and route still imports the same `prisma` singleton. The test suite now starts its own real PostgreSQL via `embedded-postgres`, so `npm test` works on a fresh clone with no database installed, no Docker and no network; `TEST_DATABASE_URL` opts out for anyone preferring their own. Suite green at 1046 passing, 0 failing; audit clean at 0 findings.\n\nSCOPE VERDICT — delivered: this cycle delivered NONE of the project's ten product deliverables, and that is correct rather than a gap. All ten were already resolved before it began (nine delivered, one deferred), and this cycle's scope was deployment enablement, which is not itself a product deliverable. Deferred by this cycle: none. The project's single outstanding deferral — registering the MCP server in a client such as Claude Desktop — is unchanged, remains an ASSIST-TRACK item outside this build flow, and carries `decidedBy: user`, so no deferral is resting on an unconfirmed agent decision. The nine delivered rows carry `decidedBy: agent` from earlier cycles; that is pre-existing state this cycle neither created nor altered.\n\nDecisions worth keeping. The `'file:./dev.db'` fallback was removed deliberately: on a serverless host a default opens a file no other instance can see, so a missing connection string must fail loudly rather than present as missing data. `kind`, `phase` and `status` stay `String` rather than becoming native enums — what began as a SQLite limitation is now a choice, since their allowed values live in one place in app/lib/mapKinds.ts. The unconditional `playwright install chromium` in postinstall is now gated off Vercel and CI, where it downloaded roughly 150MB per build for a devDependency the deployed app never imports.\n\nTwo bugs found by machinery rather than by reading, both invisible to the test suite. First: `?schema=` is a Prisma datasource convention that the `pg` driver does not parse, so the adapter queried `public` while `prisma db push` had built the tables elsewhere — all 61 integration tests failed together with `relation \"public.ThinkingMap\" does not exist`. The parameter is now lifted out in `databaseConnection()` and passed as the adapter's `schema` option, which also means a production URL naming a non-public schema now genuinely works. Second, and more serious: codeyam's shipped prisma-postgres seed adapter built its INSERT column list from `Object.keys(rows[0])` — the first row alone — so any optional column absent from row 0 was dropped from every row of that table, silently. `distinct-capture-check` caught it as two scenarios rendering byte-identical frames, differing only by `mapNode[17].testsNodeId`; git confirmed a regression rather than existing debt, since the committed screenshots were distinct. Fixed by taking the union of keys across rows and emitting SQL `DEFAULT` — not NULL — for a row that omits one, because `offsetX` is `Float @default(0)`, NOT NULL with a default, where an explicit NULL fails with 23502. No test caught either bug and no test could have; the scenario capture pipeline caught both.\n\nAlso repointed codeyam's own capture pipeline, which the plan had not anticipated and which blocked everything: .codeyam/stack.json still declared SQLite, so all 507 scenarios failed to render the moment the datasource moved. It now declares postgresql through a `${DATABASE_URL}` reference, since a literal DSN in a committed file trips the credential audit.\n\nNOT YET VERIFIED, and worth stating plainly: everything here is proven against a local PostgreSQL 14 and the embedded PostgreSQL 18 the tests start. The user's Supabase instance still has no tables and has never been connected to, so \"works against PostgreSQL\" is established while \"works against the production database\" is not. Creating the tables there and confirming the app boots against it remains outstanding. Separately out of scope and recorded rather than fixed: AttachmentChip.tsx:45 hardcodes a root-relative /api/... image path, and codeyam's preview iframe serves the app beneath /__codeyam_preview/, so React reports a hydration mismatch on that image — a preview-harness interaction identical on SQLite, and a UI concern this backend-only plan does not touch.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/editor.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/completed/ship-on-vercel-with-hosted-postgres.md",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/plans/ship-on-vercel-with-hosted-postgres.md",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-healthybinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-nothingbound--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-olderconvention--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-refusedtools--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-attachedviamcp--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-panelopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-boundtopage--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-noagentnoreason--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-overmcpserver--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-boundtopage--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-overmcpserver--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-partiallyrefused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-nothemesyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-bigturn--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerail-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentadded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentaddedmany--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-agentnote--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/exchangerow-youranswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-claimalone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-nocitations--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-longclaim--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-promptfilledthebox--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentidle--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settlednoagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-nothingtodraw--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-parenttworoundsback--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-singlethread--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-someunattached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/rowthreads-wrappedrow--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/seed-adapter.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/stack.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/636b174be3df264abd2bd1653edd40000c5a9ae45b1f32ad0c203f101b4150e0.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/b2a9b0ef4cb54a8b077ca3eebedf916e04c0f0996c1d18e3bfe40146bf64f482.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": ".env",
+      "status": "modified"
+    },
+    {
+      "path": "AUTH_UPGRADE.md",
+      "status": "modified"
+    },
+    {
+      "path": "DATABASE.md",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/[id]/exchange/route.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/contributions.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/exchange.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/insightProvenance.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/prisma.ts",
+      "status": "modified"
+    },
+    {
+      "path": "next.config.ts",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": "package.json",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/seed.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/ship-on-vercel-with-hosted-postgres.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2107a62e6ae1351bc83758a3a78d22e83431cdc39ce163a4c13392df6fa542a7.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/98dcd33ece17c0a96cc4217ab78c0e4459bd155d75eb6fce349404056a6f9e18.json",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/databaseUrl.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/databaseUrl.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/testDatabase.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/testDatabase.ts",
+      "status": "added"
+    },
+    {
+      "path": "scripts/postinstall.mjs",
+      "status": "added"
+    },
+    {
+      "path": "scripts/postinstall.test.mjs",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round ends itself, on a real board",
+      "screenshotPath": "the-round-ends-itself-on-a-real-board--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - HealthyBinding",
+      "screenshotPath": "agentbinddiagnostics-healthybinding--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - NothingBound",
+      "screenshotPath": "agentbinddiagnostics-nothingbound--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - OlderConvention",
+      "screenshotPath": "agentbinddiagnostics-olderconvention--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - RefusedTools",
+      "screenshotPath": "agentbinddiagnostics-refusedtools--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - AttachedViaMcp",
+      "screenshotPath": "agentstatus-attachedviamcp--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - MapDeleted",
+      "screenshotPath": "agentstatus-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - PanelOpen",
+      "screenshotPath": "agentstatus-panelopen--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - BoundToPage",
+      "screenshotPath": "agentstatusnarrative-boundtopage--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - MapDeleted",
+      "screenshotPath": "agentstatusnarrative-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgent",
+      "screenshotPath": "agentstatusnarrative-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgentNoReason",
+      "screenshotPath": "agentstatusnarrative-noagentnoreason--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - OverMcpServer",
+      "screenshotPath": "agentstatusnarrative-overmcpserver--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - BoundToPage",
+      "screenshotPath": "agentstatuspanel-boundtopage--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - MapDeleted",
+      "screenshotPath": "agentstatuspanel-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - NoAgent",
+      "screenshotPath": "agentstatuspanel-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - OverMcpServer",
+      "screenshotPath": "agentstatuspanel-overmcpserver--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - PartiallyRefused",
+      "screenshotPath": "agentstatuspanel-partiallyrefused--tablet.png"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly",
+      "screenshotPath": "boardchat-boardvisibleonly--tablet.png"
+    },
+    {
+      "name": "BoardChat - Default",
+      "screenshotPath": "boardchat-default--tablet.png"
+    },
+    {
+      "name": "BoardChat - DeletedTheme",
+      "screenshotPath": "boardchat-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChat - Empty",
+      "screenshotPath": "boardchat-empty--tablet.png"
+    },
+    {
+      "name": "BoardChat - JustOpened",
+      "screenshotPath": "boardchat-justopened--tablet.png"
+    },
+    {
+      "name": "BoardChat - LongAnswer",
+      "screenshotPath": "boardchat-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChat - ThreeThemes",
+      "screenshotPath": "boardchat-threethemes--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Default",
+      "screenshotPath": "boardchattranscript-default--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - DeletedTheme",
+      "screenshotPath": "boardchattranscript-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - LongAnswer",
+      "screenshotPath": "boardchattranscript-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - NoThemesYet",
+      "screenshotPath": "boardchattranscript-nothemesyet--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Overflowing",
+      "screenshotPath": "boardchattranscript-overflowing--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - RoundHeldOpen",
+      "screenshotPath": "boardworkspace-roundheldopen--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - BigTurn",
+      "screenshotPath": "exchangerail-bigturn--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Default",
+      "screenshotPath": "exchangerail-default--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - Empty",
+      "screenshotPath": "exchangerail-empty--tablet.png"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered",
+      "screenshotPath": "exchangerail-justanswered--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded",
+      "screenshotPath": "exchangerow-agentadded--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany",
+      "screenshotPath": "exchangerow-agentaddedmany--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - AgentNote",
+      "screenshotPath": "exchangerow-agentnote--tablet.png"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer",
+      "screenshotPath": "exchangerow-youranswer--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "InsightCard - Default",
+      "screenshotPath": "insightcard-default--tablet.png"
+    },
+    {
+      "name": "InsightCard - Experiment",
+      "screenshotPath": "insightcard-experiment--tablet.png"
+    },
+    {
+      "name": "InsightCard - LongLabel",
+      "screenshotPath": "insightcard-longlabel--tablet.png"
+    },
+    {
+      "name": "InsightCard - Stale",
+      "screenshotPath": "insightcard-stale--tablet.png"
+    },
+    {
+      "name": "InsightCard - StaleByOne",
+      "screenshotPath": "insightcard-stalebyone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - AgentWorking",
+      "screenshotPath": "insightdetail-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightDetail - ClaimAlone",
+      "screenshotPath": "insightdetail-claimalone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - Default",
+      "screenshotPath": "insightdetail-default--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoAgent",
+      "screenshotPath": "insightdetail-noagent--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoCitations",
+      "screenshotPath": "insightdetail-nocitations--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - AgentWorking",
+      "screenshotPath": "insightgodeeper-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - Listening",
+      "screenshotPath": "insightgodeeper-listening--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - LongClaim",
+      "screenshotPath": "insightgodeeper-longclaim--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - NoAgent",
+      "screenshotPath": "insightgodeeper-noagent--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - PromptFilledTheBox",
+      "screenshotPath": "insightgodeeper-promptfilledthebox--tablet.png"
+    },
+    {
+      "name": "InsightStack - CardOpened",
+      "screenshotPath": "insightstack-cardopened--tablet.png"
+    },
+    {
+      "name": "InsightStack - EdgeLabels",
+      "screenshotPath": "insightstack-edgelabels--tablet.png"
+    },
+    {
+      "name": "InsightStack - OneInsight",
+      "screenshotPath": "insightstack-oneinsight--tablet.png"
+    },
+    {
+      "name": "InsightStack - Overflowing",
+      "screenshotPath": "insightstack-overflowing--tablet.png"
+    },
+    {
+      "name": "InsightStack - ThreeInsights",
+      "screenshotPath": "insightstack-threeinsights--tablet.png"
+    },
+    {
+      "name": "InsightStack - Waiting",
+      "screenshotPath": "insightstack-waiting--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentIdle",
+      "screenshotPath": "insightstackempty-settledagentidle--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentWorking",
+      "screenshotPath": "insightstackempty-settledagentworking--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledNoAgent",
+      "screenshotPath": "insightstackempty-settlednoagent--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - Waiting",
+      "screenshotPath": "insightstackempty-waiting--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "MapCard - Answered",
+      "screenshotPath": "mapcard-answered--tablet.png"
+    },
+    {
+      "name": "MapCard - Default",
+      "screenshotPath": "mapcard-default--tablet.png"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer",
+      "screenshotPath": "mapcard-editingananswer--tablet.png"
+    },
+    {
+      "name": "MapCard - Finding",
+      "screenshotPath": "mapcard-finding--tablet.png"
+    },
+    {
+      "name": "MapCard - LongLabel",
+      "screenshotPath": "mapcard-longlabel--tablet.png"
+    },
+    {
+      "name": "MapCard - NoOptions",
+      "screenshotPath": "mapcard-nooptions--tablet.png"
+    },
+    {
+      "name": "MapCard - RootIdea",
+      "screenshotPath": "mapcard-rootidea--tablet.png"
+    },
+    {
+      "name": "MapCard - Yours",
+      "screenshotPath": "mapcard-yours--tablet.png"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold",
+      "screenshotPath": "maprow-belowresearchthreshold--tablet.png"
+    },
+    {
+      "name": "MapRow - Default",
+      "screenshotPath": "maprow-default--tablet.png"
+    },
+    {
+      "name": "MapRow - NamedByPhase",
+      "screenshotPath": "maprow-namedbyphase--tablet.png"
+    },
+    {
+      "name": "MapRow - PartlyAnswered",
+      "screenshotPath": "maprow-partlyanswered--tablet.png"
+    },
+    {
+      "name": "MapRow - Receded",
+      "screenshotPath": "maprow-receded--tablet.png"
+    },
+    {
+      "name": "MapRow - ResearchBand",
+      "screenshotPath": "maprow-researchband--tablet.png"
+    },
+    {
+      "name": "MapRow - TheIdea",
+      "screenshotPath": "maprow-theidea--tablet.png"
+    },
+    {
+      "name": "MapRow - Wrapping",
+      "screenshotPath": "maprow-wrapping--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "RowThreads - Default",
+      "screenshotPath": "rowthreads-default--tablet.png"
+    },
+    {
+      "name": "RowThreads - NothingToDraw",
+      "screenshotPath": "rowthreads-nothingtodraw--tablet.png"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack",
+      "screenshotPath": "rowthreads-parenttworoundsback--tablet.png"
+    },
+    {
+      "name": "RowThreads - SingleThread",
+      "screenshotPath": "rowthreads-singlethread--tablet.png"
+    },
+    {
+      "name": "RowThreads - SomeUnattached",
+      "screenshotPath": "rowthreads-someunattached--tablet.png"
+    },
+    {
+      "name": "RowThreads - WrappedRow",
+      "screenshotPath": "rowthreads-wrappedrow--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 1046,
+    "passed": 1046,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 1046,
+        "passed": 1046
+      }
+    ]
+  }
+}

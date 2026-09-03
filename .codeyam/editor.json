@@ -778,14 +778,15 @@
       "name": "tests",
       "outputFormat": "vitest-json",
       "sourceFilePatterns": [
-        "**/*.{ts,tsx,js,jsx}"
+        "**/*.{ts,tsx,js,jsx,mjs}"
       ],
       "targetedCommand": "npx vitest run -t \"{test_names}\" --reporter=json",
       "testFilePatterns": [
         "**/*.test.ts",
         "**/*.test.tsx",
         "**/*.test.js",
-        "**/*.test.jsx"
+        "**/*.test.jsx",
+        "**/*.test.mjs"
       ]
     }
   ],

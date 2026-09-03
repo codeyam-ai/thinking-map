@@ -42,25 +42,17 @@
   },
   "data": {
     "database": {
-      "type": "sqlite",
-      "url": "file:./dev.db"
+      "type": "postgresql",
+      "url": "${DATABASE_URL}"
     },
     "importStatement": "import { prisma } from '@/app/lib/prisma'",
     "schemaFile": "prisma/schema.prisma",
-    "seedAdapterType": "prisma-sqlite",
+    "schemaLoadCommand": "npx prisma db push",
+    "seedAdapterType": "prisma-postgres",
     "type": "prisma"
   },
   "defaultScreenSize": "Desktop",
   "devServerRepair": [
-    {
-      "command": "npm rebuild better-sqlite3",
-      "label": "rebuild native modules (ABI mismatch)",
-      "match": [
-        "ERR_DLOPEN_FAILED",
-        "NODE_MODULE_VERSION",
-        "did not self-register"
-      ]
-    },
     {
       "commandRef": "dbPush",
       "label": "regenerate Prisma client",
@@ -93,7 +85,7 @@
     }
   ],
   "id": "nextjs-prisma-sqlite",
-  "name": "Next.js + Prisma + SQLite",
+  "name": "Next.js + Prisma + Postgres",
   "preview": {
     "defaultPort": 3000,
     "kind": "iframe"

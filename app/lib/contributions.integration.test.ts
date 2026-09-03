@@ -1,8 +1,5 @@
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync } from 'fs';
-import { tmpdir } from 'os';
-import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { setUpTestSchema } from './testDatabase';
 
 // What a contribution from the page actually DOES to the map.
 //
@@ -10,26 +7,20 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 // the tree, and a question they answered has to stop being open — and the whole
 // point of doing them server-side is that every front door sees the result,
 // not just the browser that did it. A pure test could not tell that apart from
-// browser state, so this runs against a real (temporary) SQLite file like the
+// browser state, so this runs against a real PostgreSQL schema like the
 // exchange spine's own integration suite.
 
-let dir: string;
+let teardown: (() => Promise<void>) | undefined;
 let contributions: typeof import('./contributions');
 let prisma: typeof import('./prisma').prisma;
 
 const MAP = 'map-under-test';
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(tmpdir(), 'contributions-test-'));
-  const url = `file:${path.join(dir, 'test.db')}`;
-  // Set before the modules load: app/lib/prisma.ts reads DATABASE_URL at import
-  // time, so a later assignment would be ignored.
-  process.env.DATABASE_URL = url;
-
-  execFileSync('npx', ['prisma', 'db', 'push', '--url', url], {
-    env: { ...process.env, DATABASE_URL: url },
-    stdio: 'pipe',
-  });
+  // Assigns DATABASE_URL and pushes the schema. Must complete before the
+  // imports below: app/lib/prisma.ts reads DATABASE_URL at import time, so a
+  // later assignment would be ignored.
+  ({ teardown } = await setUpTestSchema('contributions'));
 
   contributions = await import('./contributions');
   prisma = (await import('./prisma')).prisma;
@@ -37,7 +28,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await prisma?.$disconnect();
-  if (dir) rmSync(dir, { recursive: true, force: true });
+  await teardown?.();
 });
 
 /** A map with a root idea and one open question hanging off it. */
