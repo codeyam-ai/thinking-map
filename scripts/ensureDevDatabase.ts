@@ -250,6 +250,18 @@ function runAsPostgres(file: string, args: string[], ids: Ids | null): void {
   });
 }
 
+/**
+ * Hands a path to the Postgres account, when there is one to hand it to.
+ *
+ * Every file initdb touches has to be owned by the account that will run it,
+ * and on a normal developer machine — where the script already runs as the
+ * user who will own the cluster — there is no separate account and nothing to
+ * do. Named once so that rule reads the same at each call site.
+ */
+function giveToPostgres(target: string, ids: Ids | null): void {
+  if (ids) chownSync(target, ids.uid, ids.gid);
+}
+
 /** Creates the cluster on disk. Idempotent: a cluster that exists is kept. */
 async function initialiseCluster(ids: Ids | null): Promise<void> {
   if (existsSync(path.join(DATA_DIR, 'PG_VERSION'))) return;
@@ -260,11 +272,11 @@ async function initialiseCluster(ids: Ids | null): Promise<void> {
   // Postgres refuses to start on a data directory that is group- or
   // world-readable, and insists on owning it itself.
   chmodSync(DATA_DIR, 0o700);
-  if (ids) chownSync(DATA_DIR, ids.uid, ids.gid);
+  giveToPostgres(DATA_DIR, ids);
 
   const passwordFile = path.join(CLUSTER_ROOT, 'initdb-password');
   writeFileSync(passwordFile, `${PASSWORD}\n`, { mode: 0o600 });
-  if (ids) chownSync(passwordFile, ids.uid, ids.gid);
+  giveToPostgres(passwordFile, ids);
 
   try {
     runAsPostgres(

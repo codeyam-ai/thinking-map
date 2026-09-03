@@ -1,0 +1,42 @@
+{
+  "provenAt": "2026-09-03T16:10:00Z",
+  "slug": "tool-descriptions-get-an-eval-suite",
+  "paths": [],
+  "tests": {
+    "ends with exactly one trailing newline": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "fault injection: changed serializeEvalToolsSchema to JSON.stringify with indent 4 and no trailing newline, then restored it. Revert-based proof is structurally impossible here because scripts/toolSchemaFile.ts is a brand-new module, so stashing it makes the test unable to resolve its imports rather than fail.",
+        "evidence": "refresh-tests --file scripts/toolSchemaFile.test.ts went from 1110 passed to exactly these 2 failed / 1108 passed with the injection in place, and back to 1110 passed after restoring."
+      }
+    },
+    "indents with two spaces so a description change is one diff line": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "fault injection: changed serializeEvalToolsSchema to JSON.stringify with indent 4 and no trailing newline, then restored it. Revert-based proof is structurally impossible here because scripts/toolSchemaFile.ts is a brand-new module, so stashing it makes the test unable to resolve its imports rather than fail.",
+        "evidence": "refresh-tests --file scripts/toolSchemaFile.test.ts went from 1110 passed to exactly these 2 failed / 1108 passed with the injection in place, and back to 1110 passed after restoring."
+      }
+    },
+    "omits annotations even for a tool that declares them": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "fault injection: added the annotations spread back into evalToolsSchema so read_map carried readOnlyHint, then removed it. Revert-based proof is structurally impossible here because scripts/toolSchemaFile.ts is a brand-new module.",
+        "evidence": "refresh-tests --file scripts/toolSchemaFile.test.ts reported exactly 1 failed / 1109 passed, that test being the only failure, and 1110 passed after restoring."
+      }
+    }
+  },
+  "proof": {
+    "verdict": "provenByHand",
+    "attested": [
+      "omits annotations even for a tool that declares them"
+    ],
+    "method": "fault injection: added the annotations spread back into evalToolsSchema so read_map carried readOnlyHint, then removed it. Revert-based proof is structurally impossible here because scripts/toolSchemaFile.ts is a brand-new module.",
+    "evidence": "refresh-tests --file scripts/toolSchemaFile.test.ts reported exactly 1 failed / 1109 passed, that test being the only failure, and 1110 passed after restoring."
+  }
+}

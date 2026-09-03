@@ -1,0 +1,282 @@
+[
+  {
+    "name": "Themes before nodes — create_themes: \"Create the themes first, then pass each node a themeRef\"",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "I want to think through a subscription box for houseplants. There's a lot I don't know — who it's actually for, how the plants survive shipping, and what the pricing has to look like. Set the board up with questions across those areas."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "read_map",
+        "optional": true,
+        "mockOutput": { "revision": 1, "phase": "map", "themes": [], "nodes": [] }
+      },
+      {
+        "ordered": [
+          {
+            "functionName": "create_themes",
+            "arguments": { "themes": { "$type": "array" } },
+            "mockOutput": {
+              "revision": 2,
+              "themes": [
+                { "ref": "t1", "id": "th_who" },
+                { "ref": "t2", "id": "th_shipping" },
+                { "ref": "t3", "id": "th_pricing" }
+              ]
+            }
+          },
+          {
+            "functionName": "add_nodes",
+            "arguments": { "nodes": { "$type": "array" } },
+            "mockOutput": { "revision": 3 }
+          }
+        ]
+      },
+      { "functionName": "post_note", "optional": true }
+    ]
+  },
+  {
+    "name": "A finding inside one theme carries a themeRef — add_nodes: \"A node of the same kind WITH a themeRef stays in its row\"",
+    "messages": [
+      { "role": "user", "type": "message", "content": "Where has the board got to?" },
+      {
+        "role": "assistant",
+        "type": "functioncall",
+        "name": "read_map",
+        "arguments": {}
+      },
+      {
+        "role": "tool",
+        "type": "functionresponse",
+        "name": "read_map",
+        "response": {
+          "revision": 12,
+          "phase": "research",
+          "themes": [
+            { "id": "th_pricing", "label": "Pricing" },
+            { "id": "th_shipping", "label": "Shipping" }
+          ],
+          "nodes": [
+            {
+              "id": "n_price_q",
+              "kind": "open-question",
+              "themeId": "th_pricing",
+              "label": "What would people pay monthly?",
+              "status": "open"
+            },
+            {
+              "id": "n_ship_q",
+              "kind": "open-question",
+              "themeId": "th_shipping",
+              "label": "Do plants survive three days in a box?",
+              "status": "open"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": "I asked twelve people and not one of them would go over £25 a month. Put that on the board as exactly one finding, on the pricing row where the question it answers lives. One node, nothing else."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "add_nodes",
+        "arguments": {
+          "nodes": [
+            {
+              "themeRef": { "$any": true },
+              "kind": { "$type": "string" },
+              "label": { "$type": "string" }
+            }
+          ]
+        },
+        "mockOutput": { "revision": 13 }
+      }
+    ]
+  },
+  {
+    "name": "Outline before passages — read_brief: \"Read the outline first and pull only the passages you actually need\"",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "The client sent their own spec over. Find me the one thing it says about how success gets measured — and don't read the whole document to do it."
+      }
+    ],
+    "expectedCall": [
+      {
+        "ordered": [
+          {
+            "functionName": "read_brief",
+            "mockOutput": {
+              "outline": [
+                { "id": "s1", "heading": "Background", "chars": 2400 },
+                { "id": "s2", "heading": "Who this is for", "chars": 1800 },
+                { "id": "s3", "heading": "How we will know it worked", "chars": 1500 },
+                { "id": "s4", "heading": "Constraints", "chars": 900 },
+                { "id": "s5", "heading": "Delivery timeline", "chars": 700 },
+                { "id": "s6", "heading": "Budget", "chars": 600 },
+                { "id": "s7", "heading": "Open risks", "chars": 1100 },
+                { "id": "s8", "heading": "Appendix: prior research", "chars": 5200 }
+              ]
+            }
+          },
+          {
+            "functionName": "read_brief",
+            "arguments": { "section": { "$pattern": "^s3$" } },
+            "mockOutput": {
+              "section": "s3",
+              "heading": "How we will know it worked",
+              "text": "We will call this a success at a 20% lift in weekly active users within two quarters of launch."
+            }
+          }
+        ]
+      },
+      { "functionName": "post_note", "optional": true }
+    ]
+  },
+  {
+    "name": "Incremental re-read — read_map: \"With one, returns only what changed after that revision\"",
+    "messages": [
+      { "role": "user", "type": "message", "content": "Let's pick the map back up." },
+      {
+        "role": "assistant",
+        "type": "functioncall",
+        "name": "read_map",
+        "arguments": {}
+      },
+      {
+        "role": "tool",
+        "type": "functionresponse",
+        "name": "read_map",
+        "response": {
+          "revision": 41,
+          "phase": "research",
+          "themes": [{ "id": "th_pricing", "label": "Pricing" }],
+          "nodes": [
+            {
+              "id": "n_price_q",
+              "kind": "open-question",
+              "themeId": "th_pricing",
+              "label": "What would people pay monthly?",
+              "status": "open"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": "I've answered a few of those since you last looked. Catch up on just what changed — don't change anything on the board yet."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "read_map",
+        "arguments": { "sinceRevision": { "$type": "number" } },
+        "mockOutput": {
+          "revision": 46,
+          "changed": [
+            {
+              "id": "n_price_q",
+              "status": "answered",
+              "answer": "Nobody would go over £25 a month."
+            }
+          ]
+        }
+      },
+      { "functionName": "post_note", "optional": true }
+    ]
+  },
+  {
+    "name": "The arc ends — set_phase: \"Rounds that only ever add more questions never arrive anywhere\"",
+    "messages": [
+      { "role": "user", "type": "message", "content": "How are we doing?" },
+      {
+        "role": "assistant",
+        "type": "functioncall",
+        "name": "read_map",
+        "arguments": {}
+      },
+      {
+        "role": "tool",
+        "type": "functionresponse",
+        "name": "read_map",
+        "response": {
+          "revision": 88,
+          "phase": "explore",
+          "themes": [
+            { "id": "th_pricing", "label": "Pricing" },
+            { "id": "th_shipping", "label": "Shipping" },
+            { "id": "th_who", "label": "Who it is for" }
+          ],
+          "nodes": [
+            {
+              "id": "n_1",
+              "kind": "open-question",
+              "themeId": "th_pricing",
+              "label": "What would people pay monthly?",
+              "status": "answered"
+            },
+            {
+              "id": "n_2",
+              "kind": "open-question",
+              "themeId": "th_shipping",
+              "label": "Do plants survive three days in a box?",
+              "status": "answered"
+            },
+            {
+              "id": "n_3",
+              "kind": "open-question",
+              "themeId": "th_who",
+              "label": "Who buys this first?",
+              "status": "answered"
+            },
+            {
+              "id": "n_4",
+              "kind": "direction",
+              "label": "Start with office managers on a monthly plan",
+              "status": "answered"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Everything on the board is answered. There is nothing left I can tell you that you haven't already got."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "set_phase",
+        "arguments": { "phase": "next-steps" },
+        "mockOutput": { "revision": 89, "phase": "next-steps" }
+      },
+      { "functionName": "post_note", "optional": true }
+    ]
+  },
+  {
+    "name": "The old name still works — set_phase: \"`deconstruct` is also accepted and is treated as `map`\"",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Take the map into the deconstruct phase now, please."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "set_phase",
+        "arguments": { "phase": { "$pattern": "^(deconstruct|map)$" } },
+        "mockOutput": { "revision": 5, "phase": "map" }
+      },
+      { "functionName": "post_note", "optional": true }
+    ]
+  }
+]

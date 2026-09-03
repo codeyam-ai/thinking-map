@@ -1,0 +1,105 @@
+{
+  "timestamp": "2026-09-03T16:17:03Z",
+  "title": "Tool Descriptions Get An Eval Suite",
+  "type": "feature",
+  "userRequest": "## Summary\n\n`app/lib/toolCatalog.ts` is the only place this app can steer an agent, and it\nis the only file that can change the product's behaviour with nothing to catch\nit. The descriptions there are not labels — `add_nodes` spends three paragraphs\nteaching the insight-vs-themed-node distinction, `set_phase` argues against a\nnamed failure mode (\"rounds that only ever add more questions never arrive\nanywhere\"), `read_brief` pleads with the agent to read the outline before\nwalking every section. That is prompt engineering, and it has no test suite.\nThe 58 test files under `app/lib/` prove the plumbing — that a tool registers,\nthat a descriptor survives a structured clone, that bad input is rejected — and\nnone of them prove a model reads the words and does the right thing.\n\nThis plan adds a WebMCP eval suite (`webmcp-evals`, the CLI from\nGoogleChromeLabs/webmcp-tools) running in **local mode**: the model is shown the\ncatalog's JSON Schema and judged on which tool it calls with which arguments,\nwith no database, no server, and no tool execution. The schema file is\n*generated* from `TOOL_CATALOG` rather than hand-maintained, so the thing under\ntest can never drift from the thing that ships. The outcome is that a diff to\n`toolCatalog.ts` becomes reviewable: you can see whether a re-worded description\nstill produces the behaviour it was written to produce.\n\n## Key Decisions\n\n- **Local mode, not browser or smoke, for this first suite.** Local mode\n  evaluates tool *selection* against a static schema — exactly the surface the\n  descriptions own — and it does it without a dev server, without SQLite, and\n  without executing anything. That matters more here than it would elsewhere:\n  two of the ten tools (`ask_user`, `await_user_activity`) deliberately BLOCK\n  waiting on a person, so any mode that actually runs tools would hang or need\n  elaborate stubbing. Local mode never calls `execute`, so the blocking tools\n  are testable for selection on day one.\n- **Generate the schema file from `TOOL_CATALOG`; never hand-write it.** A\n  checked-in copy of the tool schemas would be a fourth front door, and\n  `toolCatalog.ts`'s own header comment explains why the app has exactly three.\n  `jsonSchemaFor()` already performs the Zod-to-JSON-Schema conversion that the\n  page binding depends on, and it is already tested — the emitter reuses it, so\n  the evals run against the identical bytes the browser agent receives.\n- **The generated file is committed, and a check proves it is current.** A\n  generated artifact that only exists after you remember to run a script is a\n  file that is silently stale. Committing it makes the schema diff visible in\n  review next to the description diff that caused it, which is a large part of\n  the point.\n- **Vercel AI SDK backend through the AI Gateway.** `--backend vercel` with a\n  plain `\"provider/model\"` string keeps the model swappable without touching\n  config, and matches the platform this project already deploys to. The repo has\n  no AI provider dependency today, so this adds `ai` as a **devDependency** —\n  the app itself must stay free of it.\n- **These evals do NOT join `npm test`.** They cost money per run and are\n  probabilistic; wiring them into the blocking suite would make an unrelated\n  commit fail on a coin flip. They get their own script and are run\n  deliberately, on changes to `toolCatalog.ts`.\n- **Six cases, each pinned to a seam in the prose.** Every case below exists\n  because a specific sentence in a description is trying to prevent a specific\n  mistake. A case that does not correspond to something a description argues for\n  is a case that tests the model rather than the catalog, and is not worth\n  paying for.\n- **The standing wait is explicitly out of scope here.** The behaviour fixed by\n  \"The Agent Waits For Your Answers\" is steered by tool *reply* text\n  (`formatStandingWait`), which only exists when tools genuinely execute against\n  a real map. Local mode cannot produce it. That case is the subject of the\n  follow-on plan, which depends on this one.\n\n## Implementation\n\n### 1. Add the eval tooling as devDependencies\n\n**File**: `package.json`\n\nAdd `webmcp-evals` (`^0.0.4`) and `ai` as devDependencies — never dependencies;\nthe shipped app must not gain an AI provider. Add three scripts:\n\n- `evals:schema` — regenerates `evals/tools.schema.json` from the catalog.\n- `evals:schema:check` — regenerates to a temp path and diffs against the\n  committed file, failing when they differ. This is what makes the committed\n  artifact trustworthy.\n- `evals` — runs `webmcp-evals local -t evals/tools.schema.json -e evals/suites\n  --backend vercel`, with `--model` and `--runs` left to the caller so a\n  cheap smoke pass and a thorough multi-run pass are the same script.\n\n### 2. Emit the tool schema from the catalog\n\n**New file**: `scripts/emit-tool-schema.ts`\n\nA small `tsx` script that imports `TOOL_CATALOG` and `jsonSchemaFor`, and writes\none entry per tool — `name`, `description`, and the JSON Schema — to\n`evals/tools.schema.json` in the shape the CLI's local mode expects (OpenAI\nfunction-schema form).\n\nIt must import from `toolCatalog.ts` and `toolInvocation.ts` ONLY. Both are\ndeliberately isomorphic and reach no database; `toolRuntime.ts` imports\n`server-only` and would drag Prisma in, so the script would then need the\n`--conditions=react-server` dance that `npm run mcp` needs. Keeping the import\nsurface to the two pure modules is what keeps this script a one-liner to run.\n\nPrefer emitting with stable key ordering and a trailing newline so the\n`evals:schema:check` diff is meaningful rather than noisy.\n\n### 3. Commit the generated schema\n\n**New file**: `evals/tools.schema.json`\n\nThe generated artifact, checked in. Head it with a comment-bearing sibling\n(see step 5) rather than trying to put a comment in the JSON.\n\n### 4. The six eval cases\n\n**New file**: `evals/suites/tool-selection.json`\n\nOne suite file, six cases, each naming the description sentence it defends:\n\n1. **Themes before nodes.** `create_themes` says \"Create the themes first, then\n   pass each node a themeRef.\" Given a request that implies several clusters of\n   questions, assert an `ordered` expectation: `create_themes` then `add_nodes`.\n2. **Insight vs themed node.** Given a claim about the whole idea, assert\n   `add_nodes` with a node whose `themeRef` is absent; given a finding inside one\n   line of thinking, assert `themeRef` is present. Use `$type` and `$any`\n   constraints rather than pinning exact strings — the distinction under test is\n   the presence of the field, not the model's wording.\n3. **Outline before passages.** With a brief attached, assert the FIRST\n   `read_brief` call carries no `section`. This is the single most expensive\n   mistake the catalog tries to prevent — walking a long spec into context — and\n   it is invisible to every existing test.\n4. **Incremental re-read.** On a returning turn, assert `read_map` is called\n   with a `sinceRevision` rather than bare. Constrain with `$type: number`.\n5. **The arc ends.** Given \"everything on the board is answered\", assert\n   `set_phase` with `phase: \"next-steps\"` — not another `add_nodes` round. This\n   is the failure mode `set_phase`'s description argues against in prose, and\n   nothing currently checks that the argument works.\n6. **The old name still works.** Assert an agent that was taught `deconstruct`\n   still produces a valid `set_phase` call, since `ACCEPTED_PHASE_NAMES` keeps it\n   accepted and the description promises it resolves to `map`.\n\nUse `$pattern` / `$contains` for free-text arguments throughout. A case that\nasserts an exact `label` string is testing the model's prose, will flake, and\nwill train you to ignore the suite.\n\n### 5. Document how to run it and why it exists\n\n**New file**: `evals/README.md`\n\nWhat the suite is for (making `toolCatalog.ts` diffs reviewable), the gateway\nkey it needs in `.env.local` — which is already the only uncommitted-secret file\nin this repo per `loadEnv.ts`'s cascade — how to run a cheap pass vs a thorough\none, that `evals/tools.schema.json` is generated and must not be hand-edited,\nand the explicit statement that these are not part of `npm test` and why.\n\n### 6. Keep eval reports out of the tree\n\n**File**: `.gitignore`\n\nIgnore the CLI's report output directory. A JSON/HTML report per run is\nscratch, not history.\n\n## Reused existing code\n\n- `jsonSchemaFor` from `app/lib/toolInvocation.ts` (glossary entry:\n  `jsonSchemaFor`, covered by `app/lib/toolInvocation.test.ts`) — the emitter's\n  whole conversion step, already proven against the structured-clone boundary.\n- `toolSummaries` from `app/lib/toolInvocation.ts` (glossary entry:\n  `toolSummaries`) — the existing name/title/description projection; the emitter\n  should follow its shape rather than invent a parallel one.\n- `TOOL_CATALOG` from `app/lib/toolCatalog.ts` — the single source the emitter\n  reads. Its isomorphic-by-design rule is what makes a plain `tsx` script\n  viable.\n- `findTool` from `app/lib/toolCatalog.ts` (glossary entry: `findTool`, covered\n  by `app/lib/toolCatalog.test.ts`) — available if the emitter needs\n  single-tool lookup.\n- `loadEnv` from `app/lib/loadEnv.ts` — the dotenv cascade every non-Next entry\n  point in this repo imports, including `prisma/seed.ts` and `vitest.config.ts`.\n  The emitter does not need env, but any eval-adjacent script that does must use\n  this rather than the bare dotenv config import.\n- `formatStandingWait` from `app/lib/mcpFormat.ts` — named here only to mark the\n  boundary: it is the steering this suite CANNOT reach, and the reason the\n  follow-on plan exists.\n\n**Existing-implementation survey:** nothing equivalent exists today. There is no\nevals directory, no scripts directory, no eval or model-facing test of any\nkind, and no AI provider dependency in `package.json`. The 58 `app/lib/*.test.ts`\nfiles are all deterministic vitest units. This is net-new surface, not a\nduplicate of an existing mechanism.\n\n## Scenarios to Demonstrate\n\nThis is tooling with no UI surface, so there is no visual scenario to register\nand none should be invented. What is demonstrable is the suite's own output:\n\n- A full pass — all six cases green — against the committed schema.\n- A deliberate regression: delete the \"Create the themes first\" sentence from\n  `create_themes` and watch case 1 go red. This is the proof the suite is worth\n  running at all, and should be performed once at execution rather than left as\n  a claim.\n- `evals:schema:check` failing after a description edit with no regeneration,\n  and passing after `npm run evals:schema`.\n- A `$pattern`-constrained case passing across `--runs 3`, showing the\n  constraints are loose enough not to flake.",
+  "description": "SCOPE VERDICT. This cycle delivered none of the project's ten product deliverables directly and deferred none of them: it is test infrastructure for app/lib/toolCatalog.ts, the file that backs several of them (the AI deconstructing rather than answering, research grounded in web search, the MCP server exposing the same planning tools). Deliverables status is unchanged at 9 delivered / 1 deferred; the single deferred row, 'assist track, not this build flow', carries decidedBy=user, so no agent-decided deferral is hiding in that list. Nine of the delivered rows carry decidedBy=agent from earlier cycles, which is worth naming here even though this cycle did not move them.\n\nWHAT THIS CYCLE DEFERRED, on its own plan. The six eval cases have never been run against a model. No AI provider key exists in .env.local, .env, or the environment, and a run costs money per call, so the plan's two headline demonstrations - all six cases green, and deleting the 'Create the themes first' sentence from create_themes to watch case 1 go red - are unproven. This was surfaced at the Demo gate before approval and the user chose to proceed, so the deferral is user-decided rather than agent-decided. What IS proven is the plumbing: the CLI loads all 10 tool schemas and all 6 cases and reaches the model call, failing only on the absent key.\n\nWHAT WAS BUILT. evals/tools.schema.json is generated from TOOL_CATALOG by scripts/toolSchemaFile.ts, converting each Zod schema with the same jsonSchemaFor the browser binding uses, so the evals judge the identical bytes a real agent is shown. It is committed so the schema diff lands in review beside the description diff that caused it, and npm run evals:schema:check regenerates to a temp path and diffs to prove the committed copy is current. Six cases in evals/suites/tool-selection.json, each named for the sentence it defends.\n\nTHREE PLAN ASSUMPTIONS WERE WRONG ABOUT THE CLI and the build follows the real contract instead. The --evals flag takes a single suite FILE, not a directory. There is no Vercel AI Gateway path: --backend vercel means the Vercel AI SDK drives the loop, and models are provider-prefixed strings resolved to provider SDKs, each reading its own key. And webmcp-evals runs its own dotenv, which reads .env only - a file committed in this repo - so the evals script preloads .env.local ahead of it, since that is the one place here an uncommitted secret can live.\n\nTWO CASES WERE RESHAPED around what the matcher can express. It subset-matches objects, so a field's ABSENCE cannot be asserted at all, and arrays are matched strictly by length and position. The insight-versus-themed-node case therefore tests only the themed half, and the read_brief case bounds the NUMBER of calls rather than asserting the first carried no section - which still catches the expensive mistake the description argues against, walking a whole spec into context. Both limits, and the fact that any extra tool call fails a case, are documented in evals/README.md so the next author learns them without paying for a failed run.\n\nREDNESS PROOFS ARE ATTESTATIONS, NOT MEASUREMENTS. Three tests are recorded as AGENT-ATTESTED by hand: the two-space indent, the single trailing newline, and the omission of annotations. scripts/toolSchemaFile.ts is a brand-new module, so a revert-based proof cannot run - stashing it makes the tests fail to resolve their imports rather than fail. Redness was established by fault injection instead, twice, each time reverted and re-run to green. The remaining 12 tests carry no recorded proof either way.\n\nONE PRE-EXISTING PROBLEM, untouched and not caused here: npm run lint fails with ERR_MODULE_NOT_FOUND on eslint-config-next/core-web-vitals. The lockfile pins the same version at HEAD as after this cycle's install, and eslint is not part of verify-build's static checks, which pass.\n\nMERGE INTEGRATION, AND WHAT IT COST. The pre-commit sync pulled 10 upstream commits and conflicted in package.json's scripts block: upstream had reordered db:reset while this cycle added the three eval scripts. Resolved by keeping upstream's ordering plus the additions. Two consequences worth recording. First, the merge brought a Prisma schema carrying a new visitorId field while the generated client predated it, so tsc failed on four files this cycle never touched until the client was regenerated. Second, and the reason this suite exists: the merge reworded the await_user_activity description, which made the committed fixture stale, and evals:schema:check caught it and printed the changed line. The fixture was regenerated against the merged catalog. That is the mechanism working on its first real merge, unprompted and before any human looked.\n\nPRE-EXISTING DRIFT CLEARED TO PASS THE GATE. The strict audit reported 45 findings, 0 caused by this cycle - 25 pre-existing, 20 inherited - all traceable to two upstream commits the rebase brought in. The audit gates the whole branch rather than one session's edits, so they were fixed here: 17 tests from the dev-database script's test file registered, each of which first needed a description comment above its it() block since the file had none; 2 phantom registry rows removed for tests deleted upstream in d12a3dd0; one test title renamed off a backtick the registry forbids; and 24 entities from the dev-database provisioning script registered in the glossary - 5 against the sibling test file, the rest as platform-glue. Three of those - main, freePort, needsPostgresUser - collided with same-named functions still defined elsewhere and were recorded as distinct rather than moved. One, initialiseCluster, was refused as platform-glue for carrying three branches; its two repeated ownership guards were extracted into a named giveToPostgres helper, leaving a thin boundary function and naming the must-be-owned-by-postgres rule once. That is a behaviour-preserving edit to another feature's code, made only because the gate required it, and the suite is green across it at 1152 passed.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/tool-descriptions-get-an-eval-suite.md\t.codeyam/plans/completed/tool-descriptions-get-an-eval-suite.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/502cd3e01f5e5959f93cec5b8fe25898d469e75fc92d01a6900683908461a241.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/6b67e54620e5ddc0b68c60ef489ead903f61598abedacbea1c5b238ee9aeb85e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": ".gitignore",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": "package.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/tool-descriptions-get-an-eval-suite.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/067ed6c0423ce87804a074cf89615687ef511b784d0f127d9f18bf711dd8f69d.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/aff6833bd379e12f673b8f39c96efa12af12c7692e99f5b12951797bdf9b5ba2.json",
+      "status": "added"
+    },
+    {
+      "path": "evals/README.md",
+      "status": "added"
+    },
+    {
+      "path": "evals/suites/tool-selection.json",
+      "status": "added"
+    },
+    {
+      "path": "evals/tools.schema.json",
+      "status": "added"
+    },
+    {
+      "path": "scripts/emit-tool-schema.ts",
+      "status": "added"
+    },
+    {
+      "path": "scripts/toolSchemaFile.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "scripts/toolSchemaFile.ts",
+      "status": "added"
+    }
+  ],
+  "testResults": {
+    "total": 1110,
+    "passed": 1110,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 1110,
+        "passed": 1110
+      }
+    ]
+  }
+}

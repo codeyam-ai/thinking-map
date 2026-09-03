@@ -15,7 +15,10 @@
     "db:push": "npx prisma generate && npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:reset": "npx prisma generate && npx prisma db push --force-reset && npx tsx prisma/seed.ts",
-    "mcp": "NODE_OPTIONS=--conditions=react-server npx tsx mcp/stdio.ts"
+    "mcp": "NODE_OPTIONS=--conditions=react-server npx tsx mcp/stdio.ts",
+    "evals:schema": "npx tsx scripts/emit-tool-schema.ts",
+    "evals:schema:check": "npx tsx scripts/emit-tool-schema.ts evals/.tools.schema.check.json && diff -u evals/tools.schema.json evals/.tools.schema.check.json && rm -f evals/.tools.schema.check.json",
+    "evals": "DOTENV_CONFIG_PATH=.env.local DOTENV_CONFIG_QUIET=true NODE_OPTIONS=--require=dotenv/config npx webmcp-evals local -t evals/tools.schema.json -e evals/suites/tool-selection.json --backend vercel"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -42,6 +45,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ai": "^7.0.91",
     "embedded-postgres": "17.10.0-beta.17",
     "eslint": "^9",
     "eslint-config-next": "^15.3.3",
@@ -50,7 +54,8 @@
     "tailwindcss": "^4",
     "tsx": "^4.19.4",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^3",
+    "webmcp-evals": "^0.0.4"
   },
   "allowScripts": {
     "esbuild": true,

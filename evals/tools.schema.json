@@ -1,0 +1,409 @@
+{
+  "tools": [
+    {
+      "name": "read_map",
+      "description": "Read the thinking map. With no sinceRevision, returns the whole map and its current revision. With one, returns only what changed after that revision — which is what a returning agent wants, so it does not re-ingest what it already knows.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "sinceRevision": {
+            "description": "Return only changes after this revision. Omit for the full map.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        }
+      }
+    },
+    {
+      "name": "create_themes",
+      "description": "Group the questions you are about to ask into themes. A theme is one cluster on the board — name it for what it is about, not for a step in a process. Create the themes first, then pass each node a themeRef. You choose the names; the board chooses the colours.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "themes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string",
+                  "description": "A temporary id so nodes in this same call can name this theme."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "What this group of questions is about. Two or three words: \"Context\", \"Who it is for\"."
+                },
+                "tests": {
+                  "description": "Only for a \"slice\": the ref or real id of the ONE node this slice would settle — the assumption, risk, or open question that building it would answer. If it settles nothing, leave this off rather than picking the nearest node; an increment that tests nothing is shown as proving nothing, which is the honest answer.",
+                  "type": "string"
+                },
+                "sourceRef": {
+                  "description": "The brief section this claim came from, as the section id read_brief reported (e.g. 's7'). Cite the section a claim actually came from; leave it off rather than guessing. A node you inferred across the whole document, or one the person typed, has no single source — an omitted ref is correct there, and a wrong one is worse than none.",
+                  "type": "string"
+                },
+                "options": {
+                  "description": "Only meaningful on an \"open-question\": a few likely answers to offer as one-tap chips. The person can always type their own — a chip fills the box rather than sending it — so these are a head start, not a closed set of choices. Omit them when you genuinely cannot guess; a question with no options is an ordinary question with a text box.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "ref",
+                "label"
+              ]
+            }
+          },
+          "requestId": {
+            "description": "Idempotency key. Retrying with the same value is a no-op.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "themes"
+        ]
+      }
+    },
+    {
+      "name": "read_brief",
+      "description": "Read the client's own document, when the map was started from one. With no section, returns the OUTLINE — one line per section with its id, heading and length — which is cheap enough to call on any turn. With a section id, returns that passage in full. Read the outline first and pull only the passages you actually need; walking every section of a long spec into your context is how you run out of room to think. The client did not send this to have it summarised back at them — read it to find what it does NOT say, and ask about that.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "section": {
+            "description": "A section id from the outline, e.g. \"s3\". Omit to get the outline.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "read_attachment",
+      "description": "Open one thing the person brought along — a whiteboard photo, a screenshot of the flow they want replaced, a diagram they sketched. An image comes back as a picture for you to actually look at; a text document comes back as its text. read_map lists what is attached with an id for each; call this with one id, deliberately, for the ones that look like they matter. Do not walk the whole list out of habit — a picture costs far more of your context than the line naming it does. Some attachments are just a recorded name with no file behind them, and you will be told so plainly rather than as an error.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "attachmentId": {
+            "type": "string",
+            "description": "The id of one attachment, as read_map listed it."
+          }
+        },
+        "required": [
+          "attachmentId"
+        ]
+      }
+    },
+    {
+      "name": "add_nodes",
+      "description": "Add one or more nodes. Parents must appear before their children. Use status \"open\" for a question nobody has answered yet. Pass a requestId so a retry cannot duplicate the write.\n\nKeep the board supplied with insights, not only questions. An INSIGHT is a node of kind assumption, finding, gap, risk, direction, approach, suggestion, experiment written with no themeRef — a claim about the whole idea rather than a card inside one row. A node of the same kind WITH a themeRef stays in its row, and that is the difference between a finding about one line of thinking and a claim about the idea itself.\n\nAim to keep at least 3 live insights on the board. Every read_map tells you how many are live, how many the person has answered past, and how far behind you currently are — so you never have to guess. Each insight should name what it came out of via fromRefs, and where you can, offer an experiment small enough to actually run rather than another thing to consider.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string",
+                  "description": "A temporary id for this node so later nodes in the same call can name it as their parent."
+                },
+                "parentRef": {
+                  "description": "The ref of a node created earlier in this call, or the real id of an existing node. Omit only for a root idea.",
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "idea",
+                    "user",
+                    "problem",
+                    "goal",
+                    "constraint",
+                    "assumption",
+                    "open-question",
+                    "research",
+                    "finding",
+                    "gap",
+                    "approach",
+                    "pro",
+                    "risk",
+                    "known",
+                    "unknown",
+                    "direction",
+                    "next-step",
+                    "slice",
+                    "suggestion",
+                    "experiment"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Short text for the pill; aim for under 40 characters."
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "answered",
+                    "updated"
+                  ]
+                },
+                "sourceUrl": {
+                  "type": "string"
+                },
+                "imageUrl": {
+                  "description": "A picture to show on this card — a screenshot of an existing product, a diagram, a reference. Prefer showing over describing: a competitor the person can look at lands harder than a paragraph about it.",
+                  "type": "string"
+                },
+                "imageAlt": {
+                  "description": "What the picture shows. Required whenever imageUrl is set.",
+                  "type": "string"
+                },
+                "diagram": {
+                  "description": "Draw a small flow on this card: a sequence of stages with arrows between them. Use it when the thing you are explaining IS a shape — a process, a funnel, a before/after — and prose would make the reader rebuild the picture in their head.",
+                  "type": "object",
+                  "properties": {
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Two to six stages, in order. Kept short — these are boxes, not paragraphs."
+                    },
+                    "note": {
+                      "description": "One line under the diagram.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "steps"
+                  ]
+                },
+                "choices": {
+                  "description": "Offer two to four concrete options instead of a blank field. Use them when the useful answers are enumerable — experience level, who it is for, build-or-buy. The person can always type something else instead, so a list never traps them.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "themeRef": {
+                  "description": "Which theme this node belongs to: the ref of a theme created earlier in this same call, or the real id of an existing one. Omit for the root idea, which belongs to no theme.",
+                  "type": "string"
+                },
+                "fromRefs": {
+                  "description": "Only for an insight — a suggestion, experiment, finding, risk or direction. The refs (from this same call) or real ids of the questions and answers this came OUT of. Naming them is what lets the person click the insight and see the thinking behind it instead of taking it on trust. Leave it off rather than guessing; an insight drawn from the whole map has no single source, and a wrong citation is worse than none.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "ref",
+                "kind",
+                "label"
+              ]
+            }
+          },
+          "requestId": {
+            "description": "Idempotency key. Retrying with the same value is a no-op.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodes"
+        ]
+      }
+    },
+    {
+      "name": "update_node",
+      "description": "Change an existing node — typically when an answer resolves an open question. Pass expectedRevision to be told, rather than silently overwrite, if the person changed the map since you last read it.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "idea",
+              "user",
+              "problem",
+              "goal",
+              "constraint",
+              "assumption",
+              "open-question",
+              "research",
+              "finding",
+              "gap",
+              "approach",
+              "pro",
+              "risk",
+              "known",
+              "unknown",
+              "direction",
+              "next-step",
+              "slice",
+              "suggestion",
+              "experiment"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "answered",
+              "updated"
+            ]
+          },
+          "tests": {
+            "description": "The id of the node this slice would settle. A slice's purpose usually sharpens once the whole sequence is laid out, so this is editable after the fact.",
+            "type": "string"
+          },
+          "expectedRevision": {
+            "description": "The revision you last read. If the map has moved past it, the write is declined and both versions are described back to you.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "requestId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "set_phase",
+      "description": "Advance the map through the loop once the conversation has genuinely reached the next phase. The arc runs map → research → explore → next-steps and it ENDS: `next-steps` is the destination, and this tool is the only way a map reaches it. When the person says everything on the board is answered, that is a fork, not a cue for another round — either add the questions that are genuinely still missing, or move the map on. Reaching `next-steps` means writing the conclusion: what this comes to, what it would take to build, in what order, and what it depends on. Rounds that only ever add more questions never arrive anywhere.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": [
+              "idea",
+              "map",
+              "research",
+              "explore",
+              "next-steps",
+              "deconstruct"
+            ],
+            "description": "One of: idea, map, research, explore, next-steps. `deconstruct` is also accepted and is treated as `map` — the two were merged into one phase, and the old name keeps working for agents that learned it."
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      }
+    },
+    {
+      "name": "post_note",
+      "description": "Leave a one-line note on the map explaining what you just did. This replaces the assistant chat bubble: a note attached to the map, not a conversation. Keep it to a sentence.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "ask_user",
+      "description": "Put one or more questions on the map and wait for the person to answer them in the page. Bounded: if they do not answer in time you get status \"pending\" and a cursor, the questions stay on screen, and their answer lands in the log for your next read. Nothing is lost by giving up.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "questions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "options": {
+                      "description": "A few likely answers, offered as one-tap chips. A chip fills the answer box rather than sending it, so the person can still edit or ignore them.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              ]
+            }
+          },
+          "timeoutSeconds": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "questions"
+        ]
+      }
+    },
+    {
+      "name": "await_user_activity",
+      "description": "Block until the person contributes to the map, then return what they did. Use this instead of polling read_map in a loop when you have nothing to do but wait. Keep each call SHORT — timeoutSeconds: 25 — because your host aborts a tool call that runs too long, and a call it aborts cannot hand you their answer. On expiry you get timedOut true and the cursor to resume from: that is the normal return, not a failure, so call again immediately with that cursor. After each answer, handle it and call this again while open questions remain.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "sinceRevision": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "timeoutSeconds": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "sinceRevision"
+        ]
+      }
+    }
+  ]
+}

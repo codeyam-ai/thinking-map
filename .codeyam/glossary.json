@@ -1652,6 +1652,15 @@
     "testFile": "app/lib/attachmentTool.test.ts"
   },
   {
+    "description": "Resolves the shipped initdb and pg_ctl binaries. embedded-postgres keeps its platform lookup in an unexported subpath, so the per-platform @embedded-postgres package is imported directly for the absolute paths of the binaries it ships.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "binaries",
+    "untestabilityReason": {
+      "justification": "Dynamically imports a platform-specific package and returns filesystem paths that only exist on the host it runs on.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Offers the exchange log as a subscribable MCP resource. Deliberately speculative: resource subscriptions are an open proposal, so this no-ops on every browser that exists today. Same feature-detection shape as bindTools, and kept in the only file allowed to name navigator.modelContext.",
     "filePath": "app/lib/webmcp.ts",
     "name": "bindExchangeResource",
@@ -1714,6 +1723,15 @@
     ]
   },
   {
+    "description": "codeyam's capture database when this is a codeyam project, and nothing otherwise - so a plain clone gets exactly one database rather than an unexplained second one.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "captureDatabases",
+    "untestabilityReason": {
+      "justification": "Its whole behaviour is an existsSync probe of the .codeyam directory.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "The accessible name a card's copy control gives itself - 'Copy this question', 'Copy this question and your answer', or 'Copy this insight'. It lives beside cardCopyText and branches on the same three faces because it is the same decision made twice: the name has to promise exactly what the text delivers, and split across two files they can drift. A button announcing 'Copy this question' while copying the question and the answer is worse than either being wrong alone, and it is a mismatch only somebody navigating by label would ever meet. Specific rather than a shared 'Copy' for the same reason: a dozen cards are on the board at once, and a dozen controls with one name between them is a list of identical rows to a screen reader.",
     "filePath": "app/lib/boardCopyText.ts",
     "name": "cardCopyLabel",
@@ -1750,6 +1768,15 @@
     "untestabilityReason": {
       "justification": "The uncovered half is the node:dns lookup itself, and this project has no DNS-stubbing harness — a test of it would be a test of the network. Both halves of the DECISION are pure and fully covered in app/lib/briefUrl.test.ts: parseBriefUrl for the syntax and scheme rules, isBlockedAddress for every range it refuses.",
       "kind": "no-isolation-harness"
+    }
+  },
+  {
+    "description": "An unused localhost port, preferring Postgres's own 5432 so the provisioned cluster sits where a developer would look for it, and falling back to any free port when something already holds it.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "choosePort",
+    "untestabilityReason": {
+      "justification": "Composes two socket-binding probes; its result depends entirely on the host's live port availability.",
+      "kind": "platform-glue"
     }
   },
   {
@@ -1908,10 +1935,31 @@
     }
   },
   {
+    "description": "Creates the named databases on the running cluster if they are absent. codeyam otherwise creates its capture database itself when psql is on PATH, which in a container using the embedded-postgres binaries it is not - and that failure surfaces much later, as a scenario that will not activate. Creating it here costs one statement.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "ensureDatabases",
+    "untestabilityReason": {
+      "justification": "Connects to a live PostgreSQL server and issues CREATE DATABASE.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "The value .env.local declares for a key, or null. Strips surrounding quotes and treats a blank value as absent, the same rule codeyam's own resolver uses - a half-set variable is a half-written config, not an answer. Used to tell a developer's own .env.local entry apart from a real environment export: the first is a local dev credential codeyam should be handed too, the second is CI or a deployment, whose secrets this script has no business writing to disk.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "envLocalValue",
+    "testFile": "scripts/ensureDevDatabase.test.ts"
+  },
+  {
     "description": "Marks a response as a genuine fault. Deliberately narrow: a conflict or a timeout is a normal result the agent is expected to reason about, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
     "filePath": "app/lib/toolInvocation.ts",
     "name": "errorResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The tool catalog projected into the shape webmcp-evals local mode reads: one entry per tool carrying name, description and the JSON Schema from jsonSchemaFor. Those three fields are what the eval suite judges, because they are the only thing a model is shown when it decides which tool to call. Generated rather than hand-written for the reason toolCatalog.ts's own header gives - a checked-in copy of the schemas would be a fourth front door, free to drift from the three real ones. Annotations are deliberately omitted: local mode never reads readOnlyHint, so emitting it could only add noise to the diff this fixture exists to make reviewable.",
+    "filePath": "scripts/toolSchemaFile.ts",
+    "name": "evalToolsSchema",
+    "testFile": "scripts/toolSchemaFile.test.ts"
   },
   {
     "description": "The exchange log's MCP resource URI, one per map, so a subscriber is subscribed to a specific map rather than to 'the exchange' in the abstract. Kept in the file that owns every navigator.modelContext name, so the registration and the notification cannot drift to different URIs.",
@@ -2145,6 +2193,15 @@
     }
   },
   {
+    "description": "An arbitrary unused localhost port, obtained by letting the OS assign one on port 0 and reading it back.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "freePort",
+    "untestabilityReason": {
+      "justification": "Delegates the choice to the OS network stack; the returned port is whatever the host happens to have free.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "The map route's browser-tab title. Counts the map's still-open questions into the title so a backgrounded board says how much is waiting, and falls back to the bare app name when the map is missing or the read throws — metadata runs a frame before the body, so a throw here would 500 the route before the page could explain itself.",
     "filePath": "app/map/[id]/page.tsx",
     "name": "generateMetadata",
@@ -2180,6 +2237,15 @@
       "complete-what-to-do-next",
       "sprawling-a-deep-wide-map"
     ]
+  },
+  {
+    "description": "Hands a path to the Postgres account, when there is one to hand it to. Every file initdb touches has to be owned by the account that will run it, and on a normal developer machine - where the script already runs as the user who will own the cluster - there is no separate account and nothing to do. Extracted so that rule is named once rather than repeated as a bare ids guard at each call site.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "giveToPostgres",
+    "untestabilityReason": {
+      "justification": "A single guarded chown; its whole behaviour is the filesystem ownership call itself.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Groups a map's nodes into the rounds that produced them — one round per write, read off the exchange log, because nodes written together share a contiguous run of revisions and one origin. Deliberately NOT grouped by tree depth: an agent's second batch of questions usually lands at the same depth as its first, so by depth the two turns would collapse into one row. The root idea is always its own first round, and nodes the log never mentions fall back to depth grouping so a seeded or pre-existing map still draws.",
@@ -2225,6 +2291,15 @@
     "filePath": "app/lib/briefSections.ts",
     "name": "impliedHeading",
     "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "Creates the PostgreSQL cluster on disk with initdb. Idempotent: a cluster that already has a PG_VERSION file is kept as it stands, so a re-run of setup never destroys an existing dev database.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "initialiseCluster",
+    "untestabilityReason": {
+      "justification": "Runs initdb against a real data directory and chowns it; nothing observable happens except on the filesystem.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "The board's insights and how far behind the thinking they are, computed from the nodes alone. An insight is a node whose kind is in INSIGHT_STREAM_KINDS AND which carries no theme: a finding hung inside a theme is a card in that row, a themeless one is a claim about the whole idea. That rule already existed informally as CORE_INSIGHT_KINDS plus !n.themeId in GalaxyBoard, and promoting it here is what stops the agent's read and the browser disagreeing about what is on the board - a disagreement that would draw the same node twice or count it never. Staleness is read off timestamps rather than the exchange log, which is the decision that lets this be pure: MapNode.updatedAt moves when an answer lands, so one function serves both the server-side read_map and the client without either holding the log. Deriving it from MapEvent revisions was the alternative and would have forced a second query into read_map's delta branch on every turn. Nothing is hidden by being stale - an insight the thinking has moved past is still worth reading, and dropping it would silently shrink the board. Returns all zeros for an empty map, which is the day-one state and the one every capture produces.",
@@ -2293,10 +2368,28 @@
     "testFile": "app/lib/mapKinds.test.ts"
   },
   {
+    "description": "Whether a localhost port can be bound, by trying to bind it and closing again.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "isPortFree",
+    "untestabilityReason": {
+      "justification": "Binds a real TCP socket; the answer is a property of the host's network state, not of the code.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Whether a round is mostly research, finding or gap — the rule that decides which row gets its own banded territory rather than just its own card colour. Strictly more than half, so an even split does not band: a round with no majority has nothing to name it after. 'Mostly' rather than 'all' because a research round that picked up one stray question is still a research round, and demanding purity would mean the band never appeared on a real map. The root round never bands, since enclosing the map's subject as 'what already exists' would misdescribe it.",
     "filePath": "app/lib/mapRounds.ts",
     "name": "isResearchRound",
     "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Whether the cluster is currently accepting connections, per pg_ctl status.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "isRunning",
+    "untestabilityReason": {
+      "justification": "Its answer is the exit code of a pg_ctl process run against a live data directory.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Whether a scrolling box is hiding text below its bottom edge AND the reader has not already scrolled to it — the decision behind the fade on the core card. Both halves matter: a fade over the last line of a sentence that already fits claims there is more when there is not, and one that stayed on at the end would dim a finished sentence. Kept as a predicate over three numbers rather than inside the hook that reads them, because jsdom has no layout engine and a DOM-driven test would assert nothing.",
@@ -2362,6 +2455,30 @@
     ]
   },
   {
+    "description": "Pushes the Prisma schema into codeyam's capture databases, using db push --url rather than an env override so prisma.config.ts keeps resolving DATABASE_URL the one way it does everywhere else, and without --accept-data-loss so a destructive push stops to be read rather than being waved through. Never fatal: a capture database is codeyam's, and a developer running npm run dev should not be blocked from starting the app by it.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "loadCaptureSchema",
+    "untestabilityReason": {
+      "justification": "Shells out to npx prisma db push against a live database.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "The connection string for a database on the local managed cluster, given its port. One place builds this string so the URL written to .env.local, the one written to codeyam's stack.local.json, and the one used to create the databases cannot disagree.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "localUrl",
+    "testFile": "scripts/ensureDevDatabase.test.ts"
+  },
+  {
+    "description": "The uid and gid of the postgres account, read via id. stderr is discarded on purpose: 'no such user' is the expected answer the first time through, and it is not an error the developer should read.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "lookUpPostgresUser",
+    "untestabilityReason": {
+      "justification": "Shells out to the host's id command and reads the OS account database.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "The stdio entrypoint for MCP clients that launch the server as a child process, such as Claude Desktop. Serves the same buildMcpServer over a stdio transport; only the transport differs from the HTTP route.",
     "filePath": "mcp/stdio.ts",
     "name": "main",
@@ -2386,6 +2503,15 @@
     "untestabilityReason": {
       "justification": "Scaffold-shipped entrypoint left as the no-op the CodeYam data model calls for: production starts empty and scenarios carry their own seeds. There is no behaviour to assert because the function deliberately does nothing.",
       "kind": "scaffold"
+    }
+  },
+  {
+    "description": "The entry point npm run db:ensure calls. A DATABASE_URL this script did not provision always wins: no server is started and nothing is rewritten, so deployments, shared staging databases and a developer's own Postgres all keep working. Otherwise it chooses a port, initialises and starts the cluster, creates the databases, and records the URL for the app and for codeyam.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "Orchestrates process spawning, socket binding and filesystem writes end to end; its parts are covered individually where they are pure.",
+      "kind": "platform-glue"
     }
   },
   {
@@ -2462,6 +2588,15 @@
     "filePath": "app/lib/testDatabase.ts",
     "name": "needsPostgresUser",
     "testFile": "app/lib/testDatabase.test.ts"
+  },
+  {
+    "description": "Whether this process is running as root, in which case a separate postgres account is needed - Postgres refuses to run as root. True inside a container, false on a normal developer machine.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "needsPostgresUser",
+    "untestabilityReason": {
+      "justification": "Reads the process's OS user id; there is no seam to assert against without becoming a test of process.getuid itself.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Shapes the node.added event payload from the row that was just inserted. A translation, not a write: the database's vocabulary in, the exchange contract's vocabulary out. Both options and fromNodeIds are stored as JSON strings because SQLite has no array type, and the log speaks the contract's language rather than the column's, so they come back out as the arrays the tools take. The optional fields - testsNodeId, fromNodeIds, sourceRef, options - are OMITTED entirely when absent rather than sent as null, so a reader can treat presence as meaning and an ordinary node's event stays byte-for-byte what it has always been. fromNodeIds is omitted for an empty list too: an insight that cited nothing must be indistinguishable from one written before the field existed, where an empty array would instead read as 'this insight named its sources and they were none'. Pure, so it is unit-testable without a database; inline it could only be reached through a live insert.",
@@ -2596,6 +2731,12 @@
     "testFile": "app/lib/nodePlan.test.ts"
   },
   {
+    "description": "The port a connection string names, or null when it names none or is not a URL at all. This is what makes a restart reuse the existing cluster's port instead of starting a second server the app is not pointed at, and returning null rather than throwing is what keeps a typo in DATABASE_URL from killing the whole provisioning run.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "portOf",
+    "testFile": "scripts/ensureDevDatabase.test.ts"
+  },
+  {
     "description": "Records something the person did onto the map's log. The tools run in the browser but the log lives in SQLite, so an answer only becomes durable - and only becomes visible to an agent on another front door - once it has come back through this route.",
     "filePath": "app/lib/webmcp.ts",
     "name": "postUserEvent",
@@ -2605,10 +2746,28 @@
     }
   },
   {
+    "description": "The postgres account's ids when one is needed, creating the account with groupadd and useradd if it does not exist yet - the same pair embedded-postgres reaches for in this case, with -f so a re-run does not fail on an existing group. Null when running as a normal user, where no separate account is needed.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "postgresIds",
+    "untestabilityReason": {
+      "justification": "Creates a real OS user and group as root; there is no way to exercise it without mutating the host.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Recognises a Prisma known-request error structurally - a string code beside a string clientVersion - and returns the code, or null. Deliberately not instanceof: the thrown value has usually crossed a server component boundary by the time it is classified, and may come from a different copy of the client than this module imports, so class identity is not something to bet the error screen on. Requiring clientVersion as well as code is what stops a Node system error (ENOENT, which also has a code) being dressed up as a Prisma diagnosis.",
     "filePath": "app/lib/loadError.ts",
     "name": "prismaCode",
     "testFile": "app/lib/loadError.test.ts"
+  },
+  {
+    "description": "The managed URL recorded by a previous run, or null. This is what makes 'did I create this database?' answerable: a DATABASE_URL matching this file is ours to start and stop, and anything else is somebody's real database that must be left alone.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "provisionedUrl",
+    "untestabilityReason": {
+      "justification": "Reads a marker file from the cluster directory on disk.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Publishes a headless driver on window over the same bound catalog. Not a debug convenience: WebMCP is top-level-secure-context only and codeyam renders the app inside a capture iframe, so navigator.modelContext is genuinely absent in every preview and captured scenario, and this driver is what makes the tools exercisable there at all. It calls the exact catalog entries a real agent would.",
@@ -2782,6 +2941,15 @@
     "testFile": "app/lib/boardConnectors.test.ts"
   },
   {
+    "description": "Runs a cluster command as the postgres account when there is one, forcing LC_MESSAGES=C so the output this script parses does not change with the host's locale.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "runAsPostgres",
+    "untestabilityReason": {
+      "justification": "Spawns a child process with dropped privileges; the behaviour under test is the spawn itself.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "runLength",
@@ -2842,6 +3010,12 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "serializationProblem",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The eval fixture as bytes - two-space indent and exactly one trailing newline. The formatting is the point rather than a detail: it is what makes evals:schema:check print a diff where a re-worded tool description shows up as one changed line instead of a whole-file rewrite, which is most of why the generated file is committed at all. Named and tested separately from the payload builder because a careless change here silently destroys that reviewability while every other check stays green.",
+    "filePath": "scripts/toolSchemaFile.ts",
+    "name": "serializeEvalToolsSchema",
+    "testFile": "scripts/toolSchemaFile.test.ts"
   },
   {
     "description": "Gives one test file its own empty schema with the app's tables pushed into it, plus a teardown that drops it and stops the server. Assigns DATABASE_URL as a side effect and must be awaited before the modules under test are imported, since the Prisma client reads that variable at import time.",
@@ -2923,6 +3097,15 @@
     "filePath": "app/lib/toolRuntime.ts",
     "name": "standingWait",
     "testFile": "app/lib/insightProvenance.integration.test.ts"
+  },
+  {
+    "description": "Starts the cluster through pg_ctl, which forks a daemon and waits for it to accept connections. Unlike embedded-postgres - whose exit hook stops every cluster it started when the parent exits - the server outlives this process, which is the entire reason this file talks to pg_ctl at all.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "startCluster",
+    "untestabilityReason": {
+      "justification": "Daemonizes a real PostgreSQL server; the outliving-the-process behaviour is the thing that cannot be faked.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "Starts a real PostgreSQL server as a subprocess on an ephemeral port with a temporary data directory, and translates the root-container EACCES failure on spawn initdb into a message naming the actual cause and its fix.",
@@ -3019,6 +3202,12 @@
     "filePath": "app/lib/briefFormat.ts",
     "name": "untouchedNoteText",
     "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "Replaces or appends one KEY=value line in a dotenv file's text, leaving every other line - comments and unrelated keys alike - byte for byte intact. Matches an optional `export ` prefix and anchors on the whole key, so TEST_DATABASE_URL is never mistaken for DATABASE_URL; a suffix match there would silently repoint the test suite's database. Exported for tests because it edits the one file in the project holding real credentials, so 'does it clobber the other keys?' has to be answerable without provisioning a database first.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "upsertEnvLine",
+    "testFile": "scripts/ensureDevDatabase.test.ts"
   },
   {
     "description": "Moving the map to its next phase, from the page — the first page-side caller of set_phase, which until now only ever moved because an agent moved it. The ORDER is the point: the note saying what was decided goes on the log BEFORE the phase moves, so an agent reading the log finds a sentence rather than a phase that silently changed under it. A failed phase write therefore leaves the decision recorded, and says so rather than claiming the note was lost.",
@@ -3162,6 +3351,12 @@
     "testFile": "app/lib/galaxyLayout.test.ts"
   },
   {
+    "description": "Merges the managed database URL into .codeyam/stack.local.json's env block, preserving whatever else that per-developer overrides file already holds. A missing, empty or unparseable file starts from an empty object rather than refusing to write, since it contributes nothing to codeyam's lookup either way. Exported for tests for the same reason as upsertEnvLine: it edits a file a developer may have put their own overrides in.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "withCodeyamEnv",
+    "testFile": "scripts/ensureDevDatabase.test.ts"
+  },
+  {
     "description": "Wraps a Next route handler so an unanticipated throw becomes a JSON 500 rather than an unparseable body. Logs the original error to the terminal, runs it through classifyLoadError, and answers { error, command?, hint?, detail? } with the fix and the internals present only in development. A handler's own response passes through untouched, so a deliberate 400 or 404 keeps its status and body. Variadic so it composes with both (request) and (request, { params }) handlers without casting.",
     "filePath": "app/lib/apiFailure.ts",
     "name": "withFailure",
@@ -3172,5 +3367,29 @@
     "filePath": "app/lib/briefHtml.ts",
     "name": "withTitleHeading",
     "testFile": "app/lib/briefHtml.test.ts"
+  },
+  {
+    "description": "Gives codeyam the same URL the app got, when this is a codeyam project, by merging it into .codeyam/stack.local.json. The merge itself is withCodeyamEnv, which is tested; this is the file read and write around it.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "writeCodeyamEnv",
+    "untestabilityReason": {
+      "justification": "Reads and writes a real file on disk; the content decision belongs to withCodeyamEnv, which is tested.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Records the managed URL in .env.local, with a header explaining where the cluster lives and that replacing the URL with a hosted connection string leaves that cluster alone entirely. The line edit itself goes through upsertEnvLine so nothing else in the file is disturbed.",
+    "filePath": "scripts/ensureDevDatabase.ts",
+    "name": "writeEnvLocal",
+    "untestabilityReason": {
+      "justification": "Reads and writes a real file on disk; the decision it makes about the line's content is upsertEnvLine's, which is tested.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Writes the eval fixture to a path, creating its parent directories, and returns how many tools it wrote so the caller can report without re-deriving the catalog length. The I/O boundary is separated from the pure payload and formatting concerns so those two can be imported and tested without a module import writing to disk as a side effect - which is what the original single-file emitter did. Called by scripts/emit-tool-schema.ts with either the committed path or the temp path evals:schema:check diffs against.",
+    "filePath": "scripts/toolSchemaFile.ts",
+    "name": "writeEvalToolsSchema",
+    "testFile": "scripts/toolSchemaFile.test.ts"
   }
 ]

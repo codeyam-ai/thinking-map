@@ -856,6 +856,15 @@
       "runner": "tests"
     },
     {
+      "description": "The emitter, the check script and the eval command all have to name the same file. This constant is what stops them disagreeing.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "DEFAULT_EVAL_SCHEMA_PATH › points at the committed fixture path",
+      "line": 163,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
       "description": "Every step is a REAL call against the bound catalog, so a step with no explanation would leave a viewer unable to tell what it demonstrated.",
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
@@ -3853,12 +3862,102 @@
       "runner": "tests"
     },
     {
+      "description": "This is what tells a developer's own `.env.local` entry apart from a real environment export, which decides whether the URL gets mirrored to codeyam.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "envLocalValue › reads a declared value",
+      "line": 80,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An undeclared key must read as absent rather than as an empty string, or the caller cannot tell \"not configured\" from \"configured to nothing\".",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "envLocalValue › returns null when the key is not declared",
+      "line": 102,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Quoting a connection string is ordinary dotenv style, and keeping the quotes would produce a URL nothing can connect with.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "envLocalValue › strips surrounding quotes",
+      "line": 88,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Same rule codeyam's own resolver uses: a half-set variable is a half-written config, not an answer.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "envLocalValue › treats a blank value as absent",
+      "line": 96,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "Reserved for genuine faults: a conflict or a timeout is a normal result, and flagging those as errors would invite the blind retry the conflict path exists to prevent.",
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "errorResponse › marks the response as an error carrying the message",
       "line": 379,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "add_nodes builds its description by interpolating the insight kinds and the live-insight target, so an emitter that read some static field instead of the composed string would quietly ship a fixture missing the sentence that teaches the distinction.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "evalToolsSchema › carries the interpolated parts of the add_nodes description",
+      "line": 44,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Every input schema must be a plain JSON Schema object. A Zod schema leaking through here is not a formatting nit: it is a live graph of class instances that neither JSON nor the agent boundary can carry.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "evalToolsSchema › converts every input schema to a plain JSON Schema object",
+      "line": 54,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One entry per tool, in catalog order. A fixture that silently dropped a tool would leave that tool's description untested while the suite stayed green, which is the failure this whole directory exists to prevent.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "evalToolsSchema › emits one entry per catalog tool in catalog order",
+      "line": 22,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The union in ask_user's questions field is the one schema shape that has to survive conversion; losing it would silently narrow what the fixture says the agent may send.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "evalToolsSchema › keeps the ask_user questions field in the converted schema",
+      "line": 75,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "annotations are deliberately not emitted — local mode never reads them, so including them would add diff noise that can never change a result. read_map carries readOnlyHint, so it is the case that would catch a slip.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "evalToolsSchema › omits annotations even for a tool that declares them",
+      "line": 65,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The descriptions ARE the thing under test, so they must be reproduced verbatim. A truncated or re-wrapped copy would mean the evals judge prose the agent is never shown.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "evalToolsSchema › reproduces each description verbatim from the catalog",
+      "line": 31,
+      "registeredAt": "2026-09-03T16:10:25Z",
       "runner": "tests"
     },
     {
@@ -7318,6 +7417,33 @@
       "runner": "tests"
     },
     {
+      "description": "This is what makes a restart reuse the cluster's existing port instead of starting a second server the app is not pointed at.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "portOf › reads the port back out of a managed URL",
+      "line": 148,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A URL leaning on Postgres's default port declares no port of its own, and guessing 5432 for it would claim a cluster this script never provisioned.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "portOf › returns null for a URL with no explicit port",
+      "line": 154,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Garbage in DATABASE_URL must read as \"no port\" rather than throw, or the whole provisioning run dies on someone's typo.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "portOf › returns null for something that is not a URL",
+      "line": 160,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "add_nodes is the common batch write that creates open questions, so its reply must immediately put the agent into the answer-by-answer wait loop.",
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
@@ -8452,6 +8578,42 @@
       "runner": "tests"
     },
     {
+      "description": "Exactly one trailing newline. Without it every regeneration would show a no-newline-at-end-of-file marker in the diff the check command prints.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "serializeEvalToolsSchema › ends with exactly one trailing newline",
+      "line": 86,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Two-space indent is what makes a re-worded description show up as one changed line. A single-line dump would make the whole file one diff hunk and defeat the reviewability the fixture is committed for.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "serializeEvalToolsSchema › indents with two spaces so a description change is one diff line",
+      "line": 95,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Deterministic output is what lets the check command treat any diff at all as a real staleness signal rather than key-order churn.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "serializeEvalToolsSchema › produces identical bytes on repeated calls",
+      "line": 109,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bytes must parse back to exactly what the emitter built, or the file on disk is not the fixture the tests above pinned.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "serializeEvalToolsSchema › round-trips back to the same schema object",
+      "line": 103,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
       "description": "The boundary: exactly at the limit still fits, so it must not be cut.",
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
@@ -9115,6 +9277,60 @@
       "key": "untouchedNoteText › names the section by mark and heading",
       "line": 231,
       "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Without the separator the new key would be glued onto the end of the last line, producing a key nothing can read back.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "upsertEnvLine › adds a newline before the key when the file lacks a trailing one",
+      "line": 70,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The first run on a fresh clone has no `.env.local` at all, so writing the key into empty text is the ordinary path rather than an edge case.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "upsertEnvLine › adds the key to an empty file",
+      "line": 26,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "`TEST_DATABASE_URL` is a real key in this project's `.env`, and a suffix match would silently repoint the test suite's database at the dev one.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "upsertEnvLine › does not match a key that merely ends with the same name",
+      "line": 61,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "This edits the one file in the project holding real credentials, so clobbering an unrelated key or comment is the costliest thing it could do.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "upsertEnvLine › leaves every other key and comment untouched",
+      "line": 52,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A developer who wrote `export DATABASE_URL=` still declared the key, so it is replaced rather than duplicated alongside the export form.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "upsertEnvLine › replaces an _export_-prefixed declaration",
+      "line": 44,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Re-pointing an existing declaration must edit that line where it stands. Appending a second DATABASE_URL would leave which one wins up to the reader's parser.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "upsertEnvLine › replaces an existing value in place",
+      "line": 35,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
       "runner": "tests"
     },
     {
@@ -10018,6 +10234,42 @@
       "runner": "tests"
     },
     {
+      "description": "Most projects have no `stack.local.json` yet, so the block has to be created rather than merged into on the first provisioning run.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "withCodeyamEnv › creates the env block in an empty file",
+      "line": 110,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A trailing newline keeps the file well-formed for anything that appends to it and keeps its diffs clean.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "withCodeyamEnv › ends with a newline",
+      "line": 140,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "This is a per-developer overrides file. Dropping a sibling key, or another env variable beside DATABASE_URL, would silently discard their config.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "withCodeyamEnv › keeps other keys and other env variables",
+      "line": 118,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A file that does not parse contributes nothing to codeyam's lookup anyway, so writing a valid one beats refusing and leaving the URL unrecorded.",
+      "file": "scripts/ensureDevDatabase.test.ts",
+      "format": "vitest",
+      "key": "withCodeyamEnv › starts over from an unparseable file rather than refusing to write",
+      "line": 132,
+      "registeredAt": "2026-09-03T16:35:40.841761330+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "Route handlers on dynamic segments take a second context argument, and the wrapper has to hand both through unchanged.",
       "file": "app/lib/apiFailure.test.ts",
       "format": "vitest",
@@ -10078,6 +10330,42 @@
       "key": "withFailure › turns a thrown database drift into a readable JSON 500",
       "line": 71,
       "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The check script writes to a path whose directory may not exist yet, and a first generation into a fresh clone has no evals directory at all.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "writeEvalToolsSchema › creates missing parent directories",
+      "line": 135,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Regenerating over a stale file must replace it wholesale — a partial overwrite would leave trailing bytes from the previous, longer fixture.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "writeEvalToolsSchema › overwrites an existing file rather than appending",
+      "line": 144,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The count is what the emitter reports to the operator; deriving it from the catalog rather than from the caller is what keeps that line honest.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "writeEvalToolsSchema › returns the number of tools written",
+      "line": 153,
+      "registeredAt": "2026-09-03T16:10:25Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The bytes on disk are the ones the eval CLI reads, so they must be the serializer's output and nothing else.",
+      "file": "scripts/toolSchemaFile.test.ts",
+      "format": "vitest",
+      "key": "writeEvalToolsSchema › writes the serialized fixture to the given path",
+      "line": 127,
+      "registeredAt": "2026-09-03T16:10:25Z",
       "runner": "tests"
     }
   ],

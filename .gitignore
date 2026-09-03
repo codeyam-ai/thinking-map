@@ -57,6 +57,13 @@ test-results/
 playwright-report/
 blob-report/
 
+# webmcp-evals run output. A JSON/HTML report per run is scratch, not history —
+# `.evals` is the CLI's default `--output-dir`. The check temp file below is
+# what `npm run evals:schema:check` regenerates to before diffing; it is left
+# behind deliberately when the diff fails, so the stale file can be inspected.
+.evals/
+evals/.tools.schema.check.json
+
 # CodeYam - local runtime state
 .codeyam/secrets.json
 .codeyam/setup-connections.json
