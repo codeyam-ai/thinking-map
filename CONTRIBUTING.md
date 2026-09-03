@@ -43,9 +43,16 @@ A few things worth knowing:
   type error naming a model field that plainly exists in `prisma/schema.prisma`
   almost always means the client on disk is stale.
 - **The DB-backed tests provision their own PostgreSQL** and stop it afterwards
-  (`app/lib/testDatabase.ts`), so `npm test` needs nothing configured. Set
+  (`app/lib/testDatabase.ts`), so you do not need to run a database for them. Set
   `TEST_DATABASE_URL` only to point them at a database you already have — and use
   a *direct* connection, since `db push` needs a real session.
+- **`npm test` still needs `DATABASE_URL` set to something**, even though nothing
+  connects to it. `app/lib/prisma.ts` resolves it at module load, so a pure unit
+  test that imports `mapStore` or `exchange` for a database it never touches
+  throws before any test runs. `npm run setup` writes a real value into
+  `.env.local`, so this only bites a clone that skipped setup — and CI, which
+  passes a placeholder. If you see `DATABASE_URL is not set` from a test with no
+  database in sight, that is this, not your change.
 - **`npm run lint` does not pass yet.** The ESLint config was unrunnable for most
   of this project's life; it works now, and 14 React Compiler violations remain to
   be cleared. That work is tracked in

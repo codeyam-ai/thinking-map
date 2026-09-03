@@ -51,8 +51,17 @@ jobs:
       # The DB-backed tests start their own PostgreSQL (`app/lib/testDatabase.ts`)
       # and stop it afterwards, so no service container is needed. Leaving
       # `TEST_DATABASE_URL` unset is what selects that path.
+      #
+      # `DATABASE_URL` is still required, and not by those tests: `app/lib/prisma.ts`
+      # resolves it at module load (deliberately — see the note there), so a pure
+      # unit test that imports `mapStore` or `exchange` for a database it never
+      # touches throws before any test runs. An integration test overrides this
+      # value per-test, so the placeholder is only ever read by the modules that
+      # do not use it.
       - name: Run tests
         run: npm test
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
 
       # `next build` reads `DATABASE_URL` while collecting route configuration
       # and throws when it is missing — but it never opens a connection, so a

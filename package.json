@@ -1,7 +1,8 @@
 {
-  "name": "codeyam-project",
+  "name": "thinking-map",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "postinstall": "node scripts/postinstall.mjs",
     "setup": "npm install && npm run db:ensure && npm run db:push && npm run db:seed",
