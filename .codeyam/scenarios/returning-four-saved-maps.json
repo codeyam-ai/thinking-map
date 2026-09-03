@@ -1,290 +1,294 @@
 {
- "name": "Returning - four saved maps",
- "id": "54ba123f-4104-492f-85f6-083cf11665ea",
- "url": "/",
- "dimensions": [
-  "Tablet"
- ],
- "mocks": {},
- "seed": {
-  "mapNode": [
-   {
-    "id": "g-idea",
-    "kind": "idea",
-    "label": "Educational game",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": null,
-    "status": "answered",
-    "origin": "user"
-   },
-   {
-    "id": "g-user",
-    "kind": "user",
-    "label": "For: Teachers",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": "g-idea",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "id": "g-a",
-    "kind": "approach",
-    "label": "Classroom vocabulary game",
-    "mapId": "map-game",
-    "order": 0,
-    "parentId": "g-user",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "id": "e-idea",
-    "kind": "idea",
-    "label": "Better event planning",
-    "mapId": "map-events",
-    "order": 0,
-    "parentId": null,
-    "status": "answered",
-    "origin": "user"
-   },
-   {
-    "id": "e-prob",
-    "kind": "problem",
-    "label": "Four spreadsheets, one group chat",
-    "mapId": "map-events",
-    "order": 0,
-    "parentId": "e-idea",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "id": "e-res",
-    "kind": "research",
-    "label": "5 existing tools found",
-    "mapId": "map-events",
-    "order": 0,
-    "parentId": "e-prob",
-    "status": "answered",
-    "origin": "agent"
-   },
-   {
-    "id": "b-idea",
-    "kind": "idea",
-    "label": "Weekday morning bread",
-    "mapId": "map-bakery",
-    "order": 0,
-    "parentId": null,
-    "status": "answered",
-    "origin": "user"
-   },
-   {
-    "id": "b-q",
-    "kind": "open-question",
-    "label": "Who actually buys at 7am?",
-    "mapId": "map-bakery",
-    "order": 0,
-    "parentId": "b-idea",
-    "status": "open",
-    "origin": "agent"
-   },
-   {
-    "id": "r-idea",
-    "kind": "idea",
-    "label": "Garden project with the kids",
-    "mapId": "map-garden",
-    "order": 0,
-    "parentId": null,
-    "status": "answered",
-    "origin": "user"
-   },
-   {
-    "id": "r-goal",
-    "kind": "goal",
-    "label": "Something they stick with",
-    "mapId": "map-garden",
-    "order": 0,
-    "parentId": "r-idea",
-    "status": "answered",
-    "origin": "agent"
-   }
+  "name": "Returning - four saved maps",
+  "id": "43f54403-1566-4423-ad72-5562dcd36891",
+  "url": "/?visitor=demo-returning",
+  "dimensions": [
+    "Tablet"
   ],
-  "message": [
-   {
-    "content": "Actually, what if this isn't for kids, what if it's for teachers instead?",
-    "id": "msg-1",
-    "mapId": "map-game",
-    "role": "user",
-    "origin": "user"
-   },
-   {
-    "content": "I want to improve how my team plans events.",
-    "id": "msg-2",
-    "mapId": "map-events",
-    "role": "user",
-    "origin": "user"
-   },
-   {
-    "content": "I have an idea for a business.",
-    "id": "msg-3",
-    "mapId": "map-bakery",
-    "role": "user",
-    "origin": "user"
-   },
-   {
-    "content": "I want to create something for my family.",
-    "id": "msg-4",
-    "mapId": "map-garden",
-    "role": "user",
-    "origin": "user"
-   }
-  ],
-  "thinkingMap": [
-   {
-    "id": "map-game",
-    "phase": "explore",
-    "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
-    "title": "Educational game for kids",
-    "revision": 4
-   },
-   {
-    "id": "map-events",
-    "phase": "research",
-    "seedIdea": "I want to improve how my team plans events. Right now it's four spreadsheets and a group chat.",
-    "title": "A better way for my team to plan events",
-    "revision": 4
-   },
-   {
-    "id": "map-bakery",
-    "phase": "map",
-    "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.",
-    "title": "Should the bakery deliver?",
-    "revision": 3
-   },
-   {
-    "id": "map-garden",
-    "phase": "map",
-    "seedIdea": "I want to create something for my family, maybe a garden project my kids would actually stick with.",
-    "title": "Something for my kids to do outside",
-    "revision": 3
-   }
-  ],
-  "mapEvent": [
-   {
-    "id": "ev-map-game-1",
-    "mapId": "map-game",
-    "revision": 1,
-    "kind": "node.added",
-    "origin": "user",
-    "payload": "{\"id\": \"g-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-2",
-    "mapId": "map-game",
-    "revision": 2,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"g-user\", \"parentId\": \"g-idea\", \"kind\": \"user\", \"label\": \"For: Teachers\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-3",
-    "mapId": "map-game",
-    "revision": 3,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"g-a\", \"parentId\": \"g-user\", \"kind\": \"approach\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-game-4",
-    "mapId": "map-game",
-    "revision": 4,
-    "kind": "phase.set",
-    "origin": "agent",
-    "payload": "{\"phase\": \"explore\"}"
-   },
-   {
-    "id": "ev-map-events-1",
-    "mapId": "map-events",
-    "revision": 1,
-    "kind": "node.added",
-    "origin": "user",
-    "payload": "{\"id\": \"e-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Better event planning\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-events-2",
-    "mapId": "map-events",
-    "revision": 2,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"e-prob\", \"parentId\": \"e-idea\", \"kind\": \"problem\", \"label\": \"Four spreadsheets, one group chat\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-events-3",
-    "mapId": "map-events",
-    "revision": 3,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"e-res\", \"parentId\": \"e-prob\", \"kind\": \"research\", \"label\": \"5 existing tools found\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-events-4",
-    "mapId": "map-events",
-    "revision": 4,
-    "kind": "phase.set",
-    "origin": "agent",
-    "payload": "{\"phase\": \"research\"}"
-   },
-   {
-    "id": "ev-map-bakery-1",
-    "mapId": "map-bakery",
-    "revision": 1,
-    "kind": "node.added",
-    "origin": "user",
-    "payload": "{\"id\": \"b-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Weekday morning bread\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-bakery-2",
-    "mapId": "map-bakery",
-    "revision": 2,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"b-q\", \"parentId\": \"b-idea\", \"kind\": \"open-question\", \"label\": \"Who actually buys at 7am?\", \"status\": \"open\"}"
-   },
-   {
-    "id": "ev-map-bakery-3",
-    "mapId": "map-bakery",
-    "revision": 3,
-    "kind": "phase.set",
-    "origin": "agent",
-    "payload": "{\"phase\": \"deconstruct\"}"
-   },
-   {
-    "id": "ev-map-garden-1",
-    "mapId": "map-garden",
-    "revision": 1,
-    "kind": "node.added",
-    "origin": "user",
-    "payload": "{\"id\": \"r-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Garden project with the kids\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-garden-2",
-    "mapId": "map-garden",
-    "revision": 2,
-    "kind": "node.added",
-    "origin": "agent",
-    "payload": "{\"id\": \"r-goal\", \"parentId\": \"r-idea\", \"kind\": \"goal\", \"label\": \"Something they stick with\", \"status\": \"answered\"}"
-   },
-   {
-    "id": "ev-map-garden-3",
-    "mapId": "map-garden",
-    "revision": 3,
-    "kind": "phase.set",
-    "origin": "agent",
-    "payload": "{\"phase\": \"map\"}"
-   }
-  ]
- },
- "scenarioType": "application",
- "pageFilePath": "app/page.tsx",
- "description": "Someone coming back. Four thinking maps in progress, each showing which phase it reached."
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "ev-map-game-1",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "user",
+        "payload": "{\"id\": \"g-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Educational game\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-game-2",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-user\", \"parentId\": \"g-idea\", \"kind\": \"user\", \"label\": \"For: Teachers\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-game-3",
+        "kind": "node.added",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"id\": \"g-a\", \"parentId\": \"g-user\", \"kind\": \"approach\", \"label\": \"Classroom vocabulary game\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-game-4",
+        "kind": "phase.set",
+        "mapId": "map-game",
+        "origin": "agent",
+        "payload": "{\"phase\": \"explore\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-events-1",
+        "kind": "node.added",
+        "mapId": "map-events",
+        "origin": "user",
+        "payload": "{\"id\": \"e-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Better event planning\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-events-2",
+        "kind": "node.added",
+        "mapId": "map-events",
+        "origin": "agent",
+        "payload": "{\"id\": \"e-prob\", \"parentId\": \"e-idea\", \"kind\": \"problem\", \"label\": \"Four spreadsheets, one group chat\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-events-3",
+        "kind": "node.added",
+        "mapId": "map-events",
+        "origin": "agent",
+        "payload": "{\"id\": \"e-res\", \"parentId\": \"e-prob\", \"kind\": \"research\", \"label\": \"5 existing tools found\", \"status\": \"answered\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-events-4",
+        "kind": "phase.set",
+        "mapId": "map-events",
+        "origin": "agent",
+        "payload": "{\"phase\": \"research\"}",
+        "revision": 4
+      },
+      {
+        "id": "ev-map-bakery-1",
+        "kind": "node.added",
+        "mapId": "map-bakery",
+        "origin": "user",
+        "payload": "{\"id\": \"b-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Weekday morning bread\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-bakery-2",
+        "kind": "node.added",
+        "mapId": "map-bakery",
+        "origin": "agent",
+        "payload": "{\"id\": \"b-q\", \"parentId\": \"b-idea\", \"kind\": \"open-question\", \"label\": \"Who actually buys at 7am?\", \"status\": \"open\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-bakery-3",
+        "kind": "phase.set",
+        "mapId": "map-bakery",
+        "origin": "agent",
+        "payload": "{\"phase\": \"deconstruct\"}",
+        "revision": 3
+      },
+      {
+        "id": "ev-map-garden-1",
+        "kind": "node.added",
+        "mapId": "map-garden",
+        "origin": "user",
+        "payload": "{\"id\": \"r-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"Garden project with the kids\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "ev-map-garden-2",
+        "kind": "node.added",
+        "mapId": "map-garden",
+        "origin": "agent",
+        "payload": "{\"id\": \"r-goal\", \"parentId\": \"r-idea\", \"kind\": \"goal\", \"label\": \"Something they stick with\", \"status\": \"answered\"}",
+        "revision": 2
+      },
+      {
+        "id": "ev-map-garden-3",
+        "kind": "phase.set",
+        "mapId": "map-garden",
+        "origin": "agent",
+        "payload": "{\"phase\": \"map\"}",
+        "revision": 3
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "g-idea",
+        "kind": "idea",
+        "label": "Educational game",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "g-user",
+        "kind": "user",
+        "label": "For: Teachers",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "g-idea",
+        "status": "answered"
+      },
+      {
+        "id": "g-a",
+        "kind": "approach",
+        "label": "Classroom vocabulary game",
+        "mapId": "map-game",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "g-user",
+        "status": "answered"
+      },
+      {
+        "id": "e-idea",
+        "kind": "idea",
+        "label": "Better event planning",
+        "mapId": "map-events",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "e-prob",
+        "kind": "problem",
+        "label": "Four spreadsheets, one group chat",
+        "mapId": "map-events",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "e-idea",
+        "status": "answered"
+      },
+      {
+        "id": "e-res",
+        "kind": "research",
+        "label": "5 existing tools found",
+        "mapId": "map-events",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "e-prob",
+        "status": "answered"
+      },
+      {
+        "id": "b-idea",
+        "kind": "idea",
+        "label": "Weekday morning bread",
+        "mapId": "map-bakery",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "b-q",
+        "kind": "open-question",
+        "label": "Who actually buys at 7am?",
+        "mapId": "map-bakery",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "b-idea",
+        "status": "open"
+      },
+      {
+        "id": "r-idea",
+        "kind": "idea",
+        "label": "Garden project with the kids",
+        "mapId": "map-garden",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "id": "r-goal",
+        "kind": "goal",
+        "label": "Something they stick with",
+        "mapId": "map-garden",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "r-idea",
+        "status": "answered"
+      }
+    ],
+    "message": [
+      {
+        "content": "Actually, what if this isn't for kids, what if it's for teachers instead?",
+        "id": "msg-1",
+        "mapId": "map-game",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "I want to improve how my team plans events.",
+        "id": "msg-2",
+        "mapId": "map-events",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "I have an idea for a business.",
+        "id": "msg-3",
+        "mapId": "map-bakery",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "I want to create something for my family.",
+        "id": "msg-4",
+        "mapId": "map-garden",
+        "origin": "user",
+        "role": "user"
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-game",
+        "phase": "explore",
+        "revision": 4,
+        "seedIdea": "I want to build an educational game for kids, but I don't know what it should be.",
+        "title": "Educational game for kids",
+        "visitorId": "demo-returning"
+      },
+      {
+        "id": "map-events",
+        "phase": "research",
+        "revision": 4,
+        "seedIdea": "I want to improve how my team plans events. Right now it's four spreadsheets and a group chat.",
+        "title": "A better way for my team to plan events",
+        "visitorId": "demo-returning"
+      },
+      {
+        "id": "map-bakery",
+        "phase": "map",
+        "revision": 3,
+        "seedIdea": "I have an idea for a business - my neighbourhood has no good bread on weekday mornings.",
+        "title": "Should the bakery deliver?",
+        "visitorId": "demo-returning"
+      },
+      {
+        "id": "map-garden",
+        "phase": "map",
+        "revision": 3,
+        "seedIdea": "I want to create something for my family, maybe a garden project my kids would actually stick with.",
+        "title": "Something for my kids to do outside",
+        "visitorId": "demo-returning"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/page.tsx",
+  "description": "Someone coming back to four maps this browser made, each showing which phase it reached. The counterpart to 'Two visitors, one database': that scenario is these same four maps in the same database, seen by a browser that made none of them."
 }

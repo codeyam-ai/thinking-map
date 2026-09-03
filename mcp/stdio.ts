@@ -2,7 +2,8 @@
 // child process (Claude Desktop among them) rather than calling it over HTTP.
 //
 // It is the same `buildMcpServer()` the /api/mcp route serves, against the same
-// database — only the transport differs.
+// database — the transport differs, and so does the map scope: this door lists
+// every map, where the HTTP one lists only the calling browser's. See `MapScope`.
 //
 // Run with:  npm run mcp
 //
@@ -23,7 +24,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { buildMcpServer } from '../app/lib/mcpServer';
 
 async function main() {
-  const server = buildMcpServer();
+  // Every map, unlike the HTTP door. A client that can launch this process can
+  // already read the database it points at, so there is nothing for a visitor
+  // filter to protect here — and a client launched by a person to work on their
+  // own maps must be able to see them without first holding a browser cookie.
+  const server = buildMcpServer({ kind: 'all' });
   // stdout is the JSON-RPC channel here, so anything we want to say goes to
   // stderr — a stray console.log would corrupt the protocol stream.
   await server.connect(new StdioServerTransport());

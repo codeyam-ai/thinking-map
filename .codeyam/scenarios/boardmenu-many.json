@@ -1,6 +1,6 @@
 {
   "name": "BoardMenu - Many",
-  "id": "3ffb95d1-f5ae-4bf9-ba84-fd9796bd7264",
+  "id": "ef1eb67b-bea7-490b-8f9c-32020e6f72fe",
   "url": "/isolated-components/BoardMenu?s=Many",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,11 @@
   "mocks": {},
   "componentName": "BoardMenu",
   "scenarioType": "component",
-  "description": "Enough boards that the list has to hold its shape, with titles long enough to need truncating rather than wrapping the header open."
+  "description": "Enough boards that the list has to hold its shape, with titles long enough to need truncating rather than wrapping the header open. Open, so the scrolling list and the truncation are actually captured.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Boards"
+    }
+  ]
 }

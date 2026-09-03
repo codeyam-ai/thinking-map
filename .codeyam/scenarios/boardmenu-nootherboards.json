@@ -1,6 +1,6 @@
 {
   "name": "BoardMenu - NoOtherBoards",
-  "id": "9fa69cef-2c88-4f19-9bec-d1643fed632d",
+  "id": "45856e6a-1507-47b3-ba49-be626f6e81b1",
   "url": "/isolated-components/BoardMenu?s=NoOtherBoards",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,11 @@
   "mocks": {},
   "componentName": "BoardMenu",
   "scenarioType": "component",
-  "description": "Day one: there is nowhere else to go yet. The menu has to say so rather than open onto an empty list."
+  "description": "Day one, above a landing page with nothing behind it: no boards of your own and no board on screen either, so the menu must not call anything your only one. Open, because the sentence is the state.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Boards"
+    }
+  ]
 }

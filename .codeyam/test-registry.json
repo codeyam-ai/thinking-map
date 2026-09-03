@@ -1540,6 +1540,15 @@
       "runner": "tests"
     },
     {
+      "description": "The name is part of the contract between the route that writes the cookie and the pages that read it, so it is exported rather than typed twice.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "VISITOR_COOKIE › is a stable non-empty cookie name",
+      "line": 147,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
       "description": "The regression this file exists for: WebMcpBridge renders copy promising these tools are reachable, so all seven must actually appear beside it.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
@@ -5815,6 +5824,60 @@
       "runner": "tests"
     },
     {
+      "description": "A map made through a door with no browser behind it — the stdio agent — belongs to nobody rather than to everybody, and must not surface in a visitor's list.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "listMaps — visitor scoping › does not hand an unowned map to a visitor",
+      "line": 448,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Newest first, unchanged by the filter. The strip is \"pick up where you left off\", so a scoping change that quietly dropped the ordering would be a regression the assertions above could not see.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "listMaps — visitor scoping › keeps the newest-first ordering within one visitor",
+      "line": 469,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The other half of the fix, and the reason `listAllMaps` is its own named function: the stdio door still needs every map, including the unowned ones.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "listMaps — visitor scoping › listAllMaps still returns every map whoever made it",
+      "line": 457,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Absence means nothing, not everything. This is the asymmetry the whole fix turns on: a first arrival with no cookie must land on the day-one screen, and the opposite default is precisely the bug above.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "listMaps — visitor scoping › returns nothing for a visitor with no id at all",
+      "line": 438,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reported bug, pinned. `listMaps` took no arguments and filtered on nothing, so the landing page's \"Pick up where you left off\" strip showed every map anyone had ever made, to everyone. Two browsers, two maps: the list one of them gets back must contain only its own.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "listMaps — visitor scoping › returns only the maps belonging to the given visitor",
+      "line": 425,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "createMap has to actually write the owner, or the filter above would be correct and the list would still always be empty.",
+      "file": "app/lib/contributions.integration.test.ts",
+      "format": "vitest",
+      "key": "listMaps — visitor scoping › stamps the creating visitor onto the new map",
+      "line": 491,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
       "description": "A real phase must pass, or the workspace falls back and shows the wrong step as active.",
       "file": "app/lib/mapKinds.test.ts",
       "format": "vitest",
@@ -6010,6 +6073,24 @@
       "key": "mapCaption › singularises a lone open question",
       "line": 37,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Two browsers must never be handed the same id, or each would see the other's maps — the bug this feature exists to remove, reintroduced.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "mintVisitorId › gives a different id every time",
+      "line": 66,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Opaque and non-empty. An empty string would read as \"no cookie\" everywhere downstream, since every caller treats absence as no maps.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "mintVisitorId › gives a non-empty opaque string",
+      "line": 72,
+      "registeredAt": "2026-09-03T11:53:04Z",
       "runner": "tests"
     },
     {
@@ -8200,6 +8281,69 @@
       "runner": "tests"
     },
     {
+      "description": "Other query params are none of its business — a map URL carrying a filter or an agent-panel opt-in must not be read as naming a visitor.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › ignores unrelated query params",
+      "line": 137,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A bare `?visitor` with no value arrives as an empty string. Returning it would hand `listMaps` an empty-string owner, which matches no row and is a confusing way to spell \"nobody\" — null is the honest answer.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › is null for a valueless param",
+      "line": 119,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The floor, and the case that matters most: no query string may name a visitor on a deployed build. This is the one that keeps the seam from being a way to read a stranger's list by guessing.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › is null in production even when the param is present",
+      "line": 83,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Off on a server a person started themselves, exactly like the agent panel's gate. A dev build is not enough; the editor has to have launched it.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › is null on a dev server started by hand",
+      "line": 91,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A landing page with no query string at all — the day-one scenario. Absence must mean nobody, never everybody.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › is null when no param is present",
+      "line": 109,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A repeated param arrives as an array, the same shape `agentPanelRequested` handles. Reading the first entry keeps a doubled param working.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › reads the first entry when the param is repeated",
+      "line": 127,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case the seam exists for: a codeyam capture browser has no way to be handed a cookie before it navigates, so the scenario URL names the visitor.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "scenarioVisitorId › reads the param on a codeyam-launched server",
+      "line": 99,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
       "description": "The failure this exists to prevent: a hosted DSN arrives carrying its own query parameters, and naive concatenation would produce a URL with two `?` — dropping pgbouncer settings that the connection actually depends on.",
       "file": "app/lib/testDatabase.test.ts",
       "format": "vitest",
@@ -9691,6 +9835,51 @@
       "key": "visibleEvents › keeps an agent update to a node the person answered",
       "line": 73,
       "registeredAt": "2026-09-01T11:37:21Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Lax, not Strict: the saved-map list is reached by following an ordinary link, and Strict would drop the cookie on exactly that navigation — the returning visitor would land on the day-one screen holding a valid cookie.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "visitorCookieOptions › is SameSite lax so following a link still carries it",
+      "line": 33,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The reason the cookie exists at all is to say which browser owns a map, so nothing in the page may read it. httpOnly is what makes that structural rather than a convention nobody enforces.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "visitorCookieOptions › is httpOnly so no client code can read it",
+      "line": 25,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "But NOT secure in development, or http://localhost would never receive it and the whole feature would look broken on the machine it is built on.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "visitorCookieOptions › is not secure in development so http localhost still works",
+      "line": 46,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Deployed, the cookie must not travel in clear text.",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "visitorCookieOptions › is secure in production",
+      "line": 39,
+      "registeredAt": "2026-09-03T11:53:04Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Scoped to the whole site and long-lived. A path-scoped cookie would be missing on `/map/<id>`, where the Boards menu reads the same list, and a session cookie would make \"pick up where you left off\" mean \"until you close the tab\".",
+      "file": "app/lib/visitor.test.ts",
+      "format": "vitest",
+      "key": "visitorCookieOptions › is site-wide and long-lived",
+      "line": 55,
+      "registeredAt": "2026-09-03T11:53:04Z",
       "runner": "tests"
     },
     {

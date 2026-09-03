@@ -1,0 +1,18 @@
+{
+  "name": "BoardMenu - NotYoursAtAll",
+  "id": "918f3457-88ac-4fe0-bc5d-98ddcc36b867",
+  "url": "/isolated-components/BoardMenu?s=NotYoursAtAll",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardMenu",
+  "scenarioType": "component",
+  "description": "A board reached by someone else's link, by a browser that has made none of its own. The menu is open, because the whole point is the sentence inside it: this state used to be told 'This is your only board so far' about a board it does not own. Since the map list became visitor-scoped, this is an ordinary state rather than an impossible one.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Boards"
+    }
+  ]
+}

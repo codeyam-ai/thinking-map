@@ -140,17 +140,49 @@ async function createThemes(
   return { themeRefToId, events };
 }
 
-export async function listMaps() {
+const MAP_LIST_SELECT = {
+  id: true,
+  title: true,
+  seedIdea: true,
+  phase: true,
+  updatedAt: true,
+  _count: { select: { nodes: true, messages: true } },
+} as const;
+
+/**
+ * One browser's saved maps, newest first.
+ *
+ * The visitor id is REQUIRED rather than optional, and `null` returns nothing
+ * rather than everything. That asymmetry is the whole point: an unfiltered list
+ * used to hand every visitor every map anyone had ever made, so absence has to
+ * mean "no maps of your own yet" — the day-one state the landing page is built
+ * around — and never "here is everybody's".
+ *
+ * This scopes the LIST. It is not access control: `/map/<id>` stays reachable
+ * by anyone holding the link, which is already how this product is used.
+ */
+export async function listMaps(visitorId: string | null) {
+  if (!visitorId) return [];
+  return prisma.thinkingMap.findMany({
+    where: { visitorId },
+    orderBy: { updatedAt: 'desc' },
+    select: MAP_LIST_SELECT,
+  });
+}
+
+/**
+ * Every map on the instance, whoever made it.
+ *
+ * Deliberately its own function with a name that says so, rather than a `null`
+ * or a missing argument to `listMaps`. One door legitimately wants this — the
+ * MCP server door, whose caller is the operator running the process — and making
+ * that door type out `listAllMaps` means the unscoped read can be found with one
+ * grep instead of hiding inside a default.
+ */
+export async function listAllMaps() {
   return prisma.thinkingMap.findMany({
     orderBy: { updatedAt: 'desc' },
-    select: {
-      id: true,
-      title: true,
-      seedIdea: true,
-      phase: true,
-      updatedAt: true,
-      _count: { select: { nodes: true, messages: true } },
-    },
+    select: MAP_LIST_SELECT,
   });
 }
 
@@ -265,6 +297,7 @@ export async function createMap(
   seedIdea: string,
   brief?: BriefInput,
   attachments: { name: string }[] = [],
+  visitorId: string | null = null,
 ) {
   const trimmed = seedIdea.trim();
   const title = deriveTitle(trimmed, brief);
@@ -276,6 +309,10 @@ export async function createMap(
     data: {
       title,
       seedIdea: trimmed,
+      // Which browser gets to see this in its saved-map list. Null for the doors
+      // with no browser behind them — the MCP server door most of all — and a map
+      // stamped null belongs to nobody rather than to everybody.
+      visitorId,
       // Rows now, not a JSON column — but still names and no bytes. This door
       // is the one that creates a map and its attachments in a single
       // transaction, and bytes cannot travel in a JSON body alongside the

@@ -41,6 +41,21 @@ export default function BoardMenu({
 
   const others = maps.filter((m) => m.id !== currentId);
 
+  // THREE situations reach an empty list, and one sentence cannot serve them.
+  // `maps` is the boards THIS BROWSER made, so an empty one means it made none.
+  //   • none of its own, but a board on screen — it followed someone's link, and
+  //     "this is your only board" would claim it owns a board it does not.
+  //   • none of its own and no board on screen — the header above a landing page
+  //     that failed to load; there is no board to call its only one.
+  //   • exactly the board on screen — the sentence is true, and this is the case
+  //     it was written for.
+  const emptyMessage =
+    maps.length > 0
+      ? 'This is your only board so far.'
+      : currentId
+        ? 'You opened this board from a link. Start one of your own and it will show up here.'
+        : 'You have not started a board yet.';
+
   return (
     <div className="relative" ref={box}>
       <button
@@ -96,7 +111,7 @@ export default function BoardMenu({
             </>
           ) : (
             <p className="px-5 py-4 text-[13px] text-white/35">
-              This is your only board so far.
+              {emptyMessage}
             </p>
           )}
         </div>

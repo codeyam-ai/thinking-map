@@ -4,6 +4,7 @@ import FirstCard from './components/FirstCard';
 import SavedMapList from './components/SavedMapList';
 import { classifyLoadError } from './lib/loadError';
 import { listMaps } from './lib/mapStore';
+import { resolveVisitorId, type VisitorQuery } from './lib/visitor';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,13 +16,22 @@ export const dynamic = 'force-dynamic';
  * bolted together. Starting on the same surface you are about to work on means
  * the first card you fill in is already part of the map.
  */
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  // Present only so a codeyam scenario can be viewed as a chosen visitor; on a
+  // production build `resolveVisitorId` ignores it entirely.
+  searchParams?: Promise<VisitorQuery>;
+}) {
   // Same database, same failure mode as the map page — so the same treatment.
   // The header stays either way: a failed load should still look like the app,
   // not like the app is gone.
   let maps: Awaited<ReturnType<typeof listMaps>>;
   try {
-    maps = await listMaps();
+    // This browser's maps and nobody else's. A first arrival has no cookie, gets
+    // an empty list, and lands on the one-card screen — which is what the strip's
+    // `maps.length > 0` guard below always claimed to mean.
+    maps = await listMaps(await resolveVisitorId(await searchParams));
   } catch (error) {
     console.error('Failed to list maps:', error);
     return (

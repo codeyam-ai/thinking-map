@@ -1,0 +1,1848 @@
+{
+  "timestamp": "2026-09-03T12:18:46Z",
+  "title": "Your Saved Maps Are Yours",
+  "type": "feature",
+  "userRequest": "## Summary\n\n`listMaps` takes no arguments and filters on nothing, so the \"Pick up where you left\noff\" strip on the landing page shows every map anyone has ever made — to everyone.\n`GET /api/maps` returns the same unfiltered list to any caller. On a laptop with one\nperson and one database that is invisible; on a public URL it means the first thing a\nvisitor sees is a stranger's half-finished thinking, and it reads as a broken app rather\nthan as a shared canvas. Give each browser an opaque visitor id in an httpOnly cookie,\nstamp it on the maps that browser creates, and filter both the strip and the API by it.\nNo accounts, no login screen, no wall between arriving and typing the first card.\n\n## Key Decisions\n\n- **Scope the list, not the map.** `/map/<id>` stays reachable by anyone holding the\n  link, and the tools under `/api/maps/[id]/tools` stay callable. That is load-bearing\n  rather than an oversight: the whole product is a page an agent reaches through its own\n  tools, and the ids are cuids, so link-holding is already the access model. What is\n  being fixed is enumeration — the list that hands out every id for free.\n\n- **A cookie and a column, not `localStorage`.** `app/page.tsx` is a server component\n  with `dynamic = 'force-dynamic'` that awaits `listMaps()` before rendering; a\n  browser-held list of ids would force that strip to become client-rendered and would\n  still leave `GET /api/maps` returning everything. A cookie is readable where the query\n  already happens.\n\n- **The cookie is minted in `POST /api/maps` and nowhere else.** In Next 16 a cookie can\n  only be written from a route handler or server action, not from a server component —\n  and map creation is the only moment a browser earns something to remember. A visitor\n  who has never created a map has no cookie, sees no strip, and that is exactly the\n  day-one state the landing page is designed around.\n\n- **Existing rows keep `visitorId = null` and belong to nobody.** No backfill, no\n  \"claim orphans on first visit\" — the production database starts empty by design, so\n  the only rows this could strand are local development ones.\n\n- **`visitorId` is opaque and identifies a browser, not a person.** It is not an account,\n  carries no profile, and nothing else in the app may read it as identity. Clearing\n  cookies loses the strip and loses nothing else, since every map is still at its own URL.\n\n## Implementation\n\n### 1. Add the owner column\n\n**File**: `prisma/schema.prisma`\n\nAdd `visitorId String?` to `ThinkingMap` with an `@@index([visitorId])`, and a doc\ncomment in the style of the surrounding fields explaining that it names the browser that\ncreated the map, that it is nullable because maps predating it belong to nobody, and\nthat it scopes the *list* rather than access to any map.\n\n### 2. Mint and read the visitor id\n\n**New file**: `app/lib/visitor.ts`\n\nTwo small functions and one constant: the cookie name, a reader that returns the current\nvisitor id or `null`, and a minter that generates a fresh opaque id. Cookie attributes:\n`httpOnly`, `sameSite: 'lax'`, `secure` in production, a long `maxAge`, and `path: '/'`.\n\nKeep the id generation and the cookie attributes here rather than inline at the call\nsite, so the pure half is testable in milliseconds and there is one place that decides\nwhat the cookie looks like.\n\n### 3. Filter the store\n\n**File**: `app/lib/mapStore.ts`\n\n`listMaps` takes a `visitorId: string | null` and returns `[]` for `null` rather than\neverything — the failure mode of the opposite default is precisely the bug being fixed,\nso absence must mean nothing, not all. `createMap` takes the visitor id alongside its\nexisting arguments and writes it into the `prisma.thinkingMap.create` data. Neither\nfunction's other behaviour changes.\n\n### 4. Set the cookie where the map is made\n\n**File**: `app/api/maps/route.ts`\n\n`POST`: read the visitor id, mint one when absent, pass it to `createMap`, and attach the\n`Set-Cookie` to the 201 response. The existing \"a brief is enough on its own\" validation\nruns first and unchanged — a rejected request must not mint anything.\n\n`GET`: pass the cookie's visitor id to `listMaps`, so this door returns the same scoped\nlist the page renders. Both handlers stay wrapped in `withFailure`.\n\n### 5. Render only the visitor's maps\n\n**File**: `app/page.tsx`\n\nRead the cookie and pass it to `listMaps`. Everything else holds: the `try`/`catch`\naround the call, the `ErrorScreen` fallback through `classifyLoadError`, and the\n`maps.length > 0` guard that already renders the strip only for returning visitors —\nwhich now means what it says.\n\n## Reused existing code\n\n- `listMaps` and `createMap` from `app/lib/mapStore.ts` (glossary entries: `listMaps`,\n  `createMap`) — both gain a parameter; no new query path is introduced.\n- `SavedMapList` from `app/components/SavedMapList.tsx` (glossary entry: `SavedMapList`)\n  and `SavedMapRow` from `app/components/SavedMapRow.tsx` (glossary entry: `SavedMapRow`)\n  — unchanged. They already render nothing for an empty list, which is the new default.\n- `withFailure` from `app/lib/apiFailure.ts` (glossary entry: `withFailure`) — both\n  handlers in `app/api/maps/route.ts` keep their existing wrapper.\n- `classifyLoadError` from `app/lib/loadError.ts` (glossary entry: `classifyLoadError`)\n  — the landing page's error path is untouched.\n- `cuid` via Prisma's `@default(cuid())` — the same id shape the schema already uses for\n  every primary key, so nothing new is introduced for the visitor id's generation.\n- **Existing-implementation survey:** there is no existing notion of a viewer, session,\n  owner, or account anywhere in the schema or in `app/lib` — no `User` model, no\n  `next/headers` import in the entire `app/` tree, and no middleware file. `visitorId` is\n  genuinely new rather than a duplicate of something already present. Node authorship is\n  tracked per node (the *yours* badge) and is about which side of the exchange wrote a\n  node, not about which browser owns a map; the two must not be conflated.\n\n## Reproduction Test\n\nPins the bug that `listMaps` returns maps belonging to other visitors.\n\n**Target**: `app/lib/contributions.integration.test.ts` — run with\n`codeyam-editor editor refresh-tests --test listMapsScopesToVisitor`. This file already\nstands up a real database and exercises `mapStore` against it, which is what a query\nfilter needs; `app/lib/mapStore.test.ts` is deliberately the database-free half and is\nthe wrong home.\n\n```ts\n// Two browsers, two maps: the list a visitor gets back must contain only their\n// own. Returning everything is the enumeration bug this pins.\nit('returns only the maps belonging to the given visitor', async () => {\n  await mapStore.createMap('theirs', undefined, [], 'visitor-b');\n  const mine = await mapStore.createMap('mine', undefined, [], 'visitor-a');\n\n  const listed = await mapStore.listMaps('visitor-a');\n\n  expect(listed.map((m) => m.id)).toEqual([mine.id]);\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: `createMap` and\n`listMaps` do not yet accept a visitor argument, so this fails to type-check, and once\nthe arguments exist but the `where` clause does not, the assertion fails with both map\nids returned instead of one.\n\nNote that the exact `createMap` argument position must be checked against the signature\nat execution — it currently reads `(seedIdea, brief?, attachments = [])`, and the test\nabove assumes the visitor id is appended after those.\n\n## Scenarios to Demonstrate\n\n- First arrival, no cookie — one card, no saved-map strip. The day-one state a judge\n  lands on.\n- A returning visitor with three maps — the strip renders their maps and only theirs.\n- Two visitors, one database — the second browser's landing page shows nothing while the\n  first browser's shows its three, which is the whole fix made visible.\n- A returning visitor with more than three maps, so the \"Show all\" affordance is still\n  exercised under the filter.\n- A map opened by link with no cookie — the map renders fully and its tools work, proving\n  the scoping stopped at the list and did not become an access wall.",
+  "description": "The saved-map list showed every map anyone had ever made, to everyone: `listMaps` took no arguments and filtered on nothing, so on a public URL the first thing a visitor saw was a stranger's half-finished thinking. Each browser now gets an opaque id in an httpOnly cookie, minted the one moment it earns something to remember — creating its first map — and stamped on that map; the landing strip, `GET /api/maps`, the in-board Boards menu and the public `/api/mcp` agent endpoint each return only that browser's maps. What is fixed is ENUMERATION, not access: `/map/<id>` and its tools stay reachable by anyone holding the link, because ids are cuids and link-holding was already the access model.\n\nBEYOND THE PLAN, three things. (1) The plan named two call sites; there were four. The in-board Boards menu (`app/map/[id]/page.tsx`) listed an id and title for every map, which is the same enumeration by another route, so it is scoped too — a link-opened map still renders in full, only its menu is empty. (2) `/api/mcp` serves the same builder as the stdio door and is on the public URL, so an unscoped `list_thinking_maps` would have kept handing out every id after the page it mirrors had stopped. The user was asked and chose to close it: `buildMcpServer` now takes an explicit `MapScope` with NO default, HTTP gets visitor scoping (minting a cookie on the way out so a client that keeps cookies can create a map and list it back), and stdio keeps `{kind:'all'}` because that caller already has the process and the database. (3) The unscoped read is its own named function, `listAllMaps`, rather than a `null` argument — so it is greppable and can never be reached by forgetting a parameter.\n\nA capture seam was needed and is worth naming: the harness cannot put a cookie in the browser before it navigates, so every seeded saved-map scenario would have captured as the empty day-one screen. `scenarioVisitorId` reads a `?visitor=` query param behind `codeyamLaunched()` — the same floor that gates `?agentPanel=1`, false in a production build AND false on a server a person started themselves. A real cookie always wins over the URL, and `scenarioVisitorId`'s production floor is the first case its unit tests pin.\n\nTHE BOARDS-MENU SENTENCE, and how it nearly shipped wrong. Scoping the menu created a state the copy had never had to describe: a browser that owns no boards, looking at one it reached by someone else's link, was told 'This is your only board so far' about a board it does not own. It was spotted in the demo frames and disclosed — but inside the DESCRIPTION OF THE APPROVE OPTION, which is the wrong place for a defect: the button that means 'looks right' also meant 'and I accept this'. The user asked why it had not simply been fixed, and the honest answer is that the framing made accepting it the path of least resistance. It is now fixed. `BoardMenu` distinguishes THREE cases from props it already had: no boards of its own but one on screen (followed a link), no boards and nothing on screen (the landing header), and owning exactly the board on screen (the only case the original sentence was true for). Two lessons recorded deliberately: a known defect belongs in its OWN option, never as a rider on approval; and `maps.length === 0` was always available — it was called a copy nit when it was a one-line conditional.\n\nThat fix also exposed a real gap in the BoardMenu scenario set. All five of its scenarios rendered the menu CLOSED, so the popover's contents — including the sentence in question — had never been captured at all, and `distinct-capture-check` had been flagging all six pairs of them as identical-definition merge candidates for exactly that reason. All seven now drive `click Boards` through `interactions` and capture the open menu, which both covers the new states and removes the six-pair advisory.\n\nSCOPE VERDICT: this cycle DELIVERED no new project deliverable and DEFERRED none — all ten were already resolved before it began (`deliverables --open` reported none open at the confirm gate, and that was stated in the approval question). It hardens the already-delivered 'thinking maps persist so you can return to them', which promised persistence but not ownership. The project's one standing deferral is unchanged and was decided by the user, not by an agent: 'ASSIST TRACK (not this build flow): registering the MCP server in a client such as Claude Desktop'. No deliverable was deferred by an agent in this cycle or any prior one.\n\nTESTS: 21 new (15 unit in `app/lib/visitor.test.ts`, 6 database-backed in `app/lib/contributions.integration.test.ts`), 133 passing overall. `prove-red` returned PROVEN — three of the new tests go red with `app/lib/mapStore.ts` reverted, so the reproduction test genuinely pins the bug rather than passing in both worlds. Audit passes with 0 findings and NO baseline suppressions. One `distinct-capture-check` collision did arise (the newcomer's landing page was pixel-identical to day one, which is what the feature makes true) and was fixed properly rather than baselined — 'Two visitors, one database' now seeds five maps of which this browser owns one, so it shows one row out of five. That is the stronger proof anyway: an empty strip is also what a broken query returns, while a populated one shows the filter selecting rather than merely excluding. The baseline file written while that was being resolved was removed once the collision was genuinely gone, so nothing in this branch is suppressed.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/data-structure.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/your-saved-maps-are-yours.md\t.codeyam/plans/completed/your-saved-maps-are-yours.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/many-saved-maps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/one-saved-map.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/returning-four-saved-maps.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/5842e645699e6f8dd05faff0979465ddad3690e362a4f02756b2af61175f577b.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/8b70e15f120820f67e1907de648d038c07fbe8cc48fb70e2aa64f975fd003aa9.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/maps/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/api/mcp/route.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/contributions.integration.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapStore.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mcpServer.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/map/[id]/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "mcp/stdio.ts",
+      "status": "modified"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/all-eight-the-list-expanded.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/boardmenu.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/savedmaplist.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/two-visitors-one-database--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/two-visitors-one-database--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/two-visitors-one-database.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/your-saved-maps-are-yours.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/1f175ba7baff0043b56929313155d59f2679424ddec6100b29cee90f48485221.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/52146737b3e053c28e7c6e53bfa87bca9352935c8cf9f83259cf69f48d8d7cf7.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7fbbb262a51916d82f473cae369afeefb639b96bedeaa5f2199edbb0ab6b8fbc.json",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/visitor.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/visitor.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing"
+    },
+    {
+      "name": "AgentAvatar - Default"
+    },
+    {
+      "name": "AgentBindDiagnostics - HealthyBinding"
+    },
+    {
+      "name": "AgentBindDiagnostics - NothingBound"
+    },
+    {
+      "name": "AgentBindDiagnostics - OlderConvention"
+    },
+    {
+      "name": "AgentBindDiagnostics - RefusedTools"
+    },
+    {
+      "name": "AgentCallLog - Default"
+    },
+    {
+      "name": "AgentCallLog - Empty"
+    },
+    {
+      "name": "AgentCallLog - WithFailure"
+    },
+    {
+      "name": "AgentCallLogRow - Default"
+    },
+    {
+      "name": "AgentCallLogRow - Failed"
+    },
+    {
+      "name": "AgentHandoff - Default"
+    },
+    {
+      "name": "AgentHandoff - FromBrief"
+    },
+    {
+      "name": "AgentHandoff - LongIdea"
+    },
+    {
+      "name": "AgentPanelLauncher - Default"
+    },
+    {
+      "name": "AgentSimulator - Default"
+    },
+    {
+      "name": "AgentSimulator - Open"
+    },
+    {
+      "name": "AgentStartCue - Dense"
+    },
+    {
+      "name": "AgentStartCue - FromBrief"
+    },
+    {
+      "name": "AgentStartCue - FromIdea"
+    },
+    {
+      "name": "AgentStatus - AttachedViaMcp"
+    },
+    {
+      "name": "AgentStatus - Connected"
+    },
+    {
+      "name": "AgentStatus - MapDeleted"
+    },
+    {
+      "name": "AgentStatus - NoAgent"
+    },
+    {
+      "name": "AgentStatus - PanelOpen"
+    },
+    {
+      "name": "AgentStatus - Working"
+    },
+    {
+      "name": "AgentStatusDot - Connected"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable"
+    },
+    {
+      "name": "AgentStatusDot - Working"
+    },
+    {
+      "name": "AgentStatusNarrative - BoundToPage"
+    },
+    {
+      "name": "AgentStatusNarrative - MapDeleted"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgent"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgentNoReason"
+    },
+    {
+      "name": "AgentStatusNarrative - OverMcpServer"
+    },
+    {
+      "name": "AgentStatusPanel - BoundToPage"
+    },
+    {
+      "name": "AgentStatusPanel - MapDeleted"
+    },
+    {
+      "name": "AgentStatusPanel - NoAgent"
+    },
+    {
+      "name": "AgentStatusPanel - OverMcpServer"
+    },
+    {
+      "name": "AgentStatusPanel - PartiallyRefused"
+    },
+    {
+      "name": "AgentToolChips - AllNine"
+    },
+    {
+      "name": "AgentToolChips - OnlyOne"
+    },
+    {
+      "name": "AgentToolChips - PartiallyAccepted"
+    },
+    {
+      "name": "AgentToolRunner - Busy"
+    },
+    {
+      "name": "AgentToolRunner - Default"
+    },
+    {
+      "name": "AgentToolRunner - NoDriver"
+    },
+    {
+      "name": "AgentToolRunner - WithInput"
+    },
+    {
+      "name": "All eight, the list expanded"
+    },
+    {
+      "name": "An older question, three rounds up, still open"
+    },
+    {
+      "name": "AnswerChips - Default"
+    },
+    {
+      "name": "AnswerChips - Empty"
+    },
+    {
+      "name": "AnswerChips - Picked"
+    },
+    {
+      "name": "AnswerChips - Single"
+    },
+    {
+      "name": "AnswerChips - Wrapping"
+    },
+    {
+      "name": "AnswerComposer - Default"
+    },
+    {
+      "name": "AnswerComposer - EditingOnDark"
+    },
+    {
+      "name": "AnswerComposer - LongAnswer"
+    },
+    {
+      "name": "AnswerComposer - NothingToCancel"
+    },
+    {
+      "name": "AnswerComposer - Typed"
+    },
+    {
+      "name": "AppErrorBoundary - NoDigest"
+    },
+    {
+      "name": "AppErrorBoundary - WithDigest"
+    },
+    {
+      "name": "AppHeader - Default"
+    },
+    {
+      "name": "AppHeader - Explore"
+    },
+    {
+      "name": "AskAboutSectionButton - Default"
+    },
+    {
+      "name": "AskAboutSectionButton - DoubleDigitSection"
+    },
+    {
+      "name": "AskAboutSectionButton - LongHeading"
+    },
+    {
+      "name": "AskPresenceNote - Listening"
+    },
+    {
+      "name": "AskPresenceNote - NoAgent"
+    },
+    {
+      "name": "AttachmentAddButton - Busy"
+    },
+    {
+      "name": "AttachmentAddButton - Default"
+    },
+    {
+      "name": "AttachmentChip - Busy"
+    },
+    {
+      "name": "AttachmentChip - Default"
+    },
+    {
+      "name": "AttachmentChip - Document"
+    },
+    {
+      "name": "AttachmentChip - LegacyNameOnly"
+    },
+    {
+      "name": "AttachmentChip - LongName"
+    },
+    {
+      "name": "AttachmentStrip - Default"
+    },
+    {
+      "name": "AttachmentStrip - DocumentsOnly"
+    },
+    {
+      "name": "AttachmentStrip - Full"
+    },
+    {
+      "name": "AttachmentStrip - OnePastedImage"
+    },
+    {
+      "name": "AttachTabPanel - AnyAgent"
+    },
+    {
+      "name": "AttachTabPanel - Browser"
+    },
+    {
+      "name": "AttachTabPanel - ClaudeCodeLongOrigin"
+    },
+    {
+      "name": "AttachTabStrip - BrowserSelected"
+    },
+    {
+      "name": "AttachTabStrip - ClaudeSelected"
+    },
+    {
+      "name": "AttachTabStrip - Default"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly"
+    },
+    {
+      "name": "BoardChat - Default"
+    },
+    {
+      "name": "BoardChat - DeletedTheme"
+    },
+    {
+      "name": "BoardChat - Empty"
+    },
+    {
+      "name": "BoardChat - JustOpened"
+    },
+    {
+      "name": "BoardChat - LongAnswer"
+    },
+    {
+      "name": "BoardChat - ThreeThemes"
+    },
+    {
+      "name": "BoardChatBubble - Default"
+    },
+    {
+      "name": "BoardChatBubble - DeletedTheme"
+    },
+    {
+      "name": "BoardChatBubble - GeneralNote"
+    },
+    {
+      "name": "BoardChatBubble - LongAnswer"
+    },
+    {
+      "name": "BoardChatBubble - Partner"
+    },
+    {
+      "name": "BoardChatBubble - SecondTheme"
+    },
+    {
+      "name": "BoardChatBubble - ThirdTheme"
+    },
+    {
+      "name": "BoardChatComposer - Default"
+    },
+    {
+      "name": "BoardChatComposer - Typed"
+    },
+    {
+      "name": "BoardChatHeader - Collapsed"
+    },
+    {
+      "name": "BoardChatHeader - Default"
+    },
+    {
+      "name": "BoardChatPill - Default"
+    },
+    {
+      "name": "BoardChatTranscript - Default"
+    },
+    {
+      "name": "BoardChatTranscript - DeletedTheme"
+    },
+    {
+      "name": "BoardChatTranscript - LongAnswer"
+    },
+    {
+      "name": "BoardChatTranscript - NoThemesYet"
+    },
+    {
+      "name": "BoardChatTranscript - Overflowing"
+    },
+    {
+      "name": "BoardMenu - Default"
+    },
+    {
+      "name": "BoardMenu - Many"
+    },
+    {
+      "name": "BoardMenu - NoneCurrent"
+    },
+    {
+      "name": "BoardMenu - NoOtherBoards"
+    },
+    {
+      "name": "BoardMenu - NotYoursAtAll"
+    },
+    {
+      "name": "BoardMenu - OneOther"
+    },
+    {
+      "name": "BoardMenu - OnlyYourOwn"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent"
+    },
+    {
+      "name": "BoardWorkspace - RoundHeldOpen"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent"
+    },
+    {
+      "name": "BoardWorkspace - Working"
+    },
+    {
+      "name": "BoardZoomControls - Default"
+    },
+    {
+      "name": "Brief attached, nothing cited yet"
+    },
+    {
+      "name": "Brief fully accounted for"
+    },
+    {
+      "name": "BriefCoverageHeadline - FullyAccountedFor"
+    },
+    {
+      "name": "BriefCoverageHeadline - NothingCited"
+    },
+    {
+      "name": "BriefCoverageHeadline - OneSectionLeft"
+    },
+    {
+      "name": "BriefCoverageHeadline - PartlyCovered"
+    },
+    {
+      "name": "BriefDanglingNote - OneDangling"
+    },
+    {
+      "name": "BriefDanglingNote - SeveralDangling"
+    },
+    {
+      "name": "BriefDrop - Attached"
+    },
+    {
+      "name": "BriefDrop - Linking"
+    },
+    {
+      "name": "BriefDrop - Pasting"
+    },
+    {
+      "name": "BriefExcerpt - Default"
+    },
+    {
+      "name": "BriefExcerpt - NothingExtracted"
+    },
+    {
+      "name": "BriefLinkBox - Default"
+    },
+    {
+      "name": "BriefLinkBox - Filled"
+    },
+    {
+      "name": "BriefMenu - Attached"
+    },
+    {
+      "name": "BriefMenu - Busy"
+    },
+    {
+      "name": "BriefMenu - Default"
+    },
+    {
+      "name": "BriefMenu - LongFilename"
+    },
+    {
+      "name": "BriefPanel - DanglingReference"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet"
+    },
+    {
+      "name": "BriefPanelHeader - Default"
+    },
+    {
+      "name": "BriefPanelHeader - LongSourceName"
+    },
+    {
+      "name": "BriefPanelHeader - NothingAccountedFor"
+    },
+    {
+      "name": "BriefPasteBox - Default"
+    },
+    {
+      "name": "BriefPasteBox - Filled"
+    },
+    {
+      "name": "BriefReadout - Default"
+    },
+    {
+      "name": "BriefReadout - Pasted"
+    },
+    {
+      "name": "BriefReadout - ScannedPdf"
+    },
+    {
+      "name": "BriefSectionRow - Covered"
+    },
+    {
+      "name": "BriefSectionRow - EmptySection"
+    },
+    {
+      "name": "BriefSectionRow - LongHeading"
+    },
+    {
+      "name": "BriefSectionRow - Untouched"
+    },
+    {
+      "name": "BriefSectionRow - UntouchedAlreadyAsked"
+    },
+    {
+      "name": "BriefWarning - Default"
+    },
+    {
+      "name": "BriefWarning - Unsupported"
+    },
+    {
+      "name": "BuildSequence - DanglingLink"
+    },
+    {
+      "name": "BuildSequence - Default"
+    },
+    {
+      "name": "BuildSequence - Empty"
+    },
+    {
+      "name": "BuildSequence - FirstSliceOnly"
+    },
+    {
+      "name": "BuildSequence - LongSequence"
+    },
+    {
+      "name": "BuildSequence - ProvesNothing"
+    },
+    {
+      "name": "BulletCard - Default"
+    },
+    {
+      "name": "BulletCard - Empty"
+    },
+    {
+      "name": "CardChoiceList - Default"
+    },
+    {
+      "name": "CardChoiceList - LongOptions"
+    },
+    {
+      "name": "CardChoiceList - OnDarkCard"
+    },
+    {
+      "name": "CardChoiceList - Overflowing"
+    },
+    {
+      "name": "CardChoiceList - Single"
+    },
+    {
+      "name": "CardDiagram - Default"
+    },
+    {
+      "name": "CardDiagram - LongSteps"
+    },
+    {
+      "name": "CardDiagram - MagentaTheme"
+    },
+    {
+      "name": "CardDiagram - NoNote"
+    },
+    {
+      "name": "CardDiagram - Shortest"
+    },
+    {
+      "name": "CardIcon - Forward"
+    },
+    {
+      "name": "CardIcon - Found"
+    },
+    {
+      "name": "CardIcon - Gap"
+    },
+    {
+      "name": "CardIcon - Ground"
+    },
+    {
+      "name": "CardIcon - Judgment"
+    },
+    {
+      "name": "CardIcon - Pro"
+    },
+    {
+      "name": "CardIcon - Question"
+    },
+    {
+      "name": "CardIcon - Subject"
+    },
+    {
+      "name": "CardIcon - UnknownKind"
+    },
+    {
+      "name": "Complete - what to do next"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived"
+    },
+    {
+      "name": "ContributionBar - AddNode"
+    },
+    {
+      "name": "ContributionBar - Default"
+    },
+    {
+      "name": "ContributionTabs - Node"
+    },
+    {
+      "name": "ContributionTabs - Note"
+    },
+    {
+      "name": "CopyablePrompt - Default"
+    },
+    {
+      "name": "CopyablePrompt - DefaultLabel"
+    },
+    {
+      "name": "CopyablePrompt - Inline"
+    },
+    {
+      "name": "CopyablePrompt - Primary"
+    },
+    {
+      "name": "CopyablePrompt - ShortPrompt"
+    },
+    {
+      "name": "CopyTextButton - OnADarkCard"
+    },
+    {
+      "name": "CopyTextButton - OnAnOpenCard"
+    },
+    {
+      "name": "CopyTextButton - OnTheCoreDisc"
+    },
+    {
+      "name": "CoreAttachments - Default"
+    },
+    {
+      "name": "CoreAttachments - Empty"
+    },
+    {
+      "name": "CoreAttachments - Full"
+    },
+    {
+      "name": "CoreAttachments - LegacyNameOnly"
+    },
+    {
+      "name": "CoreAttachments - Single"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne"
+    },
+    {
+      "name": "CoreIdeaCard - Default"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments"
+    },
+    {
+      "name": "Day one - nothing yet"
+    },
+    {
+      "name": "DirectionsCard - Default"
+    },
+    {
+      "name": "DirectionsCard - Empty"
+    },
+    {
+      "name": "Disclosure - Default"
+    },
+    {
+      "name": "Disclosure - Open"
+    },
+    {
+      "name": "Disclosure - WithCount"
+    },
+    {
+      "name": "EmptyHint - Default"
+    },
+    {
+      "name": "ErrorScreen - NotFound"
+    },
+    {
+      "name": "ErrorScreen - SchemaDrift"
+    },
+    {
+      "name": "ErrorScreen - SchemaDriftProduction"
+    },
+    {
+      "name": "ErrorScreen - Unreachable"
+    },
+    {
+      "name": "ErrorScreen - Unrecognised"
+    },
+    {
+      "name": "ExchangeNote - Statement"
+    },
+    {
+      "name": "ExchangeNote - WithQuestion"
+    },
+    {
+      "name": "ExchangeRail - BigTurn"
+    },
+    {
+      "name": "ExchangeRail - Default"
+    },
+    {
+      "name": "ExchangeRail - Empty"
+    },
+    {
+      "name": "ExchangeRail - JustAnswered"
+    },
+    {
+      "name": "ExchangeRailEmpty - Default"
+    },
+    {
+      "name": "ExchangeRow - AgentAdded"
+    },
+    {
+      "name": "ExchangeRow - AgentAddedMany"
+    },
+    {
+      "name": "ExchangeRow - AgentNote"
+    },
+    {
+      "name": "ExchangeRow - YourAnswer"
+    },
+    {
+      "name": "FirstCardAttachments - Both"
+    },
+    {
+      "name": "FirstCardAttachments - FilesOnly"
+    },
+    {
+      "name": "FirstCardAttachments - LinkAttached"
+    },
+    {
+      "name": "FirstCardAttachments - LongFilename"
+    },
+    {
+      "name": "FirstCardAttachments - PastedScreenshot"
+    },
+    {
+      "name": "FirstCardAttachments - ScreenshotAndDoc"
+    },
+    {
+      "name": "FirstCardAttachments - ShortName"
+    },
+    {
+      "name": "FirstCardControls - BriefOnly"
+    },
+    {
+      "name": "FirstCardControls - Busy"
+    },
+    {
+      "name": "FirstCardControls - Default"
+    },
+    {
+      "name": "FirstCardControls - Ready"
+    },
+    {
+      "name": "FirstCardFileChip - Document"
+    },
+    {
+      "name": "FirstCardFileChip - Image"
+    },
+    {
+      "name": "FirstCardFileChip - LongName"
+    },
+    {
+      "name": "FirstCardLinkBox - Default"
+    },
+    {
+      "name": "FirstCardLinkBox - Filled"
+    },
+    {
+      "name": "FirstCardLinkBox - Reading"
+    },
+    {
+      "name": "FootnoteLine - Default"
+    },
+    {
+      "name": "FootnoteLine - LongestLine"
+    },
+    {
+      "name": "FootnoteLine - Short"
+    },
+    {
+      "name": "GalaxyBackdrop - Close"
+    },
+    {
+      "name": "GalaxyBackdrop - Default"
+    },
+    {
+      "name": "GalaxyBackdrop - Whole"
+    },
+    {
+      "name": "GalaxyBoard - Default"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes"
+    },
+    {
+      "name": "GlobalError - Default"
+    },
+    {
+      "name": "Grounded - research and its gaps"
+    },
+    {
+      "name": "HandoffAttachTabs - Default"
+    },
+    {
+      "name": "HandoffAttachTabs - NoAgentTab"
+    },
+    {
+      "name": "HandoffAttachTabs - ServerRender"
+    },
+    {
+      "name": "HandoffFootnote - Default"
+    },
+    {
+      "name": "HandoffFootnote - LongOrigin"
+    },
+    {
+      "name": "HandoffFootnote - ServerRender"
+    },
+    {
+      "name": "HandoffInstruction - Default"
+    },
+    {
+      "name": "HandoffInstruction - LongWording"
+    },
+    {
+      "name": "HandoffReattach - Default"
+    },
+    {
+      "name": "HandoffReattach - Dense"
+    },
+    {
+      "name": "HandoffReattach - FromBrief"
+    },
+    {
+      "name": "HandoffReattach - ServerRender"
+    },
+    {
+      "name": "IdeaForm - Busy"
+    },
+    {
+      "name": "IdeaForm - Default"
+    },
+    {
+      "name": "IdeaForm - Filled"
+    },
+    {
+      "name": "IdeaForm - WithBrief"
+    },
+    {
+      "name": "IdeaHero - Default"
+    },
+    {
+      "name": "IdeaPrompt - Bad Gateway"
+    },
+    {
+      "name": "IdeaPrompt - Default"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift In Production"
+    },
+    {
+      "name": "IdeaPrompt - Schema Drift"
+    },
+    {
+      "name": "IdeaPrompt - Server Failure"
+    },
+    {
+      "name": "InlineError - Default"
+    },
+    {
+      "name": "InlineError - Diagnosis In Production"
+    },
+    {
+      "name": "InlineError - Diagnosis"
+    },
+    {
+      "name": "InlineError - Silent"
+    },
+    {
+      "name": "InlineError - Upload"
+    },
+    {
+      "name": "InsightCard - Default"
+    },
+    {
+      "name": "InsightCard - Experiment"
+    },
+    {
+      "name": "InsightCard - LongLabel"
+    },
+    {
+      "name": "InsightCard - Stale"
+    },
+    {
+      "name": "InsightCard - StaleByOne"
+    },
+    {
+      "name": "InsightCardEyebrow - Default"
+    },
+    {
+      "name": "InsightCardEyebrow - Experiment"
+    },
+    {
+      "name": "InsightCardEyebrow - Stale"
+    },
+    {
+      "name": "InsightCardEyebrow - StaleByOne"
+    },
+    {
+      "name": "InsightCardEyebrow - UnknownKind"
+    },
+    {
+      "name": "InsightCardEyebrow - VeryStale"
+    },
+    {
+      "name": "InsightDetail - AgentWorking"
+    },
+    {
+      "name": "InsightDetail - ClaimAlone"
+    },
+    {
+      "name": "InsightDetail - Default"
+    },
+    {
+      "name": "InsightDetail - NoAgent"
+    },
+    {
+      "name": "InsightDetail - NoCitations"
+    },
+    {
+      "name": "InsightGoDeeper - AgentWorking"
+    },
+    {
+      "name": "InsightGoDeeper - Listening"
+    },
+    {
+      "name": "InsightGoDeeper - LongClaim"
+    },
+    {
+      "name": "InsightGoDeeper - NoAgent"
+    },
+    {
+      "name": "InsightGoDeeper - PromptFilledTheBox"
+    },
+    {
+      "name": "InsightSources - Default"
+    },
+    {
+      "name": "InsightSources - Many"
+    },
+    {
+      "name": "InsightSources - NoSources"
+    },
+    {
+      "name": "InsightSources - OtherRow"
+    },
+    {
+      "name": "InsightSources - Single"
+    },
+    {
+      "name": "InsightStack - CardOpened"
+    },
+    {
+      "name": "InsightStack - EdgeLabels"
+    },
+    {
+      "name": "InsightStack - OneInsight"
+    },
+    {
+      "name": "InsightStack - Overflowing"
+    },
+    {
+      "name": "InsightStack - ThreeInsights"
+    },
+    {
+      "name": "InsightStack - Waiting"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentIdle"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentWorking"
+    },
+    {
+      "name": "InsightStackEmpty - SettledNoAgent"
+    },
+    {
+      "name": "InsightStackEmpty - Waiting"
+    },
+    {
+      "name": "InsightWaysForward - Default"
+    },
+    {
+      "name": "InsightWaysForward - EmptyChoices"
+    },
+    {
+      "name": "InsightWaysForward - LongChoice"
+    },
+    {
+      "name": "InsightWaysForward - NoChoices"
+    },
+    {
+      "name": "InsightWaysForward - OtherRow"
+    },
+    {
+      "name": "InsightWaysForward - Single"
+    },
+    {
+      "name": "IntakeHint - Default"
+    },
+    {
+      "name": "IntakeHint - Reading"
+    },
+    {
+      "name": "Just started"
+    },
+    {
+      "name": "KeepThinkingPanel - Default"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet"
+    },
+    {
+      "name": "LandingScreen - DayOne"
+    },
+    {
+      "name": "LandingScreen - Default"
+    },
+    {
+      "name": "Many saved maps"
+    },
+    {
+      "name": "MapCard - Answered"
+    },
+    {
+      "name": "MapCard - Default"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer"
+    },
+    {
+      "name": "MapCard - Finding"
+    },
+    {
+      "name": "MapCard - LongLabel"
+    },
+    {
+      "name": "MapCard - NoOptions"
+    },
+    {
+      "name": "MapCard - RootIdea"
+    },
+    {
+      "name": "MapCard - Yours"
+    },
+    {
+      "name": "MapCardAnswer - Answered"
+    },
+    {
+      "name": "MapCardAnswer - ChipFilledTheBox"
+    },
+    {
+      "name": "MapCardAnswer - Default"
+    },
+    {
+      "name": "MapCardAnswer - LongAnswer"
+    },
+    {
+      "name": "MapCardAnswer - ManyOptions"
+    },
+    {
+      "name": "MapCardAnswer - NoOptions"
+    },
+    {
+      "name": "MapCardEyebrow - Answered"
+    },
+    {
+      "name": "MapCardEyebrow - Asked"
+    },
+    {
+      "name": "MapCardEyebrow - Default"
+    },
+    {
+      "name": "MapCardEyebrow - Everything"
+    },
+    {
+      "name": "MapCardEyebrow - Finding"
+    },
+    {
+      "name": "MapCardEyebrow - FromBrief"
+    },
+    {
+      "name": "MapCardEyebrow - Yours"
+    },
+    {
+      "name": "MapCardHeader - Default"
+    },
+    {
+      "name": "MapCardHeader - Found"
+    },
+    {
+      "name": "MapCardHeader - ManyRounds"
+    },
+    {
+      "name": "MapCardHeader - Risk"
+    },
+    {
+      "name": "MapCardHeader - Root"
+    },
+    {
+      "name": "MapEmptyState - Default"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold"
+    },
+    {
+      "name": "MapRow - Default"
+    },
+    {
+      "name": "MapRow - NamedByPhase"
+    },
+    {
+      "name": "MapRow - PartlyAnswered"
+    },
+    {
+      "name": "MapRow - Receded"
+    },
+    {
+      "name": "MapRow - ResearchBand"
+    },
+    {
+      "name": "MapRow - TheIdea"
+    },
+    {
+      "name": "MapRow - Wrapping"
+    },
+    {
+      "name": "MapScreen - FromBrief"
+    },
+    {
+      "name": "MapScreen - JustArrived"
+    },
+    {
+      "name": "MapScreen - NoAgent"
+    },
+    {
+      "name": "MapScreen - Reattach"
+    },
+    {
+      "name": "MapScreen - Summary"
+    },
+    {
+      "name": "MapScreen - SummaryReattach"
+    },
+    {
+      "name": "MapScreen - Working"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer"
+    },
+    {
+      "name": "MapWorkspace - Default"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding"
+    },
+    {
+      "name": "MapWorkspace - Quiet"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound"
+    },
+    {
+      "name": "MapWorkspace - Seeded"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map"
+    },
+    {
+      "name": "NextStepsTrack - Default"
+    },
+    {
+      "name": "NextStepsTrack - Empty"
+    },
+    {
+      "name": "Nobody has picked this up yet"
+    },
+    {
+      "name": "NodeKindPicker - Default"
+    },
+    {
+      "name": "NodeKindPicker - Risk"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent"
+    },
+    {
+      "name": "NodeQuestionHeader - Default"
+    },
+    {
+      "name": "NodeQuestionHeader - LongLabel"
+    },
+    {
+      "name": "NotFound - Default"
+    },
+    {
+      "name": "Old arrangement data, now inert"
+    },
+    {
+      "name": "One saved map"
+    },
+    {
+      "name": "Partly answered - two settled, one open"
+    },
+    {
+      "name": "PendingCards - Default"
+    },
+    {
+      "name": "PendingCards - Two"
+    },
+    {
+      "name": "PendingNote - AgentIdle"
+    },
+    {
+      "name": "PendingNote - AgentWorking"
+    },
+    {
+      "name": "PendingNote - NoAgent"
+    },
+    {
+      "name": "PendingRow - SettledAgentIdle"
+    },
+    {
+      "name": "PendingRow - SettledAgentWorking"
+    },
+    {
+      "name": "PendingRow - SettledNoAgent"
+    },
+    {
+      "name": "PendingRow - Waiting"
+    },
+    {
+      "name": "PhaseAdvance - EndOfExplore"
+    },
+    {
+      "name": "PhaseAdvance - EndOfMap"
+    },
+    {
+      "name": "PhaseAdvance - EndOfResearch"
+    },
+    {
+      "name": "PhaseAdvance - NoMapToAdvance"
+    },
+    {
+      "name": "PhaseAdvance - OnTheBoard"
+    },
+    {
+      "name": "PhaseAdvance - OnTheBoardEndOfExplore"
+    },
+    {
+      "name": "PhaseNav - Default"
+    },
+    {
+      "name": "PhaseNav - NarrowAtEnd"
+    },
+    {
+      "name": "PhaseNav - NarrowAtStart"
+    },
+    {
+      "name": "PhaseNav - NarrowScrolled"
+    },
+    {
+      "name": "PhaseNav - NextSteps"
+    },
+    {
+      "name": "PhaseNav - Research"
+    },
+    {
+      "name": "Pivoted - now it is for teachers"
+    },
+    {
+      "name": "QuestionCard - Answered"
+    },
+    {
+      "name": "QuestionCard - Choices"
+    },
+    {
+      "name": "QuestionCard - Diagram"
+    },
+    {
+      "name": "QuestionCard - Focused"
+    },
+    {
+      "name": "QuestionCard - Insight"
+    },
+    {
+      "name": "QuestionCard - Open"
+    },
+    {
+      "name": "QuestionCard - Reference"
+    },
+    {
+      "name": "RecordedAnswer - Default"
+    },
+    {
+      "name": "RecordedAnswer - LongAnswer"
+    },
+    {
+      "name": "RecordedAnswer - Terse"
+    },
+    {
+      "name": "Returning - four saved maps"
+    },
+    {
+      "name": "RoundControl - AllAnswered"
+    },
+    {
+      "name": "RoundControl - Countdown"
+    },
+    {
+      "name": "RoundControl - CountdownFinalSecond"
+    },
+    {
+      "name": "RoundControl - Default"
+    },
+    {
+      "name": "RoundControl - NothingAnswered"
+    },
+    {
+      "name": "RoundControl - OneLeft"
+    },
+    {
+      "name": "RoundControl - Waiting"
+    },
+    {
+      "name": "RowFooter - ReadyToResearch"
+    },
+    {
+      "name": "RowFooter - RoundOfStatements"
+    },
+    {
+      "name": "RowFooter - StillAnswering"
+    },
+    {
+      "name": "RowProgress - Default"
+    },
+    {
+      "name": "RowProgress - LongRound"
+    },
+    {
+      "name": "RowProgress - NoneAnswered"
+    },
+    {
+      "name": "RowProgress - SingleQuestion"
+    },
+    {
+      "name": "RowThreads - Default"
+    },
+    {
+      "name": "RowThreads - NothingToDraw"
+    },
+    {
+      "name": "RowThreads - ParentTwoRoundsBack"
+    },
+    {
+      "name": "RowThreads - SingleThread"
+    },
+    {
+      "name": "RowThreads - SomeUnattached"
+    },
+    {
+      "name": "RowThreads - WrappedRow"
+    },
+    {
+      "name": "SavedMapList - Default"
+    },
+    {
+      "name": "SavedMapRow - Default"
+    },
+    {
+      "name": "SavedMapRow - LegacyPhase"
+    },
+    {
+      "name": "SavedMapRow - SingleNode"
+    },
+    {
+      "name": "Seed planted - three open questions"
+    },
+    {
+      "name": "SeedIdeaQuote - Default"
+    },
+    {
+      "name": "SeedIdeaQuote - LongIdea"
+    },
+    {
+      "name": "SeedIdeaQuote - ShortIdea"
+    },
+    {
+      "name": "SendButton - Default"
+    },
+    {
+      "name": "SendButton - Disabled"
+    },
+    {
+      "name": "SendButton - Large"
+    },
+    {
+      "name": "SliceCard - DanglingLink"
+    },
+    {
+      "name": "SliceCard - Default"
+    },
+    {
+      "name": "SliceCard - NoEffortStated"
+    },
+    {
+      "name": "SliceCard - ProvesNothing"
+    },
+    {
+      "name": "Sprawling - a deep, wide map"
+    },
+    {
+      "name": "Started from a client brief"
+    },
+    {
+      "name": "SuggestionChips - Default"
+    },
+    {
+      "name": "SummaryHeadline - Default"
+    },
+    {
+      "name": "SummaryScreen - Default"
+    },
+    {
+      "name": "SummaryView - Default"
+    },
+    {
+      "name": "SummaryView - Empty"
+    },
+    {
+      "name": "SummaryView - NoSlices"
+    },
+    {
+      "name": "The agent worked here, then left"
+    },
+    {
+      "name": "The dev panel, deliberately opted into"
+    },
+    {
+      "name": "The map builds downward - four rounds"
+    },
+    {
+      "name": "The partner is already thinking"
+    },
+    {
+      "name": "The round ends itself, on a real board"
+    },
+    {
+      "name": "The round is answered, and the map reaches on"
+    },
+    {
+      "name": "ThemeParticles - Blue"
+    },
+    {
+      "name": "ThemeParticles - Default"
+    },
+    {
+      "name": "ThemeParticles - Green"
+    },
+    {
+      "name": "ThemeParticles - HueZero"
+    },
+    {
+      "name": "ThemeParticles - Muted"
+    },
+    {
+      "name": "ThinkingIndicator - Default"
+    },
+    {
+      "name": "ThinkingIndicator - FurtherOut"
+    },
+    {
+      "name": "ThinkingIndicator - LongLabel"
+    },
+    {
+      "name": "ThinkingIndicator - Thinking"
+    },
+    {
+      "name": "ThinkingMapView - Default"
+    },
+    {
+      "name": "ThinkingMapView - Empty"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption"
+    },
+    {
+      "name": "ThinkingMapView - Seeded"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions"
+    },
+    {
+      "name": "Two visitors, one database"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion"
+    },
+    {
+      "name": "What already exists - a research round set apart"
+    },
+    {
+      "name": "Wordmark - Default"
+    }
+  ],
+  "testResults": {
+    "total": 129,
+    "passed": 129,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 129,
+        "passed": 129
+      }
+    ]
+  }
+}

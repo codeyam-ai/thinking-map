@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { createMap, listMaps } from '@/app/lib/mapStore';
 import { parseBriefInput } from '@/app/lib/briefInput';
 import { withFailure } from '@/app/lib/apiFailure';
+import {
+  VISITOR_COOKIE,
+  mintVisitorId,
+  readVisitorId,
+  visitorCookieOptions,
+} from '@/app/lib/visitor';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,8 +15,12 @@ export const dynamic = 'force-dynamic';
 // often — reaches the browser as a readable `{ error }` rather than as an
 // unparseable body the fetch API then complains about.
 
+// This door returns the same scoped list the landing page renders. It used to
+// hand any caller every map on the instance, which is the enumeration the
+// visitor cookie exists to close — fixing the page alone would have left the
+// same list one fetch away.
 export const GET = withFailure(async () => {
-  return NextResponse.json({ maps: await listMaps() });
+  return NextResponse.json({ maps: await listMaps(await readVisitorId()) });
 });
 
 export const POST = withFailure(async (request: Request) => {
@@ -37,6 +47,19 @@ export const POST = withFailure(async (request: Request) => {
         .map((name) => ({ name }))
     : [];
 
-  const map = await createMap(seedIdea, brief, attachments);
-  return NextResponse.json({ id: map.id }, { status: 201 });
+  // Creating a map is the only moment a browser earns something to remember, so
+  // it is the only place the cookie is minted. Deliberately AFTER the validation
+  // above: a request that was told to come back with an idea must not walk away
+  // with an identity. And a server component cannot write a cookie in Next 16,
+  // which is the other reason it happens on this door rather than on the page.
+  const existingVisitorId = await readVisitorId();
+  const visitorId = existingVisitorId ?? mintVisitorId();
+
+  const map = await createMap(seedIdea, brief, attachments, visitorId);
+
+  const response = NextResponse.json({ id: map.id }, { status: 201 });
+  if (!existingVisitorId) {
+    response.cookies.set(VISITOR_COOKIE, visitorId, visitorCookieOptions());
+  }
+  return response;
 });

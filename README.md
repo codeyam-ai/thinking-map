@@ -353,6 +353,10 @@ States captured as runnable scenarios with codeyam-editor:
 
 <img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
 
+### All eight, the list expanded
+
+<img src=".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png" alt="All eight, the list expanded" width="280">
+
 ### An older question, three rounds up, still open
 
 <img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
@@ -364,8 +368,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Brief fully accounted for
 
 <img src=".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png" alt="Brief fully accounted for" width="280">
-
-### Conflict declined - the person rewording survived
-
-<img src=".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png" alt="Conflict declined - the person rewording survived" width="280">
 <!-- codeyam:scenario-gallery:end -->

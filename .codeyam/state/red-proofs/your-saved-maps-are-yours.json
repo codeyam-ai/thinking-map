@@ -1,0 +1,41 @@
+{
+  "provenAt": "2026-09-03T11:52:56Z",
+  "slug": "your-saved-maps-are-yours",
+  "paths": [
+    "app/lib/mapStore.ts"
+  ],
+  "runScope": [
+    "app/lib/mapStore.ts"
+  ],
+  "tests": {
+    "returns nothing for a visitor with no id at all": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "returns only the maps belonging to the given visitor": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "stamps the creating visitor onto the new map": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "returns only the maps belonging to the given visitor",
+      "returns nothing for a visitor with no id at all",
+      "stamps the creating visitor onto the new map"
+    ]
+  }
+}

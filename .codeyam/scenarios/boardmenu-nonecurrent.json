@@ -1,6 +1,6 @@
 {
   "name": "BoardMenu - NoneCurrent",
-  "id": "a85390f1-8ea4-47d7-b957-871701f597b8",
+  "id": "64a06b0a-3aba-4439-9972-e62039c55e7c",
   "url": "/isolated-components/BoardMenu?s=NoneCurrent",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,11 @@
   "mocks": {},
   "componentName": "BoardMenu",
   "scenarioType": "component",
-  "description": "Viewing a board that is not in the list, which is reachable by direct link. Nothing should be marked as current when nothing is."
+  "description": "Viewing a board that is not in the list — reachable by direct link while you do own other boards, so the menu lists yours and marks none of them current. Open, so that absence of a current marker is visible.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Boards"
+    }
+  ]
 }

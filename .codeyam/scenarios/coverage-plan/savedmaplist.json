@@ -1,0 +1,36 @@
+{
+  "surface": "SavedMapList",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "maps",
+      "value": "empty",
+      "rationale": "source-derived state maps=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "maps",
+      "value": "one",
+      "rationale": "source-derived state maps=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "maps",
+      "value": "many",
+      "rationale": "source-derived state maps=many",
+      "status": "covered"
+    },
+    {
+      "dimension": "expanded",
+      "value": "true",
+      "rationale": "source-derived state expanded=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "expanded",
+      "value": "false",
+      "rationale": "source-derived state expanded=false",
+      "status": "covered"
+    }
+  ]
+}

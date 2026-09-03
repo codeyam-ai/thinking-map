@@ -22,8 +22,22 @@ const scenarios: Record<string, Props> = {
   Default: { maps: MAPS, currentId: "map-galaxy" },
 
   // Day one. There is nowhere else to go yet, and the menu has to say so
-  // rather than open onto an empty list.
+  // rather than open onto an empty list. No board on screen either, so it must
+  // not call anything your only one.
   NoOtherBoards: { maps: [], currentId: undefined },
+
+  // Exactly one board, and it is the one you are looking at — the case the
+  // "this is your only board so far" sentence was actually written for.
+  OnlyYourOwn: {
+    maps: [{ id: "map-galaxy", title: "Handover between shifts at a small vet practice" }],
+    currentId: "map-galaxy",
+  },
+
+  // A board reached by someone else's link, by a browser that has made none of
+  // its own. Since the map list became visitor-scoped this is a real state, and
+  // it is the one that used to be told "this is your only board so far" about a
+  // board it does not own.
+  NotYoursAtAll: { maps: [], currentId: "map-galaxy" },
 
   // Exactly one other board — the boundary where a list becomes a list.
   OneOther: { maps: MAPS.slice(0, 2), currentId: "map-galaxy" },

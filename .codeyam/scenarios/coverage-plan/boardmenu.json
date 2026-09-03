@@ -1,0 +1,36 @@
+{
+  "surface": "BoardMenu",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "others",
+      "value": "empty",
+      "rationale": "source-derived state others=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "others",
+      "value": "one",
+      "rationale": "source-derived state others=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "others",
+      "value": "many",
+      "rationale": "source-derived state others=many",
+      "status": "covered"
+    },
+    {
+      "dimension": "open",
+      "value": "true",
+      "rationale": "source-derived state open=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "open",
+      "value": "false",
+      "rationale": "source-derived state open=false",
+      "status": "covered"
+    }
+  ]
+}

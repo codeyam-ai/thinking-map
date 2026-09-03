@@ -10,6 +10,7 @@ import { getMap, listMaps } from '@/app/lib/mapStore';
 import { readSince } from '@/app/lib/exchange';
 import { classifyLoadError } from '@/app/lib/loadError';
 import { normalizePhase, type Phase } from '@/app/lib/mapKinds';
+import { resolveVisitorId } from '@/app/lib/visitor';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,9 +77,15 @@ export default async function MapPage({ params, searchParams }: MapPageProps) {
   // starts holding a cursor it can resume from rather than one it has to go
   // and fetch before it knows anything.
   const { revision, events } = await readSince(map.id);
-  // Every board, for the menu. Cheap next to the map itself and it means the
-  // header never has to fetch on the client.
-  const maps = await listMaps();
+  // This browser's boards, for the menu. Cheap next to the map itself and it
+  // means the header never has to fetch on the client.
+  //
+  // Scoped for the same reason the landing strip is: the menu lists an id and a
+  // title for every map it is given, so an unscoped one is the same enumeration
+  // by another route. Someone who opened this map from a link and owns nothing
+  // gets an empty menu — the map itself still renders in full, because the link
+  // is the access model and that has not changed.
+  const maps = await listMaps(await resolveVisitorId(query));
 
   // Null unless this map was started from a brief, which is most of them.
   const brief = map.brief ?? null;

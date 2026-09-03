@@ -9,7 +9,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { waitForNewMap } from './exchange';
-import { createMap, listMaps } from './mapStore';
+import { createMap, listAllMaps, listMaps } from './mapStore';
 import { formatMapList, formatNewMaps } from './mcpFormat';
 import { TOOL_CATALOG, timeoutMsFrom } from './toolCatalog';
 import { runTool } from './toolRuntime';
@@ -22,11 +22,27 @@ function textResult(text: string, structured?: Record<string, unknown>) {
 }
 
 /**
+ * Whose maps this server instance is allowed to see.
+ *
+ * The two doors that serve `buildMcpServer` are not equally trusted, and the
+ * type says so rather than leaving it to a default. Over stdio the caller
+ * already has the process and the database, so `all` is honest. Over HTTP the
+ * caller is whoever found the URL, so it gets the same visitor scoping the
+ * landing page gets — otherwise `/api/mcp` would keep handing out every map's
+ * id and title after the page it mirrors had stopped.
+ *
+ * There is deliberately no default. A door has to say which one it is.
+ */
+export type MapScope =
+  | { kind: 'all' }
+  | { kind: 'visitor'; visitorId: string | null };
+
+/**
  * Build a fresh server instance. One per request in the stateless HTTP mode —
  * the server object is cheap, and per-request construction keeps concurrent
  * clients from sharing transport state.
  */
-export function buildMcpServer(): McpServer {
+export function buildMcpServer(scope: MapScope): McpServer {
   const server = new McpServer({
     name: 'thinking-map',
     version: '0.2.0',
@@ -41,10 +57,22 @@ export function buildMcpServer(): McpServer {
     {
       title: 'List thinking maps',
       description:
-        'List every thinking map, newest first, with the phase each has reached.',
+        scope.kind === 'all'
+          ? 'List every thinking map, newest first, with the phase each has reached.'
+          : 'List the thinking maps started from this browser, newest first, with the phase each has reached. Maps started elsewhere are not listed; open one by its link instead.',
       annotations: { readOnlyHint: true },
     },
-    async () => textResult(formatMapList(await listMaps())),
+    // The one place the two doors actually differ. `listAllMaps` is named rather
+    // than reached by passing null, so the unscoped read is greppable and can
+    // never be arrived at by forgetting an argument.
+    async () =>
+      textResult(
+        formatMapList(
+          scope.kind === 'all'
+            ? await listAllMaps()
+            : await listMaps(scope.visitorId),
+        ),
+      ),
   );
 
   server.registerTool(
@@ -56,7 +84,16 @@ export function buildMcpServer(): McpServer {
       inputSchema: { seedIdea: z.string() },
     },
     async ({ seedIdea }) => {
-      const map = await createMap(seedIdea);
+      // Stamped with the same visitor the list is scoped to, so a caller that
+      // creates a map can find it again in `list_thinking_maps`. Over stdio
+      // there is no visitor and the map belongs to nobody — which is fine there,
+      // because that door lists everything anyway.
+      const map = await createMap(
+        seedIdea,
+        undefined,
+        [],
+        scope.kind === 'visitor' ? scope.visitorId : null,
+      );
       return textResult(`Created map ${map.id} — "${map.title}".`);
     },
   );

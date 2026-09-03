@@ -1,6 +1,6 @@
 {
   "name": "BoardMenu - Default",
-  "id": "4ece9ff9-9f1f-47ad-9f96-35ff1878ae07",
+  "id": "068fdfb1-b7c2-4137-81e2-d20d58f9c3e2",
   "url": "/isolated-components/BoardMenu?s=Default",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,11 @@
   "mocks": {},
   "componentName": "BoardMenu",
   "scenarioType": "component",
-  "description": "The way back to your other boards, collapsed. The boards you are not looking at should cost no space on the one you are, which is why this is a button rather than a rail."
+  "description": "The ordinary case: a handful of boards with the current one among them, listed under 'Earlier boards'. Open, so the list is what you see rather than the closed button every one of these scenarios used to capture.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Boards"
+    }
+  ]
 }

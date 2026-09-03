@@ -12,6 +12,7 @@ import { setUpTestSchema } from './testDatabase';
 
 let teardown: (() => Promise<void>) | undefined;
 let contributions: typeof import('./contributions');
+let mapStore: typeof import('./mapStore');
 let prisma: typeof import('./prisma').prisma;
 
 const MAP = 'map-under-test';
@@ -23,6 +24,7 @@ beforeAll(async () => {
   ({ teardown } = await setUpTestSchema('contributions'));
 
   contributions = await import('./contributions');
+  mapStore = await import('./mapStore');
   prisma = (await import('./prisma')).prisma;
 }, 120_000);
 
@@ -399,5 +401,102 @@ describe('attachments', () => {
     expect((await putAttachments(id, 'nope')).status).toBe(400);
     expect((await putAttachments(id, { name: 'a.pdf' })).status).toBe(400);
     expect(await storedNames(id)).toEqual(['keep.txt']);
+  });
+});
+
+// Who a saved map belongs to.
+//
+// Database-bound for the same reason the rest of this file is: the fix IS a
+// `where` clause, and a mocked store would happily return whatever it was told
+// to. Only a real query against real rows can tell a filtered list from an
+// unfiltered one.
+describe('listMaps — visitor scoping', () => {
+  async function noMaps() {
+    await prisma.mapEvent.deleteMany({});
+    await prisma.mapNode.deleteMany({});
+    await prisma.message.deleteMany({});
+    await prisma.thinkingMap.deleteMany({});
+  }
+
+  // The reported bug, pinned. `listMaps` took no arguments and filtered on
+  // nothing, so the landing page's "Pick up where you left off" strip showed
+  // every map anyone had ever made, to everyone. Two browsers, two maps: the
+  // list one of them gets back must contain only its own.
+  it('returns only the maps belonging to the given visitor', async () => {
+    await noMaps();
+    await mapStore.createMap('theirs', undefined, [], 'visitor-b');
+    const mine = await mapStore.createMap('mine', undefined, [], 'visitor-a');
+
+    const listed = await mapStore.listMaps('visitor-a');
+
+    expect(listed.map((m) => m.id)).toEqual([mine.id]);
+  });
+
+  // Absence means nothing, not everything. This is the asymmetry the whole fix
+  // turns on: a first arrival with no cookie must land on the day-one screen,
+  // and the opposite default is precisely the bug above.
+  it('returns nothing for a visitor with no id at all', async () => {
+    await noMaps();
+    await mapStore.createMap('theirs', undefined, [], 'visitor-b');
+
+    expect(await mapStore.listMaps(null)).toEqual([]);
+  });
+
+  // A map made through a door with no browser behind it — the stdio agent —
+  // belongs to nobody rather than to everybody, and must not surface in a
+  // visitor's list.
+  it('does not hand an unowned map to a visitor', async () => {
+    await noMaps();
+    await mapStore.createMap('made by an agent over stdio');
+
+    expect(await mapStore.listMaps('visitor-a')).toEqual([]);
+  });
+
+  // The other half of the fix, and the reason `listAllMaps` is its own named
+  // function: the stdio door still needs every map, including the unowned ones.
+  it('listAllMaps still returns every map whoever made it', async () => {
+    await noMaps();
+    await mapStore.createMap('theirs', undefined, [], 'visitor-b');
+    await mapStore.createMap('mine', undefined, [], 'visitor-a');
+    await mapStore.createMap('nobody owns this one');
+
+    expect(await mapStore.listAllMaps()).toHaveLength(3);
+  });
+
+  // Newest first, unchanged by the filter. The strip is "pick up where you left
+  // off", so a scoping change that quietly dropped the ordering would be a
+  // regression the assertions above could not see.
+  it('keeps the newest-first ordering within one visitor', async () => {
+    await noMaps();
+    const older = await mapStore.createMap(
+      'the earlier idea',
+      undefined,
+      [],
+      'visitor-a',
+    );
+    const newer = await mapStore.createMap(
+      'the later idea',
+      undefined,
+      [],
+      'visitor-a',
+    );
+
+    const listed = await mapStore.listMaps('visitor-a');
+
+    expect(listed.map((m) => m.id)).toEqual([newer.id, older.id]);
+  });
+
+  // createMap has to actually write the owner, or the filter above would be
+  // correct and the list would still always be empty.
+  it('stamps the creating visitor onto the new map', async () => {
+    await noMaps();
+    const map = await mapStore.createMap('mine', undefined, [], 'visitor-a');
+
+    const stored = await prisma.thinkingMap.findUnique({
+      where: { id: map.id },
+      select: { visitorId: true },
+    });
+
+    expect(stored?.visitorId).toBe('visitor-a');
   });
 });

@@ -302,7 +302,7 @@
     "testFile": "app/components/BoardChat.render.test.tsx"
   },
   {
-    "description": "The way back to your other boards, collapsed into the header — the boards you are not looking at should cost no space on the one you are. It closes on an outside click and on Escape, because a menu that can only be closed by the button that opened it is a trap on a surface where every other click means something.",
+    "description": "The way back to your other boards, collapsed into the header — the boards you are not looking at should cost no space on the one you are. It closes on an outside click and on Escape, because a menu that can only be closed by the button that opened it is a trap on a surface where every other click means something. Since the map list became visitor-scoped, three different situations reach an empty list and the menu picks its sentence between them: no boards of your own but one on screen means you followed someone's link, no boards and nothing on screen is the landing header, and owning exactly the board on screen is the only case that may be called your only board. Saying the last of those to a link-follower would claim they own a board they do not.",
     "filePath": "app/components/BoardMenu.tsx",
     "name": "BoardMenu",
     "scenarios": [
@@ -1391,7 +1391,7 @@
     }
   },
   {
-    "description": "The Pick up where you left off list. Renders nothing at all when there are no saved maps, so day one stays clean.",
+    "description": "The Pick up where you left off list. Renders nothing at all when there are no saved maps, so day one stays clean - and since the list became visitor-scoped, 'no saved maps' means none of YOURS rather than none at all, which is what that guard always claimed to mean. A visitor who has never created a map has no cookie, gets an empty list, and sees the one-card screen.",
     "filePath": "app/components/SavedMapList.tsx",
     "name": "SavedMapList",
     "scenarios": [
@@ -1685,7 +1685,7 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
-    "description": "Builds the HTTP and stdio front doors from the shared tool catalog rather than a hand-written list, which is what stops the three doors drifting apart. Loops the catalog, splicing a mapId argument onto each tool's own schema and stripping it back off before handing the call to the shared runtime - out here the agent has no page, so it must name the map it means. Adds the two whole-collection tools that belong only to the server doors, list_thinking_maps and create_thinking_map, since a page is already scoped to one map. Built fresh per request in the stateless HTTP mode.",
+    "description": "Builds the HTTP and stdio front doors from the shared tool catalog rather than a hand-written list, which is what stops the three doors drifting apart. Loops the catalog, splicing a mapId argument onto each tool's own schema and stripping it back off before handing the call to the shared runtime - out here the agent has no page, so it must name the map it means. Adds the two whole-collection tools that belong only to the server doors, list_thinking_maps and create_thinking_map, since a page is already scoped to one map. Built fresh per request in the stateless HTTP mode. Takes a MapScope saying whose maps this instance may see, with no default, because the two doors it serves are not equally trusted: over stdio the caller already has the process and the database so 'all' is honest, while over HTTP at /api/mcp the caller is whoever found the public URL and gets the same visitor scoping the landing page gets - otherwise that door would keep handing out every map's id and title after the page it mirrors had stopped.",
     "filePath": "app/lib/mcpServer.ts",
     "name": "buildMcpServer",
     "untestabilityReason": {
@@ -1813,7 +1813,7 @@
     "testFile": "app/lib/coreIdeaType.test.ts"
   },
   {
-    "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title. The seed idea is the person's, so the root node and opening message are user-origin - an agent reading the log must not mistake the human's starting idea for something it wrote. Records the root as the map's first event, leaving it at revision 1: a new map at revision 0 with an empty log would give an agent no way to tell it from one it had already read to the end.",
+    "description": "Starts a map from an unstructured idea, keeping the text verbatim as both the root node and the person's first message so the conversation and the map are two views of the same thing from the first turn. Truncates only the display title. The seed idea is the person's, so the root node and opening message are user-origin - an agent reading the log must not mistake the human's starting idea for something it wrote. Records the root as the map's first event, leaving it at revision 1: a new map at revision 0 with an empty log would give an agent no way to tell it from one it had already read to the end. Takes the creating browser's visitor id as a fourth argument and stamps it on the row, which is what lets that browser find the map again in its saved-map list; it defaults to null for the doors with no browser behind them - the stdio MCP door most of all - and a map stamped null belongs to nobody rather than to everybody.",
     "filePath": "app/lib/mapStore.ts",
     "name": "createMap",
     "scenarios": [
@@ -2341,13 +2341,19 @@
     "testFile": "app/lib/chatLines.test.ts"
   },
   {
+    "description": "Every map on the instance, whoever made it. Deliberately its own function with a name that says so, rather than a null or a missing argument to listMaps: one door legitimately wants this - the stdio MCP server door, whose caller already has the process and the database it points at - and making that door type out listAllMaps means the unscoped read can be found with one grep instead of hiding inside a default that any new caller would inherit by accident.",
+    "filePath": "app/lib/mapStore.ts",
+    "name": "listAllMaps",
+    "testFile": "app/lib/contributions.integration.test.ts"
+  },
+  {
     "description": "Metadata for every attachment on a map, in the order they arrived, as the whole-list PUT hands it back. It selects the columns and never `bytes`, reducing the file to a boolean before anything leaves the database — the same rule getMap follows, applied to the one route that answers with a list. Sending the bytes back to a caller that just uploaded them would put a megabyte through a JSON encoder for nothing.",
     "filePath": "app/api/maps/[id]/attachments/route.ts",
     "name": "listFor",
     "testFile": "app/lib/contributions.integration.test.ts"
   },
   {
-    "description": "Lists every thinking map newest-first with its phase and node/message counts. Backs the landing screen's Pick up where you left off list and the MCP list_thinking_maps tool.",
+    "description": "Lists one browser's saved thinking maps, newest-first, with each map's phase and node/message counts. Backs the landing screen's Pick up where you left off strip, GET /api/maps, and the Boards menu on the map page. The visitor id is REQUIRED rather than optional, and null returns nothing rather than everything: an unfiltered list used to hand every visitor every map anyone had ever made, so absence has to mean no maps of your own yet - the day-one state the landing page is built around - and never here is everybody's. This scopes the LIST and is not access control: a map stays reachable by anyone holding its link, which is already how this product is used. The unscoped read lives in listAllMaps under its own name.",
     "filePath": "app/lib/mapStore.ts",
     "name": "listMaps",
     "scenarios": [
@@ -2423,6 +2429,12 @@
     "filePath": "app/lib/insightStream.ts",
     "name": "millis",
     "testFile": "app/lib/insightStream.test.ts"
+  },
+  {
+    "description": "A fresh opaque visitor id. Random and never derived from the request, so it carries nothing about the person and cannot be guessed from one browser to another - two browsers handed the same id would each see the other's maps, which is the bug this feature removes, reintroduced.",
+    "filePath": "app/lib/visitor.ts",
+    "name": "mintVisitorId",
+    "testFile": "app/lib/visitor.test.ts"
   },
   {
     "description": "Reads navigator.modelContext, or null where there is none. The single place the WebMCP global is touched, so the draft spec moving again is one edit rather than a sweep.",
@@ -2662,6 +2674,15 @@
     "testFile": "app/lib/exchange.integration.test.ts"
   },
   {
+    "description": "The current browser's visitor id from its cookie, or null when it has never made a map. Null is the honest answer for a first arrival, and every caller must read it as no maps rather than all maps - that opposite default is the enumeration bug this feature exists to remove. Reads through next/headers, so it works in a server component as well as a route handler; only WRITING a cookie is restricted to the latter.",
+    "filePath": "app/lib/visitor.ts",
+    "name": "readVisitorId",
+    "untestabilityReason": {
+      "justification": "A one-line read of next/headers cookies(), which only exists inside a request. The behaviour it feeds is covered by the saved-map scenarios and by listMaps' integration tests; the pure half it delegates to is unit-tested in visitor.test.ts.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "The only place a map revision is minted. Appends events to the map's log and bumps ThinkingMap.revision once per event inside a single transaction, so a revision can never exist without its event or vice versa - either would hand a reader a cursor it cannot resume from. Every row of a batch carries the requestId, so a retry returns the whole original batch and its LAST revision; keying only the first row loses the batch's extent and hands a retrying agent a stale cursor, which makes it re-read its own writes as new. The dedupe lookup itself lives in findPriorBatch, shared with applyToolCalls so there is one notion of \"seen this key\". Takes an optional transaction client: a caller already inside a transaction hands over its own, because SQLite will not nest transactions and opening a second would deadlock against the write lock the outer one holds. Fires the in-process emitter that waiting callers race against - but NOT when a transaction was borrowed, since the outer transaction has not committed yet and waking a waiter on a revision that can still roll back would show a map that never existed.",
     "filePath": "app/lib/exchange.ts",
     "name": "recordEvents",
@@ -2702,6 +2723,15 @@
     "filePath": "app/lib/mapStore.ts",
     "name": "resolveRef",
     "testFile": "app/lib/mapStore.test.ts"
+  },
+  {
+    "description": "The visitor whose maps a request should list: the browser's own cookie, or - only on a codeyam-launched server - the one a scenario URL names. The cookie always wins where both are present, so a real returning browser is never overridden by a URL.",
+    "filePath": "app/lib/visitor.ts",
+    "name": "resolveVisitorId",
+    "untestabilityReason": {
+      "justification": "A two-term precedence over readVisitorId, which needs a live request through next/headers. Both halves are covered: scenarioVisitorId in visitor.test.ts, and the whole path end-to-end by the saved-map scenarios.",
+      "kind": "platform-glue"
+    }
   },
   {
     "description": "The readable part of an MCP tool response — the first text block, which is what an agent would actually read. Falls back to raw JSON rather than rendering nothing, because a silently empty panel is worse than an ugly one.",
@@ -2770,6 +2800,12 @@
     "filePath": "app/lib/mapRounds.ts",
     "name": "runsFromLog",
     "testFile": "app/lib/mapRounds.test.ts"
+  },
+  {
+    "description": "Which visitor a codeyam scenario is being viewed as, from a ?visitor= query param, or null. It exists because a cookie is minted by a POST and the capture harness has no way to put one in the browser before it navigates - without it every seeded saved-map scenario would capture as the empty day-one screen, and the state most worth showing, two browsers seeing different halves of one database, could not be demonstrated at all. It reuses the seam this app already has for this shape of problem: a query param behind codeyamLaunched(), which is false in a production build AND false on a server a person started themselves, since the editor injects the variable it keys on. Read per request, so it varies per scenario rather than being fixed for the life of the dev server.",
+    "filePath": "app/lib/visitor.ts",
+    "name": "scenarioVisitorId",
+    "testFile": "app/lib/visitor.test.ts"
   },
   {
     "description": "Points a base connection string at one schema, built through URL rather than concatenation so a hosted DSN keeps the query parameters it already carries instead of losing them behind a second question mark.",
@@ -3088,6 +3124,12 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "visibleEvents",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "How the visitor cookie is written, decided in one place rather than at each call site. httpOnly because no client code has any business reading it - it is not a preference or a flag. SameSite lax rather than strict because the saved-map list is reached by following an ordinary link, and strict would drop the cookie on exactly that navigation, landing a returning visitor on the day-one screen while holding a valid cookie. Secure only in production, so http localhost still receives it during development. A year-long maxAge and a site-wide path, because a path-scoped cookie would be missing on the map page where the Boards menu reads the same list.",
+    "filePath": "app/lib/visitor.ts",
+    "name": "visitorCookieOptions",
+    "testFile": "app/lib/visitor.test.ts"
   },
   {
     "description": "Blocks until somebody starts a thinking map, or until the caller's timeout expires. The server-door half of the answer to a page not being able to wake an agent: nothing here pushes, but an agent with nothing to do can park, so a submitted idea is picked up rather than sitting on an empty page. A near-copy of waitForUserActivity - check first, then race the in-process emitter against a poll, on a bounded deadline - so the two read as one pattern. Cursored by createdAt rather than revision, because revision is per-map and a map that does not exist yet has none a waiter could have read. The comparison is exclusive, which is what stops a re-park from re-delivering the map just handed over. A timeout is a normal result carrying the cursor, never an error.",

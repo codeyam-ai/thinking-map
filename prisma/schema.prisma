@@ -40,6 +40,19 @@ model ThinkingMap {
   /// Which stage of the loop this map has reached:
   /// idea | deconstruct | map | research | explore | next-steps
   phase    String @default("idea")
+  /// Names the BROWSER that created this map, not a person. Minted as an opaque
+  /// id into an httpOnly cookie at map creation and stamped here, so the saved-map
+  /// list can show a visitor their own maps instead of everyone's.
+  ///
+  /// It scopes the LIST and nothing else. `/map/<id>` and the tools under it stay
+  /// reachable by anyone holding the link — ids are cuids and link-holding is
+  /// already the access model, so this is not an access control column and must
+  /// not be read as one.
+  ///
+  /// Nullable because maps made before it existed belong to nobody: there is no
+  /// backfill and no claim-on-first-visit, so those rows simply never appear in
+  /// anyone's list.
+  visitorId String?
   /// LEGACY. What the person attached, as JSON: [{ name }] — names and nothing
   /// else. Superseded by the `attachments` relation below, which holds the file
   /// itself, and read only by the one-off backfill in `prisma/backfill-attachments.ts`.
@@ -66,6 +79,8 @@ model ThinkingMap {
   brief    MapBrief?
 
   attachments MapAttachment[]
+
+  @@index([visitorId])
 }
 
 // ──────────────────────────────────────────────
