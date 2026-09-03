@@ -1,12 +1,13 @@
 {
- "name": "Wordmark - Default",
- "id": "8c7087ce-974a-4c5d-a6bf-e2918a7b677f",
- "url": "/isolated-components/Wordmark?s=Default",
- "dimensions": [
-  "Tablet"
- ],
- "mocks": {},
- "componentName": "Wordmark",
- "scenarioType": "component",
- "description": "The mark and wordmark: three nodes and the connectors between them."
+  "name": "Wordmark - Default",
+  "id": "8c7087ce-974a-4c5d-a6bf-e2918a7b677f",
+  "url": "/isolated-components/Wordmark?s=Default",
+  "dimensions": [
+    "Tablet",
+    "Mobile"
+  ],
+  "mocks": {},
+  "componentName": "Wordmark",
+  "scenarioType": "component",
+  "description": "The product lockup, ink on paper. At Tablet the full lockup - the mark and the name as outlined paths. At Mobile, under the 520px breakpoint, the same component crops to a second svg holding the mark alone, so the name drops away without leaving the dead space a CSS hide would strand."
 }

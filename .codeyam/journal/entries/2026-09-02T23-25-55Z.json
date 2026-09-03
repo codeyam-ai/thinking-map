@@ -1,0 +1,539 @@
+{
+  "timestamp": "2026-09-02T23:25:55Z",
+  "title": "The Header Wears the Real Mark",
+  "type": "feature",
+  "userRequest": "## Summary\n\n`Wordmark` currently draws a hand-coded placeholder — three circles and two\nstrokes on a 22x22 viewBox — next to the literal text \"Thinking Map\". The real\nlogo now exists as a file. It is a full lockup: a 127x31 mark plus the product\nname already outlined as vector paths, so dropping it in retires the `<span>`\nas well as the glyph. Swap it in, keeping every property the placeholder earned:\nit follows the ink token instead of hardcoding a colour, it still names the link\nhome for a screen reader now that the name is paths rather than text, and it\nstill collapses to the mark alone on a narrow screen.\n\nThe asset is co-located with this plan:\n`![The Thinking Map lockup](assets/the-header-wears-the-real-mark/thinking-map-logo.svg)`\n(white on transparent — it will look blank in a light markdown viewer; the file\nis the source of truth for the path data, not a preview).\n\n## Key Decisions\n\n- **Inline the paths into `Wordmark.tsx`; do not add a public/ dir and an img tag.**\n  Three reasons, in order of weight. (1) The exported SVG is `fill=\"white\"` on\n  every one of its 14 shapes, and this product is light-only by design —\n  `--paper: #f1efea`, `--ink: #0f0f0f`, with no dark mode anywhere in\n  `app/globals.css`. A white logo on warm paper is an invisible logo. Fixing\n  that means the fills have to inherit, and only an inline SVG can inherit\n  `currentColor`; an `<img src=\"/logo.svg\">` cannot be recoloured by the page.\n  (2) It is the established pattern — `CardIcon`'s own doc comment says the\n  product draws its marks inline \"rather than pulled from an icon package\",\n  and `Wordmark` and `NodeAccentMark` do the same. (3) There is no public/\n  directory in the repo at all, so the img-tag route means inventing a static\n  asset pipeline to hold one file.\n\n- **Replace every `fill=\"white\"` with `fill=\"currentColor\"`, and let the\n  anchor carry the colour.** The placeholder hardcoded `var(--ink)` on each\n  shape; `currentColor` is the same result said once instead of fourteen\n  times, and it is what `CardIcon` already uses. `body` sets\n  `color: var(--ink)`, so the correct colour arrives by inheritance —\n  `text-ink` on the `<a>` is belt-and-braces against a future link colour\n  rule.\n\n- **Two `<svg>` elements sharing one mark constant, not one element with a\n  hidden group.** The narrow-screen behaviour has to survive: today the name is\n  a `<span>` that `hidden min-[520px]:inline` can simply drop. In a single\n  lockup SVG, hiding the name paths with CSS would leave the `viewBox` still\n  reserving all 127 units, so the mark would sit in ~100px of dead space.\n  Cropping the `viewBox` to the mark's real bounding box is what actually\n  collapses it, and `viewBox` is not a CSS property — so it takes a second\n  element. Only the three mark rects are duplicated (via a shared constant),\n  not the eleven letter paths.\n\n- **The mark's crop is `viewBox=\"0 0 32 31\"`.** Derived from the file, not\n  guessed: `rect x=5 w=27` spans x 5..32; the two `rotate(90 ...)` rects\n  resolve to x 0..10 and x 10..17.26; the first letter path starts at\n  x=38.6. So x 0..32 is exactly the mark and nothing else.\n\n- **Render at `h-[26px]`, confirmed against the captures rather than trusted.**\n  The lockup's cap height is only ~12.4 of its 31 units, so matching the old\n  22px glyph height would render the name at ~8.8px cap — visibly smaller than\n  the 15px extrabold text it replaces. 26px puts the name near its old weight\n  and makes the lockup ~106px wide, still narrower than the ~132px the glyph\n  and span occupied together, which keeps the half-screen header constraint\n  satisfied. The narrow-screen mark grows from 22px to 26px square. Both\n  numbers are a starting point to check in the `AppHeader` and map-screen\n  captures, not a settled fact.\n\n- **`aria-label=\"Thinking Map\"` moves onto the `<a>`.** Today the link's\n  accessible name comes from the visible `<span>`, with the svg\n  `aria-hidden`. Once the name is outlined paths there is no text node left,\n  so without this the header's home link announces as an unnamed link — a real\n  regression hiding inside a cosmetic change. Both svgs stay `aria-hidden`.\n\n## Implementation\n\n### 1. Rebuild the mark from the real asset\n\n**File**: `app/components/Wordmark.tsx`\n\nTake the shapes verbatim from\n`assets/the-header-wears-the-real-mark/thinking-map-logo.svg`, changing only\n`fill=\"white\"` to `fill=\"currentColor\"` on all 14 of them. Do not retype the\npath data — copy it.\n\nStructure the file as:\n\n- A module-level `MARK` constant holding the three `<rect>` elements (the two\n  with `transform=\"rotate(90 ...)\"` keep their transforms exactly as exported).\n  A constant because both svgs render it and the duplication is the only thing\n  the two-element approach costs.\n- A module-level `LOCKUP_NAME` constant (or an inline fragment) holding the\n  eleven letter paths.\n- The component: an `<a href=\"/\">` keeping `suppressHydrationWarning` — the\n  preview proxy rewrites `href` in server HTML, and `app/not-found.tsx:20` documents\n  why every anchor here needs it — plus `aria-label=\"Thinking Map\"` and\n  `className=\"flex shrink-0 items-center text-ink\"`. The old `gap-2.5` goes:\n  the space between mark and name is baked into the lockup's geometry now.\n- Inside it, the mark-only svg (`viewBox=\"0 0 32 31\"`, `aria-hidden=\"true\"`,\n  `className=\"h-[26px] w-auto min-[520px]:hidden\"`) and the full lockup svg\n  (`viewBox=\"0 0 127 31\"`, `aria-hidden=\"true\"`,\n  `className=\"hidden h-[26px] w-auto min-[520px]:block\"`).\n\nKeep a doc comment in the spirit of the one being replaced, and keep the\nnarrow-screen comment's reasoning — \"under ~520px the mark stands alone,\nbecause a lockup that wraps mid-name reads as broken in a way a mark on its own\ndoes not\" — since that judgment is still the reason the second element exists.\n\nNothing outside this file changes. `AppHeader` renders `<Wordmark />` with no\nprops and needs no edit; the glossary entry's description (\"The product mark:\nthree nodes and the connectors between them...\") should be refreshed to\ndescribe the real lockup, which the workflow's glossary step handles.\n\n### 2. Re-capture what the header appears in\n\n**File**: `.codeyam/scenarios/wordmark-default.json`\n\nThe existing `Wordmark - Default` scenario captures at `Tablet` only, which\nonly ever exercises the lockup branch. Add a narrow dimension so the\n`min-[520px]` crop is actually demonstrated rather than asserted — the mark-only\nsvg is new code and no current capture would show it.\n\n`appheader-default` and `appheader-explore` re-capture as a consequence of the\ncomponent change; no edit to those files is expected.\n\n## Reused existing code\n\n- `Wordmark` from `app/components/Wordmark.tsx` (glossary entry: `Wordmark`) —\n  the file being rewritten; its anchor semantics, `suppressHydrationWarning`,\n  and `min-[520px]` breakpoint are all kept.\n- `AppHeader` from `app/components/AppHeader.tsx` (glossary entry: `AppHeader`)\n  — the sole consumer, unchanged, but the surface every capture reviews.\n- `CardIcon` from `app/components/CardIcon.tsx` (glossary entry: `CardIcon`) —\n  the precedent for `fill=\"currentColor\"` on an inline mark, and the doc comment\n  stating the draw-inline convention this plan follows.\n- The `--ink` token and its `text-ink` Tailwind alias from `app/globals.css`\n  (`:root` at line 10, `@theme inline` at line 67).\n- `app/not-found.tsx` (line 20) for the `suppressHydrationWarning` rationale\n  that must survive the rewrite.\n\n**Existing-implementation survey.** Checked before writing this plan: the repo\nhas no public/ directory, no app-router icon or favicon file of any kind, and no\nimg-tag or file-referenced logo anywhere under `app/` — every mark in the\nproduct is drawn inline (`Wordmark`, `CardIcon`). So nothing\nequivalent to a static-asset logo path exists to reuse or duplicate; inlining is\nthe only pattern already present.\n\n## Scenarios to Demonstrate\n\n- `Wordmark - Default` at Tablet — the full lockup, ink on paper, at its\n  chosen height.\n- `Wordmark` at a narrow width (under 520px) — the mark alone, cropped, with\n  no dead space where the name used to be. This is the capture that proves the\n  `viewBox` crop rather than the CSS hide.\n- `AppHeader - Default` — lockup left, `BoardMenu` right, on one line.\n- `AppHeader - Returning` — the same with a populated board menu, the tightest\n  case for horizontal room.\n- The map screen at half-screen width — the constraint \"App Chrome That Fits a\n  Half Screen\" established; the lockup is narrower than what it replaces, so\n  this should confirm rather than surprise.\n- The not-found page, which renders `AppHeader` with no `status`.",
+  "description": "Replaced the header's hand-coded placeholder — three circles, two strokes, and a separate \"Thinking Map\" text span — with the real product lockup from the design asset. The 14 shapes are copied verbatim from the exported SVG and inlined into Wordmark rather than loaded through an img tag, because the export is white on transparent and this product is light-only: only an inline SVG can swap fill=\"white\" for fill=\"currentColor\" and inherit the page's ink instead of rendering invisible on paper. The narrow-screen behaviour is preserved by a second svg cropped to viewBox=\"0 0 32 31\" — the mark's measured bounding box — because hiding the name paths with CSS would leave the viewBox still reserving all 127 units and strand the mark in ~100px of dead space, and viewBox is not a CSS property. The link carries an explicit aria-label now that the name is outlined paths with no text node left to name it.\n\nScope verdict: this cycle delivered exactly the planned logo swap and deferred nothing. It neither delivered nor deferred any of the project's 10 deliverables — all 10 were already resolved before the cycle began (9 delivered, 1 deferred), so there was no open subset to decide on and no new deferral was recorded. The single standing deferral, the assist-track registering item, was decided by the user in an earlier cycle; no agent-decided deferral was added here.\n\nOnly app/components/Wordmark.tsx changed. AppHeader, its sole consumer, needed no edit. The Wordmark scenario gained a Mobile dimension so the breakpoint crop is demonstrated rather than asserted, and the 38 scenarios that render the header were recaptured. Audit passed with 0 findings; tsc passes; the AppHeader - Default scenario description was also corrected, having still described a phase track the header stopped carrying in an earlier feature.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/assets/the-header-wears-the-real-mark/thinking-map-logo.svg\t.codeyam/plans/completed/assets/the-header-wears-the-real-mark/thinking-map-logo.svg",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/the-header-wears-the-real-mark.md\t.codeyam/plans/completed/the-header-wears-the-real-mark.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/appheader-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-nodigest--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-nodigest--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-withdigest--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/apperrorboundary-withdigest--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/appheader-explore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/notfound-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/notfound-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/wordmark-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/wordmark-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/wordmark-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7c5ca9734084e9113be7175b23cf53ad8558dea2ade14dfdf5b3ac1751b724fe.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ec4893d7583dee9a32ebe07d6cd048fd4205fbeb86632fcacf4efe27761b9ae6.json",
+      "status": "deleted"
+    },
+    {
+      "path": "app/components/Wordmark.tsx",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/appheader.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/wordmark.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/wordmark-default--mobile.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/4258969244764a34f8b7ab877c11f4287f863a5a4ef2cdab6b563b138ef7513c.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/53add3f179348781714b658dbef73caf37de73d90571e9e58fec8c123dcc8abf.json",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AppErrorBoundary - NoDigest",
+      "screenshotPath": "apperrorboundary-nodigest--tablet.png"
+    },
+    {
+      "name": "AppErrorBoundary - WithDigest",
+      "screenshotPath": "apperrorboundary-withdigest--tablet.png"
+    },
+    {
+      "name": "AppHeader - Default",
+      "screenshotPath": "appheader-default--tablet.png"
+    },
+    {
+      "name": "AppHeader - Explore",
+      "screenshotPath": "appheader-explore--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "NotFound - Default",
+      "screenshotPath": "notfound-default--tablet.png"
+    },
+    {
+      "name": "Wordmark - Default",
+      "screenshotPath": "wordmark-default--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 8,
+        "passed": 8
+      }
+    ]
+  }
+}

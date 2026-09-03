@@ -1,0 +1,18 @@
+{
+  "surface": "AppHeader",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "status",
+      "value": "true",
+      "rationale": "source-derived state status=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "status",
+      "value": "false",
+      "rationale": "source-derived state status=false",
+      "status": "covered"
+    }
+  ]
+}
