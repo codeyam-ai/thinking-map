@@ -11,10 +11,8 @@
       "deferredAt": "2026-09-03T00:09:26Z"
     }
   ],
-  "finalizeIntent": "fast",
-  "finalizeIntentBranch": "feat/reach-the-browser-agent",
   "drained": {
-    "screenshots": 36,
-    "at": "2026-09-02T23:41:39Z"
+    "screenshots": 106,
+    "at": "2026-09-03T00:48:25Z"
   }
 }
