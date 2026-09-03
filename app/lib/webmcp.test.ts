@@ -2,8 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   bindTools,
   isWebMcpAvailable,
+  onModelContextReady,
   publishAgentDriver,
+  requestUserInteraction,
   webMcpUnavailableReason,
+  type BindReport,
 } from './webmcp';
 import { TOOL_CATALOG } from './toolCatalog';
 
@@ -114,6 +117,15 @@ describe('webMcpUnavailableReason', () => {
 // really unregisters — a live name re-registered throws InvalidStateError, so a
 // leaky disposer breaks the next map the person opens.
 
+/** Binds and resolves with the report. Registration is async now — the shipped
+ *  registerTool returns a promise — so the outcome cannot be read in the same
+ *  tick the binding is made. */
+function nextReport(ctx: { mapId: string }): Promise<BindReport> {
+  return new Promise((resolve) => {
+    bindTools({ ...ctx, onReport: resolve });
+  });
+}
+
 describe('bindTools', () => {
   // The current spec convention (Chrome 146+): one registerTool per tool.
   it('registers every tool through registerTool when that convention is present', () => {
@@ -176,6 +188,94 @@ describe('bindTools', () => {
     expect(sets).toEqual([9, 0]);
   });
 
+  // Registration used to fail silently, so a page could report an attached
+  // agent while offering nothing. The report is what makes the difference
+  // observable — to the header, to the dev panel, and to this test.
+  it('reports which tools the browser accepted and which it refused', async () => {
+    vi.stubGlobal('navigator', {
+      modelContext: {
+        // A REJECTION, not a throw: the shipped registerTool is async, so this
+        // is the shape a real refusal arrives in.
+        registerTool: (d: { name: string }) =>
+          d.name === 'add_nodes'
+            ? Promise.reject(new Error('InvalidStateError'))
+            : Promise.resolve(),
+        unregisterTool: () => {},
+      },
+    });
+    const report = await nextReport({ mapId: 'm' });
+    expect(report.convention).toBe('registerTool');
+    expect(report.registered).toContain('read_map');
+    expect(report.registered).not.toContain('add_nodes');
+    expect(report.failed).toEqual([
+      { name: 'add_nodes', reason: 'InvalidStateError' },
+    ]);
+  });
+
+  // Chrome unregisters by AbortSignal rather than by name, so the binding has
+  // to hand one over — a disposer that cannot cancel leaves the next map's
+  // binding failing on live names.
+  it('passes an abort signal that disposal fires', async () => {
+    let signal: AbortSignal | undefined;
+    vi.stubGlobal('navigator', {
+      modelContext: {
+        registerTool: (_d: unknown, opts?: { signal?: AbortSignal }) => {
+          signal ??= opts?.signal;
+          return Promise.resolve();
+        },
+      },
+    });
+    const dispose = bindTools({ mapId: 'm' });
+    expect(signal).toBeInstanceOf(AbortSignal);
+    expect(signal!.aborted).toBe(false);
+    dispose();
+    expect(signal!.aborted).toBe(true);
+  });
+
+  // The descriptors have to reach a real `postMessage`-shaped boundary intact.
+  // A browser that clones on the way in is the honest simulation of Chrome's
+  // own behaviour, and the old Zod-schema descriptors died exactly here.
+  it('registers through a browser that structured-clones the descriptor', async () => {
+    const seen: { name: string; inputSchema: unknown }[] = [];
+    vi.stubGlobal('navigator', {
+      modelContext: {
+        registerTool: (d: { name: string; inputSchema: unknown }) => {
+          // Throws DataCloneError on anything a real registration would reject.
+          seen.push(
+            structuredClone({ name: d.name, inputSchema: d.inputSchema }),
+          );
+        },
+        unregisterTool: () => {},
+      },
+    });
+    const report = await nextReport({ mapId: 'm' });
+    expect(report.failed).toEqual([]);
+    expect(report.registered).toHaveLength(CATALOG_SIZE);
+    expect(seen.find((t) => t.name === 'read_map')?.inputSchema).toMatchObject({
+      type: 'object',
+    });
+  });
+
+  // The surface that actually matters. Chrome's imperative-API guide and
+  // ChatGPT's WebMCP docs both register on `document.modelContext`; the page
+  // read only `navigator`, so a browser WITH WebMCP reported "no browser agent"
+  // and registered nothing. This is that bug, pinned.
+  it('binds to document.modelContext, where the browser actually keeps it', async () => {
+    const registered: string[] = [];
+    vi.stubGlobal('navigator', {});
+    vi.stubGlobal('document', {
+      modelContext: {
+        registerTool: (d: { name: string }) => {
+          registered.push(d.name);
+          return Promise.resolve();
+        },
+      },
+    });
+    const report = await nextReport({ mapId: 'm' });
+    expect(registered).toContain('read_map');
+    expect(report.registered).toHaveLength(CATALOG_SIZE);
+  });
+
   // No agent at all — the common case, including every codeyam capture. It must
   // be a silent no-op with a disposer that is safe to call.
   it('does nothing and returns a safe disposer with no browser agent', () => {
@@ -220,5 +320,202 @@ describe('publishAgentDriver', () => {
     expect(
       (fakeWindow.__thinkingMapAgent as { mapId: string } | undefined)?.mapId,
     ).toBe('map-2');
+  });
+});
+
+// The agent injects the model context, not the page, and nothing guarantees it
+// lands before React hydrates — in the ChatGPT and Chrome integrated browsers
+// it frequently does not. A one-shot check at mount is a race the page loses
+// silently, reporting "no browser agent" forever on a page that acquired one
+// 300ms later.
+describe('onModelContextReady', () => {
+  // Stands in for a window that can be listened to and whose agent can arrive
+  // partway through, which is the whole point of the watch.
+  function watchableWindow() {
+    const listeners = new Map<string, Set<() => void>>();
+    return {
+      isSecureContext: true,
+      addEventListener: (type: string, fn: () => void) => {
+        if (!listeners.has(type)) listeners.set(type, new Set());
+        listeners.get(type)!.add(fn);
+      },
+      removeEventListener: (type: string, fn: () => void) => {
+        listeners.get(type)?.delete(fn);
+      },
+      emit: (type: string) => listeners.get(type)?.forEach((fn) => fn()),
+      listenerCount: () =>
+        [...listeners.values()].reduce((n, set) => n + set.size, 0),
+    };
+  }
+
+  // The common case in an ordinary browser: the agent is already there, so the
+  // page must bind now rather than wait a poll interval to notice.
+  it('fires immediately when the model context is already present', () => {
+    vi.stubGlobal('window', watchableWindow());
+    vi.stubGlobal('document', { modelContext: {} });
+    const ready = vi.fn();
+    onModelContextReady(ready);
+    expect(ready).toHaveBeenCalledTimes(1);
+  });
+
+  // The race this exists for. Nothing at mount, an agent a moment later, and
+  // the page has to notice on its own.
+  it('fires once the model context appears later', () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('window', watchableWindow());
+    vi.stubGlobal('document', {});
+    const ready = vi.fn();
+    onModelContextReady(ready);
+    expect(ready).not.toHaveBeenCalled();
+
+    vi.stubGlobal('document', { modelContext: {} });
+    vi.advanceTimersByTime(500);
+    expect(ready).toHaveBeenCalledTimes(1);
+
+    // And only once, however long the page stays open afterwards.
+    vi.advanceTimersByTime(5_000);
+    expect(ready).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  // Some hosts announce themselves rather than make the page poll. Honouring
+  // the event removes up to a quarter-second of lag when they do.
+  it('fires on a host-announced ready event without waiting for a poll', () => {
+    vi.useFakeTimers();
+    const fakeWindow = watchableWindow();
+    vi.stubGlobal('window', fakeWindow);
+    vi.stubGlobal('document', {});
+    const ready = vi.fn();
+    onModelContextReady(ready);
+
+    vi.stubGlobal('document', { modelContext: {} });
+    fakeWindow.emit('modelcontextready');
+    expect(ready).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  // An announcement with no agent actually behind it is not readiness. Firing
+  // here would bind against nothing and report a connection that does not
+  // exist — the exact class of lie this feature was built to end.
+  it('ignores a ready event when no model context arrived with it', () => {
+    vi.useFakeTimers();
+    const fakeWindow = watchableWindow();
+    vi.stubGlobal('window', fakeWindow);
+    vi.stubGlobal('document', {});
+    const ready = vi.fn();
+    onModelContextReady(ready);
+
+    fakeWindow.emit('mcp-ready');
+    expect(ready).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  // Bounded on purpose: an agent that has not appeared within the window is not
+  // coming, and a map left open for hours must not keep an interval and two
+  // listeners alive waiting for one.
+  it('stops watching after the deadline and never fires', () => {
+    vi.useFakeTimers();
+    const fakeWindow = watchableWindow();
+    vi.stubGlobal('window', fakeWindow);
+    vi.stubGlobal('document', {});
+    const ready = vi.fn();
+    onModelContextReady(ready);
+
+    vi.advanceTimersByTime(30_001);
+    expect(fakeWindow.listenerCount()).toBe(0);
+
+    vi.stubGlobal('document', { modelContext: {} });
+    vi.advanceTimersByTime(5_000);
+    expect(ready).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  // Navigating between boards disposes the watch. A leaked one would keep
+  // polling for a map the page has already left.
+  it('stops watching when disposed', () => {
+    vi.useFakeTimers();
+    const fakeWindow = watchableWindow();
+    vi.stubGlobal('window', fakeWindow);
+    vi.stubGlobal('document', {});
+    const ready = vi.fn();
+    const stop = onModelContextReady(ready);
+
+    stop();
+    expect(fakeWindow.listenerCount()).toBe(0);
+
+    vi.stubGlobal('document', { modelContext: {} });
+    vi.advanceTimersByTime(5_000);
+    expect(ready).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  // Server rendering has no window to watch, and this runs during the bridge's
+  // setup — throwing here would take the whole map page down.
+  it('does nothing outside a browser', () => {
+    vi.stubGlobal('window', undefined);
+    const ready = vi.fn();
+    expect(() => onModelContextReady(ready)()).not.toThrow();
+    expect(ready).not.toHaveBeenCalled();
+  });
+});
+
+// Brings the page forward so the person actually sees an ask_user question.
+// It lives in this file so that this stays the ONLY place naming where the
+// browser keeps its model context — the bridge used to reach for
+// `navigator.modelContext` itself, quietly making it a second place the
+// discovery fix had to be applied.
+describe('requestUserInteraction', () => {
+  // The supported host: the work is handed to the browser so it can surface the
+  // tab first, and the result still comes back to the caller.
+  it('delegates to the host and returns the result', async () => {
+    const seen: unknown[] = [];
+    vi.stubGlobal('document', {
+      modelContext: {
+        requestUserInteraction: (run: () => Promise<unknown>) => {
+          seen.push(run);
+          return run();
+        },
+      },
+    });
+    vi.stubGlobal('navigator', {});
+
+    await expect(requestUserInteraction(async () => 'answered')).resolves.toBe(
+      'answered',
+    );
+    expect(seen).toHaveLength(1);
+  });
+
+  // A host without the capability must still run the work. Requiring it would
+  // mean a question that is never asked rather than one asked in a background
+  // tab, and the second is plainly the better failure.
+  it('runs the work directly when the host does not support it', async () => {
+    vi.stubGlobal('document', { modelContext: {} });
+    vi.stubGlobal('navigator', {});
+    await expect(requestUserInteraction(async () => 'answered')).resolves.toBe(
+      'answered',
+    );
+  });
+
+  // No agent at all — an ordinary browser, or a captured scenario — takes the
+  // same path rather than throwing on a missing model context.
+  it('runs the work directly when there is no model context', async () => {
+    vi.stubGlobal('document', {});
+    vi.stubGlobal('navigator', {});
+    await expect(requestUserInteraction(async () => 'answered')).resolves.toBe(
+      'answered',
+    );
+  });
+
+  // A rejection is the agent's to handle. Swallowing it here would settle a
+  // pending question with nothing and leave the agent waiting on a turn that
+  // already failed.
+  it('propagates a rejection from the work', async () => {
+    vi.stubGlobal('document', {});
+    vi.stubGlobal('navigator', {});
+    await expect(
+      requestUserInteraction(async () => {
+        throw new Error('timed out');
+      }),
+    ).rejects.toThrow('timed out');
   });
 });

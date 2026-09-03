@@ -1,0 +1,12 @@
+{
+  "name": "AgentBindDiagnostics - NothingBound",
+  "id": "f56c0b68-1e9b-4358-bf1b-8ada6ef997e1",
+  "url": "/isolated-components/AgentBindDiagnostics?s=NothingBound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentBindDiagnostics",
+  "scenarioType": "component",
+  "description": "No binding at all — the state every preview and capture genuinely produces. Every field reads 'none', which is the honest answer rather than a blank row a developer has to guess at."
+}

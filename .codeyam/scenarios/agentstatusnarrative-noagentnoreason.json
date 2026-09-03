@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusNarrative - NoAgentNoReason",
+  "id": "30ab7ff6-5b98-455a-bc7d-7bfb75588b3c",
+  "url": "/isolated-components/AgentStatusNarrative?s=NoAgentNoReason",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusNarrative",
+  "scenarioType": "component",
+  "description": "The same absence when the page has no diagnosis to offer. The optional-field branch: the reason is dropped cleanly rather than leaving a stray separator, so the paragraph still reads as a sentence."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AgentBindDiagnostics - RefusedTools",
+  "id": "a87331ae-c963-495c-ba09-19c827e43620",
+  "url": "/isolated-components/AgentBindDiagnostics?s=RefusedTools",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentBindDiagnostics",
+  "scenarioType": "component",
+  "description": "The row that ends the silence this whole feature was built around. Two tools the browser REFUSED, named, with its own reason for each — including the DataCloneError that was being thrown from inside Chrome and swallowed by a bare catch, leaving a page that reported an attached agent and exposed nothing to it. Development only, where it costs a person nothing."
+}

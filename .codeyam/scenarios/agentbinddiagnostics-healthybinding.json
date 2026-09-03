@@ -1,0 +1,12 @@
+{
+  "name": "AgentBindDiagnostics - HealthyBinding",
+  "id": "eda2bc8e-366c-41a3-a90c-059e87d82fa0",
+  "url": "/isolated-components/AgentBindDiagnostics?s=HealthyBinding",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentBindDiagnostics",
+  "scenarioType": "component",
+  "description": "A binding with nothing wrong with it: the current registerTool convention, bound to the page, no refusals. The row a developer glances at and moves past — and the baseline that makes the refused-tools state legible by contrast."
+}

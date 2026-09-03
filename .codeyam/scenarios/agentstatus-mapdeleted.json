@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatus - MapDeleted",
+  "id": "71b79942-a14f-4237-a022-5549b9495568",
+  "url": "/isolated-components/AgentStatus?s=MapDeleted",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatus",
+  "scenarioType": "component",
+  "description": "The map was deleted underneath this open tab. The one reason that stays inline rather than moving behind the click: a person has to act on it, and burying it would mean the page knows the tab is dead and declines to say so. A 404 on the log is permanent, not a dropped poll."
+}

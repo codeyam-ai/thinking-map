@@ -22,14 +22,19 @@ import {
   buildToolDescriptors,
   errorResponse,
   pendingQuestions,
+  serializationProblem,
   toolSummaries,
   validateToolInput,
+  type JsonSchema,
 } from './toolInvocation';
 
 interface RegisterToolDescriptor {
   name: string;
   description: string;
-  inputSchema: unknown;
+  /** JSON Schema, not a Zod schema. The descriptor crosses an agent boundary,
+   *  so anything here that a structured clone cannot copy fails the whole
+   *  registration — see `jsonSchemaFor` in toolInvocation.ts. */
+  inputSchema: JsonSchema;
   annotations?: Record<string, unknown>;
   execute(args: unknown): Promise<McpToolResponse>;
 }
@@ -43,8 +48,19 @@ interface RegisterResourceDescriptor {
 }
 
 interface ModelContextLike {
-  registerTool?(descriptor: RegisterToolDescriptor): unknown;
+  /** Async in the shipped API — it returns a promise, so a failure ARRIVES as a
+   *  rejection rather than a throw. Registering without handling that is how a
+   *  refusal becomes an unhandled rejection nobody sees. The options argument
+   *  carries the AbortSignal that unregisters the tool. */
+  registerTool?(
+    descriptor: RegisterToolDescriptor,
+    options?: { signal?: AbortSignal },
+  ): unknown;
+  /** The explicit form, kept for hosts that expose it. Chrome documents the
+   *  AbortController instead, so both paths run on disposal. */
   unregisterTool?(name: string): unknown;
+  /** Brings the page forward so a person actually sees what they are asked. */
+  requestUserInteraction?<R>(run: () => Promise<R>): Promise<R>;
   /** The pre-March-2026 convention the polyfill still ships. */
   provideContext?(context: { tools: RegisterToolDescriptor[] }): unknown;
   /** Resources and their change notification are an OPEN PROPOSAL
@@ -64,11 +80,49 @@ function exchangeUri(mapId: string): string {
   return `webmcp://thinking-map/${mapId}/exchange`;
 }
 
+/**
+ * The browser's model context, wherever this browser keeps it.
+ *
+ * `document.modelContext` is the real one. Chrome's imperative-API guide and
+ * ChatGPT's own WebMCP docs both register there, and the page checking only
+ * `navigator` is exactly why a browser WITH WebMCP reported "no browser agent"
+ * — the object was one property away the whole time.
+ *
+ * `navigator` is kept as a fallback rather than replaced: earlier drafts and
+ * the `@mcp-b/global` polyfill put it there, and a page that reads both attaches
+ * to either without caring which revision the host implements.
+ */
 function modelContext(): ModelContextLike | null {
-  if (typeof navigator === 'undefined') return null;
-  const mc = (navigator as Navigator & { modelContext?: ModelContextLike })
-    .modelContext;
-  return mc ?? null;
+  if (typeof document !== 'undefined') {
+    const onDocument = (
+      document as Document & { modelContext?: ModelContextLike }
+    ).modelContext;
+    if (onDocument) return onDocument;
+  }
+  if (typeof navigator !== 'undefined') {
+    const onNavigator = (
+      navigator as Navigator & { modelContext?: ModelContextLike }
+    ).modelContext;
+    if (onNavigator) return onNavigator;
+  }
+  return null;
+}
+
+/**
+ * Ask the host to bring the page forward, where it supports that.
+ *
+ * Lives here because this file is meant to be the only one that names
+ * `modelContext` — the bridge used to reach for `navigator.modelContext`
+ * itself, which quietly made it a second place the surface had to be corrected.
+ */
+export async function requestUserInteraction<T>(
+  run: () => Promise<T>,
+): Promise<T> {
+  const mc = modelContext();
+  if (typeof mc?.requestUserInteraction === 'function') {
+    return mc.requestUserInteraction(run) as Promise<T>;
+  }
+  return run();
 }
 
 /**
@@ -84,6 +138,55 @@ export function isWebMcpAvailable(): boolean {
   if (!window.isSecureContext) return false;
   if (window.top !== window) return false;
   return modelContext() !== null;
+}
+
+/**
+ * Call back as soon as a browser agent is reachable, now or later.
+ *
+ * The API is injected by the agent, not by the page, and nothing guarantees it
+ * lands before React hydrates — in the ChatGPT and Chrome integrated browsers
+ * it frequently does not. A one-shot check at mount therefore reports "no
+ * browser agent" on a page that acquires one a few hundred milliseconds later
+ * and never looks again, which is a race the page loses silently.
+ *
+ * So: fire immediately when it is already there, otherwise watch. The watch is
+ * bounded — an agent that has not appeared within `WATCH_MS` is not coming, and
+ * a page left open for hours must not keep an interval alive for one.
+ */
+const POLL_MS = 250;
+const WATCH_MS = 30_000;
+
+export function onModelContextReady(ready: () => void): Disposer {
+  if (typeof window === 'undefined') return () => {};
+  if (modelContext() !== null) {
+    ready();
+    return () => {};
+  }
+
+  let stopped = false;
+  const stop = () => {
+    if (stopped) return;
+    stopped = true;
+    clearInterval(timer);
+    clearTimeout(deadline);
+    // Some hosts announce themselves rather than make the page poll. Listening
+    // costs nothing and removes the up-to-250ms lag when they do.
+    window.removeEventListener('modelcontextready', onEvent);
+    window.removeEventListener('mcp-ready', onEvent);
+  };
+  const settle = () => {
+    if (stopped || modelContext() === null) return;
+    stop();
+    ready();
+  };
+  const onEvent = () => settle();
+
+  const timer = setInterval(settle, POLL_MS);
+  const deadline = setTimeout(stop, WATCH_MS);
+  window.addEventListener('modelcontextready', onEvent);
+  window.addEventListener('mcp-ready', onEvent);
+
+  return stop;
 }
 
 /** Why the page is not bound, in a form the UI can render honestly. */
@@ -173,34 +276,97 @@ export async function callCatalogTool(
 /** Cancels a binding. Calling it twice is safe. */
 export type Disposer = () => void;
 
+function messageFor(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+/** What a binding actually achieved, as opposed to what it attempted. */
+export interface BindReport {
+  /** The convention the browser offered, or null when it offered none. */
+  convention: 'registerTool' | 'provideContext' | null;
+  /** Tools the browser accepted. This is the set an agent can discover. */
+  registered: string[];
+  /** Tools that did not make it, and why — the thing a silent catch hides. */
+  failed: { name: string; reason: string }[];
+}
+
 /**
  * Register the catalog with the browser agent for one map.
  *
  * Re-registering a live name throws `InvalidStateError`, so unregister-then-
  * register is the only safe update path — which is what the returned disposer
  * is for, and why the caller must dispose before binding a different map.
+ *
+ * A per-tool failure is still survivable rather than fatal, but it is no longer
+ * SILENT: every one is reported through `ctx.onReport`. A binding that registers
+ * nothing at all used to be indistinguishable from a binding that worked, which
+ * is exactly how a page came to say "agent attached" while offering no tools.
  */
 export function bindTools(ctx: {
   mapId: string;
   client?: ToolClient;
+  onReport?: (report: BindReport) => void;
 }): Disposer {
+  const report = (r: BindReport) => ctx.onReport?.(r);
+
   const mc = modelContext();
-  if (!mc) return () => {};
+  if (!mc) {
+    report({ convention: null, registered: [], failed: [] });
+    return () => {};
+  }
 
   const descriptors: RegisterToolDescriptor[] = buildToolDescriptors(
     (name) => (args) => callCatalogTool(name, args, ctx),
   );
 
   if (typeof mc.registerTool === 'function') {
-    for (const d of descriptors) {
+    // Chrome unregisters by AbortSignal rather than by name, so the binding
+    // carries its own controller and disposal aborts it.
+    const controller = new AbortController();
+
+    // Every call is made in THIS tick — the awaiting happens afterwards — so a
+    // browser that registers synchronously behaves exactly as before, and one
+    // that returns promises is still handled.
+    const outcomes = descriptors.map((d) => {
+      // Checked before the call rather than after the failure: the browser's
+      // own DataCloneError names nothing, while this names the tool.
+      const problem = serializationProblem(d);
+      if (problem) return Promise.resolve({ name: d.name, reason: problem });
       try {
-        mc.registerTool(d);
-      } catch {
-        // A name left registered by a previous binding that failed to dispose.
-        // Losing one tool is better than losing the whole binding.
+        return Promise.resolve(
+          mc.registerTool!(d, { signal: controller.signal }),
+        ).then(
+          () => ({ name: d.name, reason: null as string | null }),
+          // A rejection, not a throw. Handling it here is also what keeps a
+          // refused registration from surfacing as an unhandled rejection.
+          (error: unknown) => ({ name: d.name, reason: messageFor(error) }),
+        );
+      } catch (error) {
+        // A host that still throws synchronously — typically a name left
+        // registered by a binding that failed to dispose. Losing one tool is
+        // better than losing the whole binding.
+        return Promise.resolve({ name: d.name, reason: messageFor(error) });
       }
-    }
+    });
+
+    void Promise.all(outcomes).then((results) => {
+      // Aborted before the promises settled: the page moved on, and reporting
+      // a binding it no longer has would race the next map's report.
+      if (controller.signal.aborted) return;
+      report({
+        convention: 'registerTool',
+        registered: results.filter((r) => !r.reason).map((r) => r.name),
+        failed: results
+          .filter((r) => r.reason)
+          .map((r) => ({ name: r.name, reason: r.reason! })),
+      });
+    });
+
     return () => {
+      // Both paths, deliberately: the signal is what Chrome documents, and
+      // `unregisterTool` is what earlier drafts and the polyfill expose. A tool
+      // left registered makes the NEXT map's binding fail on a live name.
+      controller.abort();
       for (const d of descriptors) {
         try {
           mc.unregisterTool?.(d.name);
@@ -214,7 +380,29 @@ export function bindTools(ctx: {
   // The older polyfill convention: one call replaces the whole set, so the
   // disposer clears it by providing an empty set rather than unregistering.
   if (typeof mc.provideContext === 'function') {
-    mc.provideContext({ tools: descriptors });
+    // One call carries the whole set, so one bad descriptor would take every
+    // tool down with it. Dropping it is the only way the rest survive.
+    const usable = descriptors.filter((d) => serializationProblem(d) === null);
+    const failed = descriptors
+      .filter((d) => !usable.includes(d))
+      .map((d) => ({ name: d.name, reason: serializationProblem(d) ?? '' }));
+    try {
+      mc.provideContext({ tools: usable });
+      report({
+        convention: 'provideContext',
+        registered: usable.map((d) => d.name),
+        failed,
+      });
+    } catch (error) {
+      report({
+        convention: 'provideContext',
+        registered: [],
+        failed: descriptors.map((d) => ({
+          name: d.name,
+          reason: error instanceof Error ? error.message : String(error),
+        })),
+      });
+    }
     return () => {
       try {
         mc.provideContext?.({ tools: [] });
@@ -224,6 +412,17 @@ export function bindTools(ctx: {
     };
   }
 
+  // An object called `modelContext` that offers neither convention. Worth
+  // reporting rather than treating as absence: the page IS talking to a host,
+  // it just cannot register with it, and those need different fixes.
+  report({
+    convention: null,
+    registered: [],
+    failed: descriptors.map((d) => ({
+      name: d.name,
+      reason: 'browser exposes navigator.modelContext with no registerTool or provideContext',
+    })),
+  });
   return () => {};
 }
 

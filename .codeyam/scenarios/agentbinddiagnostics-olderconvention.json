@@ -1,0 +1,12 @@
+{
+  "name": "AgentBindDiagnostics - OlderConvention",
+  "id": "86d4bfb7-cac2-4d61-b7b3-3bbe5f0b0a32",
+  "url": "/isolated-components/AgentBindDiagnostics?s=OlderConvention",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentBindDiagnostics",
+  "scenarioType": "component",
+  "description": "The pre-March-2026 provideContext convention that the mcp-b/global polyfill still ships. Worth showing at a glance, because which convention the host offered changes what a failure means — one call replaces the whole tool set rather than registering them one at a time."
+}

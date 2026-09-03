@@ -100,6 +100,27 @@ describe('WebMcpBridge - NoAgent', () => {
     expect(screen.queryByText('No tools bound.')).toBeNull();
   });
 
+  // A tab left open across a map's deletion. The binding is intact and the
+  // browser is still attached, so every ordinary signal reads "connected" —
+  // while each registered tool answers "No such map". The first agent to meet
+  // this reported the app as broken to the person using it, which is the cost
+  // of a page that cannot tell a dead map from a dropped request.
+  it('says the map is gone when the log 404s, rather than claiming a binding', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('Not found', { status: 404 })),
+    );
+    renderBridge();
+    await waitFor(
+      () =>
+        expect(
+          screen.getByText(/this map no longer exists/i),
+        ).toBeDefined(),
+      { timeout: 4000 },
+    );
+    expect(screen.getByText('No agent attached')).toBeDefined();
+  });
+
   // With nothing outstanding, WebMcpBridge shows the trigger rather than the
   // answer block, and displays a zero count.
   it('shows nothing awaiting an answer', () => {

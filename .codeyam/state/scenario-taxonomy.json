@@ -580,7 +580,8 @@
         "status": "covered"
       },
       "many": {
-        "status": "covered"
+        "status": "n-a",
+        "reason": "The 'many' signal for this view is registered=many - many tools ACCEPTED by the browser - and WebMcpBridge mounts the real bridge, which reads that off a live WebMCP binding. A capture runs in an iframe, and WebMCP is top-level-secure-context only, so registered is structurally always empty here; no seed or fixture can change it without replacing the component under test. The state itself is demonstrated where it can be honestly staged as props: AgentToolChips - AllNine, AgentStatusPanel - BoundToPage, and AgentStatus - PanelOpen."
       },
       "loading": {
         "status": "covered"

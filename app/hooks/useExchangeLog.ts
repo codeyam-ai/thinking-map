@@ -14,6 +14,17 @@ export interface ExchangeLog {
   events: ExchangeEvent[];
   /** The map's revision as last observed. */
   revision: number | null;
+  /**
+   * The map this page is bound to no longer exists.
+   *
+   * Distinct from a failed poll on purpose. A dropped request is transient and
+   * the next tick recovers from the same cursor; a 404 is permanent, and every
+   * tool the page has registered is now bound to an id that answers "No such
+   * map". Left undistinguished, a stale tab goes on advertising nine working
+   * tools over a map that is gone — which is exactly what an agent then reports
+   * back to its person as an app failure.
+   */
+  missing: boolean;
   /** Fold in events from a write the page performed itself. */
   absorb(incoming: ExchangeEvent[]): void;
   /** Record a revision the page learned about out of band. */
@@ -42,6 +53,7 @@ export function useExchangeLog(
 ): ExchangeLog {
   const [events, setEvents] = useState<ExchangeEvent[]>(initialEvents);
   const [revision, setRevision] = useState<number | null>(serverRevision);
+  const [missing, setMissing] = useState(false);
   const router = useRouter();
 
   /** The log is append-only and revision-ordered, so a revision is the whole
@@ -68,7 +80,13 @@ export function useExchangeLog(
       try {
         const query = cursor === null ? '' : `?since=${cursor}`;
         const res = await fetch(`/api/maps/${mapId}/exchange${query}`);
-        if (!res.ok || !live) return;
+        if (!live) return;
+        // 404 is the map itself being gone, not a request that went wrong.
+        if (res.status === 404) {
+          setMissing(true);
+          return;
+        }
+        if (!res.ok) return;
         const body = (await res.json()) as {
           revision?: number;
           events?: ExchangeEvent[];
@@ -112,5 +130,5 @@ export function useExchangeLog(
     }
   }, [revision, serverRevision, router]);
 
-  return { events, revision, absorb, observeRevision };
+  return { events, revision, missing, absorb, observeRevision };
 }

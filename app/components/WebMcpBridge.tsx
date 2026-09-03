@@ -21,10 +21,15 @@ import {
 import {
   bindExchangeResource,
   bindTools,
+  onModelContextReady,
   publishAgentDriver,
+  requestUserInteraction,
   webMcpUnavailableReason,
+  type BindReport,
+  type Disposer,
 } from '@/app/lib/webmcp';
 import { toolSummaries } from '@/app/lib/toolInvocation';
+import { agentPresence, type AgentChannel } from '@/app/lib/agentPresence';
 import { readJson } from '@/app/lib/readJson';
 import { useAskUser, type PendingQuestion } from '@/app/hooks/useAskUser';
 import { useExchangeLog } from '@/app/hooks/useExchangeLog';
@@ -40,14 +45,32 @@ export type BridgeStatus = 'unavailable' | 'connected' | 'working';
 
 export interface BridgeState {
   status: BridgeStatus;
+  /** Which door the attached agent came through. `webmcp` is bound to this tab
+   *  and can be asked a question; `mcp` is working the map over HTTP and can
+   *  only read what the log tells it. Null when nobody is here. */
+  channel: AgentChannel | null;
+  /** When the log last saw the agent act, at any door. */
+  lastAgentAt: Date | null;
   /** Why no agent is attached, when that is the case. */
   reason: string | null;
+  /** The map this page is bound to has been deleted. Every registered tool now
+   *  answers "No such map", so this outranks every other presence signal. */
+  mapMissing: boolean;
   /** Questions an agent is waiting on right now. Empty when nothing is pending. */
   pending: PendingQuestion[];
   /** The tools this page exposes. Read from the catalog rather than from the
    *  published driver: a consumer's effect runs before its parent's, so
    *  reading the driver would race the very binding that creates it. */
   tools: string[];
+  /** The tools the BROWSER accepted — what an agent can actually discover.
+   *  Distinct from `tools` on purpose: the catalog is what the page offers,
+   *  this is what got through, and the gap between them was invisible until
+   *  it was given a name. Empty whenever no agent is attached. */
+  registered: string[];
+  /** Tools the browser refused, with the reason it gave. */
+  bindFailures: { name: string; reason: string }[];
+  /** Which registration convention the browser offered, if any. */
+  convention: 'registerTool' | 'provideContext' | null;
   /** The map's revision as last observed by the page. */
   revision: number | null;
   /** The log as the page knows it — what the activity rail renders. */
@@ -112,6 +135,7 @@ export function WebMcpBridge({
 }) {
   const [status, setStatus] = useState<BridgeStatus>('unavailable');
   const [reason, setReason] = useState<string | null>(null);
+  const [report, setReport] = useState<BindReport | null>(null);
 
   const log = useExchangeLog(mapId, initialEvents, initialRevision);
   const { absorb, observeRevision } = log;
@@ -173,30 +197,49 @@ export function WebMcpBridge({
         setStatus('working');
         return ask(questions, timeoutMs);
       },
-      requestUserInteraction: async <T,>(run: () => Promise<T>) => {
-        const mc = (
-          navigator as Navigator & {
-            modelContext?: {
-              requestUserInteraction?<R>(fn: () => Promise<R>): Promise<R>;
-            };
-          }
-        ).modelContext;
-        // Where the host supports it this brings the page forward, so the
-        // person actually sees the question they are being asked.
-        if (typeof mc?.requestUserInteraction === 'function') {
-          return mc.requestUserInteraction(run);
-        }
-        return run();
-      },
+      // Brings the page forward where the host supports it, so the person
+      // actually sees the question. Delegated rather than reached for directly:
+      // `webmcp.ts` is meant to be the only file that knows where the browser
+      // keeps its model context, and this was the one place that knew too.
+      requestUserInteraction: requestUserInteraction,
     };
 
     const ctx = { mapId, client };
 
-    const unavailable = webMcpUnavailableReason();
-    setReason(unavailable);
-    setStatus(unavailable ? 'unavailable' : 'connected');
+    // What the page knows before a browser agent has had a chance to appear.
+    // Not a verdict: `onModelContextReady` below revises it the moment one does.
+    setReason(webMcpUnavailableReason());
+    setStatus('unavailable');
+    setReport(null);
 
-    const disposeTools = bindTools(ctx);
+    // Binding is deferred to whenever the API exists rather than done once at
+    // mount. The agent injects `navigator.modelContext`, and in an integrated
+    // browser that regularly lands after hydration — a page that checked once
+    // would report "no browser agent" for the rest of the session.
+    let disposeTools: Disposer = () => {};
+    const stopWatching = onModelContextReady(() => {
+      const gate = webMcpUnavailableReason();
+      setReason(gate);
+      // A top-level secure page with an agent: bind, then say what the browser
+      // actually took — a registration that failed must not read as connected.
+      if (!gate) {
+        disposeTools = bindTools({
+          ...ctx,
+          onReport: (r) => {
+            setReport(r);
+            setStatus(r.registered.length > 0 ? 'connected' : 'unavailable');
+            if (r.registered.length === 0) {
+              setReason(
+                r.failed[0]
+                  ? `registration failed: ${r.failed[0].reason}`
+                  : 'the browser accepted no tools',
+              );
+            }
+          },
+        });
+      }
+    });
+
     // The headless driver is published whether or not a real agent is present:
     // in a preview or a captured scenario it is the ONLY way these tools can be
     // driven, because WebMCP is unreachable inside the capture iframe.
@@ -213,8 +256,13 @@ export function WebMcpBridge({
       },
     });
 
+    // Every map change runs this: the watcher stops, the previous map's tools
+    // are unregistered, and the next binding starts clean. Re-registering a
+    // live name throws InvalidStateError, so leaving one behind would strand
+    // the board the person navigated TO with no tools at all.
     return () => {
       settle(null);
+      stopWatching();
       disposeTools();
       disposeDriver();
       disposeResource();
@@ -223,18 +271,80 @@ export function WebMcpBridge({
 
   const tools = useMemo(() => toolSummaries().map((t) => t.name), []);
 
+  // Presence lapses on a clock, and an agent that has stopped writing produces
+  // no re-render to notice that with. The tick is what lets the page go quiet
+  // on its own instead of claiming an agent is here until something else
+  // happens to re-render it.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setTick((t) => t + 1), 15_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // The map has three doors, so presence is read off the evidence every door
+  // leaves in the log — not off this tab's binding alone, which is what made an
+  // agent working through /api/mcp invisible to the whole page.
+  const presence = useMemo(
+    () =>
+      agentPresence({
+        webMcpBound: (report?.registered.length ?? 0) > 0,
+        events: log.events,
+      }),
+    // `tick` is a dependency on purpose: it is the clock the window is measured
+    // against, and without it presence would never expire.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [report, log.events, tick],
+  );
+
+  // A map that no longer exists outranks every other signal. The tools are
+  // still registered and the browser is still bound, so every honest-looking
+  // indicator says "attached" — while each of those tools answers "No such
+  // map". A stale tab reporting nine working tools is how an agent came to
+  // report the app as broken to the person using it.
+  const effectiveStatus: BridgeStatus = log.missing
+    ? 'unavailable'
+    : status === 'working'
+      ? 'working'
+      : // `working` is this tab's own ask_user in flight, so it outranks the
+        // rest. Otherwise an agent at any door reads as connected.
+        presence.attached
+        ? 'connected'
+        : status;
+
+  const effectiveReason = log.missing
+    ? 'this map no longer exists — reload to start a new one'
+    : reason;
+
   const value = useMemo<BridgeState>(
     () => ({
-      status,
-      reason,
+      status: effectiveStatus,
+      channel: log.missing ? null : presence.channel,
+      lastAgentAt: presence.lastAgentAt,
+      reason: effectiveReason,
+      mapMissing: log.missing,
       pending,
       tools,
+      registered: report?.registered ?? [],
+      bindFailures: report?.failed ?? [],
+      convention: report?.convention ?? null,
       revision: log.revision,
       events: log.events,
       answer,
       contribute,
     }),
-    [status, reason, pending, tools, log.revision, log.events, answer, contribute],
+    [
+      effectiveStatus,
+      presence,
+      effectiveReason,
+      log.missing,
+      pending,
+      tools,
+      report,
+      log.revision,
+      log.events,
+      answer,
+      contribute,
+    ],
   );
 
   return (

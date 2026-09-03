@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusNarrative - NoAgent",
+  "id": "731f175d-186d-4794-9e51-8b53a7ed63ed",
+  "url": "/isolated-components/AgentStatusNarrative?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusNarrative",
+  "scenarioType": "component",
+  "description": "Absence with its reason, stated as a fact about the browser rather than a fault in the app — WebMCP needs a top-level secure page in a browser with an agent, and most arrivals do not have one. It then says the part that matters more: the map is fully usable without one."
+}

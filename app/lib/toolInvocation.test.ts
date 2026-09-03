@@ -3,10 +3,13 @@ import {
   answeredResponse,
   buildToolDescriptors,
   errorResponse,
+  jsonSchemaFor,
   pendingQuestions,
+  serializationProblem,
   toolSummaries,
   validateToolInput,
 } from './toolInvocation';
+import { TOOL_CATALOG, findTool } from './toolCatalog';
 
 // Everything a page-side tool call decides, with the browser and the network
 // taken out of it. Agent input is untrusted on both sides of the wire, and the
@@ -197,6 +200,51 @@ describe('buildToolDescriptors', () => {
     expect(readMap?.inputSchema).toBeDefined();
   });
 
+  // The bug this pins: descriptors used to carry the catalog's live Zod schema
+  // straight through. `registerTool` copies the descriptor across an agent
+  // boundary, so a Zod schema throws DataCloneError there — and the binding's
+  // catch swallowed it, leaving a page that claimed an attached agent and
+  // registered nothing. `toBeDefined()` above passes for a Zod schema too,
+  // which is precisely why it did not catch this.
+  it('describes every tool with a schema that survives a structured clone', () => {
+    for (const descriptor of buildToolDescriptors(noop)) {
+      expect(() => structuredClone(descriptor.inputSchema)).not.toThrow();
+    }
+  });
+
+  // Not merely cloneable — actually JSON Schema. A cloneable object of the
+  // wrong shape would register and then be uncallable, which is worse than a
+  // registration that fails loudly.
+  it('gives read_map a JSON Schema an agent can fill in', () => {
+    const readMap = buildToolDescriptors(noop).find(
+      (d) => d.name === 'read_map',
+    );
+    expect(readMap?.inputSchema).toMatchObject({
+      type: 'object',
+      properties: { sinceRevision: { type: 'integer' } },
+    });
+  });
+
+  // The check the binding runs before handing a descriptor to the browser, so
+  // a bad one is named here rather than thrown anonymously from inside Chrome.
+  it('reports no serialization problem for any catalog tool', () => {
+    for (const descriptor of buildToolDescriptors(noop)) {
+      expect([descriptor.name, serializationProblem(descriptor)]).toEqual([
+        descriptor.name,
+        null,
+      ]);
+    }
+  });
+
+  // And catches the regression if the Zod schema is ever wired back in.
+  it('names the offending field when a schema cannot be cloned', () => {
+    const bad = {
+      ...buildToolDescriptors(noop)[0],
+      inputSchema: { parse: () => {} } as unknown as Record<string, unknown>,
+    };
+    expect(serializationProblem(bad)).not.toBeNull();
+  });
+
   // Only the two read-only tools should carry annotations; attaching them
   // everywhere would tell an agent a write is safe to retry speculatively.
   it('attaches annotations only to the tools that declare them', () => {
@@ -216,6 +264,109 @@ describe('buildToolDescriptors', () => {
     await descriptors.find((d) => d.name === 'post_note')!.execute({});
     await descriptors.find((d) => d.name === 'set_phase')!.execute({});
     expect(calls).toEqual(['post_note', 'set_phase']);
+  });
+});
+
+// The conversion that is the whole reason a browser agent can see these tools
+// at all. A Zod schema is a live graph of class instances and closures, and
+// handing one across the agent boundary throws — which the binding used to
+// swallow, leaving a page that claimed an attached agent and exposed nothing.
+describe('jsonSchemaFor', () => {
+  // Plain JSON Schema, not a Zod object wearing one. This is the property the
+  // browser actually depends on.
+  it('produces a plain object schema for every catalog tool', () => {
+    for (const tool of TOOL_CATALOG) {
+      const schema = jsonSchemaFor(tool);
+      expect([tool.name, schema.type]).toEqual([tool.name, 'object']);
+      expect(typeof schema.properties).toBe('object');
+    }
+  });
+
+  // The property the descriptors are built on: whatever comes back must survive
+  // the same algorithm the browser applies on the way out.
+  it('produces a schema that survives a structured clone', () => {
+    for (const tool of TOOL_CATALOG) {
+      expect(() => structuredClone(jsonSchemaFor(tool))).not.toThrow();
+    }
+  });
+
+  // `io: 'input'` describes what the agent must SEND, which is what a tool's
+  // input schema means. The output view would encode defaults as required and
+  // demand fields the agent is not supposed to supply.
+  it('describes the input side, so defaulted fields stay optional', () => {
+    const readMap = jsonSchemaFor(findTool('read_map')!);
+    expect(readMap.required ?? []).not.toContain('sinceRevision');
+  });
+
+  // Memoized: the catalog is frozen, so re-deriving on every bind is waste, and
+  // a stable identity means a re-registration hands the browser the same object
+  // rather than a look-alike.
+  it('returns the same object on a second call for one tool', () => {
+    const tool = findTool('read_map')!;
+    expect(jsonSchemaFor(tool)).toBe(jsonSchemaFor(tool));
+  });
+
+  // Memoization keyed per tool, not one schema shared by all of them — the bug
+  // a single cached value would introduce is every tool advertising read_map's
+  // arguments.
+  it('gives different tools their own schemas', () => {
+    expect(jsonSchemaFor(findTool('read_map')!)).not.toBe(
+      jsonSchemaFor(findTool('add_nodes')!),
+    );
+  });
+});
+
+// `structuredClone` is not a proxy for this check — it IS the check, the same
+// algorithm the browser runs. What these pin is that it turns an opaque
+// DataCloneError thrown from inside Chrome into something printable.
+describe('serializationProblem', () => {
+  const execute = () => async () => ({
+    content: [{ type: 'text' as const, text: '' }],
+  });
+  const descriptor = () => buildToolDescriptors(execute)[0];
+
+  // The ordinary case: a well-formed descriptor has nothing to report, and
+  // reporting a problem here would make every binding look broken.
+  it('reports null for a well-formed descriptor', () => {
+    expect(serializationProblem(descriptor())).toBeNull();
+  });
+
+  // The original bug, caught by name. A function anywhere in the schema is
+  // exactly what a Zod object smuggles across.
+  it('reports the clone failure when the schema carries a function', () => {
+    const problem = serializationProblem({
+      ...descriptor(),
+      inputSchema: { parse: () => {} } as unknown as Record<string, unknown>,
+    });
+    expect(problem).not.toBeNull();
+    expect(problem).toMatch(/clone/i);
+  });
+
+  // A descriptor the browser would accept and an agent could not use. It clones
+  // fine, so only an explicit check catches it.
+  it('reports a missing description, which clones fine but is useless', () => {
+    expect(serializationProblem({ ...descriptor(), description: '' })).toBe(
+      'no description',
+    );
+  });
+
+  // WebMCP input schemas are object schemas. A bare string schema would be
+  // registered and then reject every call the agent made.
+  it('reports an input schema that is not an object schema', () => {
+    expect(
+      serializationProblem({ ...descriptor(), inputSchema: { type: 'string' } }),
+    ).toMatch(/not object/);
+  });
+
+  // And the degenerate version of the same, where there is no schema to inspect
+  // rather than a wrong one.
+  it('reports an input schema that is not an object at all', () => {
+    expect(
+      serializationProblem({
+        ...descriptor(),
+        inputSchema: null as unknown as Record<string, unknown>,
+      }),
+    ).toBe('input schema is not an object');
   });
 });
 
