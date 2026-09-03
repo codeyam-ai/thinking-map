@@ -1,0 +1,52 @@
+{
+  "provenAt": "2026-09-03T21:19:56Z",
+  "slug": "lint-runs-and-ci-keeps-it-running",
+  "paths": [
+    "package.json",
+    "package-lock.json",
+    "eslint.config.mjs"
+  ],
+  "runScope": [
+    "package.json",
+    "package-lock.json",
+    "eslint.config.mjs"
+  ],
+  "tests": {
+    "eslint_allows_plain_anchors_for_preview_proxy": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "eslint_config_loads": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "Re-attested: a later prove-red run (--path eslint.config.mjs, proving the three config-decision tests) legitimately recorded this test as a green-both-ways survival guard, which is correct for THAT revert but does not describe the fix this test actually pins. The fix it pins is an installed dependency VERSION (eslint-config-next 15.5.25 -> 16.3.4) living in node_modules, which no source-path revert can reach: prove-red --path package.json --path package-lock.json returned BLOCKED (no runner owns those files). Redness was established by real fault injection instead: npm install eslint-config-next@15.5.25 --no-save downgraded node_modules to the exact broken version leaving all source, including this test, untouched; the test was run; then npm install restored 16.3.4.",
+        "evidence": "WITHOUT FIX (eslint-config-next@15.5.25 installed, all source unchanged): FAIL eslint-config.test.mjs > eslint config > eslint_config_loads -- TypeError: default is not iterable at eslint.config.mjs:6:6, the '...nextVitals' spread; 1 failed (1). WITH FIX (16.3.4 restored): passes, and the full suite is 1164 passed / 0 failed. The vitest failure mode differs from the plan's predicted Node ERR_MODULE_NOT_FOUND because vite's resolver leniently resolves the extensionless subpath to the CJS file whose default export is not an array; the config fails to load either way, so the test pins the fix. Separately: the plan's specified target filename eslint.config.test.mjs was unrunnable -- vitest configDefaults.exclude contains '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*' -- and matched 0 tests until renamed to eslint-config.test.mjs."
+      }
+    },
+    "eslint_ignores_generated_codeyam_tooling": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "eslint_keeps_react_compiler_rules_as_warnings": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "eslint_keeps_react_compiler_rules_as_warnings"
+    ]
+  }
+}

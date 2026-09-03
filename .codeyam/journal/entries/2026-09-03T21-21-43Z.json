@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-09-03T21:21:43Z",
+  "title": "Lint Runs, and CI Keeps It Running",
+  "type": "feature",
+  "userRequest": "## Summary\n\n`npm run lint` has never worked in this repository. `eslint.config.mjs` imports\n`eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`, but the\ninstalled `eslint-config-next` is `15.5.25` — a package with no `exports` map,\nshipping bare `core-web-vitals.js` / `typescript.js` CJS files. Node's ESM\nresolver therefore refuses the extensionless subpath and ESLint dies with\n`ERR_MODULE_NOT_FOUND ... Did you mean to import \"eslint-config-next/core-web-vitals.js\"?`\nbefore it reads a single source file. `git log -S` shows `\"next\": \"^16\"` and\n`\"eslint-config-next\": \"^15.3.3\"` were introduced in the *same* first commit\n(`9aafd7c`), so this is not upgrade drift — the config has been unrunnable since\nline one, and nothing gates on it (the only workflow is a deploy, and\n`.codeyam/stack.json` declares no lint command).\n\nThe fix is a version bump: `eslint-config-next@16.3.4` matches the installed\n`next@16.3.4` exactly and is flat-config native. `eslint.config.mjs` itself needs\nno change — it is already written in the exact shape Next 16's own docs\nprescribe. What is unknown, and what makes this more than a one-line diff, is\nthe backlog: 463 `.ts`/`.tsx` files under `app/` have never been linted. This\nplan bumps the dependency, clears whatever surfaces, and adds a CI job so the\nnext drift fails a pull request instead of sitting undetected for the life of\nthe project.\n\n## Key Decisions\n\n- **Bump the dependency; do not touch `eslint.config.mjs`.** Next 16's ESLint\n  reference (`node_modules/next/dist/docs/01-app/03-api-reference/05-config/03-eslint.md`)\n  documents precisely the current file's imports — `defineConfig`, spread\n  `nextVitals`, `globalIgnores([\".next/**\", \"out/**\", \"build/**\", \"next-env.d.ts\"])`.\n  The config was written for 16 all along; only the pinned version is behind.\n  Changing the config to chase the 15-shaped `.js` subpaths would be fixing the\n  wrong end.\n\n- **Pin `^16.3.4` to match `next` exactly.** `eslint-config-next` ships in\n  lockstep with `next` and carries `@next/eslint-plugin-next` with it; a\n  mismatched pair is what produced this bug. The registry has stable 16.x up to\n  `16.3.4`, matching the installed `next@16.3.4`.\n\n- **Fix violations rather than baselining them.** The signals say the backlog is\n  probably modest: `tsc --noEmit` is clean, there are zero explicit `: any`\n  annotations, one `<img `, and one raw `<a href=\"/`. Nine `eslint-disable`\n  comments already exist naming the three rules the authors expected to fire\n  (`@next/next/no-img-element` ×4, `react-hooks/exhaustive-deps` ×4,\n  `@typescript-eslint/no-explicit-any` ×1). If the real count contradicts that\n  estimate, see the escape hatch in Implementation step 3.\n\n- **The nine existing disable comments are unverified.** They were written for a\n  linter that has never run, so some may suppress nothing at all. Run with\n  `--report-unused-disable-directives` and delete the ones that turn out to be\n  decorative — a disable comment that suppresses nothing is a false claim about\n  the code.\n\n- **Gate in CI on pull requests, not only on `main`.** A lint that runs only\n  after merge reports history. The existing `.github/workflows/deploy-production.yml` triggers on\n  push to `main`, which is the wrong moment and the wrong job to bolt this onto,\n  so this adds a separate workflow.\n\n- **`next lint` is not an option.** Next 16 removed the command entirely\n  (`version-16.md`: \"The `next lint` command has been removed. Use Biome or\n  ESLint directly. `next build` no longer runs linting.\"). The bare `eslint`\n  script in `package.json` is already correct.\n\n## Implementation\n\n### 1. Bump `eslint-config-next` to match `next`\n\n**File**: `package.json`\n\nIn `devDependencies`, change `\"eslint-config-next\": \"^15.3.3\"` to\n`\"eslint-config-next\": \"^16.3.4\"`. Run `npm install` so `package-lock.json`\nrecords it. Leave the `\"lint\": \"eslint\"` script as it is — it is the form Next 16\ndocuments.\n\nConfirm afterwards that `npx eslint --version` and a bare `npm run lint` get past\nconfig resolution; the failure this plan fixes happens before any file is read,\nso \"it printed violations\" is already the success signal for this step.\n\n### 2. Verify the flat config against the shipped 16 docs\n\n**File**: `eslint.config.mjs`\n\nExpected to need no edit. Diff it against the setup block in\n`node_modules/next/dist/docs/01-app/03-api-reference/05-config/03-eslint.md` and\nchange it only if 16.3.4 disagrees with the documented shape. If `typescript`\nturns out to be folded into `core-web-vitals` in 16, drop the now-redundant\nsecond import rather than keeping a duplicate rule set.\n\n### 3. Clear the backlog\n\n**Files**: the violations reported across `app/`, `mcp/`, and `scripts/`\n\nCapture the first real run's output before changing anything — it is the only\nmeasurement of the backlog that exists, and step 4's gate is meaningless until it\nis zero. Then:\n\n- Fix genuine violations. Prefer the real fix over a suppression; `next/image`\n  for the one `<img `, `next/link` for the one raw internal `<a href=\"/\">`.\n- Run once with `--report-unused-disable-directives` and delete every\n  `eslint-disable` comment that suppresses nothing.\n- For `react-hooks/exhaustive-deps` (30 `useEffect` call sites, 4 already\n  suppressed), do not add dependencies mechanically — a wrong dependency array\n  changes runtime behavior. Where a suppression is genuinely correct, keep it and\n  give it a one-line reason.\n\n**Escape hatch — report, do not improvise.** If the count is large enough that\nfixing it all would swamp this change (say, past ~50 violations or touching more\nthan ~25 files), stop and report the number and the rule breakdown rather than\neither grinding through it or silently downgrading rules to warnings. Splitting\nthe cleanup into its own plan is a decision for the user, and it needs the real\ncount to be made. Note that step 4's CI job cannot land until the tree is clean,\nso a split means this plan lands without its gate.\n\n### 4. Gate lint in CI\n\n**New file**: `.github/workflows/lint.yml`\n\nA workflow that runs on `pull_request` and on `push` to `main`, mirroring the\nconventions already in `.github/workflows/deploy-production.yml`:\nthe `checkout` and `setup-node` actions at v4 with `node-version: 24` and\n`cache: npm`, `npm ci`, then `npm run lint`.\n\nTwo details specific to this repo:\n\n- `permissions: contents: read`, as the existing workflow declares.\n- `npm ci` triggers `postinstall`, and `scripts/postinstall.mjs` already skips\n  the Playwright browser download when `CI` is set — so no extra guard is needed,\n  and the lint job will not pull a ~150MB browser.\n\nDo not add the job to the deploy workflow: that workflow is\n`push`-to-`main`-only and gated on the `production` environment, so a lint step\nthere would never see a pull request.\n\n### 5. Declare lint to codeyam (optional, if free)\n\n**File**: `.codeyam/stack.json`\n\nThe `commands` block declares `dev`, `test`, `setup`, `dbPush`, and\n`seedAdapter`, but no lint. If the editor supports a lint command there, add it\nso the codeyam loop runs the same check as CI. Skip this if no such key is\nsupported — the CI job in step 4 is the load-bearing gate, and an invented key\nin `stack.json` would be worse than the omission.\n\n## Reused existing code\n\n- `.github/workflows/deploy-production.yml` — the CI conventions the new workflow\n  copies: the `checkout` and `setup-node` actions at v4 (`node-version: 24`,\n  `cache: npm`), `npm ci`, and the `permissions: contents: read` declaration.\n- `scripts/postinstall.mjs` — `shouldSkipBrowserInstall` already returns `'CI'`\n  when `CI` is set, so the new lint job inherits the Playwright skip for free and\n  needs no workaround.\n- `eslint.config.mjs` — kept as-is; it is already the Next 16 documented shape.\n\n**Existing-implementation survey.** There is no lint gate anywhere in this\nproject today, and nothing to duplicate: `.github/workflows/` contains only\nthe deploy workflow, which has no lint step; `.codeyam/stack.json`'s\n`commands` block declares no lint entry; and `.codeyam/glossary-index.txt`\nreturns zero matches for \"lint\", so no registered helper covers this area. The\nCI job and the config test below are both genuinely new surface.\n\n## Reproduction Test\n\nPins the actual defect: the project's own ESLint flat config cannot be loaded at\nall, because the pinned `eslint-config-next` does not expose the subpaths it\nimports.\n\n**Target**: `eslint.config.test.mjs` (new) — run with\n`codeyam-editor editor refresh-tests --test eslint_config_loads`.\n\n```js\n// eslint.config.mjs loads and produces a non-empty flat config\nit('eslint_config_loads', async () => {\n  const { default: config } = await import('./eslint.config.mjs');\n\n  expect(Array.isArray(config)).toBe(true);\n  expect(config.length).toBeGreaterThan(0);\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: the dynamic\n`import()` rejects with `ERR_MODULE_NOT_FOUND`, `Cannot find module\n'/workspace/node_modules/eslint-config-next/core-web-vitals' imported from\n/workspace/eslint.config.mjs`, so the test errors before reaching the first\nassertion. After the bump it resolves and both assertions pass.\n\nThis test is worth keeping permanently rather than deleting after the fix: it is\nthe check that would have caught the mismatch in commit `9aafd7c`, it runs in\nmilliseconds, and it fails on exactly the drift that CI's `npm run lint` would\notherwise have to discover the slow way.\n\n## Scenarios to Demonstrate\n\nThis is build tooling — it renders nothing, so the demonstrations are command\noutcomes rather than app states:\n\n- `npm run lint` completes and reports violations instead of dying at config\n  resolution (the before/after that defines the fix).\n- `npm run lint` exits `0` on a clean tree, once step 3 lands.\n- The new `eslint.config.test.mjs` goes red before the bump and green after.\n- A pull request with a deliberate violation (an unescaped `<img `) fails the new\n  CI job — the gate proving itself, not just existing.\n- `npx vitest run` stays green: 1116 tests, unaffected by any of this.",
+  "description": "SCOPE VERDICT: this cycle delivered no product deliverable and deferred none. All 10 of the project's deliverables were already resolved before it began (9 delivered, 1 deferred), and the single deferral -- registering the MCP server in a client such as Claude Desktop -- carries decidedBy=user and belongs to the assist track, not this build flow. No deferral in this project was decided by the agent alone. This cycle is build tooling: it adds no product surface and closes no product deliverable, and that is its intended scope rather than an unmet one.\n\nA SIBLING LANDED THE FIRST HALF WHILE THIS SESSION WAS QUEUED. This cycle held the commit queue for 8393s, and during that wait a sibling session (fdfdf60 'make npm run lint runnable, and clear the noise it reported', plus the lockfile bump in b9fead8) implemented the same plan's first half and pushed it. The rebase surfaced genuine conflicts in eslint.config.mjs and package-lock.json, resolved by taking upstream's work as the base rather than overwriting it. What upstream already owns, and this cycle deliberately did NOT re-land: the ^16.3.4 bump; the .codeyam/** ignore; the underscore-prefix no-unused-vars convention; the prefer-const fix in depthOf; and the five no-html-link-for-pages suppressions -- which upstream placed INLINE at each site rather than in config, so this cycle dropped its own config-level 'off' to avoid rendering those five comments unused.\n\nWHAT THIS CYCLE ACTUALLY CONTRIBUTES is the half the sibling explicitly stopped short of. Their commit message ends: 'That leaves 17 React Compiler violations (react-hooks v6) ... Lint is deliberately not yet a CI gate.' It could not be one: with those 17 still errors, npm run lint exited non-zero. So (1) the three React Compiler rules -- set-state-in-effect (9 sites), refs (7), immutability (1), across 11 files -- are set to warn on the user's explicit decision. Every one of those sites is a deliberate pattern with its own written rationale (reading window after mount so a component server-renders; writing a ref during render to keep an effect's deps stable; a capture fixture patching window.fetch before the first request escapes). Warn rather than off keeps the signal for new code without blocking CI on a backlog predating the linter. (2) .github/workflows/lint.yml gates npm run lint on every pull request and on pushes to main, mirroring the repo's existing workflow conventions; postinstall already skips the Playwright download under CI. (3) An eslint staticChecks entry in .codeyam/editor.json, so verify-build runs locally what CI runs remotely -- it now reports two checks, tsc and eslint, where it reported one. (4) eslint-config.test.mjs, the first tests this config has ever had.\n\nNOTE ON CI LAYOUT. Upstream also added .github/workflows/ci.yml (type-check, test, build) on the same triggers. lint.yml sits alongside it as its own status check rather than a step inside it; folding the two together would save one npm ci per pull request and is a reasonable follow-up, but it was not done here because it would edit a freshly-landed upstream file for a marginal gain.\n\nTWO PLACES THE PLAN WAS WRONG. Its specified test target, eslint.config.test.mjs, was unrunnable: vitest's configDefaults.exclude contains '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*', so the file matched 0 tests by virtue of its own name, and was renamed to eslint-config.test.mjs. And the plan predicted an exhaustive-deps backlog across 30 useEffect sites; what actually shipped with eslint-config-next 16 was a different, newer rule family entirely.\n\nEVIDENCE, RE-MEASURED AFTER THE MERGE. Four tests, all passing; npm run lint reports 17 problems, 0 errors, exit 0. prove-red over a revert of eslint.config.mjs now reports exactly one fault-pinning test -- eslint_keeps_react_compiler_rules_as_warnings, this cycle's own contribution. eslint_ignores_generated_codeyam_tooling and eslint_allows_plain_anchors_for_preview_proxy are correctly reported as SURVIVAL GUARDS, green both ways, because the behaviour they guard now arrives from upstream rather than from this diff; they are kept so a later change cannot quietly undo it. eslint_config_loads remains AGENT-ATTESTED BY HAND and not tool-measured: the fix it pins is an installed dependency version in node_modules, which no source-path revert reaches (prove-red over package.json returned BLOCKED -- no runner owns those files). Redness was established by real fault injection: installing eslint-config-next@15.5.25 with all source untouched produced 'TypeError: default is not iterable' at eslint.config.mjs:6, and restoring 16.3.4 returned it to green. That row is a claim, not a measurement, and is recorded as such.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/editor.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/completed/lint-runs-and-ci-keeps-it-running.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/plans/lint-runs-and-ci-keeps-it-running.md\t.codeyam/plans/completed/lint-runs-and-ci-keeps-it-running.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/lint-runs-and-ci-keeps-it-running.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e25ecb1c13a1ff00d80c2a27cbe62a9bf5c3c83b8d5c0878245c4efe1aef02f6.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": ".github/workflows/lint.yml",
+      "status": "added"
+    },
+    {
+      "path": "eslint-config.test.mjs",
+      "status": "added"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/974e82e49692c8f52eb22fb5e5173f6ae46d4221f6096bc3ab393423b5e84cf5.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/afe0b172bb87a5f2a849dcb334c0afb57829981eea109b381387a195615ec3a4.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/e1bdb7b71f16a993aae7175223d5e833e4cafb70cb66e165762faed232f2d0ff.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/fb426d73873cea5d6a9c808681215fcb0ca744a2a94953a81a22ff83398b94ff.json",
+      "status": "added"
+    }
+  ],
+  "testResults": {
+    "total": 1259,
+    "passed": 1,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 1259,
+        "passed": 1
+      }
+    ]
+  }
+}

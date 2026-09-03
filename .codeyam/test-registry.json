@@ -4240,6 +4240,42 @@
       "runner": "tests"
     },
     {
+      "description": "Every internal link here is a plain `<a href=\"/\">`, and that is forced by the environment rather than chosen for convenience: the CodeYam preview proxy serves the app under a path prefix and rewrites `href` in the server HTML, so a `next/link` hydrates against a different href and warns on every scenario capture. Turning this rule back on would not improve the app — it would make a passing lint demand a change that breaks scenario captures.",
+      "file": "eslint-config.test.mjs",
+      "format": "vitest",
+      "key": "eslint config › eslint_allows_plain_anchors_for_preview_proxy",
+      "line": 65,
+      "registeredAt": "2026-09-03T18:31:05Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The flat config loads at all and yields a non-empty rule set. This project's ESLint config was unrunnable from its first commit: `next` and `eslint-config-next` were pinned to different majors in the same commit, and the 15.x package ships no `exports` map, so Node's ESM resolver refused the extensionless `eslint-config-next/core-web-vitals` subpath that `eslint.config.mjs` imports. Every `npm run lint` died with ERR_MODULE_NOT_FOUND before reading a single source file — which is why the backlog",
+      "file": "eslint-config.test.mjs",
+      "format": "vitest",
+      "key": "eslint config › eslint_config_loads",
+      "line": 20,
+      "registeredAt": "2026-09-03T18:31:05Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`.codeyam/` holds editor-generated tooling — every file carries a \"codeyam-generated — DO NOT EDIT\" header and is rewritten wholesale on the next codeyam-editor update, so a lint fix there cannot survive. It supplied 68 of the 93 problems the first working lint run reported. Without the ignore, a green tree goes red again the moment the editor regenerates.",
+      "file": "eslint-config.test.mjs",
+      "format": "vitest",
+      "key": "eslint config › eslint_ignores_generated_codeyam_tooling",
+      "line": 32,
+      "registeredAt": "2026-09-03T18:31:05Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The React Compiler rule set arrived with eslint-config-next 16 and flags 14 deliberate, individually-documented patterns across 9 files. Warnings, not \"off\", is the recorded decision: new code still gets told, but CI does not block on a backlog that predates the linter ever running. Pinned because both directions are silent regressions — promoting them to errors breaks CI on untouched code, and dropping them to \"off\" loses the signal entirely.",
+      "file": "eslint-config.test.mjs",
+      "format": "vitest",
+      "key": "eslint config › eslint_keeps_react_compiler_rules_as_warnings",
+      "line": 47,
+      "registeredAt": "2026-09-03T18:31:05Z",
+      "runner": "tests"
+    },
+    {
       "description": "The person's own idea and the agent's questions have to be distinguishable in the log, or an agent re-reading it ingests its own output as new input.",
       "file": "app/lib/evalMapFixture.test.ts",
       "format": "vitest",

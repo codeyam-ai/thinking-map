@@ -647,12 +647,12 @@
   },
   "coverageThresholds": {
     "global": {
-      "minLinePercent": 90.0
+      "minLinePercent": 90
     }
   },
   "database": null,
   "defaultScreenSize": "Tablet",
-  "deviceScaleFactor": 2.0,
+  "deviceScaleFactor": 2,
   "env": {},
   "files": {
     "eventLogMaxBytes": null,
@@ -758,6 +758,24 @@
         "**/*.tsx"
       ],
       "name": "tsc"
+    },
+    {
+      "name": "eslint",
+      "description": "ESLint (eslint-config-next flat config)",
+      "command": "npm run lint",
+      "filePatterns": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.mjs"
+      ],
+      "excludePatterns": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/build/**",
+        ".codeyam/**"
+      ]
     }
   ],
   "testCacheIgnorePatterns": [],

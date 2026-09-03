@@ -1,0 +1,41 @@
+name: Lint
+
+# Runs on pull requests so drift fails review rather than being discovered
+# after merge, and on `main` so the branch itself is never left broken.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+# A newer push supersedes a lint run still queued for the same ref; nothing
+# here touches shared state, so cancelling in flight is safe.
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # `scripts/postinstall.mjs` already skips the Playwright browser download
+      # when CI is set, so this stays a dependency install and does not pull a
+      # ~150MB browser the lint job would never launch.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint

@@ -137,3 +137,41 @@ look like mistakes and are not. Everyone taking part is expected to uphold the
 ## License
 
 [MIT](./LICENSE) © 2026 CodeYam.
+
+<!-- codeyam:scenario-gallery:start -->
+## Scenario gallery
+
+States captured as runnable scenarios with codeyam-editor:
+
+### A board with pictures, a drawn shape and a shortlist
+
+<img src=".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png" alt="A board with pictures, a drawn shape and a shortlist" width="280">
+
+### A plan with a gap - one slice proves nothing
+
+<img src=".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png" alt="A plan with a gap - one slice proves nothing" width="280">
+
+### A brief, and nobody has picked it up yet
+
+<img src=".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png" alt="A brief, and nobody has picked it up yet" width="280">
+
+### Complete - what to do next
+
+<img src=".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png" alt="Complete - what to do next" width="280">
+
+### All eight, the list expanded
+
+<img src=".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png" alt="All eight, the list expanded" width="280">
+
+### Weighing the alternatives against each other
+
+<img src=".codeyam/scenarios/screenshots/weighing-the-alternatives-against-each-other--desktop.png" alt="Weighing the alternatives against each other" width="280">
+
+### An older question, three rounds up, still open
+
+<img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
+
+### Brief attached, nothing cited yet
+
+<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
+<!-- codeyam:scenario-gallery:end -->
