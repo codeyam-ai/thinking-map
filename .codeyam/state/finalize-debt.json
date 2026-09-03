@@ -3,7 +3,14 @@
   "lastFinalizedSha": "2cefde8ed8d4e4925709b7df25142aa1a53ab557",
   "lastFullFinalizeSha": "e0430b80c5e232585df996dab89900e9a3ea1ecf",
   "lastFullFinalizeTree": "047a2c4e7eaa8088d1339a88bf71e8da77a7158d14c534c94ee3d1144a24a748",
-  "deferred": [],
+  "deferred": [
+    {
+      "sha": "b29669ccf04c6c1fa84414b5b85ee19110b958ea",
+      "shortSha": "b29669c",
+      "subject": "feat: Reach the Browser Agent, and Say What It Can Do",
+      "deferredAt": "2026-09-03T00:09:26Z"
+    }
+  ],
   "finalizeIntent": "fast",
   "finalizeIntentBranch": "feat/reach-the-browser-agent",
   "drained": {
