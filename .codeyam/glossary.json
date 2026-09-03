@@ -2121,6 +2121,12 @@
     "testFile": "app/lib/attachments.test.ts"
   },
   {
+    "description": "Formats the open-question count and exact await_user_activity cursor that keeps an agent waiting for one answer at a time.",
+    "filePath": "app/lib/mcpFormat.ts",
+    "name": "formatStandingWait",
+    "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
     "description": "Sends a page-side tool call to the tools route, where the shared runtime executes it. The page cannot run the catalog itself because every implementation ends in SQLite, so this one hop is the only difference between the page door and the two server doors.",
     "filePath": "app/lib/webmcp.ts",
     "name": "forward",
@@ -2197,7 +2203,7 @@
     }
   },
   {
-    "description": "What a map with nobody working on it says for itself, in words - pure, and pinned by tests rather than left as strings inside a component. `hasBrief` decides which tool the start prompt names. `worked` selects the demoted wording for a map an agent has already left, because 'No one is on this yet' is false there. `origin` builds both spellings of the MCP endpoint: the bare `<origin>/api/mcp` any agent puts in its connector settings, and `mcpCommand`, the `claude mcp add` shortcut - the HTTP form when the origin is known, `npm run mcp` on the server render where it is not. `attachTabs` returns the three ways in as alternatives rather than prose, ordered browser / any agent / Claude Code, with the browser tab carrying no copyable text at all because that route needs nothing pasted anywhere. `mcpCommand` stays flat beside them because HandoffReattach shows it with no tabs around it.",
+    "description": "What a map with nobody working on it says for itself, in words — pure and pinned by tests rather than left as strings inside a component. It tells an agent to use await_user_activity after writing questions; worked maps can include the latest revision so a returning agent reads answers already waiting in the log.",
     "filePath": "app/lib/handoffCopy.ts",
     "name": "handoffCopy",
     "testFile": "app/lib/handoffCopy.test.ts"
@@ -2869,6 +2875,12 @@
     "filePath": "app/lib/mcpFormat.ts",
     "name": "standingAskSentence",
     "testFile": "app/lib/mcpFormat.test.ts"
+  },
+  {
+    "description": "Reads the map after a write and returns wait-loop guidance when unanswered open questions remain.",
+    "filePath": "app/lib/toolRuntime.ts",
+    "name": "standingWait",
+    "testFile": "app/lib/insightProvenance.integration.test.ts"
   },
   {
     "description": "Starts a real PostgreSQL server as a subprocess on an ephemeral port with a temporary data directory, and translates the root-container EACCES failure on spawn initdb into a message naming the actual cause and its fix.",

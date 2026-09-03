@@ -85,8 +85,8 @@ export function attachedStartCopy({
     // in ChatGPT, and a board still showing nothing. The map is the artifact,
     // so the prompt has to say where the thinking goes.
     prompt: hasBrief
-      ? 'Read the brief with read_brief, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. Do not summarise back to me in chat — the map is the output.'
-      : 'Read the map with read_map, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. Do not summarise back to me in chat — the map is the output.',
+      ? 'Read the brief with read_brief, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. After writing questions, call await_user_activity and keep waiting: each answer is another turn, not the end. Do not summarise back to me in chat — the map is the output.'
+      : 'Read the map with read_map, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. After writing questions, call await_user_activity and keep waiting: each answer is another turn, not the end. Do not summarise back to me in chat — the map is the output.',
   };
 }
 
@@ -149,6 +149,8 @@ export interface HandoffCopyInput {
    * own map stops trusting the true ones next to it.
    */
   worked?: boolean;
+  /** The last known map revision, used to resume an agent after it detached. */
+  resumeRevision?: number | null;
   /**
    * The page's own origin, e.g. `https://example.com` — passed in rather than
    * read off `window` here, which is what keeps this module pure and testable.
@@ -168,6 +170,7 @@ export function handoffCopy({
   seedIdea,
   hasBrief,
   worked = false,
+  resumeRevision,
   origin,
 }: HandoffCopyInput): HandoffCopy {
   const firstTool = hasBrief ? 'read_brief' : 'read_map';
@@ -208,10 +211,10 @@ export function handoffCopy({
     explanation:
       'Your idea is saved. Nothing is working on it yet — a map cannot summon a thinking partner, so an agent has to come to it.',
     startPrompt: hasBrief
-      ? `Work on thinking map ${mapId}. Start with ${firstTool} to read the brief it was started from, then deconstruct it.`
+      ? `Work on thinking map ${mapId}.${worked && resumeRevision !== null && resumeRevision !== undefined ? ` Resume from revision ${resumeRevision}; answers may already be waiting in the log.` : ''} Start with ${firstTool} to read the brief it was started from, then deconstruct it. After writing questions, call await_user_activity and keep waiting for each answer rather than ending your turn.`
       : `Work on thinking map ${mapId}${
           idea ? ` — "${idea}"` : ''
-        }. Start with ${firstTool}, then deconstruct the idea.`,
+        }.${worked && resumeRevision !== null && resumeRevision !== undefined ? ` Resume from revision ${resumeRevision}; answers may already be waiting in the log.` : ''} Start with ${firstTool}, then deconstruct the idea. After writing questions, call await_user_activity and keep waiting for each answer rather than ending your turn.`,
     // The payoff, once, above the tabs. It used to also carry the two doors and
     // their caveats in the same breath, which is what made the panel read as a
     // wall — the doors are alternatives, so they belong in tabs where a reader

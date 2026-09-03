@@ -218,6 +218,32 @@ describe('handoffCopy', () => {
     expect(copy.startPrompt).toContain(MAP_ID);
   });
 
+  // A returning agent needs a cursor that includes the person's unread work,
+  // otherwise it starts again from an earlier state and misses their answers.
+  it('puts the known revision in a worked map resume prompt', () => {
+    const copy = handoffCopy({
+      mapId: MAP_ID,
+      hasBrief: false,
+      worked: true,
+      resumeRevision: 29,
+    });
+    expect(copy.startPrompt).toContain('Resume from revision 29');
+    expect(copy.startPrompt).toContain('answers may already be waiting');
+  });
+
+  // Both entry points start an agent turn, so both must explicitly tell it to
+  // wait after writing questions rather than treating the first turn as done.
+  it('tells the agent to keep waiting after it writes questions', () => {
+    for (const hasBrief of [true, false]) {
+      expect(handoffCopy({ mapId: MAP_ID, hasBrief }).startPrompt).toContain(
+        'await_user_activity',
+      );
+      expect(attachedStartCopy({ hasBrief }).prompt).toContain(
+        'await_user_activity',
+      );
+    }
+  });
+
   // Every field renders directly; an empty one would be a blank row in the card.
   // `steps` is an array, so check the strings inside it rather than only its
   // length — two empty steps would pass a length check and render two blank

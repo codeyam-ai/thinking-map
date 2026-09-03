@@ -349,7 +349,7 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     name: 'await_user_activity',
     title: 'Wait for the person to do something',
     description:
-      'Block until the person contributes to the map, then return what they did. Use this instead of polling read_map in a loop when you have nothing to do but wait. Bounded: on expiry you get timedOut true and the cursor to resume from.',
+      'Block until the person contributes to the map, then return what they did. Use this instead of polling read_map in a loop when you have nothing to do but wait. After each answer, handle it and call this again while open questions remain. Bounded: on expiry you get timedOut true and the cursor to resume from.',
     inputSchema: z.object({
       sinceRevision: z.number().int(),
       timeoutSeconds: z.number().int().optional(),
@@ -364,7 +364,7 @@ export function findTool(name: string): ToolSpec | undefined {
 
 /** Default patience for the two waiting tools, and the ceiling on it. A cap
  *  exists so a confused agent cannot pin a connection open indefinitely. */
-export const DEFAULT_TIMEOUT_SECONDS = 30;
+export const DEFAULT_TIMEOUT_SECONDS = 300;
 export const MAX_TIMEOUT_SECONDS = 600;
 
 export function timeoutMsFrom(seconds: number | undefined): number {

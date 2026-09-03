@@ -91,6 +91,7 @@ export default function AgentHandoff({
     seedIdea,
     hasBrief,
     worked: workedByAgent,
+    resumeRevision: bridge?.revision,
     origin,
   });
 

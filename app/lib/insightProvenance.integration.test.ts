@@ -207,3 +207,24 @@ describe('read_map carries the standing ask', () => {
     expect(out.structured!.insights).toMatchObject({ live: 0, answersSinceNewest: 0 });
   });
 });
+
+describe('post-write wait guidance', () => {
+  // add_nodes is the common batch write that creates open questions, so its
+  // reply must immediately put the agent into the answer-by-answer wait loop.
+  it('sends the agent to await activity after adding an open question', async () => {
+    const id = await freshMap();
+    const out = await toolRuntime.runTool(
+      'add_nodes',
+      {
+        nodes: [
+          { ref: 'q1', kind: 'open-question', label: 'Who is this for?', status: 'open' },
+        ],
+      },
+      { mapId: id, origin: 'agent' },
+    );
+    const text = textOf(out);
+    expect(text).toContain('1 question on this map is still open');
+    expect(text).toContain('await_user_activity');
+    expect(text).toMatch(/sinceRevision: \d+/);
+  });
+});

@@ -4573,6 +4573,33 @@
       "runner": "tests"
     },
     {
+      "description": "Non-question nodes may be open for their own workflow reasons; they must not make an agent wait for an answer nobody owes.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatStandingWait › ignores open nodes that are not questions",
+      "line": 278,
+      "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Open questions are the contract: the reply must tell an agent exactly how to park itself until the person supplies the missing context.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatStandingWait › names the open-question count and the revision to wait from",
+      "line": 253,
+      "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Once everything is answered there is nothing to wait for, and an added instruction would wrongly prevent the agent from moving the map forward.",
+      "file": "app/lib/mcpFormat.test.ts",
+      "format": "vitest",
+      "key": "formatStandingWait › returns no guidance when every question is answered",
+      "line": 270,
+      "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
       "description": "The log speaks the contract's language, not the column's. A reader of the exchange log should learn what an insight came out of without having to know that SQLite made it a string.",
       "file": "app/lib/insightProvenance.integration.test.ts",
       "format": "vitest",
@@ -4960,6 +4987,15 @@
       "runner": "tests"
     },
     {
+      "description": "A returning agent needs a cursor that includes the person's unread work, otherwise it starts again from an earlier state and misses their answers.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › puts the known revision in a worked map resume prompt",
+      "line": 223,
+      "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
       "description": "The person's own words carry the context an agent needs, so a sentence-map prompt should hand them over rather than making the agent go and look.",
       "file": "app/lib/handoffCopy.test.ts",
       "format": "vitest",
@@ -5002,6 +5038,15 @@
       "key": "handoffCopy › still names the map in the worked variant’s prompt",
       "line": 216,
       "registeredAt": "2026-09-02T13:54:01Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Both entry points start an agent turn, so both must explicitly tell it to wait after writing questions rather than treating the first turn as done.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "handoffCopy › tells the agent to keep waiting after it writes questions",
+      "line": 236,
+      "registeredAt": "2026-09-03T11:12:59Z",
       "runner": "tests"
     },
     {
@@ -7156,6 +7201,15 @@
       "runner": "tests"
     },
     {
+      "description": "add_nodes is the common batch write that creates open questions, so its reply must immediately put the agent into the answer-by-answer wait loop.",
+      "file": "app/lib/insightProvenance.integration.test.ts",
+      "format": "vitest",
+      "key": "post-write wait guidance › sends the agent to await activity after adding an open question",
+      "line": 225,
+      "registeredAt": "2026-09-03T11:12:59Z",
+      "runner": "tests"
+    },
+    {
       "description": "A disposer from a previous map must not delete the driver a newer binding has already published, or the current page loses its tools.",
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
@@ -8800,6 +8854,15 @@
       "key": "timeoutMsFrom › uses the agent’s timeout when it is reasonable",
       "line": 79,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Five minutes is long enough for a thoughtful answer and remains below the hard cap that protects the server from an indefinitely parked connection.",
+      "file": "app/lib/toolCatalog.test.ts",
+      "format": "vitest",
+      "key": "timeoutMsFrom › waits five minutes by default",
+      "line": 80,
+      "registeredAt": "2026-09-03T11:12:59Z",
       "runner": "tests"
     },
     {

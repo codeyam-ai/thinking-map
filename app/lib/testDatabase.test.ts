@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { schemaUrl, uniqueSchemaName } from './testDatabase';
+import { needsPostgresUser, schemaUrl, uniqueSchemaName } from './testDatabase';
 
 // The two pure halves of the test-database helper. Everything else in that
 // module needs a real PostgreSQL to say anything, which is exactly why these
@@ -7,6 +7,12 @@ import { schemaUrl, uniqueSchemaName } from './testDatabase';
 // lives, and they can be pinned without one.
 
 describe('uniqueSchemaName', () => {
+  // OS-user creation requires administrator privileges, so regular developer
+  // runs must start Postgres as the account already running the test process.
+  it('only asks Embedded Postgres to create an OS user when running as root', () => {
+    expect(needsPostgresUser()).toBe(process.getuid?.() === 0);
+  });
+
   // The fixed `test_` prefix is what makes a stray schema identifiable as test
   // debris on a database that may also hold someone's real data.
   it('prefixes the label so test schemas are recognisable on a shared server', () => {

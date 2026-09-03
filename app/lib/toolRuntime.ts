@@ -13,7 +13,7 @@ import { applyToolCalls, getAttachment, getBrief, getMap } from './mapStore';
 import { attachmentNotFound, attachmentToolResult } from './attachmentTool';
 import { splitIntoSections } from './briefSections';
 import { computeBriefCoverage } from './briefCoverage';
-import { formatInsightStanding, formatMapDetail } from './mcpFormat';
+import { formatInsightStanding, formatMapDetail, formatStandingWait } from './mcpFormat';
 import {
   TARGET_LIVE_INSIGHTS,
   insightStream,
@@ -50,6 +50,13 @@ function standing(stream: InsightStream) {
     answersSinceNewest: stream.answersSinceNewest,
     target: TARGET_LIVE_INSIGHTS,
   };
+}
+
+/** Read the post-write map because tool replies are the only place an agent
+ * can be told it owes the person a wait. */
+async function standingWait(mapId: string, revision: number): Promise<string> {
+  const map = await getMap(mapId);
+  return formatStandingWait(map?.nodes ?? [], revision);
 }
 
 /** One question as `ask_user` accepts it: the bare string it has always taken,
@@ -107,6 +114,7 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     // ref, and without the real ids it could only attach nodes to them inside
     // the same call.
     const opened = result.events.filter((e) => e.kind === 'theme.added');
+    const wait = await standingWait(ctx.mapId, result.revision);
     return {
       text:
         `Opened ${opened.length} theme(s): ` +
@@ -116,7 +124,7 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
             return `${p.label} (${p.id})`;
           })
           .join(', ') +
-        `. The map is now at revision ${result.revision}.`,
+        `. The map is now at revision ${result.revision}.${wait ? `\n\n${wait}` : ''}`,
       structured: { revision: result.revision, themes: opened.map((e) => e.payload) },
     };
   },
@@ -233,8 +241,9 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
         structured: { revision: result.revision, deduped: true },
       };
     }
+    const wait = await standingWait(ctx.mapId, result.revision);
     return {
-      text: `Added ${result.events.length} node(s). The map is now at revision ${result.revision}.`,
+      text: `Added ${result.events.length} node(s). The map is now at revision ${result.revision}.${wait ? `\n\n${wait}` : ''}`,
       structured: { revision: result.revision, added: result.events.length },
     };
   },
@@ -316,8 +325,9 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
         ? ' End this map on a build sequence, not just a to-do list: add "slice" nodes for the smallest increments worth building, smallest first, each naming with `tests` the assumption, risk, or open question it would settle. If an increment settles nothing, add it without `tests` rather than picking the nearest node — it will be shown as proving nothing, which is the honest answer. Put its rough effort in `detail`, in your own words.'
         : '';
 
+    const wait = await standingWait(ctx.mapId, result.revision);
     return {
-      text: `The map is now in the ${input.phase} phase, at revision ${result.revision}.${guidance}`,
+      text: `The map is now in the ${input.phase} phase, at revision ${result.revision}.${guidance}${wait ? `\n\n${wait}` : ''}`,
       structured: { revision: result.revision, phase: input.phase },
     };
   },
@@ -326,8 +336,9 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     const result = await recordEvents(ctx.mapId, [
       { kind: 'agent.note', origin: ctx.origin, payload: { text: input.text } },
     ]);
+    const wait = await standingWait(ctx.mapId, result.revision);
     return {
-      text: `Noted. The map is now at revision ${result.revision}.`,
+      text: `Noted. The map is now at revision ${result.revision}.${wait ? `\n\n${wait}` : ''}`,
       structured: { revision: result.revision },
     };
   },
@@ -433,7 +444,7 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     );
     if (result.timedOut) {
       return {
-        text: `Nothing from them yet. The map is still at revision ${result.revision} — wait again from there, or carry on.`,
+        text: `Nothing from them yet. The map is still at revision ${result.revision}. Call await_user_activity again with sinceRevision: ${result.revision} to keep waiting.`,
         structured: {
           timedOut: true,
           revision: result.revision,
@@ -441,8 +452,9 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
         },
       };
     }
+    const wait = await standingWait(ctx.mapId, result.revision);
     return {
-      text: `They did this:\n${renderEvents(result.events)}\n\nThe map is at revision ${result.revision}.`,
+      text: `They did this:\n${renderEvents(result.events)}\n\nThe map is at revision ${result.revision}.${wait ? `\n\n${wait}` : ''}`,
       structured: {
         timedOut: false,
         revision: result.revision,

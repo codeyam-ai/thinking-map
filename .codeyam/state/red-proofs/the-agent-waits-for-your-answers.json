@@ -1,0 +1,25 @@
+{
+  "provenAt": "2026-09-03T11:59:02Z",
+  "slug": "the-agent-waits-for-your-answers",
+  "paths": [
+    "app/lib/handoffCopy.ts"
+  ],
+  "runScope": [
+    "app/lib/handoffCopy.ts"
+  ],
+  "tests": {
+    "handoffCopy › tells the agent to keep waiting after it writes questions": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "handoffCopy › tells the agent to keep waiting after it writes questions"
+    ]
+  }
+}

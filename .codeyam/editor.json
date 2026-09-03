@@ -682,7 +682,7 @@
   "port": 3000,
   "projectDescription": "A conversational AI tool that helps people turn vague ideas and problems into clear, structured, actionable plans. It will need to be an MCP",
   "projectTitle": "Thinking Map",
-  "provider": "claude",
+  "provider": "codex",
   "proxy": {
     "controlPort": 14303,
     "dbPort": 14205,

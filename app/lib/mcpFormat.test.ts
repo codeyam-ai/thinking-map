@@ -5,6 +5,7 @@ import {
   formatMapDetail,
   formatMapList,
   formatNewMaps,
+  formatStandingWait,
   standingAskSentence,
 } from './mcpFormat';
 import {
@@ -243,6 +244,39 @@ describe('standingAskSentence', () => {
     const out = standingAskSentence();
     expect(out).toContain('fromRefs');
     expect(out).toContain('small enough to actually run');
+  });
+});
+
+describe('formatStandingWait', () => {
+  // Open questions are the contract: the reply must tell an agent exactly how
+  // to park itself until the person supplies the missing context.
+  it('names the open-question count and the revision to wait from', () => {
+    const out = formatStandingWait(
+      [
+        { kind: 'open-question', status: 'open' },
+        { kind: 'open-question', status: 'asked' },
+        { kind: 'idea', status: 'open' },
+      ],
+      17,
+    );
+    expect(out).toContain('2 questions');
+    expect(out).toContain('await_user_activity');
+    expect(out).toContain('sinceRevision: 17');
+    expect(out).toContain('timeoutSeconds: 300');
+  });
+
+  // Once everything is answered there is nothing to wait for, and an added
+  // instruction would wrongly prevent the agent from moving the map forward.
+  it('returns no guidance when every question is answered', () => {
+    expect(
+      formatStandingWait([{ kind: 'open-question', status: 'answered' }], 4),
+    ).toBe('');
+  });
+
+  // Non-question nodes may be open for their own workflow reasons; they must
+  // not make an agent wait for an answer nobody owes.
+  it('ignores open nodes that are not questions', () => {
+    expect(formatStandingWait([{ kind: 'idea', status: 'open' }], 4)).toBe('');
   });
 });
 

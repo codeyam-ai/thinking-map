@@ -51,6 +51,15 @@ type EmbeddedServer = {
 
 let serverPromise: Promise<EmbeddedServer> | null = null;
 
+/**
+ * PostgreSQL refuses to run as root. Embedded Postgres can create a temporary
+ * unprivileged account for that unusual case, but asking it to do so on a
+ * normal developer machine needlessly depends on OS account administration.
+ */
+export function needsPostgresUser(): boolean {
+  return process.getuid?.() === 0;
+}
+
 /** An unused localhost port, claimed by binding to port 0 and reading it back. */
 async function freePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -84,9 +93,10 @@ async function startEmbeddedPostgres(): Promise<EmbeddedServer> {
     user: 'postgres',
     password: 'postgres',
     port,
-    // Postgres refuses to run as root. CI containers usually are root, so ask
-    // the package to create an unprivileged user and drop to it.
-    createPostgresUser: true,
+    // Postgres refuses to run as root. Only ask the package to create an
+    // unprivileged user in that case: on developer machines it otherwise
+    // relies on OS account creation and can fail before Postgres starts.
+    createPostgresUser: needsPostgresUser(),
     // The cluster is disposable; do not leave one behind between runs.
     persistent: false,
   });

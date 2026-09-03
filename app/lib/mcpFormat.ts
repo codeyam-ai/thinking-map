@@ -207,6 +207,28 @@ export function formatInsightStanding(stream: InsightStream): string {
 }
 
 /**
+ * The same steering channel as the standing insight ask, applied to questions
+ * that need a person's answer. A page cannot wake an agent, so a write that
+ * leaves questions open must explicitly send the agent into the wait loop.
+ */
+export function formatStandingWait(
+  nodes: readonly { kind: string; status: string }[],
+  revision: number,
+): string {
+  const open = nodes.filter(
+    (node) => node.kind === 'open-question' && node.status !== 'answered',
+  ).length;
+  if (open === 0) return '';
+
+  return [
+    `## Waiting for answers`,
+    `${open} question${open === 1 ? '' : 's'} on this map ${open === 1 ? 'is' : 'are'} still open.`,
+    `Call await_user_activity with sinceRevision: ${revision} and timeoutSeconds: 300.`,
+    'It returns as soon as one answer lands; handle that answer, then call it again while questions remain open rather than ending your turn.',
+  ].join('\n');
+}
+
+/**
  * Render one map in full for an MCP client: the seed idea kept verbatim, the
  * conversation, and the node tree. The two views are shown together because
  * they are two renderings of the same thinking.

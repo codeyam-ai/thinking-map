@@ -75,6 +75,12 @@ describe('timeoutMsFrom', () => {
     expect(timeoutMsFrom(undefined)).toBe(DEFAULT_TIMEOUT_SECONDS * 1000);
   });
 
+  // Five minutes is long enough for a thoughtful answer and remains below the
+  // hard cap that protects the server from an indefinitely parked connection.
+  it('waits five minutes by default', () => {
+    expect(DEFAULT_TIMEOUT_SECONDS).toBe(300);
+  });
+
   // An agent that knows its own patience should get exactly what it asked for.
   it('uses the agent’s timeout when it is reasonable', () => {
     expect(timeoutMsFrom(45)).toBe(45_000);
