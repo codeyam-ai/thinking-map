@@ -2737,6 +2737,42 @@
       "runner": "tests"
     },
     {
+      "description": "Everything after `--` on the npm command line has to reach the CLI, or `--model` is dropped and the run charges the wrong provider.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "browserEvalArgs › forwards the caller arguments",
+      "line": 51,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`-u` pointing anywhere but the seeded map produces \"0 tools registered on page\", which reads as a WebMCP fault rather than a wrong URL — so the flag pairing is worth pinning even though it looks obvious.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "browserEvalArgs › points the CLI at the target page and the suite file",
+      "line": 34,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Ordering, not merely presence: commander takes the LAST occurrence of a repeated option, so a caller's `--backend gemini` only wins if the forwarded arguments come after the defaults.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "browserEvalArgs › puts caller arguments last so they override the defaults",
+      "line": 66,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Omitting this does not fail — it silently changes which model driver runs, and the run still completes with different results.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "browserEvalArgs › selects the vercel backend by default",
+      "line": 44,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
       "description": "The state the feature exists to make visible: work scheduled early that tests no assumption. It is reported, never filtered out.",
       "file": "app/lib/buildSequence.test.ts",
       "format": "vitest",
@@ -4204,6 +4240,105 @@
       "runner": "tests"
     },
     {
+      "description": "The person's own idea and the agent's questions have to be distinguishable in the log, or an agent re-reading it ingests its own output as new input.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapEvents › attributes the seed idea to the person and the questions to the agent",
+      "line": 103,
+      "registeredAt": "2026-09-03T17:35:28.391891578+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The log is what an agent reads to learn what it missed. Events carrying no node id would render as bare kinds naming nothing.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapEvents › carries the node each question event refers to",
+      "line": 92,
+      "registeredAt": "2026-09-03T17:35:28.391891578+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "`recordEvents` numbers each NEW event from the map's `revision` column, so a log that did not start at 1 or skipped a number would collide with, or leave a hole before, the first event a tool writes.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapEvents › numbers revisions from one, gaplessly",
+      "line": 76,
+      "registeredAt": "2026-09-03T17:35:28.391891578+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The seeder sets the map's revision column to this count. If the two ever disagreed, the agent's first cursor would skip or repeat history — the exact failure writing the log at all is meant to prevent.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapEvents › produces one event per seeded row so the map revision can match",
+      "line": 84,
+      "registeredAt": "2026-09-03T17:35:28.391891578+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "`formatStandingWait` branches on the count for its wording. The plural is what an agent meets on a real board, so trimming the fixture to one question would quietly test a branch the product rarely shows.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapFixture › carries enough open questions to reach the plural wording",
+      "line": 39,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Guards the assertion above from passing for the wrong reason: a root node that accidentally counted as an open question would inflate the total the plural test checks.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapFixture › hangs the questions off a root that is not itself counted",
+      "line": 53,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The load-bearing property. An empty standing wait means the agent is never told to wait, so the eval case would fail with nothing wrong in the product.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapFixture › produces a non-empty standing wait",
+      "line": 18,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The eval case asserts the agent calls `await_user_activity` with a numeric `sinceRevision`. If the sentence stopped naming either, the case would be asserting behaviour the app no longer asks for.",
+      "file": "app/lib/evalMapFixture.test.ts",
+      "format": "vitest",
+      "key": "evalMapFixture › tells the agent to call await_user_activity with the map revision",
+      "line": 26,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The name is interpolated into a DROP SCHEMA statement. Hex cannot carry a quote, so the identifier is safe by construction — this pins that the default really is hex and not something looser.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "evalSchemaName › defaults to a suffix that cannot break a SQL identifier",
+      "line": 19,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Two runs at once must not share a schema: the second would push into the first's tables and the first's teardown would drop the second's data.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "evalSchemaName › does not repeat itself between runs",
+      "line": 25,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A stray schema on a shared server has to be identifiable as eval debris rather than someone's data. Same argument `uniqueSchemaName` makes for its own prefix.",
+      "file": "app/lib/browserEvalRun.test.ts",
+      "format": "vitest",
+      "key": "evalSchemaName › prefixes the schema so eval debris is recognisable",
+      "line": 12,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
       "description": "add_nodes builds its description by interpolating the insight kinds and the live-insight target, so an emitter that read some static field instead of the composed string would quietly ship a fixture missing the sentence that teaches the distinction.",
       "file": "scripts/toolSchemaFile.test.ts",
       "format": "vitest",
@@ -5020,6 +5155,24 @@
       "key": "formatStandingWait › sends the agent to chat to say what it did and what is needed",
       "line": 282,
       "registeredAt": "2026-09-03T15:56:38.631769+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Two calls landing on one port would mean the probe socket was never really released — the failure that would silently collide two servers started back to back.",
+      "file": "app/lib/freePort.test.ts",
+      "format": "vitest",
+      "key": "freePort › does not hand out the same port twice in a row",
+      "line": 36,
+      "registeredAt": "2026-09-03T17:30:19Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The contract all three callers depend on. A number in the right range would satisfy a shape assertion while naming a port something else already holds, so the proof that the port is usable is using it.",
+      "file": "app/lib/freePort.test.ts",
+      "format": "vitest",
+      "key": "freePort › returns a port that can actually be bound",
+      "line": 14,
+      "registeredAt": "2026-09-03T17:30:19Z",
       "runner": "tests"
     },
     {

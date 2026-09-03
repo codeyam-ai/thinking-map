@@ -13,6 +13,10 @@
 
 # next.js
 /.next/
+# The build directory the browser eval run uses instead of `.next`, so that an
+# eval run and a `npm run dev` you already have open cannot corrupt each
+# other's output. See `distDir` in next.config.ts.
+/.next-evals/
 /out/
 
 # production

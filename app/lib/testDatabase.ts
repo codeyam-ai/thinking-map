@@ -36,13 +36,12 @@
 // leaves at most one stray schema behind on a database that is thrown away
 // anyway.
 
-import { execFileSync } from 'node:child_process';
-import { createServer } from 'node:net';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { Client } from 'pg';
+import { freePort } from './freePort';
+import { dropSchema, pushSchema } from './schemaLifecycle';
 
 type EmbeddedServer = {
   url: string;
@@ -60,32 +59,13 @@ export function needsPostgresUser(): boolean {
   return process.getuid?.() === 0;
 }
 
-/** An unused localhost port, claimed by binding to port 0 and reading it back. */
-async function freePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.unref();
-    server.on('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address();
-      if (address === null || typeof address === 'string') {
-        server.close();
-        reject(new Error('could not determine a free port for the test database'));
-        return;
-      }
-      const { port } = address;
-      server.close(() => resolve(port));
-    });
-  });
-}
-
 async function startEmbeddedPostgres(): Promise<EmbeddedServer> {
   // Imported lazily so that setting TEST_DATABASE_URL avoids loading the
   // package — and, more usefully, so a machine with no embedded-postgres
   // binary for its platform can still run the suite against its own database.
   const { default: EmbeddedPostgres } = await import('embedded-postgres');
 
-  const port = await freePort();
+  const port = await freePort('test database');
   const dataDir = mkdtempSync(path.join(tmpdir(), 'codeyam-testdb-'));
 
   const server = new EmbeddedPostgres({
@@ -221,37 +201,3 @@ export function schemaUrl(base: string, schema: string): string {
   return parsed.toString();
 }
 
-/** Create the schema and the app's tables inside it. */
-function pushSchema(url: string): void {
-  // `--url` rather than the env alone: this Prisma reads its datasource from
-  // prisma.config.ts, so DATABASE_URL by itself would push to the dev database.
-  // `db push` creates the schema when it is missing.
-  try {
-    execFileSync('npx', ['prisma', 'db', 'push', '--url', url], {
-      env: { ...process.env, DATABASE_URL: url },
-      stdio: 'pipe',
-    });
-  } catch (err) {
-    // Never swallow the push output. Without this the failure surfaces as an
-    // opaque `beforeAll` throw and the real Prisma error — the one naming the
-    // broken model or the unreachable host — is lost.
-    const e = err as { stderr?: Buffer; stdout?: Buffer };
-    throw new Error(
-      `prisma db push failed:\n${e.stderr?.toString() ?? ''}${e.stdout?.toString() ?? ''}`,
-    );
-  }
-}
-
-/** Remove the schema and everything in it. */
-async function dropSchema(base: string, schema: string): Promise<void> {
-  const client = new Client({ connectionString: base });
-  await client.connect();
-  try {
-    // The identifier is ours — `uniqueSchemaName` has already reduced it to
-    // `[a-z0-9_]` — but quote it anyway so this can never become an injection
-    // site if that ever loosens.
-    await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
-  } finally {
-    await client.end();
-  }
-}

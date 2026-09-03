@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-09-03T18:05:53Z",
+  "title": "The Standing Wait Is Proved Against A Live Map",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe most recent behavioural fix in this repo — \"The Agent Waits For Your\nAnswers\" — has no test. It could not have one: the fix was not code, it was\nwords, and the words live in tool *reply* text rather than tool descriptions.\n`formatStandingWait` in `app/lib/mcpFormat.ts` counts the open questions on a\nmap and appends \"Call await_user_activity with sinceRevision: N\" to what the\nagent reads after every write. That sentence only exists when a tool genuinely\nexecutes against a real map with real open questions, which is precisely why the\nlocal-mode suite from the prerequisite plan cannot reach it.\n\nThis plan adds a second, smaller eval run in **browser mode**: the eval CLI\ndrives a real Chrome against a running dev server on a seeded map, the WebMCP\nbinding registers the real catalog, tools execute for real, and the assertion is\nthat the agent calls `await_user_activity` after writing questions instead of\nending its turn. It is the only way to prove that a fix made entirely of prose\nstays fixed.\n\n## Key Decisions\n\n- **Browser mode, because the steering is in the reply.** Local mode shows the\n  model a static schema and never calls `execute`, so `formatStandingWait` never\n  runs and the sentence under test is never produced. Smoke mode executes tools\n  but uses no model, so it cannot judge what the agent does next. Only browser\n  mode has both halves.\n- **A dedicated seeded map, created and torn down by the eval run.** The tools\n  write to SQLite. Pointing an eval at a map that matters would corrupt it, and\n  pointing it at a fresh map per run keeps the assertion about open-question\n  count deterministic. The seed script creates the map, prints its id, and the\n  run targets `/map/<id>`.\n- **Seed through the same Prisma adapter pattern as `prisma/seed.ts`.** That\n  file's header is explicit that `new PrismaClient()` without the\n  `PrismaBetterSqlite3` adapter is wrong under Prisma 7. The eval seeder is a\n  second standalone entry point and has to follow the identical pattern,\n  including the `loadEnv` import before any env read.\n- **Never run against `dev.db`.** Point `DATABASE_URL` at a throwaway file for\n  the eval run. The README already states the production database starts empty\n  by design; an eval that leaves maps behind quietly breaks that property.\n- **A bounded, short timeout on the blocking tools.** `ask_user` and\n  `await_user_activity` block by design and return `pending` / `timedOut` on\n  expiry rather than failing. The eval passes a small `timeoutSeconds` so the\n  run cannot wedge — the assertion is that the call is MADE, not that a person\n  answers it.\n- **This is a separate plan, not part of the local suite.** It needs a running\n  server, a seeded database, a real Chrome, and DB isolation — none of which the\n  local suite needs. Merging them would hold a cheap, already-useful suite behind\n  infrastructure, and would make one plan that needs \"and also\" to describe.\n- **One case, deliberately.** Browser runs are slow and expensive. This plan\n  buys exactly the regression the repo has already been bitten by once; more\n  cases can follow once the harness is proven.\n\n## Implementation\n\n### 1. Seed a disposable map with open questions\n\n**New file**: `scripts/seed-eval-map.ts`\n\nCreates a map in the phase where questions have been asked, with a known number\nof `open-question` nodes at `status: \"open\"`, then prints the map id to stdout so\nthe run script can build the URL. Follows `prisma/seed.ts` exactly on the adapter\nand the `loadEnv` import; takes `DATABASE_URL` from the environment so the caller\ndecides which database it lands in.\n\nThe node shape must match what `formatStandingWait` actually counts — nodes of\nkind `open-question` whose status is not `answered`. Seeding anything else\nproduces an empty standing-wait sentence and a test that passes for the wrong\nreason. Confirm empirically at execution that the seeded map really does yield a\nnon-empty `formatStandingWait` before trusting the fixture.\n\n### 2. The standing-wait eval case\n\n**New file**: `evals/suites/standing-wait.json`\n\nOne case. The user message asks for the map to be taken forward; the expected\ncall sequence is `add_nodes` (or `read_map` then `add_nodes`) followed by\n`await_user_activity` carrying a numeric `sinceRevision`. Express the tail as an\n`ordered` constraint with `$type: number` on `sinceRevision` — the point is that\nthe agent parks itself, not which revision it happens to name.\n\nA second assertion worth encoding in the same case: `await_user_activity` is\ncalled rather than the turn ending. If the CLI cannot express \"and then stop\" as\na negative, express it as the ordered pair and let the absence of the second call\nbe the failure.\n\n### 3. Wire up the run\n\n**File**: `package.json`\n\nAn `evals:browser` script that seeds the throwaway database, starts the dev\nserver, and runs `webmcp-evals browser -u <url> -e evals/suites/standing-wait.json\n--backend vercel`. Keep it a single entry point so nobody has to remember the\nthree-step dance, and make it clean up the throwaway database afterwards.\n\nNote that `npm run dev` binds `-H 127.0.0.1` — the eval URL must use that host,\nnot `localhost`, if the two ever resolve differently on the runner.\n\n### 4. Extend the eval documentation\n\n**File** (created by the prerequisite plan `tool-descriptions-get-an-eval-suite`): `evals/README.md`\n\nSection on browser mode: what it needs that local mode does not (Chrome, a\nserver, a database), why the standing-wait case can only live here, and an\nexplicit warning never to point it at `dev.db`.\n\n## Reused existing code\n\n- `formatStandingWait` from `app/lib/mcpFormat.ts` — the exact behaviour under\n  test. The eval asserts the agent obeys the sentence this function emits.\n- `standingAskSentence` from `app/lib/mcpFormat.ts` — the established precedent\n  for steering through tool-reply text; named so the eval's framing matches the\n  mechanism the app already documents.\n- `TOOL_CATALOG` from `app/lib/toolCatalog.ts` — registered for real by the page\n  binding in browser mode, so no schema file is involved on this path.\n- `bindTools` from `app/lib/webmcp.ts` (glossary entry: `bindTools`, covered by\n  `app/lib/webmcp.test.ts`) — the registration the eval depends on succeeding in\n  a real browser. If a browser run finds no tools, this is the first place to\n  look.\n- `isWebMcpAvailable` from `app/lib/webmcp.ts` (glossary entry:\n  `isWebMcpAvailable`) — its secure-context and top-level-frame conditions are\n  the prerequisites the eval's Chrome must satisfy.\n- `loadEnv` from `app/lib/loadEnv.ts` — required by the seeder, before any env\n  read, per the pattern in `prisma/seed.ts`.\n- `prisma/seed.ts` — the adapter pattern the new seeder must copy rather than\n  reinvent.\n\n**Existing-implementation survey:** no browser-driven or model-driven test\nexists in this repo today. `postinstall` installs Playwright Chromium, but\nnothing in the tree drives it — there are no Playwright specs and no e2e\ndirectory. The eval CLI uses its own Chrome channel, so the existing Chromium\ninstall is unrelated and should not be assumed to satisfy it.\n\n## Scenarios to Demonstrate\n\nTooling with no UI surface; nothing to register. The demonstrable outcomes are:\n\n- A green run: the agent writes questions and then calls\n  `await_user_activity`.\n- The regression caught: strip the \"rather than ending your turn\" clause from\n  `formatStandingWait` and watch the case go red. Perform this once at\n  execution — a browser eval that has never been seen to fail is not yet\n  evidence of anything.\n- The seeded map genuinely producing a non-empty standing-wait sentence, checked\n  before the first full run.\n- A run that leaves `dev.db` untouched.",
+  "description": "Adds a browser-mode eval that proves the standing-wait steering, plus the isolated database plumbing a browser eval needs, and hoists three helpers that had been copy-pasted into shared tested modules.\n\nWHY THIS EXISTS. The most recent behavioural fix in this repo — 'The Agent Waits For Your Answers' — had no test and structurally could not have one. The fix was not code, it was words: `formatStandingWait` appends a paragraph to a tool's REPLY telling the agent to say something in chat and then call `await_user_activity` with a cursor 'rather than ending your turn'. Local-mode evals show the model a static schema file and answer its calls from `mockOutput`, so that sentence is never generated and the behaviour is unreachable. Browser mode is the only mode that both executes tools for real and judges what the agent does next.\n\nWHAT LANDED. `evals/suites/standing-wait.json` holds one case: the user asks for more questions on an existing theme, and the expected trajectory is `add_nodes` followed by `await_user_activity` carrying a numeric `sinceRevision`. The pair is an `ordered` group because the matcher cannot express 'and then the turn did not end' — the failure being caught is the ABSENCE of the second call. Trailing optional `await_user_activity` entries absorb the repeat-the-wait loop the product actually asks for, which would otherwise score as extra calls and fail the case. `npm run evals:browser` runs the whole dance as one command: mint a throwaway PostgreSQL schema, push the tables, seed the fixture map, start a dev server pointed at it, run the CLI against the seeded map's URL, and drop everything in a `finally`.\n\nSCOPE VERDICT. This cycle DELIVERED none of the project's ten product deliverables and DEFERRED none. All ten were already resolved before it began (`deliverables --open` reported 'No open deliverables — all 10 are resolved' at the plan-confirmation gate), and this is test infrastructure for behaviour that already shipped rather than new product surface. No deliverable row was touched, so there is no agent-decided deferral to surface. The one commitment the plan made that this cycle did NOT discharge is named under LIMITATION below.\n\nDEVIATIONS FROM THE PLAN, and why. The plan was written against SQLite (`PrismaBetterSqlite3`, a throwaway `dev.db` file, 'never run against dev.db'). The repo is on PostgreSQL via `PrismaPg` and `databaseConnection()`. The intent carried over exactly; the mechanism changed: isolation is now a throwaway SCHEMA rather than a throwaway file, which is the same unit `app/lib/testDatabase.ts` already uses per test file. The runner REPLACES the `?schema=` parameter of `DATABASE_URL` rather than trusting it, so pointing it at an ordinary development database is safe by construction — verified: after six runs the development schema still held zero maps. The plan also asked for the run to be a package.json script; it is a TypeScript orchestrator instead, because a `&&` chain cannot express 'drop the schema and kill the server whatever happened' and cleanup-on-failure is the whole point.\n\nTWO DEFECTS FOUND BY RUNNING IT. Both were invisible to type-checking and only appeared because the harness was executed six times. (1) The dev server survived `SIGTERM`: the process being signalled was `npx`, and Next's real server was a grandchild that kept serving the throwaway port long after the schema had been dropped. Fixed by invoking the binary directly, spawning it `detached`, and signalling the whole process group. (2) The build directory was removed while Next was still watching it, which made Next log 'the directory was deleted' and RESTART ITSELF — recreating the directory and leaking the very server the cleanup had just tried to stop. Fixed by ordering the teardown: stop the server, wait for the process to actually be gone, then take its build directory. Separately, Next silently rewrote `tsconfig.json` on the first run; the include entries are now committed so it has nothing to add.\n\nEXTRACTIONS. Writing the runner made existing duplication visible. `freePort` existed in THREE places — the test database, the dev database, and the new runner — and the copies had already drifted over whether to `unref` the probe socket; it now lives in one module taking the caller's purpose so the failure message still names which server failed to start. `pushSchema` and `dropSchema` were about to become a second copy each and moved into a shared schema-lifecycle module. The seeder's event-log construction was also extracted after the glossary guard correctly refused to accept it as thin I/O glue: revision numbering is real logic, and an off-by-one there seeds cleanly and then hands the agent a cursor that skips or repeats history.\n\nEVIDENCE. 17 new tests, full suite 1169 passing / 0 failing, audit 0 findings. The plan asked that the fixture be confirmed empirically to yield a non-empty standing wait; that check is now a permanent test asserting the fixture against the real `formatStandingWait` rather than a one-off. Two tests were shown red under fault injection — flipping the fixture questions to `answered`, and moving the forwarded-argument spread ahead of the defaults — and both are recorded as AGENT-ATTESTED, not tool-measured, because both modules are new on this branch and a revert leaves nothing to import.\n\nLIMITATION — the eval has never actually run. `webmcp-evals browser` drives `puppeteer-core`'s `channel`, which resolves a Chrome INSTALLED on the machine and launches it with `--enable-features=WebMCP`; the Playwright Chromium this repo's postinstall fetches does not satisfy it. No Chrome of any channel is present here, and there is no model API key in `.env.local`. Every run therefore reached the browser launch and stopped there. The plan's second demonstrable outcome — strip the 'rather than ending your turn' clause from `formatStandingWait` and watch the case go red — is consequently NOT discharged, and this harness should not be described as proven until someone runs it on a machine with Chrome (`--chrome-channel chrome-dev` on Linux, where there is no Canary) and a key. A browser eval that has never been seen to fail is not yet evidence of anything.\n\nUNRELATED PRE-EXISTING ISSUES OBSERVED. The generated Prisma client was stale, so `tsc` was failing on `visitorId` before any of this work began; `npx prisma generate` cleared it. `npm run lint` is broken by a config resolution error in `eslint.config.mjs` — already the subject of the queued plan `lint-runs-and-ci-keeps-it-running`, so it was left alone.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/the-standing-wait-is-proved-against-a-live-map.md\t.codeyam/plans/completed/the-standing-wait-is-proved-against-a-live-map.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/79aab8675a292b78b14894c5e1c82a10d3a989b2493ce0af402f500855a6b4b8.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7dc88f65de1b0ad5bb37b50fa8e1620efc08684fef2c6a7290bb93f5557c00a7.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": ".gitignore",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/testDatabase.ts",
+      "status": "modified"
+    },
+    {
+      "path": "evals/README.md",
+      "status": "modified"
+    },
+    {
+      "path": "next.config.ts",
+      "status": "modified"
+    },
+    {
+      "path": "package.json",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/ensureDevDatabase.ts",
+      "status": "modified"
+    },
+    {
+      "path": "tsconfig.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/the-standing-wait-is-proved-against-a-live-map.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/bab6f04aae9a6bd60380a692e62989f3e1470d2d088f61830d98416a31a2d4fb.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/d5bd06e633d8f66f9e88f701ce655fcdda2ac9b60b8d254e65b4d870a142fd91.json",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/browserEvalRun.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/browserEvalRun.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/evalMapFixture.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/evalMapFixture.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/freePort.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/freePort.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/schemaLifecycle.ts",
+      "status": "added"
+    },
+    {
+      "path": "evals/suites/standing-wait.json",
+      "status": "added"
+    },
+    {
+      "path": "scripts/run-browser-evals.ts",
+      "status": "added"
+    },
+    {
+      "path": "scripts/seed-eval-map.ts",
+      "status": "added"
+    }
+  ],
+  "testResults": {
+    "total": 1169,
+    "passed": 1169,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 1169,
+        "passed": 1169
+      }
+    ]
+  }
+}

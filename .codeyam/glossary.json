@@ -1845,6 +1845,12 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "The argument list handed to webmcp-evals browser. Built here rather than inline in the spawn call because a wrong flag does not crash: a bad target URL yields zero registered tools, which reads as a WebMCP failure, and a missing backend silently swaps the model driver. Caller arguments go last so anything passed after the npm double-dash overrides the defaults, since commander takes the last occurrence of a repeated option.",
+    "filePath": "app/lib/browserEvalRun.ts",
+    "name": "browserEvalArgs",
+    "testFile": "app/lib/browserEvalRun.test.ts"
+  },
+  {
     "description": "Builds the HTTP and stdio front doors from the shared tool catalog rather than a hand-written list, which is what stops the three doors drifting apart. Loops the catalog, splicing a mapId argument onto each tool's own schema and stripping it back off before handing the call to the shared runtime - out here the agent has no page, so it must name the map it means. Adds the two whole-collection tools that belong only to the server doors, list_thinking_maps and create_thinking_map, since a page is already scoped to one map. Built fresh per request in the stateless HTTP mode. Takes a MapScope saying whose maps this instance may see, with no default, because the two doors it serves are not equally trusted: over stdio the caller already has the process and the database so 'all' is honest, while over HTTP at /api/mcp the caller is whoever found the public URL and gets the same visitor scoping the landing page gets - otherwise that door would keep handing out every map's id and title after the page it mirrors had stopped.",
     "filePath": "app/lib/mcpServer.ts",
     "name": "buildMcpServer",
@@ -2089,11 +2095,11 @@
     "testFile": "app/lib/loadError.test.ts"
   },
   {
-    "description": "Removes a test run's schema and everything in it, quoting the identifier so the statement can never become an injection site.",
-    "filePath": "app/lib/testDatabase.ts",
+    "description": "Removes a disposable schema and everything in it. Runs in each caller's cleanup path so a failed test file or eval run leaves nothing behind, and quotes the identifier even though both callers mint the name themselves, so this can never become an injection site if either ever loosens. Takes the base connection string rather than the schema-qualified one, since a schema cannot be dropped from a session inside it.",
+    "filePath": "app/lib/schemaLifecycle.ts",
     "name": "dropSchema",
     "untestabilityReason": {
-      "justification": "Connects to a live PostgreSQL server and issues DDL. Run in the teardown of every integration test file.",
+      "justification": "Issues DROP SCHEMA against a live PostgreSQL connection; there is nothing to assert without one.",
       "kind": "platform-glue"
     }
   },
@@ -2117,6 +2123,24 @@
     "filePath": "app/lib/toolInvocation.ts",
     "name": "errorResponse",
     "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
+    "description": "The event log for a seeded eval map, with revisions assigned. Numbering is separated from writing because it is the part that can be silently wrong: revisions must start at 1 and be gapless, and the map's revision column must equal the count, since recordEvents numbers each new event from that column — an off-by-one in any of the three seeds cleanly and then hands the agent a cursor that skips or repeats history.",
+    "filePath": "app/lib/evalMapFixture.ts",
+    "name": "evalMapEvents",
+    "testFile": "app/lib/evalMapFixture.test.ts"
+  },
+  {
+    "description": "The shape of the disposable thinking map the browser eval runs against: a board in the map phase carrying two open questions. Held apart from the seeding script because formatStandingWait returns an empty string unless at least one node is an unanswered open-question — so a fixture of the wrong shape produces no standing-wait sentence, the eval case fails, and the failure reads as a product regression rather than bad seed data. Being side-effect free is what lets that property be asserted with no database.",
+    "filePath": "app/lib/evalMapFixture.ts",
+    "name": "evalMapFixture",
+    "testFile": "app/lib/evalMapFixture.test.ts"
+  },
+  {
+    "description": "The name of the throwaway PostgreSQL schema for one browser eval run. The fixed prefix is what makes a stray schema identifiable as eval debris on a server that may also hold real data, and the hex suffix is what makes the identifier safe by construction where it is interpolated into a DROP SCHEMA statement — the same two arguments uniqueSchemaName makes for test schemas.",
+    "filePath": "app/lib/browserEvalRun.ts",
+    "name": "evalSchemaName",
+    "testFile": "app/lib/browserEvalRun.test.ts"
   },
   {
     "description": "The tool catalog projected into the shape webmcp-evals local mode reads: one entry per tool carrying name, description and the JSON Schema from jsonSchemaFor. Those three fields are what the eval suite judges, because they are the only thing a model is shown when it decides which tool to call. Generated rather than hand-written for the reason toolCatalog.ts's own header gives - a checked-in copy of the schemas would be a fourth front door, free to drift from the three real ones. Annotations are deliberately omitted: local mode never reads readOnlyHint, so emitting it could only add noise to the diff this fixture exists to make reviewable.",
@@ -2347,22 +2371,10 @@
     }
   },
   {
-    "description": "Claims an unused localhost port by binding to port 0 and reading the assigned port back, so a test-run PostgreSQL server cannot collide with anything already listening.",
-    "filePath": "app/lib/testDatabase.ts",
+    "description": "An unused localhost port, obtained by binding to port 0 and reading the assigned port back. Replaces three near-identical private copies — the test database, the development database, and the browser eval run — which had already drifted over whether to unref the probe socket. Takes the caller's purpose so the failure message names which server failed to start. Advisory rather than a reservation: nothing stops another process claiming the port between the close and the caller's own bind.",
+    "filePath": "app/lib/freePort.ts",
     "name": "freePort",
-    "untestabilityReason": {
-      "justification": "Binds a real TCP socket to ask the kernel for a port. Asserting on the result would only restate what the OS assigned.",
-      "kind": "platform-glue"
-    }
-  },
-  {
-    "description": "An arbitrary unused localhost port, obtained by letting the OS assign one on port 0 and reading it back.",
-    "filePath": "scripts/ensureDevDatabase.ts",
-    "name": "freePort",
-    "untestabilityReason": {
-      "justification": "Delegates the choice to the OS network stack; the returned port is whatever the host happens to have free.",
-      "kind": "platform-glue"
-    }
+    "testFile": "app/lib/freePort.test.ts"
   },
   {
     "description": "The map route's browser-tab title. Counts the map's still-open questions into the title so a backgrounded board says how much is waiting, and falls back to the bare app name when the map is missing or the read throws — metadata runs a frame before the body, so a throw here would 500 the route before the page could explain itself.",
@@ -2690,6 +2702,24 @@
     }
   },
   {
+    "description": "The whole browser-eval dance as one command: mint a throwaway schema, push the tables, seed the map, start a dev server pointed at it, run the eval CLI, and tear all of it down in a finally so a failed run cleans up too. Replaces the DATABASE_URL schema parameter rather than trusting it, which is what makes pointing this at an ordinary development database safe.",
+    "filePath": "scripts/run-browser-evals.ts",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "Top-level orchestration of a database, a dev server and a browser; every step it composes is itself platform glue.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Writes the eval fixture into whichever database DATABASE_URL names, and prints the new map's id. A thin writer by design: the shape it persists comes from evalMapFixture and the event numbering from evalMapEvents, both of which are tested without a database, leaving this function a sequence of bare Prisma create calls.",
+    "filePath": "scripts/seed-eval-map.ts",
+    "name": "main",
+    "untestabilityReason": {
+      "justification": "A bare sequence of Prisma create calls against a real PostgreSQL database; the fixture shape and the event numbering it writes are tested separately in evalMapFixture.test.ts.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Derives the line beside LIVE MAP from the current nodes so the map narrates itself truthfully: a bare seed, a count of open questions, an answered/open split, or the reassurance that nothing was lost after a direction change. Excludes the root idea from the answered count, and lets a just-updated node outrank the arithmetic.",
     "filePath": "app/lib/mapCaption.ts",
     "name": "mapCaption",
@@ -2966,11 +2996,11 @@
     "testFile": "app/lib/webmcp.test.ts"
   },
   {
-    "description": "Creates the schema and the app's tables inside it by running prisma db push against an explicit --url, and rethrows a failed push with its captured stdout and stderr so the real Prisma error survives instead of an opaque beforeAll throw.",
-    "filePath": "app/lib/testDatabase.ts",
+    "description": "Creates a disposable schema and builds the app's tables inside it, driving prisma db push with an explicit url rather than the environment alone — Prisma reads its datasource from prisma.config.ts, so DATABASE_URL by itself would push to the development database. Never swallows the push output, because the Prisma error naming the broken model is the only useful thing about that failure. Shared by the test suite and the browser eval run, which need the same schema lifecycle for the same reason.",
+    "filePath": "app/lib/schemaLifecycle.ts",
     "name": "pushSchema",
     "untestabilityReason": {
-      "justification": "Shells out to the Prisma CLI against a live database. Run by every integration test file's setup.",
+      "justification": "Shells out to the Prisma CLI against a real PostgreSQL server; the tables it creates are the only observable result.",
       "kind": "platform-glue"
     }
   },
@@ -3190,6 +3220,15 @@
     "testFile": "app/lib/briefFormat.test.ts"
   },
   {
+    "description": "Runs the eval seeder against the throwaway schema and returns the map id it printed. Captures stdout, which carries the bare id and nothing else, while letting stderr through so the seeder's progress line reaches the person watching — the split that lets the id be consumed programmatically without a logging change silently corrupting the URL.",
+    "filePath": "scripts/run-browser-evals.ts",
+    "name": "seedMap",
+    "untestabilityReason": {
+      "justification": "Spawns a child process that writes to a real database; its output is that process's behaviour, not this function's.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "A mulberry32 PRNG keyed off a theme's hue, so a galaxy's dust is the same on the server and in the browser. The determinism is the load-bearing part rather than the randomness: lose it and React finds a different tree than the one the server sent, which is a hydration error on a board that otherwise looks fine. Not exported — the property is asserted through the markup it produces, since that is what actually has to match.",
     "filePath": "app/components/ThemeParticles.tsx",
     "name": "seeded",
@@ -3304,11 +3343,29 @@
     }
   },
   {
+    "description": "Starts next dev against the throwaway schema on a free port and waits until it actually serves the eval's own map URL. Probes that URL rather than the site root because Next compiles a route on first request, so a root probe reports ready and then hands the browser a page still seconds from compiling — during which no WebMCP tools are registered. Spawned detached, in its own process group, so the whole tree can be signalled later.",
+    "filePath": "scripts/run-browser-evals.ts",
+    "name": "startDevServer",
+    "untestabilityReason": {
+      "justification": "Spawns a real Next.js dev server and polls it over HTTP; readiness is a property of that process.",
+      "kind": "platform-glue"
+    }
+  },
+  {
     "description": "Starts a real PostgreSQL server as a subprocess on an ephemeral port with a temporary data directory, and translates the root-container EACCES failure on spawn initdb into a message naming the actual cause and its fix.",
     "filePath": "app/lib/testDatabase.ts",
     "name": "startEmbeddedPostgres",
     "untestabilityReason": {
       "justification": "Spawns a PostgreSQL server process and initialises a data directory on disk. Exercised for real by every integration test run, which is what proves it works.",
+      "kind": "platform-glue"
+    }
+  },
+  {
+    "description": "Stops the eval's dev server and waits for the process to actually be gone, signalling the whole process group rather than the single pid — Next runs its work in children, and signalling the pid alone left a server still serving the throwaway port after the run had finished and its schema had been dropped. SIGKILL is the backstop so cleanup can never itself hang.",
+    "filePath": "scripts/run-browser-evals.ts",
+    "name": "stopDevServer",
+    "untestabilityReason": {
+      "justification": "Sends OS signals to a real process group and waits on process exit.",
       "kind": "platform-glue"
     }
   },

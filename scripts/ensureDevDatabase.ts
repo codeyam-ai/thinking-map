@@ -54,6 +54,7 @@ import path from 'node:path';
 import { arch, platform } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { Client } from 'pg';
+import { freePort } from '../app/lib/freePort';
 
 /** Everything this script owns lives here. Gitignored; safe to delete. */
 const CLUSTER_ROOT = path.resolve(process.cwd(), '.dev-postgres');
@@ -180,27 +181,10 @@ function isPortFree(port: number): Promise<boolean> {
   });
 }
 
-function freePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.on('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address();
-      if (address === null || typeof address === 'string') {
-        server.close();
-        reject(new Error('could not find a free port for the dev database'));
-        return;
-      }
-      const { port } = address;
-      server.close(() => resolve(port));
-    });
-  });
-}
-
 /** An unused localhost port, preferring Postgres's own 5432. */
 async function choosePort(): Promise<number> {
   if (await isPortFree(PREFERRED_PORT)) return PREFERRED_PORT;
-  return freePort();
+  return freePort('dev database');
 }
 
 function lookUpPostgresUser(): Ids {

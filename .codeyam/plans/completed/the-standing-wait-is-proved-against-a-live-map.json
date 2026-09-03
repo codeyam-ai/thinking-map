@@ -1,0 +1,41 @@
+{
+  "claimStartedAt": "2026-09-03T16:53:18Z",
+  "completedAt": "2026-09-03T18:05:53Z",
+  "completedBy": {
+    "agentProvider": "codex",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "backend-step15",
+    "machine": "codeyam-editor-codeyam-editor-15",
+    "originId": "7e3358ff-5f57-471c-90db-49283a2b8ce7",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "the-standing-wait-is-proved-against-a-live-map",
+    "sessionId": "1a504c9a-65de-4552-8db9-5d73770829ba",
+    "startedAt": "2026-09-03T16:53:18Z"
+  },
+  "createdAt": "2026-09-03T11:58:30Z",
+  "deliverables": [
+    ".gitignore",
+    "app/lib/browserEvalRun.test.ts",
+    "app/lib/browserEvalRun.ts",
+    "app/lib/evalMapFixture.test.ts",
+    "app/lib/evalMapFixture.ts",
+    "app/lib/freePort.test.ts",
+    "app/lib/freePort.ts",
+    "app/lib/schemaLifecycle.ts",
+    "app/lib/testDatabase.ts",
+    "evals/README.md",
+    "evals/suites/standing-wait.json",
+    "next.config.ts",
+    "package.json",
+    "scripts/ensureDevDatabase.ts",
+    "scripts/run-browser-evals.ts",
+    "scripts/seed-eval-map.ts",
+    "tsconfig.json"
+  ],
+  "journalTimestamp": "2026-09-03T18:05:53Z",
+  "mode": "backend",
+  "planFile": "completed/the-standing-wait-is-proved-against-a-live-map.md",
+  "slug": "the-standing-wait-is-proved-against-a-live-map",
+  "title": "The Standing Wait Is Proved Against A Live Map"
+}

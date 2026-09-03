@@ -1,0 +1,34 @@
+[
+  {
+    "name": "The standing wait is obeyed — formatStandingWait: \"Then call await_user_activity with sinceRevision: N ... rather than ending your turn\"",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Shipping is the part of this I understand least. Put a few more of the questions you'd need answered about shipping onto the board — just the questions, don't try to answer them yourself."
+      }
+    ],
+    "expectedCall": [
+      { "functionName": "read_map", "optional": true },
+      { "functionName": "read_map", "optional": true },
+      { "functionName": "create_themes", "optional": true },
+      {
+        "ordered": [
+          {
+            "functionName": "add_nodes",
+            "arguments": { "nodes": { "$type": "array" } }
+          },
+          { "functionName": "post_note", "optional": true },
+          {
+            "functionName": "await_user_activity",
+            "arguments": { "sinceRevision": { "$type": "number" } }
+          }
+        ]
+      },
+      { "functionName": "await_user_activity", "optional": true },
+      { "functionName": "await_user_activity", "optional": true },
+      { "functionName": "await_user_activity", "optional": true },
+      { "functionName": "post_note", "optional": true }
+    ]
+  }
+]

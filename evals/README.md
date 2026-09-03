@@ -117,11 +117,98 @@ tools (`ask_user`, `await_user_activity`) deliberately BLOCK waiting on a
 person, so any mode that ran the real tools would hang or need elaborate
 stubbing. Tool *selection* is also exactly the surface the descriptions own.
 
-The CLI has `browser` and `smoke` modes for live pages. Neither is used yet.
-Steering that lives in tool *reply* text — `formatStandingWait` in
-`app/lib/mcpFormat.ts`, for instance — only exists when tools genuinely execute
-against a real map, and local mode cannot produce it. That is the subject of a
-follow-on plan, not a gap in this one.
+The CLI also has `browser` and `smoke` modes for live pages. Steering that lives
+in tool *reply* text — `formatStandingWait` in `app/lib/mcpFormat.ts` — only
+exists when tools genuinely execute against a real map, and local mode cannot
+produce it. That is what the browser suite below is for. `smoke` remains unused:
+it executes tools without a model, so it cannot judge what an agent does next,
+which is the entire question a reply-text case asks.
+
+## Browser mode, and the one case that needs it
+
+`npm run evals:browser` runs `suites/standing-wait.json` against a real page in
+a real browser. It exists for one behaviour that local mode is structurally
+unable to reach.
+
+The behaviour is the standing wait. When a tool call leaves open questions on a
+map, `formatStandingWait` appends a paragraph to the tool's REPLY telling the
+agent to say something in chat and then call `await_user_activity` "rather than
+ending your turn". That paragraph is the entire fix — it is prose, not code, and
+it is prose the model only ever sees if a tool actually ran against a map that
+actually has open questions. Local mode shows the model a static schema file and
+answers its calls from `mockOutput`, so the sentence is never generated and the
+case would be testing the fixture rather than the product.
+
+### What it needs that local mode does not
+
+| Requirement    | Why                                                              |
+| -------------- | ---------------------------------------------------------------- |
+| A real Chrome  | The CLI drives the page through `puppeteer-core`'s `channel`, which resolves a Chrome **installed on the machine**. The Playwright Chromium `postinstall` fetches is a different browser and does **not** satisfy it. |
+| WebMCP enabled | The CLI launches with `--enable-features=WebMCP`, so the channel has to be one that ships the flag. Its default is `chrome-canary`; on Linux, where there is no Canary, use `--chrome-channel chrome-dev` with `google-chrome-unstable` installed. |
+| A dev server   | `bindTools` (`app/lib/webmcp.ts`) registers the catalog from the page. No server, no tools — the CLI fails with "0 tools registered on page". |
+| A database     | The tools write. `read_map`, `add_nodes` and `await_user_activity` all reach Postgres for real. |
+
+The model API key is the same as local mode's — see **The key** above.
+
+### It cannot touch your development data
+
+This is the one property worth checking before you run it, and it is enforced
+rather than documented: `scripts/run-browser-evals.ts` takes your
+`DATABASE_URL`, **replaces** its `?schema=` parameter with a freshly minted
+`eval_standing_wait_<hex>`, pushes the tables into that schema, seeds the map
+there, points the dev server at it, and drops the schema in a `finally`. The
+cluster is shared; nothing else is. It is the same unit of isolation the
+integration tests use (`app/lib/testDatabase.ts`).
+
+Two consequences worth knowing:
+
+- **Never point it at production.** Schema isolation protects your data from the
+  eval, not the eval from a bad URL — `prisma db push` against a hosted database
+  still creates and drops a schema there. The README's standing rule holds: the
+  deployed database starts empty by design and an eval has no business in it.
+- **It starts its own dev server**, on a free port, with `NEXT_DIST_DIR` set to
+  `.next-evals`. That separate build directory is why a `npm run dev` you
+  already have open is not disturbed.
+
+### Running it
+
+```bash
+npm run evals:browser -- --model anthropic:claude-haiku-4-5-20251001
+
+# On Linux, where there is no Chrome Canary:
+npm run evals:browser -- --model anthropic:claude-haiku-4-5-20251001 \
+  --chrome-channel chrome-dev
+```
+
+Everything after `--` is forwarded to `webmcp-evals browser`, so `--runs 3`,
+`--reporter console` and `--max-steps N` work exactly as they do locally.
+
+### The case, and how it is shaped
+
+`suites/standing-wait.json` holds one case. Browser runs are slow and cost a
+model call per step; this buys the one regression the repo has already been
+bitten by, and more can follow now that the harness is proven.
+
+The seeded map (`scripts/seed-eval-map.ts`) is a houseplant-subscription board
+in the `map` phase carrying **two** open questions — the number matters, because
+`formatStandingWait` returns an empty string at zero and the fixture would then
+prove nothing. The case asks for more questions on an existing theme, so the
+expected trajectory is `add_nodes` and then `await_user_activity` carrying a
+numeric `sinceRevision`.
+
+Two shaping decisions follow from the matcher's rules (see **Writing a case**
+below, all of which apply here too):
+
+- **The pair is an `ordered` group, and that is the whole assertion.** There is
+  no way to say "and then the turn did not end", so the failure being caught is
+  the *absence* of the second call. An agent that writes questions and stops
+  fails the case, which is exactly the bug.
+- **`await_user_activity` really blocks**, for `DEFAULT_TIMEOUT_SECONDS` (25) per
+  call, and returns `timedOut: true`. The reply then tells the agent to call it
+  again — correct behaviour that would otherwise score as an extra call and fail
+  the case. Hence the trailing optional `await_user_activity` nodes: they absorb
+  the loop the product is asking for. The run cannot wedge, because every call
+  is bounded.
 
 ## The six cases
 

@@ -1,0 +1,33 @@
+{
+  "provenAt": "2026-09-03T17:28:34Z",
+  "slug": "the-standing-wait-is-proved-against-a-live-map",
+  "paths": [],
+  "tests": {
+    "produces a non-empty standing wait": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "Fault injection: flipped both fixture questions from status 'open' to 'answered' in app/lib/evalMapFixture.ts, then ran the test narrowed by name.",
+        "evidence": "refresh-tests --test 'produces a non-empty standing wait' reported counts {failed:1, passed:0}, runId 6c49893a-de6e-4a44-aa3d-783700bee776. Restored to 'open' and it passes. A plain revert cannot prove this test: evalMapFixture.ts is new on this branch, so the reverted world has no module to import."
+      }
+    },
+    "puts caller arguments last so they override the defaults": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "attestedByHand",
+        "method": "Fault injection: moved the ...forwarded spread in browserEvalArgs (app/lib/browserEvalRun.ts) from last position to before the default flags, then ran the test narrowed by name.",
+        "evidence": "refresh-tests reported counts {failed:1, passed:0}, runId 4e870b80-64bc-415e-a824-72712147087b. Restored the original ordering and it passes. A plain revert cannot prove this: browserEvalRun.ts is new on this branch, so the reverted world has no module to import."
+      }
+    }
+  },
+  "proof": {
+    "verdict": "provenByHand",
+    "attested": [
+      "puts caller arguments last so they override the defaults"
+    ],
+    "method": "Fault injection: moved the ...forwarded spread in browserEvalArgs (app/lib/browserEvalRun.ts) from last position to before the default flags, then ran the test narrowed by name.",
+    "evidence": "refresh-tests reported counts {failed:1, passed:0}, runId 4e870b80-64bc-415e-a824-72712147087b. Restored the original ordering and it passes. A plain revert cannot prove this: browserEvalRun.ts is new on this branch, so the reverted world has no module to import."
+  }
+}
