@@ -251,6 +251,25 @@ does not have.
    deployment step.
 4. Deploy.
 
+### Automatic production deploys
+
+Pushing to `main` runs [`.github/workflows/deploy-production.yml`](.github/workflows/deploy-production.yml).
+It applies the Prisma schema first, then builds and deploys the production app
+to Vercel. Before the first push, add these GitHub repository secrets:
+
+| Secret | Value |
+| --- | --- |
+| `SUPABASE_SCHEMA_DATABASE_URL` | The Supabase **direct** connection string (port 5432), or its IPv4-reachable session-pooler equivalent on port 5432. It is used only for `prisma db push`. |
+| `VERCEL_TOKEN` | A Vercel personal access token with permission to deploy this project. |
+| `VERCEL_ORG_ID` | The Vercel team ID that owns the project. |
+| `VERCEL_PROJECT_ID` | The Vercel project ID. |
+
+The Vercel project must also have `DATABASE_URL` set to the Supabase **pooled**
+connection string (port 6543), which is the URL the deployed app uses at
+runtime. If Vercel's native Git integration is enabled for this repository,
+disable its automatic deployments: this workflow is the deployment authority
+and ensures the schema update completes before the app is released.
+
 The production database is expected to be **empty on first boot**. That is a
 product decision, not an oversight: a new visitor starts with no saved maps, and
 `prisma/seed.ts` is deliberately a no-op. The landing screen's day-one state is
