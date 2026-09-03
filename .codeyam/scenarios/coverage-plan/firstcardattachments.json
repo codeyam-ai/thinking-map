@@ -1,0 +1,42 @@
+{
+  "surface": "FirstCardAttachments",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "files",
+      "value": "empty",
+      "rationale": "source-derived state files=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "files",
+      "value": "one",
+      "rationale": "source-derived state files=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "files",
+      "value": "many",
+      "rationale": "source-derived state files=many",
+      "status": "planned"
+    },
+    {
+      "dimension": "briefs",
+      "value": "empty",
+      "rationale": "source-derived state briefs=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "briefs",
+      "value": "one",
+      "rationale": "source-derived state briefs=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "briefs",
+      "value": "many",
+      "rationale": "source-derived state briefs=many",
+      "status": "planned"
+    }
+  ]
+}

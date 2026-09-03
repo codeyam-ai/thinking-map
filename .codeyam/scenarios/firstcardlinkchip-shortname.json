@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardLinkChip - ShortName",
+  "id": "1f08b537-2825-4600-9166-874d800591be",
+  "url": "/isolated-components/FirstCardLinkChip?s=ShortName",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardLinkChip",
+  "scenarioType": "component",
+  "description": "A bare domain, which is what an untitled page gives you. Shown exactly as it is: truncation is for names that need it rather than a house style applied to every chip, and this is the frame that proves the difference."
+}

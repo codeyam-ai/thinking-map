@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardLinkChip - LongName",
+  "id": "4e827e90-756d-4b28-8287-b94d37754970",
+  "url": "/isolated-components/FirstCardLinkChip?s=LongName",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardLinkChip",
+  "scenarioType": "component",
+  "description": "A page title that runs to a sentence, which is most of them. The case that decides whether a page can be shown in a 440px card at all - it truncates rather than widening, because the card's own controls sit on the row below and a chip that grows pushes them out of line."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachmentCount - JustOver",
+  "id": "da380d79-38e8-44e9-b1f1-76be88935cf6",
+  "url": "/isolated-components/FirstCardAttachmentCount?s=JustOver",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachmentCount",
+  "scenarioType": "component",
+  "description": "One past the threshold, the first moment the count appears at all. Below this it would be arithmetic about chips the person can already see, so this frame is where it has to earn its place rather than read as clutter on a card whose emptiness is deliberate."
+}

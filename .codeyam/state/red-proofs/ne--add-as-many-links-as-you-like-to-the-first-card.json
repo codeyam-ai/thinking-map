@@ -1,0 +1,34 @@
+{
+  "provenAt": "2026-09-03T19:08:41Z",
+  "slug": "ne--add-as-many-links-as-you-like-to-the-first-card",
+  "paths": [
+    "app/lib/briefMerge.ts",
+    "app/components/FirstCardAttachments.tsx",
+    "app/components/FirstCardAttachmentCount.tsx"
+  ],
+  "runScope": [
+    "app/lib/briefMerge.ts",
+    "app/components/FirstCardAttachments.tsx",
+    "app/components/FirstCardAttachmentCount.tsx"
+  ],
+  "tests": {
+    "FirstCardAttachments": {
+      "withoutFix": "missing",
+      "withFix": "missing",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "mergeBriefs": {
+      "withoutFix": "didNotBuild",
+      "withFix": "missing",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "inconclusive",
+    "reason": "the without-fix world FAILED TO COMPILE, so no test in the crate ran and mergeBriefs never got a verdict — this is a build failure, not a test that was reverted away. Reverting a cross-file change (a field, a signature, a variant) leaves the code that still references it un-buildable. Either revert a SMALLER --path set that still compiles on its own, or accept that this change cannot be bisected this way and prove it by another means. Do NOT move or rename the test — where it lives is not the problem"
+  }
+}

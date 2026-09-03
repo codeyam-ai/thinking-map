@@ -302,6 +302,127 @@
         "status": "covered"
       }
     },
+    "FirstCardAttachmentCount": {
+      "empty": {
+        "status": "n-a",
+        "reason": "At or below the threshold this component renders nothing at all - deliberately, because a count of chips a person can already see is noise on a card whose emptiness is the point. The zero case therefore has no pixels to capture, and the rule that produces it is pinned by FirstCardAttachments' own test that no count shows while everything is visible."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "Same shape as empty: one attachment is under the threshold, so nothing renders. This component states a total; it is not a list and has no one-item boundary of its own."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "It receives a number and renders a sentence, synchronously. There is no fetch, no pending phase, and nothing to be in progress."
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "Its only input is an integer, so there is no long text, no missing optional field and no unicode for an edge case to act on. What overflows is the strip of chips below it, which is FirstCardAttachments - Overflowing."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no failure this line can be in. It reports a count of what the card is already holding, and a page that could not be read never joins that count."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "It binds no handlers. It is a sentence, not a control - every action on this card belongs to the chips, the two attach buttons, or the send."
+      }
+    },
+    "FirstCardAttachments": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Nothing here is asynchronous. The strip renders the pages and files the card is already holding, both handed in as props; the fetch that produces a page is the link box's, and its in-flight state is captured as FirstCardLinkBox - Reading."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The strip has no failure of its own. A page that could not be read never becomes a chip, and the sentence saying so is drawn by FirstCard below the controls, not here - this component renders only what successfully arrived."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
+    "FirstCardControls": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "No collection reaches this row. It is three fixed controls - Browse, Add a link, and the send - so there is no empty-to-many boundary to show."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Same reason as single: the row is a fixed set of three controls and cannot grow from data, so it has no overflow or truncation boundary."
+      },
+      "loading": {
+        "status": "covered"
+      },
+      "edge": {
+        "status": "n-a",
+        "reason": "Every label here is fixed copy - Browse, Add a link - with no data-driven text, no optional fields and no unicode to vary. There is nothing for an edge case to act on."
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The row has no failure of its own. A page that could not be read is reported as a sentence below it, drawn by FirstCard; these buttons render identically whether or not that sentence is there."
+      },
+      "key-interaction": {
+        "status": "covered"
+      }
+    },
+    "FirstCardLinkChip": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The chip always has a page - it is rendered once per attached page and never with none. The zero case is the strip rendering nothing at all, which belongs to FirstCardAttachments and is covered there."
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "This renders exactly one chip. Several chips at once is the strip's state, not this component's, and it is covered as FirstCardAttachments - SeveralLinks and - Overflowing."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "Nothing here is asynchronous. The page arrives already fetched, as a prop; the in-flight read belongs to the link box and is covered as FirstCardLinkBox - Reading."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "A page that could not be read never becomes a chip at all - the failure is reported as a sentence on the card before this component is ever rendered. There is no failed chip to picture."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Its one action is the remove button, which reports the page upward and renders nothing itself. The visible result is a chip leaving the strip, which is FirstCardAttachments' state, and the reported source name is asserted in FirstCardAttachments.render.test.tsx."
+      }
+    },
     "FirstCardPrompt": {
       "empty": {
         "status": "covered"

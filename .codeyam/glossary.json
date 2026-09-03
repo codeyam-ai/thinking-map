@@ -864,7 +864,7 @@
     }
   },
   {
-    "description": "Where a board begins: the single card on the landing screen that turns a typed sentence, an attached page, or both into a map. It autofocuses its field on mount, because the one thing a person arriving here should be able to do is start typing. Holds the state and the trip to /api/maps; the link box, the attachment chips and the control row are their own components. A browsed file travels as a name only, while a link travels as text - the server fetched the page, so the board gets a real brief the partner can quote - and a brief alone is enough to start a board, matching the rule /api/maps already enforces.",
+    "description": "Where a board begins: the single card on the landing screen that turns a typed sentence, attached pages, or both into a map. It autofocuses its field on mount, because the one thing a person arriving here should be able to do is start typing. Holds the state and the trip to /api/maps; the link box, the attachment chips and the control row are their own components. It carries a LIST of fetched pages rather than one - an idea usually arrives with a repo AND a doc AND somebody else s page - deduped by source name, and at start mergeBriefs folds them into the single brief the schema allows, each under its own markdown heading so the outline reads back as the pages in the order they were added. A browsed file travels with its bytes in its own request once there is an id to address; pages alone are enough to start a board, matching the rule /api/maps already enforces.",
     "filePath": "app/components/FirstCard.tsx",
     "name": "FirstCard",
     "untestabilityReason": {
@@ -873,7 +873,16 @@
     }
   },
   {
-    "description": "What the landing card is carrying, named back to the person. Two kinds of chip, and the difference is real rather than decorative: a link travels as TEXT the board can quote, so its chip inverts to black on the card's yellow, while a browsed or pasted file is something brought ALONG with the idea. A file now travels with its bytes — uploaded once the board exists — and an image shows the picture, which is not decoration: a pasted screenshot has no useful filename, so the thumbnail is the only thing identifying it and the only way to catch a mis-paste. Renders nothing at all when the card is carrying nothing, which is almost every arrival.",
+    "description": "How many things the first card is carrying, said out loud - and only once the strip can no longer show them all. Below the threshold this would be arithmetic about four chips a person can already see, which is noise on a card whose emptiness is deliberate; past it the strip scrolls, and this line is the only thing saying that what went out of sight is still attached rather than dropped. The threshold lives here, next to the sentence it governs, because the rule and the words it produces are one thing.",
+    "filePath": "app/components/FirstCardAttachmentCount.tsx",
+    "name": "FirstCardAttachmentCount",
+    "scenarios": [
+      "firstcardattachmentcount-justover",
+      "firstcardattachmentcount-many"
+    ]
+  },
+  {
+    "description": "What the landing card is carrying, named back to the person - now pure composition: a count, then a bounded strip of two kinds of chip. The two kinds are genuinely different rather than decoratively so. A page travels as TEXT the board can quote, so its chip inverts to black on the card yellow; a browsed or pasted file is something brought ALONG with the idea, travels with its bytes, and an image shows its picture, which is not decoration - a pasted screenshot has no useful filename, so the thumbnail is the only thing identifying it. The card takes as many pages as you point it at now, so the strip is bounded and scrolls rather than growing the card and pushing its own controls off the bottom, with the count stating the total once there is more than it can show. Renders nothing at all when the card is carrying nothing, which is almost every arrival.",
     "filePath": "app/components/FirstCardAttachments.tsx",
     "name": "FirstCardAttachments",
     "scenarios": [
@@ -887,7 +896,7 @@
     ]
   },
   {
-    "description": "The row along the bottom of the landing card: the ways in on the left, the way on to the board at the right. Two attach buttons rather than a menu, because two choices is not a menu's worth of choice and hiding them would hide the very thing the labels exist to say - that this card takes a document or a page, not just a sentence. The send goes live on either a typed idea or an attached brief, matching the rule /api/maps already enforces rather than being stricter than it.",
+    "description": "The row along the bottom of the landing card: the ways in on the left, the way on to the board at the right. Two attach buttons rather than a menu, because two choices is not a menu s worth of choice and hiding them would hide the very thing the labels exist to say - that this card takes a document or a page, not just a sentence. Neither way in ever dims. Add a link used to grey out once a page was attached, on the theory that a board has one brief and offering a second was offering to lose the first; the pages now merge into that one brief at start, so the limit is gone and the button stays selectable. The send goes live on either a typed idea or an attached page, matching the rule /api/maps already enforces rather than being stricter than it.",
     "filePath": "app/components/FirstCardControls.tsx",
     "name": "FirstCardControls",
     "scenarios": [
@@ -915,6 +924,16 @@
       "firstcardlinkbox-default",
       "firstcardlinkbox-filled",
       "firstcardlinkbox-reading"
+    ]
+  },
+  {
+    "description": "One page the first card is holding, before there is a board to put it on. Its own component, mirroring FirstCardFileChip, because the card carries two genuinely different kinds of thing and each deserves to be looked at on its own. This one INVERTS - black on the card's yellow - because it is the brief: the document the board will be ABOUT, rather than something brought along with it. A file's chip is a wash of the same yellow, and that contrast is the whole visual claim, which only survives if the two can be shown side by side. The name truncates rather than widening, because the card is 440px and its controls sit on the row below; the full name stays in the remove button's label, so nothing is actually lost.",
+    "filePath": "app/components/FirstCardLinkChip.tsx",
+    "name": "FirstCardLinkChip",
+    "scenarios": [
+      "firstcardlinkchip-default",
+      "firstcardlinkchip-shortname",
+      "firstcardlinkchip-longname"
     ]
   },
   {
@@ -1759,6 +1778,12 @@
     "filePath": "app/lib/briefFormat.ts",
     "name": "approxPages",
     "testFile": "app/lib/briefFormat.test.ts"
+  },
+  {
+    "description": "A page's name, made safe to stand as a markdown heading. Not cosmetic: briefSections matches a heading against a WHOLE line, so a source name carrying a newline would stop being a heading at all and that page would silently fold into the one above it, losing its own section id. Collapsing the whitespace to single spaces is what keeps the merge's promise that every attached page starts a section of its own.",
+    "filePath": "app/lib/briefMerge.ts",
+    "name": "asHeading",
+    "testFile": "app/lib/briefMerge.test.ts"
   },
   {
     "description": "The copy that says what sending a node question will actually do. WebMCP is pull-only, so asking wakes an agent already parked on await_user_activity and reaches nobody otherwise; this returns the send label and the note for each case, so the one thing the feature could mislead about is pinned by tests rather than read off a screenshot.",
@@ -2733,6 +2758,12 @@
       "justification": "A bare findUnique selecting only the id, coerced to a boolean. The work is the database call itself; the route behaviour it guards is covered by the exchange route's own probes and the mid-exchange scenario.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Folding several fetched pages into the one brief a board is allowed to have. The card takes as many links as you point it at, but MapBrief.mapId is unique and a brief is write-once - and that immutability is load-bearing, because briefSections derives s1..sN from the text by a pure splitter and nodes cite those ids as provenance. So the several become one here, at intake, before anything is written: each page under its own markdown heading, which is exactly what the splitter cuts on, so the outline an agent reads back IS the list of pages that were attached, in the order they were attached. One page passes through VERBATIM - no heading, no rewritten media type - because wrapping it would shift every section id on the most common map there is. Several become a text/markdown document named by its count. An empty list returns undefined, so no brief stays one case for the caller rather than five.",
+    "filePath": "app/lib/briefMerge.ts",
+    "name": "mergeBriefs",
+    "testFile": "app/lib/briefMerge.test.ts"
   },
   {
     "description": "An unknown thrown value as the reason string a bind report carries. A browser refusing a tool throws whatever it likes, and the whole point of the report is that a per-tool failure stops being silent - so a non-Error rejection has to arrive as printable text rather than collapsing the report that names it.",

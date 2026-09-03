@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardLinkChip - Default",
+  "id": "bf9c1742-e1a1-482e-b0e4-7ca1e47d0cbc",
+  "url": "/isolated-components/FirstCardLinkChip?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardLinkChip",
+  "scenarioType": "component",
+  "description": "One page the card is holding, before there is a board to put it on. It inverts to black on the card's yellow because it IS the brief - the document the board will be about - where a browsed file's chip is a wash of the same yellow. That contrast is the whole visual claim, and it only reads against the real card colour."
+}

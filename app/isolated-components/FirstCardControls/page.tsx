@@ -14,24 +14,22 @@ import Component from '../../components/FirstCardControls';
 
 function Harness() {
   const s = useSearchParams().get('s') ?? 'Default';
-  const preset: Record<
-    string,
-    { busy: boolean; canStart: boolean; linkDisabled: boolean }
-  > = {
+  const preset: Record<string, { busy: boolean; canStart: boolean }> = {
     // What almost every arrival sees: nothing typed, nothing attached, so the
     // send is dimmed and both ways in are open.
-    Default: { busy: false, canStart: false, linkDisabled: false },
+    Default: { busy: false, canStart: false },
     // Something typed. The send goes solid, which is the only signal that the
     // card is ready to go.
-    Ready: { busy: false, canStart: true, linkDisabled: false },
-    // A brief in hand and NOTHING typed. The send is live anyway, which is the
-    // opposite of every other state here — a page says what you want thought
-    // through, so the sentence is optional. "Add a link" dims because there is
-    // one brief per board.
-    BriefOnly: { busy: false, canStart: true, linkDisabled: true },
-    // Mid-submit: the whole row locks and the send spins, so a second click
-    // cannot start a second board.
-    Busy: { busy: true, canStart: true, linkDisabled: true },
+    Ready: { busy: false, canStart: true },
+    // Startable from a page alone: pages attached and NOTHING typed. Identical
+    // in props to Ready now, and kept anyway — it is the state that says the
+    // sentence is OPTIONAL, and it is the one where "Add a link" staying live
+    // matters most, because a person who arrived with one page usually has a
+    // second. It used to dim here.
+    BriefOnly: { busy: false, canStart: true },
+    // Mid-submit: the send spins and goes dead, so a second click cannot start
+    // a second board.
+    Busy: { busy: true, canStart: true },
   };
   const config = preset[s];
   if (!config) return <div>Unknown scenario: {s}</div>;
@@ -45,7 +43,6 @@ function Harness() {
         <Component
           busy={config.busy}
           canStart={config.canStart}
-          linkDisabled={config.linkDisabled}
           onBrowse={() => {}}
           onLink={() => {}}
           onStart={() => {}}

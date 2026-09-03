@@ -1,0 +1,16 @@
+{
+  "name": "FirstCardAttachments - Overflowing",
+  "id": "704be8cb-984a-4884-bf3a-298ed7706088",
+  "url": "/isolated-components/FirstCardAttachments?s=Overflowing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "demonstratesState": {
+    "briefs": "many",
+    "files": "many"
+  },
+  "description": "A dozen pages and the full four files. Links are uncapped now, so the strip has to absorb the consequence: it scrolls inside a bounded height rather than growing the card and pushing its own controls off the bottom, and the count above states the total so what is below the fold is stated rather than merely scrollable."
+}

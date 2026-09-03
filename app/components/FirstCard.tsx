@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { fetchBriefFromLink, type FetchedBrief } from '@/app/lib/briefFetch';
 import { admitFiles } from '@/app/lib/attachments';
+import { mergeBriefs } from '@/app/lib/briefMerge';
 import FirstCardAttachments from './FirstCardAttachments';
 import FirstCardControls from './FirstCardControls';
 import FirstCardLinkBox from './FirstCardLinkBox';
@@ -45,14 +46,13 @@ export default function FirstCard() {
    * idea usually comes with a repo AND a doc AND the competitor's page, and the
    * card allowed the first of those and then greyed the control out.
    *
-   * The FIRST is still the brief — the document the board is ABOUT, which the
-   * schema has exactly one of and which the partner is told to read first. The
-   * rest travel as text attachments, which is what they are: things brought
-   * along. That split is a fact about the map's shape, not a ranking of the
-   * links, and the order is the person's own so it stays predictable.
+   * They are ALL the brief. At start they are merged into the single document
+   * the schema allows, each page under its own heading, so the outline the
+   * partner reads back is this list in this order. No page is demoted to
+   * something brought along: being second is a position, not a lesser kind of
+   * source.
    */
   const [briefs, setBriefs] = useState<FetchedBrief[]>([]);
-  const brief = briefs[0] ?? null;
   const [dragging, setDragging] = useState(false);
 
   /**
@@ -87,27 +87,8 @@ export default function FirstCard() {
    * about the third file would leave them looking at a start button that would
    * create a SECOND board.
    */
-  /**
-   * The links past the first, as files the board can open.
-   *
-   * The server already fetched each page and handed back its words, so there
-   * is nothing left to go and get — the text is turned into a plain-text file
-   * and sent up the same path a browsed document takes. That is deliberately
-   * the SAME path: a second link is something brought along, exactly like a
-   * dropped PDF, and giving it its own mechanism would mean two ways for a
-   * document to reach a board and two places for that to go wrong.
-   */
-  function briefsAsFiles(): File[] {
-    return briefs.slice(1).map(
-      (extra) =>
-        new File([extra.text], `${extra.sourceName}.txt`, {
-          type: 'text/plain',
-        }),
-    );
-  }
-
-  async function uploadFiles(mapId: string, extra: File[] = []) {
-    for (const file of [...files, ...extra]) {
+  async function uploadFiles(mapId: string) {
+    for (const file of files) {
       try {
         const form = new FormData();
         form.append('file', file);
@@ -141,13 +122,17 @@ export default function FirstCard() {
         setError(failed);
         return;
       }
-      // Same page twice is a slip, not an instruction. Silently keeping the
-      // one already there is kinder than an error about a duplicate.
-      setBriefs((prev) =>
-        prev.some((b) => b.sourceName === fetched.sourceName)
-          ? prev
-          : [...prev, fetched],
-      );
+      // The same page twice is said out loud rather than absorbed. A browsed
+      // file can be seen sitting in the strip already, so `admitFiles` can
+      // afford to drop a repeat in silence — but here the person typed an
+      // address and pressed a button, and a box that just closes on them looks
+      // exactly like a fetch that failed. The first copy is kept: they asked
+      // for that page, and they still have it.
+      if (briefs.some((b) => b.sourceName === fetched.sourceName)) {
+        setError(`${fetched.sourceName} is already attached.`);
+        return;
+      }
+      setBriefs((prev) => [...prev, fetched]);
       setUrl('');
       setLinking(false);
     } finally {
@@ -161,7 +146,12 @@ export default function FirstCard() {
     // want thought through. What the board cannot start from is neither. This
     // is the same rule `/api/maps` already enforces, said here so the button
     // agrees with the server instead of being stricter than it.
-    if ((!seedIdea && !brief) || busy) return;
+    if ((!seedIdea && briefs.length === 0) || busy) return;
+    // The several become one HERE, on the way out, because the schema allows a
+    // board exactly one brief and that document has to be whole before it is
+    // written. `mergeBriefs` returns undefined for an empty list, so "no brief"
+    // stays the single case the body below already spreads around.
+    const brief = mergeBriefs(briefs);
     setBusy(true);
     setError(null);
     try {
@@ -172,25 +162,13 @@ export default function FirstCard() {
         // once this one has answered with an id, because a JSON body carrying
         // a megabyte of base64 alongside the idea would make the one request
         // the board cannot start without the slowest one on the screen.
-        // A fetched page is still the exception: its words are already text,
-        // so they travel in full as the brief.
-        body: JSON.stringify({
-          seedIdea,
-          ...(brief
-            ? {
-                brief: {
-                  text: brief.text,
-                  sourceName: brief.sourceName,
-                  mediaType: brief.mediaType,
-                },
-              }
-            : {}),
-        }),
+        // Fetched pages are still the exception: their words are already text,
+        // so they travel in full as the brief — however many there were.
+        body: JSON.stringify({ seedIdea, ...(brief ? { brief } : {}) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Could not start a map.');
-      const extra = briefsAsFiles();
-      if (files.length || extra.length) await uploadFiles(data.id, extra);
+      if (files.length) await uploadFiles(data.id);
       router.push(`/map/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start a map.');
@@ -261,10 +239,7 @@ export default function FirstCard() {
 
         <FirstCardControls
           busy={busy}
-          canStart={value.trim().length > 0 || brief !== null}
-          // Never disabled now. One link was a limit nobody asked for: an idea
-          // usually arrives with a repo and a doc and somebody else's page.
-          linkDisabled={false}
+          canStart={value.trim().length > 0 || briefs.length > 0}
           onBrowse={() => picker.current?.click()}
           onLink={() => setLinking((was) => !was)}
           onStart={() => void start()}

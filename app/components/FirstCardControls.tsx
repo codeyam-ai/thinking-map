@@ -12,18 +12,14 @@
 export default function FirstCardControls({
   busy,
   canStart,
-  linkDisabled,
   onBrowse,
   onLink,
   onStart,
 }: {
   busy: boolean;
   /** Whether there is anything to start a board FROM — a typed idea or an
-   *  attached brief. Either is enough; neither is not. */
+   *  attached page. Either is enough; neither is not. */
   canStart: boolean;
-  /** True once a brief is in hand: there is one brief per board, so offering a
-   *  second link is offering to lose the first. */
-  linkDisabled: boolean;
   onBrowse: () => void;
   onLink: () => void;
   onStart: () => void;
@@ -57,12 +53,14 @@ export default function FirstCardControls({
         </button>
 
         {/* The third door, and the only one whose contents actually reach the
-            board as words. */}
+            board as words. It never goes dim: the card takes as many pages as
+            you point it at, and greying this out after the first was a limit
+            nobody asked for — an idea usually arrives with a repo AND a doc AND
+            somebody else's page. */}
         <button
           type="button"
           onClick={onLink}
-          disabled={linkDisabled}
-          className="rounded-full bg-black/12 px-4 py-2 text-[13px] font-medium text-black transition-opacity hover:bg-black/20 disabled:opacity-30"
+          className="rounded-full bg-black/12 px-4 py-2 text-[13px] font-medium text-black hover:bg-black/20"
         >
           Add a link
         </button>

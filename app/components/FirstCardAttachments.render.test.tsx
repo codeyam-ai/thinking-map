@@ -144,4 +144,57 @@ describe('FirstCardAttachments', () => {
     expect(screen.getByText('example.gov/spec')).toBeTruthy();
     expect(screen.getByText('notes.txt')).toBeTruthy();
   });
+
+  // Under the threshold a count would be arithmetic about chips the person can
+  // already see, on a card whose emptiness is deliberate.
+  it('shows no count while everything is visible at a glance', () => {
+    render(
+      <FirstCardAttachments
+        briefs={[
+          { ...BRIEF, sourceName: 'a.example' },
+          { ...BRIEF, sourceName: 'b.example' },
+        ]}
+        files={[new File([''], 'notes.txt')]}
+        onRemoveBrief={vi.fn()}
+        onRemoveFile={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText(/attached$/)).toBeNull();
+  });
+
+  // Past it the strip scrolls, and this line is the only thing saying that what
+  // went out of sight is still attached rather than dropped. It counts BOTH
+  // kinds, because what overflows the strip is the total.
+  it('states the total once the strip can no longer show it all', () => {
+    render(
+      <FirstCardAttachments
+        briefs={[
+          { ...BRIEF, sourceName: 'a.example' },
+          { ...BRIEF, sourceName: 'b.example' },
+          { ...BRIEF, sourceName: 'c.example' },
+        ]}
+        files={[new File([''], 'notes.txt'), new File([''], 'spec.pdf')]}
+        onRemoveBrief={vi.fn()}
+        onRemoveFile={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('5 attached')).toBeTruthy();
+  });
+
+  // The strip names itself the same way the board's own strip does, so the two
+  // do not describe the same idea in two different words to a screen reader.
+  it('labels the strip as what the idea is carrying', () => {
+    render(
+      <FirstCardAttachments
+        briefs={[BRIEF]}
+        files={[]}
+        onRemoveBrief={vi.fn()}
+        onRemoveFile={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText('Attached to this idea')).toBeTruthy();
+  });
 });

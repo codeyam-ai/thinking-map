@@ -3,6 +3,24 @@
   "surface_kind": "component",
   "states": [
     {
+      "dimension": "briefs",
+      "value": "empty",
+      "rationale": "source-derived state briefs=empty",
+      "status": "covered"
+    },
+    {
+      "dimension": "briefs",
+      "value": "one",
+      "rationale": "source-derived state briefs=one",
+      "status": "covered"
+    },
+    {
+      "dimension": "briefs",
+      "value": "many",
+      "rationale": "source-derived state briefs=many",
+      "status": "covered"
+    },
+    {
       "dimension": "files",
       "value": "empty",
       "rationale": "source-derived state files=empty",
@@ -42,7 +60,7 @@
       "dimension": "error",
       "value": "true",
       "rationale": "source-derived state error=true",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "error",
@@ -54,7 +72,7 @@
       "dimension": "linking",
       "value": "true",
       "rationale": "source-derived state linking=true",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "linking",
@@ -66,7 +84,7 @@
       "dimension": "dragging",
       "value": "true",
       "rationale": "source-derived state dragging=true",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "dragging",
@@ -78,7 +96,7 @@
       "dimension": "brief",
       "value": "true",
       "rationale": "source-derived state brief=true",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "brief",

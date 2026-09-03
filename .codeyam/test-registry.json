@@ -946,6 +946,15 @@
       "runner": "tests"
     },
     {
+      "description": "The strip names itself the same way the board's own strip does, so the two do not describe the same idea in two different words to a screen reader.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › labels the strip as what the idea is carrying",
+      "line": 188,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
       "description": "A name that already fits is shown as it is — truncation is for names that need it, not a house style.",
       "file": "app/components/FirstCardAttachments.render.test.tsx",
       "format": "vitest",
@@ -997,6 +1006,24 @@
       "key": "FirstCardAttachments › shows every link that was added, not only the first",
       "line": 96,
       "registeredAt": "2026-09-03T16:25:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Under the threshold a count would be arithmetic about chips the person can already see, on a card whose emptiness is deliberate.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › shows no count while everything is visible at a glance",
+      "line": 150,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Past it the strip scrolls, and this line is the only thing saying that what went out of sight is still attached rather than dropped. It counts BOTH kinds, because what overflows the strip is the total.",
+      "file": "app/components/FirstCardAttachments.render.test.tsx",
+      "format": "vitest",
+      "key": "FirstCardAttachments › states the total once the strip can no longer show it all",
+      "line": 169,
+      "registeredAt": "2026-09-03T19:09:35Z",
       "runner": "tests"
     },
     {
@@ -6730,6 +6757,78 @@
       "key": "mapCaption › singularises a lone open question",
       "line": 37,
       "registeredAt": "2026-08-31T23:19:44.789701647+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A name carrying a newline would stop being a heading at all — the splitter matches a WHOLE line — and the page would silently fold into the one above it. Collapsing the whitespace is what keeps the join's promise.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › collapses whitespace in a name so it stays one heading line",
+      "line": 75,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Each page arrives under its own name, in the order it was added — the order is the person's, so it has to survive the merge unreordered.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › joins several pages under their own headings, in order",
+      "line": 35,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A page whose own text already carries headings simply splits finer. That is the splitter working rather than a defect, and it is worth pinning so nobody later \"fixes\" it by escaping the page's own markdown.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › lets a page that carries its own headings split finer",
+      "line": 105,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A document made of three pages is not the first page, and saying so would be a lie the readout repeats. It is also markdown now, whatever the pages were made of, because the headings this added are markdown.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › names the merged document by its count and calls it markdown",
+      "line": 49,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The most common map there is. A heading added here would shift every section id on it, so the single page must come back byte-identical.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › passes a single page through verbatim",
+      "line": 23,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The join between this module and the splitter, which is the assertion that catches a change to either one breaking the other: the outline an agent reads back IS the list of pages, addressable as s1..sN.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › produces a document whose outline is the pages that were attached",
+      "line": 87,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "\"Nothing attached\" has to stay ONE case for the caller. Returning an empty document instead would make the POST body carry a brief made of nothing.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › returns undefined when nothing was attached",
+      "line": 17,
+      "registeredAt": "2026-09-03T19:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Untrimmed, a page ending in blank lines would meet the next page's heading with a run of empties — whitespace nobody wrote, carried into a document that is then immutable.",
+      "file": "app/lib/briefMerge.test.ts",
+      "format": "vitest",
+      "key": "mergeBriefs › trims each page so the join cannot leave blank runs",
+      "line": 63,
+      "registeredAt": "2026-09-03T19:09:35Z",
       "runner": "tests"
     },
     {

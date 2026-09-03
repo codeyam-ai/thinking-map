@@ -1,0 +1,435 @@
+{
+  "timestamp": "2026-09-03T19:31:09Z",
+  "title": "Add As Many Links As You Like To The First Card",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe first card lets you attach exactly one link. Once a page is fetched, \"Add a\nlink\" greys out — `linkDisabled={brief !== null}` — so a second source is\noffered only by throwing the first away. That restriction is real, not a slip:\n`MapBrief.mapId` is `@unique` and the brief is write-once, and that immutability\nis load-bearing, because `briefSections.ts` derives stable `s1..sN` ids from the\ntext by a pure splitter and nodes cite those ids as provenance.\n\nThis plan lets the card carry as many links as you want without touching that\nmodel. The card holds a LIST of fetched pages; at Start they are merged into the\nsingle brief the server already accepts, each page under its own `# <sourceName>`\nmarkdown heading. The existing splitter then cuts the merged document on exactly\nthose headings, so the brief outline an agent reads back is the list of pages you\nattached, in order, with stable ids. One link merges to byte-identical text, so\nnothing about today's single-link map changes.\n\nBecause links become uncapped, the chip strip has to survive a card carrying a\ndozen things: it gets a bounded height that scrolls, plus a count so what is out\nof sight is still stated.\n\nBrowse was checked separately and needs no change — see Key Decisions.\n\n## Key Decisions\n\n- **Merge into one brief rather than allowing many.** Considered dropping the\n  `@unique` on `MapBrief.mapId`, and rejected it: the schema comment at\n  `prisma/schema.prisma:406` records that attaching or replacing a brief on a\n  running map would need a document-version model and a story for references\n  pointing into a passage that no longer exists. Merging at intake gets multiple\n  links with zero schema change and no new state for `read_brief` or `sourceRef`\n  provenance to account for.\n- **Merge on the client, at Start, not in the route.** The POST body keeps its\n  current shape — one `brief` object — so `parseBriefInput` and `createMap` are\n  untouched and the server contract does not fork. The merge is a pure function\n  in its own module, which is where it can actually be tested at the edges.\n- **One link merges to itself, verbatim.** `mergeBriefs` passes a single brief\n  through with no heading added and no media type rewrite. Wrapping it would\n  shift every section id on the most common map there is, for no gain.\n- **Headings carry the page names.** `briefSections.ts` splits on markdown\n  headings, so `# <sourceName>` per page makes the outline the list of sources.\n  A page whose own text already contains headings simply splits finer — that is\n  the splitter working, not a defect.\n- **Dedupe links by `sourceName`, mirroring files.** `admitFiles` refuses a file\n  whose name is already held; a link door that silently attached the same page\n  twice would be the odd one out, and a duplicated page would appear twice in\n  the merged brief.\n- **The link box still closes after a successful attach.** The ask is that the\n  button stay selectable, and it will be. Leaving the box open was considered —\n  it saves a click per link — but it is a change to a flow nobody complained\n  about, and an address field that never goes away crowds a card whose emptiness\n  is deliberate.\n- **No cap on links; the strip absorbs the consequence.** Files keep their cap of\n  4 (`MAX_ATTACHMENTS_PER_MAP`), which is server-enforced in the upload route and\n  is not in scope. Links have none, so the strip gets a bounded scrolling height\n  rather than growing the card without limit.\n- **Scroll rather than expand-on-hover.** `max-h-[…] overflow-y-auto` is the\n  pattern already used for a list that must not grow the surface it sits in\n  (`BoardMenu.tsx:83`, `MapWorkspace.tsx:70`). Hover disclosure would invent a\n  gesture this app does not otherwise use, and it is unreachable by touch.\n- **Browse is left alone — it already does this.** Its button carries no\n  `disabled` prop at all, the picker is `multiple`, and `addFiles` appends and\n  dedupes. Clicking it repeatedly already accumulates files; the only wall is\n  the cap of 4, which reports itself as a sentence rather than a greyed button.\n  Checked and deliberately unchanged.\n\n## Implementation\n\n### 1. The merge itself\n\n**New file**: `app/lib/briefMerge.ts`\n\nA pure module, no React and no fetch, exporting one function:\n\n`mergeBriefs(briefs: FetchedBrief[]): BriefInput | undefined`\n\n- Empty list returns `undefined`, so \"no brief\" stays one case for the caller.\n- A single brief returns `{ text, sourceName, mediaType }` verbatim — no heading,\n  no rewriting.\n- Two or more return the pages joined as `# <sourceName>` followed by a blank\n  line and that page's text, separated by blank lines; `sourceName` becomes\n  `\"<n> pages\"`; `mediaType` becomes `text/markdown`, which is what the merged\n  document now honestly is.\n\nNormalise each page's text the way the rest of the intake does before joining\n(trailing whitespace trimmed) so the join cannot produce runs of blank lines that\nchange where the splitter cuts.\n\n### 2. The card holds a list\n\n**File**: `app/components/FirstCard.tsx`\n\n- Replace the `brief` state with `briefs: FetchedBrief[]`, starting empty.\n- `attachLink` appends rather than assigns: on a successful fetch, refuse the\n  page when a held brief already has that `sourceName` (report it through the\n  existing `error` state), otherwise append, clear the address, and close the\n  box as it does today.\n- `canStart` becomes `value.trim().length > 0 || briefs.length > 0`.\n- `start` calls `mergeBriefs(briefs)` and spreads the result into the POST body\n  in place of the current inline single-brief object; when it returns\n  `undefined`, the body carries no `brief` key, exactly as now.\n- Drop the `linkDisabled` prop from the `FirstCardControls` call site.\n- Pass `briefs` and an `onRemoveBrief` that removes by index to\n  `FirstCardAttachments`.\n\n### 3. The button stops greying out\n\n**File**: `app/components/FirstCardControls.tsx`\n\nRemove the `linkDisabled` prop, its type, its doc comment about one brief per\nboard, and the `disabled` attribute on the \"Add a link\" button. Keep\n`disabled:opacity-30` off that button's class list once nothing sets it. The\nBrowse button and the Start button are untouched.\n\n### 4. The strip shows many chips without growing the card\n\n**File**: `app/components/FirstCardAttachments.tsx`\n\n- Prop `brief: FetchedBrief | null` becomes `briefs: FetchedBrief[]`, and\n  `onClearBrief` becomes `onRemoveBrief: (index: number) => void`. Render one\n  inverted chip per brief, keyed by index — two pages can legitimately share a\n  display name, so the index is the only stable key.\n- Render nothing when `briefs.length === 0 && files.length === 0`, unchanged.\n- Give the `ul` a bounded height that scrolls when the contents exceed it, using\n  the `max-h-[…] overflow-y-auto` pattern cited above — roughly three rows of\n  chips, so the card's proportions hold. Add the `aria-label=\"Attached to this\n  idea\"` that `AttachmentStrip.tsx:39` already uses, so the two strips name\n  themselves the same way.\n- When the combined count of briefs and files is greater than four, show a small\n  count above the list (e.g. \"7 attached\") so the items below the fold are\n  stated rather than merely scrollable.\n\n### 5. Keep the isolated-component harnesses honest\n\n**File**: `app/isolated-components/FirstCardControls/page.tsx`\n\nDrop `linkDisabled` from the preset type and from all four presets. The\n`BriefOnly` preset now differs from `Ready` only in intent, so either fold it\ninto `Ready` or keep it and re-describe it as \"startable from a page alone\" —\nwhichever the scenario registry ends up cleaner with.\n\n**File**: `app/isolated-components/FirstCardAttachments/page.tsx`\n\nSwitch every preset to the `briefs` array shape and add two: several links\nattached at once, and a card carrying enough links and files to make the strip\nscroll. These are what prove the overflow behaviour visually.\n\n### 6. Tests\n\n**New file**: `app/lib/briefMerge.test.ts`\n\nCover the edges the merge actually has: an empty list, a single brief passing\nthrough byte-identical, several pages joined under their own headings, the\nderived `sourceName` and `mediaType`, and a page whose text already carries\nheadings.\n\n**File**: `app/components/FirstCardAttachments.render.test.tsx`\n\nExtend for the list shape: several brief chips rendered at once, removal\nreporting the right index, and the count line appearing only past the threshold.\nThe existing cases keep their meaning with a one-element array.\n\n**File**: `app/lib/briefSections.test.ts`\n\nAdd one case asserting a merged two-page document splits into `s1` and `s2` with\nthe page names as headings. That is the join between the two modules, and it is\nthe assertion that would catch a change to either one breaking the other.\n\nRe-register affected scenarios after the UI changes.\n\n## Reused existing code\n\n- `FetchedBrief` from `app/lib/briefFetch.ts` — the shape the card already holds;\n  the list is a list of these, no new type.\n- `fetchBriefFromLink` from `app/lib/briefFetch.ts` — unchanged; the second link\n  goes through exactly the same server-side guarded fetch as the first.\n- `BriefInput` from `app/lib/briefInput.ts` — the return type the new merge helper\n  is written against, so the merged brief is typed as the thing the route\n  already parses.\n- `parseBriefInput` from `app/lib/briefInput.ts` — untouched, and that is the\n  point: the POST body shape does not change.\n- `splitIntoSections` from `app/lib/briefSections.ts` (glossary entry: `briefSections`)\n  — the heading splitter the merged document is written to feed. Not modified.\n- `admitFiles` and `MAX_ATTACHMENTS_PER_MAP` from `app/lib/attachments.ts` — the\n  file path, unchanged, and the precedent for deduping by name that the link\n  dedupe copies.\n- `shortenName` from `app/lib/attachments.ts` — already truncates each chip's\n  label; it needs nothing new to serve more chips.\n- `useFilePreviews` from `app/hooks/useFilePreviews.ts` — file chip thumbnails,\n  unchanged.\n- `FirstCardFileChip` from `app/components/FirstCardFileChip.tsx` (glossary\n  entry: `FirstCardFileChip`) — unchanged.\n- `FirstCardLinkBox` from `app/components/FirstCardLinkBox.tsx` (glossary entry:\n  `FirstCardLinkBox`) — unchanged; it is reopened rather than altered.\n- `AttachmentStrip` from `app/components/AttachmentStrip.tsx` — not modified;\n  its `aria-label` wording is the precedent the strip's label copies.\n\n**Existing-implementation survey.** There is no merge, concatenate, or join\nhelper for briefs anywhere in `app/lib` today — the fourteen `brief*` modules\ncover fetching, extraction, sectioning, formatting, coverage and URL guarding,\nand none of them combines two documents, so the merge helper in Implementation\nstep 1 is genuinely new rather than a duplicate of something already here. There\nis likewise no existing overflow/disclosure component to reuse for the chip\nstrip; `max-h-[…] overflow-y-auto` is a repeated inline pattern, not a\ncomponent, and this plan follows it inline rather than extracting one for two\ncall sites.\n\n**Out of scope, noted.** `app/components/IdeaPrompt.tsx` and\n`app/components/BriefLinkBox.tsx` are a second, older intake surface, reachable\nonly through `app/components/LandingScreen.tsx`, which nothing but the isolated-component\nharness renders. It carries the same one-brief assumption. Left alone\ndeliberately; it is dead-ish surface and changing it would double the diff for\nno user-visible gain.\n\n## Scenarios to Demonstrate\n\n- One link attached — the unchanged case, proving \"Add a link\" is now still\n  selectable beside it.\n- Three links attached, chips listed in the order they were added.\n- A dozen links and four files — the strip scrolls inside its bounded height and\n  the count states the total.\n- Links and browsed files together, each kind still readable as its own sort of\n  chip against the yellow.\n- The same URL added twice — the second is refused with a sentence, and the\n  first is still there.\n- A link removed from the middle of the list, the rest keeping their order.\n- Empty card — the strip renders nothing at all, as it does today.\n- A merged brief read back through the outline: page names as section headings,\n  ids `s1..sN` in attach order.",
+  "description": "The first card now takes as many links as you point it at. It used to allow exactly one: once a page was fetched, Add a link greyed out, so a second source was only available by throwing the first away. The card now holds a LIST of fetched pages, and at Start a new pure module merges them into the single brief the schema allows - each page under its own '# <page name>' markdown heading, joined in the order they were added. That heading shape is deliberate: briefSections already splits on markdown headings, so the outline an agent reads back through read_brief IS the list of pages that were attached, with stable s1..sN ids. One page merges to byte-identical text, so nothing about an existing single-link map changes. No schema change was needed - MapBrief.mapId stays unique and the brief stays write-once, which is what keeps section-id provenance sound. Duplicate pages are refused by source name with a sentence rather than silently absorbed, and because links are now uncapped the chip strip gained a bounded scrolling height plus a count so what is out of sight is still stated. Two components were extracted along the way - FirstCardLinkChip (restoring the symmetry with FirstCardFileChip, which was already its own component) and FirstCardAttachmentCount - leaving FirstCardAttachments as pure composition. Browse was checked and deliberately left alone: its picker was already multiple and its button was never disabled.\n\nWorth recording: multi-link had been PARTLY shipped by an earlier cycle under a different mechanism - links past the first became .txt files uploaded to the attachments route. That path counted against the server-enforced cap of four attachments and uploadFiles never checked res.ok, so a fifth link was silently dropped and only the first page was ever part of the brief. This cycle replaced that mechanism with the merge, on the user's explicit choice at the plan gate after the conflict was surfaced.\n\nSCOPE VERDICT: this cycle delivered the plan in full - the merge module, the list-holding card, the un-dimmed button, the bounded scrolling strip with its count, the two extractions, and the scenario and test coverage for all of it. It DEFERRED nothing. The project's 10 deliverables were all already resolved before this cycle began (9 delivered, 1 deferred - 'assist track, not this build flow', decided by the user), and this cycle neither added nor changed a deferral.\n\nOne gap named honestly rather than hidden: the duplicate-link refusal sentence has no captured scenario. Capturing it needs a real page fetch over the public internet on every recapture - there is no mockable manifest for /api/briefs/fetch - and baking that fragility into the scenario set was judged worse than the missing frame. The behaviour is exercised by code and was shown in the live demo; it is not marked n-a, because the state can occur - this is a capture limitation, not an impossible state.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/ne--add-as-many-links-as-you-like-to-the-first-card.md\t.codeyam/plans/completed/ne--add-as-many-links-as-you-like-to-the-first-card.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/firstcard.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardcontrols-briefonly.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardcontrols-busy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/day-one-nothing-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-both--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-filesonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-linkattached--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-longfilename--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-pastedscreenshot--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-screenshotanddoc--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-shortname--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-briefonly--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-briefonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-busy--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-busy--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardcontrols-ready--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/many-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/one-saved-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/returning-four-saved-maps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/two-visitors-one-database--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/157d615438d2003355ca68e01dcd8644bd2cca6a35a4089f007e8d99be95e97f.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a8eab0ecbb27199c3b4416a34e05b15f1a5516d25998c6169924708b65cca9f5.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardAttachments.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/FirstCardControls.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/FirstCardAttachments/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/FirstCardControls/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/firstcardattachmentcount.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/firstcardattachments.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/firstcardcontrols.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/firstcardlinkchip.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachmentcount-justover.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachmentcount-many.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-overflowing.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardattachments-severallinks.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardlinkchip-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardlinkchip-longname.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/firstcardlinkchip-shortname.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachmentcount-justover--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachmentcount-justover--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachmentcount-many--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachmentcount-many--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-overflowing--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-overflowing--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-severallinks--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardattachments-severallinks--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkchip-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkchip-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkchip-longname--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkchip-longname--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkchip-shortname--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/firstcardlinkchip-shortname--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/ne--add-as-many-links-as-you-like-to-the-first-card.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/3daceb43ff5d7a242b1e3618ec0294de6826e859a34ac8cc417edb24393cc1f3.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/80fc0f8774d23e4382ce02c688bc877065c924c585232aad1a40a775a965082a.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/dfe9dc0e9271e86056508c9a90dc620eadc77c4a35e6a488626b9ea2f29f83fc.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardAttachmentCount.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/FirstCardLinkChip.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardAttachmentCount/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/FirstCardLinkChip/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefMerge.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/briefMerge.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "All eight, the list expanded",
+      "screenshotPath": "all-eight-the-list-expanded--tablet.png"
+    },
+    {
+      "name": "Day one - nothing yet",
+      "screenshotPath": "day-one-nothing-yet--tablet.png"
+    },
+    {
+      "name": "Many saved maps",
+      "screenshotPath": "many-saved-maps--tablet.png"
+    },
+    {
+      "name": "One saved map",
+      "screenshotPath": "one-saved-map--tablet.png"
+    },
+    {
+      "name": "Returning - four saved maps",
+      "screenshotPath": "returning-four-saved-maps--tablet.png"
+    },
+    {
+      "name": "Two visitors, one database",
+      "screenshotPath": "two-visitors-one-database--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachmentCount - JustOver",
+      "screenshotPath": "firstcardattachmentcount-justover--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachmentCount - Many",
+      "screenshotPath": "firstcardattachmentcount-many--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - Both",
+      "screenshotPath": "firstcardattachments-both--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - FilesOnly",
+      "screenshotPath": "firstcardattachments-filesonly--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - LinkAttached",
+      "screenshotPath": "firstcardattachments-linkattached--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - LongFilename",
+      "screenshotPath": "firstcardattachments-longfilename--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - Overflowing",
+      "screenshotPath": "firstcardattachments-overflowing--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - PastedScreenshot",
+      "screenshotPath": "firstcardattachments-pastedscreenshot--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - ScreenshotAndDoc",
+      "screenshotPath": "firstcardattachments-screenshotanddoc--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - SeveralLinks",
+      "screenshotPath": "firstcardattachments-severallinks--tablet.png"
+    },
+    {
+      "name": "FirstCardAttachments - ShortName",
+      "screenshotPath": "firstcardattachments-shortname--tablet.png"
+    },
+    {
+      "name": "FirstCardControls - BriefOnly",
+      "screenshotPath": "firstcardcontrols-briefonly--tablet.png"
+    },
+    {
+      "name": "FirstCardControls - Busy",
+      "screenshotPath": "firstcardcontrols-busy--tablet.png"
+    },
+    {
+      "name": "FirstCardControls - Default",
+      "screenshotPath": "firstcardcontrols-default--tablet.png"
+    },
+    {
+      "name": "FirstCardControls - Ready",
+      "screenshotPath": "firstcardcontrols-ready--tablet.png"
+    },
+    {
+      "name": "FirstCardLinkChip - Default",
+      "screenshotPath": "firstcardlinkchip-default--tablet.png"
+    },
+    {
+      "name": "FirstCardLinkChip - LongName",
+      "screenshotPath": "firstcardlinkchip-longname--tablet.png"
+    },
+    {
+      "name": "FirstCardLinkChip - ShortName",
+      "screenshotPath": "firstcardlinkchip-shortname--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 18,
+        "passed": 18
+      }
+    ]
+  }
+}

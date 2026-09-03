@@ -1,0 +1,12 @@
+{
+  "name": "FirstCardAttachmentCount - Many",
+  "id": "673883cb-ea49-4fc5-b647-5c4dcfe82eba",
+  "url": "/isolated-components/FirstCardAttachmentCount?s=Many",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachmentCount",
+  "scenarioType": "component",
+  "description": "A card carrying far more than the strip can show. This is what the line exists for: the chips below it are scrolling inside a bounded height, and this sentence is the only thing saying that what went out of sight is still attached rather than dropped."
+}

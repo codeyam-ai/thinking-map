@@ -1,6 +1,6 @@
 {
   "name": "FirstCardControls - BriefOnly",
-  "id": "1a618437-5a3d-4dea-bac6-97df3a13b705",
+  "id": "4b8107d7-4674-4993-a4a0-dee5f02cd4b4",
   "url": "/isolated-components/FirstCardControls?s=BriefOnly",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "FirstCardControls",
   "scenarioType": "component",
-  "description": "A page attached and NOTHING typed, with the send live anyway - the opposite of every other state here. A page says what you want thought through, so the sentence becomes optional. Add a link dims because there is one brief per board, and offering a second is offering to lose the first."
+  "description": "Startable from a page alone: something attached and NOTHING typed, with the send live anyway - the opposite of every other state here, because a page says what you want thought through so the sentence becomes optional. It is also the state where Add a link staying at full strength matters most: somebody who arrived with one page usually has a second, and this control used to dim here on the theory that a board has one brief. It no longer does - the pages merge into that one brief at start."
 }

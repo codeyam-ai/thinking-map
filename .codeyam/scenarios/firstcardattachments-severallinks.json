@@ -1,0 +1,15 @@
+{
+  "name": "FirstCardAttachments - SeveralLinks",
+  "id": "b6840337-267b-467c-85cb-504254ad2b68",
+  "url": "/isolated-components/FirstCardAttachments?s=SeveralLinks",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "FirstCardAttachments",
+  "scenarioType": "component",
+  "demonstratesState": {
+    "briefs": "many"
+  },
+  "description": "The state this whole change exists for: three pages attached at once, which is the ordinary shape of arriving with research - the spec, the competitor, and the thing somebody wrote about both. They are listed in the order they were added and they all wear the same chip, because none of them is a lesser kind of source; at start they merge into one brief, each under its own heading. Before this the card allowed the first page and then greyed the control out."
+}

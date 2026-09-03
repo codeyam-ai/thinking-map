@@ -1,9 +1,10 @@
 'use client';
 
 import type { FetchedBrief } from '@/app/lib/briefFetch';
-import { shortenName } from '@/app/lib/attachments';
 import { useFilePreviews } from '@/app/hooks/useFilePreviews';
+import FirstCardAttachmentCount from './FirstCardAttachmentCount';
 import FirstCardFileChip from './FirstCardFileChip';
+import FirstCardLinkChip from './FirstCardLinkChip';
 
 /**
  * What the first card is carrying, named back to the person.
@@ -30,10 +31,9 @@ export default function FirstCardAttachments({
   onRemoveBrief,
   onRemoveFile,
 }: {
-  /** Every page pointed at, in the order they were added. The first is the
-   *  brief the board is about; the rest travel as text attachments. They all
-   *  wear the same chip, because that split is a fact about the map's shape
-   *  and not a ranking the person needs to be shown. */
+  /** Every page pointed at, in the order they were added. They are all the
+   *  brief — merged into one document at start, each under its own heading —
+   *  so they all wear the same chip, with no first among them. */
   briefs: FetchedBrief[];
   files: File[];
   onRemoveBrief: (sourceName: string) => void;
@@ -44,31 +44,32 @@ export default function FirstCardAttachments({
   if (briefs.length === 0 && files.length === 0) return null;
 
   return (
-    <ul className="mb-3 flex flex-wrap gap-2">
-      {briefs.map((brief) => (
-        <li
-          key={brief.sourceName}
-          className="flex max-w-full items-center gap-2 rounded-full bg-black px-3 py-1.5 text-[12px] text-[#e4ec4b]"
-        >
-          <span className="truncate">{shortenName(brief.sourceName, 34)}</span>
-          <button
-            type="button"
-            aria-label={`Remove ${brief.sourceName}`}
-            onClick={() => onRemoveBrief(brief.sourceName)}
-            className="text-[#e4ec4b]/60 hover:text-[#e4ec4b]"
-          >
-            ×
-          </button>
-        </li>
-      ))}
-      {files.map((file) => (
-        <FirstCardFileChip
-          key={file.name}
-          file={file}
-          previewUrl={previews[file.name]}
-          onRemove={() => onRemoveFile(file.name)}
-        />
-      ))}
-    </ul>
+    <div className="mb-3">
+      <FirstCardAttachmentCount total={briefs.length + files.length} />
+      <ul
+        // Bounded and scrolling rather than growing. The card is a fixed
+        // 440px object whose emptiness is deliberate, and a dozen links would
+        // otherwise push the controls off the bottom of it — the same reason
+        // the activity rail is capped where it sits.
+        aria-label="Attached to this idea"
+        className="flex max-h-[164px] flex-wrap gap-2 overflow-y-auto"
+      >
+        {briefs.map((brief) => (
+          <FirstCardLinkChip
+            key={brief.sourceName}
+            brief={brief}
+            onRemove={() => onRemoveBrief(brief.sourceName)}
+          />
+        ))}
+        {files.map((file) => (
+          <FirstCardFileChip
+            key={file.name}
+            file={file}
+            previewUrl={previews[file.name]}
+            onRemove={() => onRemoveFile(file.name)}
+          />
+        ))}
+      </ul>
+    </div>
   );
 }

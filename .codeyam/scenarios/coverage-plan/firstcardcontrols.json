@@ -1,0 +1,18 @@
+{
+  "surface": "FirstCardControls",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "busy",
+      "value": "true",
+      "rationale": "source-derived state busy=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "busy",
+      "value": "false",
+      "rationale": "source-derived state busy=false",
+      "status": "covered"
+    }
+  ]
+}
