@@ -1,4 +1,8 @@
 import { summarizeMap } from './mapStore';
+// The number the agent is TOLD to pass has to be the number the runtime would
+// have used anyway. Typing it here as a literal is how it came to say 300 while
+// the constant meant something else entirely.
+import { DEFAULT_TIMEOUT_SECONDS } from './toolCatalog';
 import {
   INSIGHT_STREAM_KINDS,
   TARGET_LIVE_INSIGHTS,
@@ -210,6 +214,22 @@ export function formatInsightStanding(stream: InsightStream): string {
  * The same steering channel as the standing insight ask, applied to questions
  * that need a person's answer. A page cannot wake an agent, so a write that
  * leaves questions open must explicitly send the agent into the wait loop.
+ *
+ * Two clauses here are load-bearing and were each added after watching the loop
+ * fail in a real session:
+ *
+ * The chat line, because THIS TEXT IS NOT ADDRESSED TO THE PERSON. It is a tool
+ * reply, read only by the agent, and an agent that writes questions and parks
+ * silently leaves someone looking at a map with no idea that anything is owed
+ * from them or where to put it. The agent's chat window is the only channel
+ * that reaches them, so the reply has to spend a sentence sending it there.
+ *
+ * The short timeout, because the agent's host aborts a long tool call — see
+ * `DEFAULT_TIMEOUT_SECONDS`. Naming 300 here, as this used to, was enough to
+ * break the loop on its own: the wait was killed in transit, and the agent
+ * reported a timeout rather than looping. The instruction has to make a bounded
+ * return sound like the normal thing it is, or an agent reads `timedOut` as a
+ * failure and stops.
  */
 export function formatStandingWait(
   nodes: readonly { kind: string; status: string }[],
@@ -223,8 +243,9 @@ export function formatStandingWait(
   return [
     `## Waiting for answers`,
     `${open} question${open === 1 ? '' : 's'} on this map ${open === 1 ? 'is' : 'are'} still open.`,
-    `Call await_user_activity with sinceRevision: ${revision} and timeoutSeconds: 300.`,
-    'It returns as soon as one answer lands; handle that answer, then call it again while questions remain open rather than ending your turn.',
+    'First, in your chat: say in a sentence or two what you just put on the map, and ask them to answer the open questions on the map itself rather than in chat. They cannot see this reply — your chat window is the only place you can reach them.',
+    `Then call await_user_activity with sinceRevision: ${revision} and timeoutSeconds: ${DEFAULT_TIMEOUT_SECONDS}.`,
+    'Keep every wait that short and repeat it: your host cuts off a long tool call before an answer can reach you, so timedOut true is the normal return rather than a failure. Call it again immediately with the cursor it hands back. It returns as soon as one answer lands; handle that answer, say in chat what it changed, then wait again while questions remain open rather than ending your turn.',
   ].join('\n');
 }
 

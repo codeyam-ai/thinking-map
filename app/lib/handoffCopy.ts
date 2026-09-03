@@ -84,9 +84,16 @@ export function attachedStartCopy({
     // did exactly that — read_map, then five tidy paragraphs of analysis back
     // in ChatGPT, and a board still showing nothing. The map is the artifact,
     // so the prompt has to say where the thinking goes.
+    //
+    // It asks for a short chat note as WELL, which is not a softening of that
+    // rule. This prompt used to end "do not summarise back to me in chat", and
+    // an agent obeying it wrote questions and then went silent — leaving a
+    // person watching a map with no idea that anything was owed from them or
+    // where to put it. Tool replies are invisible to them; chat is the only
+    // channel that is not. So: thinking on the map, and a pointer in chat.
     prompt: hasBrief
-      ? 'Read the brief with read_brief, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. After writing questions, call await_user_activity and keep waiting: each answer is another turn, not the end. Do not summarise back to me in chat — the map is the output.'
-      : 'Read the map with read_map, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. After writing questions, call await_user_activity and keep waiting: each answer is another turn, not the end. Do not summarise back to me in chat — the map is the output.',
+      ? 'Read the brief with read_brief, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. Then tell me in chat what you put on the map and which questions you need me to answer there — the deconstruction itself belongs on the map, but I cannot see your tool results, so a couple of sentences is how I know anything is owed from me. Then call await_user_activity with timeoutSeconds: 25 and re-call it every time it expires: each answer is another turn, not the end.'
+      : 'Read the map with read_map, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. Then tell me in chat what you put on the map and which questions you need me to answer there — the deconstruction itself belongs on the map, but I cannot see your tool results, so a couple of sentences is how I know anything is owed from me. Then call await_user_activity with timeoutSeconds: 25 and re-call it every time it expires: each answer is another turn, not the end.',
   };
 }
 
@@ -211,10 +218,10 @@ export function handoffCopy({
     explanation:
       'Your idea is saved. Nothing is working on it yet — a map cannot summon a thinking partner, so an agent has to come to it.',
     startPrompt: hasBrief
-      ? `Work on thinking map ${mapId}.${worked && resumeRevision !== null && resumeRevision !== undefined ? ` Resume from revision ${resumeRevision}; answers may already be waiting in the log.` : ''} Start with ${firstTool} to read the brief it was started from, then deconstruct it. After writing questions, call await_user_activity and keep waiting for each answer rather than ending your turn.`
+      ? `Work on thinking map ${mapId}.${worked && resumeRevision !== null && resumeRevision !== undefined ? ` Resume from revision ${resumeRevision}; answers may already be waiting in the log.` : ''} Start with ${firstTool} to read the brief it was started from, then deconstruct it. After writing questions, tell me in chat what you added and what you need me to answer on the map, then call await_user_activity with timeoutSeconds: 25 and re-call it every time it expires, rather than ending your turn.`
       : `Work on thinking map ${mapId}${
           idea ? ` — "${idea}"` : ''
-        }.${worked && resumeRevision !== null && resumeRevision !== undefined ? ` Resume from revision ${resumeRevision}; answers may already be waiting in the log.` : ''} Start with ${firstTool}, then deconstruct the idea. After writing questions, call await_user_activity and keep waiting for each answer rather than ending your turn.`,
+        }.${worked && resumeRevision !== null && resumeRevision !== undefined ? ` Resume from revision ${resumeRevision}; answers may already be waiting in the log.` : ''} Start with ${firstTool}, then deconstruct the idea. After writing questions, tell me in chat what you added and what you need me to answer on the map, then call await_user_activity with timeoutSeconds: 25 and re-call it every time it expires, rather than ending your turn.`,
     // The payoff, once, above the tabs. It used to also carry the two doors and
     // their caveats in the same breath, which is what made the panel read as a
     // wall — the doors are alternatives, so they belong in tabs where a reader

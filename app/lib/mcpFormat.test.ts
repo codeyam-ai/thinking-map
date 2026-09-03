@@ -13,6 +13,7 @@ import {
   TARGET_LIVE_INSIGHTS,
   type InsightStream,
 } from './insightStream';
+import { DEFAULT_TIMEOUT_SECONDS } from './toolCatalog';
 
 const row = (id: string, title: string, phase: string, nodes = 0, messages = 0) => ({
   id,
@@ -262,7 +263,26 @@ describe('formatStandingWait', () => {
     expect(out).toContain('2 questions');
     expect(out).toContain('await_user_activity');
     expect(out).toContain('sinceRevision: 17');
-    expect(out).toContain('timeoutSeconds: 300');
+  });
+
+  // The wait it prescribes must fit inside the host's tool-call budget. This
+  // asserted 300 once, which is precisely the value that made every wait die in
+  // transit — so it is pinned against the shared default rather than retyped,
+  // and the old number is named as forbidden.
+  it('prescribes a wait short enough for a host to actually return', () => {
+    const out = formatStandingWait([{ kind: 'open-question', status: 'open' }], 3);
+    expect(out).toContain(`timeoutSeconds: ${DEFAULT_TIMEOUT_SECONDS}`);
+    expect(out).not.toContain('timeoutSeconds: 300');
+    expect(out).toContain('timedOut');
+  });
+
+  // The agent is the only thing that reads this text, and the person is the only
+  // one who can answer. A reply that parks the agent without sending it to chat
+  // leaves someone staring at a map that never said anything was owed.
+  it('sends the agent to chat to say what it did and what is needed', () => {
+    const out = formatStandingWait([{ kind: 'open-question', status: 'open' }], 3);
+    expect(out).toContain('chat');
+    expect(out).toContain('cannot see this reply');
   });
 
   // Once everything is answered there is nothing to wait for, and an added

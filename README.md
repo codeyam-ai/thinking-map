@@ -200,6 +200,11 @@ Three habits follow from that, and the tools are shaped to make them easy:
   carrying the same value returns the original revision instead of writing twice.
 - **Wait with `await_user_activity`,** not a polling loop. It blocks until the person
   actually does something.
+- **Say in chat what you did and what you need.** Tool replies are invisible to the person
+  — they see a map, not your tool results. An agent that writes questions and then parks
+  silently leaves someone looking at a board with no idea anything is owed from them. So
+  the reply to every write that leaves questions open explicitly sends you back to chat
+  for a sentence or two: what went on the map, and that answers go on the map too.
 - **Park on `await_new_map` when you have no map yet.** Same idiom one level up: it
   blocks until somebody starts a map anywhere, then hands you each new one with its seed
   idea and whether it came from a brief. A page still cannot wake you — but if you are
@@ -215,6 +220,15 @@ Two more things worth knowing:
   `await_new_map` take a timeout and, on expiry, hand back a cursor rather than hanging. Giving up costs
   nothing: the question stays on the map and the answer lands in the log for your next
   read.
+- **Each wait is short on purpose; the patience comes from the loop.** The default is 25
+  seconds, and `timedOut: true` is the normal return rather than a failure — re-call
+  immediately with the cursor and no contribution can slip through the gap. The limit is
+  not this server's: *your host* decides when a tool call has run too long, and a browser
+  agent aborts an in-flight WebMCP call after tens of seconds while a stock MCP client
+  gives up at sixty. A five-minute wait — which this default used to be — is therefore
+  killed in transit, so the agent reads a transport timeout instead of the `timedOut`
+  result, and an answer typed on the map a minute later reaches nobody. Ask for a longer
+  `timeoutSeconds` only if you know your own host will wait that long.
 - **The page advances its own phase, and says so on the log.** When a round's questions
   are all answered and nothing more arrives, the map offers the one action that ends the
   phase — "Ready to research", and so on. Pressing it posts a `user.note` naming the

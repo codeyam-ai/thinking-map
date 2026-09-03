@@ -349,7 +349,7 @@ export const TOOL_CATALOG: readonly ToolSpec[] = [
     name: 'await_user_activity',
     title: 'Wait for the person to do something',
     description:
-      'Block until the person contributes to the map, then return what they did. Use this instead of polling read_map in a loop when you have nothing to do but wait. After each answer, handle it and call this again while open questions remain. Bounded: on expiry you get timedOut true and the cursor to resume from.',
+      'Block until the person contributes to the map, then return what they did. Use this instead of polling read_map in a loop when you have nothing to do but wait. Keep each call SHORT — timeoutSeconds: 25 — because your host aborts a tool call that runs too long, and a call it aborts cannot hand you their answer. On expiry you get timedOut true and the cursor to resume from: that is the normal return, not a failure, so call again immediately with that cursor. After each answer, handle it and call this again while open questions remain.',
     inputSchema: z.object({
       sinceRevision: z.number().int(),
       timeoutSeconds: z.number().int().optional(),
@@ -362,9 +362,27 @@ export function findTool(name: string): ToolSpec | undefined {
   return TOOL_CATALOG.find((t) => t.name === name);
 }
 
-/** Default patience for the two waiting tools, and the ceiling on it. A cap
- *  exists so a confused agent cannot pin a connection open indefinitely. */
-export const DEFAULT_TIMEOUT_SECONDS = 300;
+/**
+ * Default patience for the two waiting tools, and the ceiling on it.
+ *
+ * 25 seconds is not how long a person gets to answer — it is how long ONE call
+ * may hold. The wait is a loop, and the patience it adds up to is unbounded,
+ * because the questions live on the map: whatever one call misses, the next one
+ * picks up from the cursor it was handed.
+ *
+ * It is short because the AGENT'S HOST, not this server, decides when a tool
+ * call has taken too long. A browser agent aborts an in-flight WebMCP call
+ * after tens of seconds, and MCP clients ship a 60-second request timeout. A
+ * five-minute default — which this was — therefore never returned: the host
+ * killed the call first, so the agent read a transport timeout instead of the
+ * `timedOut` result this tool goes to such lengths to hand back, and an answer
+ * typed on the map at second 90 reached nobody at all. Every call has to fit
+ * comfortably inside the smallest of those budgets.
+ *
+ * The cap stays generous for a caller that knows its own host allows more. It
+ * exists so a confused agent cannot pin a connection open indefinitely.
+ */
+export const DEFAULT_TIMEOUT_SECONDS = 25;
 export const MAX_TIMEOUT_SECONDS = 600;
 
 export function timeoutMsFrom(seconds: number | undefined): number {

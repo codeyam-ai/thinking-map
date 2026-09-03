@@ -29,6 +29,7 @@ import {
 import { findConflictingChanges, needsConflictCheck } from './conflict';
 import { renderEvents } from './exchangeFormat';
 import {
+  DEFAULT_TIMEOUT_SECONDS,
   findTool,
   timeoutMsFrom,
   type McpToolResponse,
@@ -399,7 +400,7 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
       return {
         text: [
           `Asked ${questions.length} question(s). No page is attached to this session, so there is nobody to answer them here.`,
-          `They are on the map as open questions. Poll with await_user_activity or read_map from revision ${revision}.`,
+          `They are on the map as open questions. Tell them in chat what you asked and that their answers go on the map, then wait with await_user_activity from revision ${revision} (timeoutSeconds: ${DEFAULT_TIMEOUT_SECONDS}, re-called each time it expires) or read_map from the same revision.`,
         ].join('\n'),
         structured: { status: 'pending', revision, cursor: revision, questions },
       };
@@ -414,8 +415,8 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
       const revision = await currentRevision(ctx.mapId);
       return {
         text: [
-          `No answer yet after ${Math.round(timeoutMs / 1000)}s. The questions are still on the map.`,
-          `Resume from revision ${revision} — their answer will be waiting in the log.`,
+          `No answer yet after ${Math.round(timeoutMs / 1000)}s — the wait is bounded, so this is expiry rather than refusal. The questions are still on the map.`,
+          `Tell them in chat what you asked and that their answers go on the map, then call await_user_activity with sinceRevision: ${revision} and timeoutSeconds: ${DEFAULT_TIMEOUT_SECONDS} to keep waiting. Their answer lands in the log either way.`,
         ].join('\n'),
         structured: { status: 'pending', revision, cursor: revision, questions },
       };
@@ -444,7 +445,10 @@ const IMPLEMENTATIONS: Record<string, Impl> = {
     );
     if (result.timedOut) {
       return {
-        text: `Nothing from them yet. The map is still at revision ${result.revision}. Call await_user_activity again with sinceRevision: ${result.revision} to keep waiting.`,
+        // Says "normal" out loud. The wait is deliberately shorter than the
+        // host's tool-call budget, so an agent working a map sees this reply
+        // repeatedly and must not read the third one as the loop breaking.
+        text: `Nothing from them yet — this is the normal bounded return, not a failure. The map is still at revision ${result.revision}. Call await_user_activity again right away with sinceRevision: ${result.revision} and timeoutSeconds: ${DEFAULT_TIMEOUT_SECONDS} to keep waiting. If you have not yet told them in chat what is on the map and that their answers go on the map, do that first.`,
         structured: {
           timedOut: true,
           revision: result.revision,

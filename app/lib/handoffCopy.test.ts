@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { attachedStartCopy, handoffCopy } from './handoffCopy';
+import { DEFAULT_TIMEOUT_SECONDS } from './toolCatalog';
 
 // The same honest-copy rule askPresence pins, one surface over: a map nobody is
 // attached to must say so, and must not imply work is underway. The failure
@@ -244,6 +245,38 @@ describe('handoffCopy', () => {
     }
   });
 
+  // The wait these prompts ask for has to be one a host will actually let
+  // return. Both carry the number as a literal — this module stays free of the
+  // catalog so a client bundle does not pull zod in for one integer — so the
+  // pinning has to happen here, where importing it is free.
+  it('asks for a wait short enough for a host to return, in both prompts', () => {
+    for (const hasBrief of [true, false]) {
+      for (const prompt of [
+        handoffCopy({ mapId: MAP_ID, hasBrief }).startPrompt,
+        attachedStartCopy({ hasBrief }).prompt,
+      ]) {
+        expect(prompt).toContain(`timeoutSeconds: ${DEFAULT_TIMEOUT_SECONDS}`);
+        expect(prompt).toContain('re-call it every time it expires');
+      }
+    }
+  });
+
+  // The prompt used to end "do not summarise back to me in chat", and an agent
+  // obeying it wrote questions and went silent — leaving the person who pasted
+  // the prompt with no idea anything was owed from them. Tool replies are
+  // invisible to them; chat is not. Both prompts must send the agent there.
+  it('asks the agent to say in chat what it did and what is needed next', () => {
+    for (const hasBrief of [true, false]) {
+      for (const prompt of [
+        handoffCopy({ mapId: MAP_ID, hasBrief }).startPrompt,
+        attachedStartCopy({ hasBrief }).prompt,
+      ]) {
+        expect(prompt).toContain('in chat');
+        expect(prompt).not.toContain('Do not summarise back to me in chat');
+      }
+    }
+  });
+
   // Every field renders directly; an empty one would be a blank row in the card.
   // `steps` is an array, so check the strings inside it rather than only its
   // length — two empty steps would pass a length check and render two blank
@@ -278,10 +311,15 @@ describe('attachedStartCopy', () => {
 
   // The same instruction said in plain words, because an agent that follows
   // tool names but still narrates its answer has not put anything on the map.
-  it('tells the agent not to answer in chat', () => {
+  //
+  // The prompt now also asks for a chat note, which is the opposite-looking
+  // change and must not be allowed to dissolve this one: the note is a POINTER
+  // ("here is what I put on the map"), and the thinking still has to go on the
+  // map. So this pins the division of labour rather than the old sentence.
+  it('keeps the deconstruction on the map, not in chat', () => {
     for (const hasBrief of [true, false]) {
       expect(attachedStartCopy({ hasBrief }).prompt).toMatch(
-        /the map is the output/i,
+        /deconstruction (itself )?(ON|belongs on) the map/i,
       );
     }
   });

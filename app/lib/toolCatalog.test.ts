@@ -75,10 +75,15 @@ describe('timeoutMsFrom', () => {
     expect(timeoutMsFrom(undefined)).toBe(DEFAULT_TIMEOUT_SECONDS * 1000);
   });
 
-  // Five minutes is long enough for a thoughtful answer and remains below the
-  // hard cap that protects the server from an indefinitely parked connection.
-  it('waits five minutes by default', () => {
-    expect(DEFAULT_TIMEOUT_SECONDS).toBe(300);
+  // The one number in this file with a hard external constraint on it. The
+  // default must stay inside the SMALLEST tool-call budget an agent host
+  // imposes — tens of seconds for a browser agent, 60s for a stock MCP client —
+  // because a call the host aborts cannot deliver the `timedOut` result, and the
+  // agent reads a transport failure instead of looping. This was 300, and the
+  // loop was broken the whole time it was. Patience comes from re-calling.
+  it('keeps a single wait well inside a host’s tool-call timeout', () => {
+    expect(DEFAULT_TIMEOUT_SECONDS).toBe(25);
+    expect(DEFAULT_TIMEOUT_SECONDS).toBeLessThan(30);
   });
 
   // An agent that knows its own patience should get exactly what it asked for.
