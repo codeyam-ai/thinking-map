@@ -1,0 +1,1 @@
+{"commitKind":"unfinalized","pushedRef":"refs/heads/main","reason":"Open-source release pass: docs, CI, lint config, and the six README gallery recaptures. The 76 remaining stale screenshots are inherited from c3e01ac 'One Bar Over the Map', which reworked the board chrome; they belong to that change, not this one.","timestamp":"2026-09-03T19:14:45Z","user":"jared@codeyam.com"}
