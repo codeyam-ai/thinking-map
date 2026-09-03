@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - AnsweredLong",
+  "id": "6be64ad2-eab1-42b2-bd42-408ffabbd5e4",
+  "url": "/isolated-components/QuestionCard?s=AnsweredLong",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "A three-part answer clamped inside a fixed 300x360 card. An answer that can now be several options plus a qualification is systematically longer than the single option this face was built for, so it degrades to a truncated statement rather than spilling out of the card — and the pencil in the corner stays reachable, which is what would otherwise be pushed off."
+}

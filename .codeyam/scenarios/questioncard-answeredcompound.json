@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - AnsweredCompound",
+  "id": "b588926b-df82-4449-a9f4-6d315be88e14",
+  "url": "/isolated-components/QuestionCard?s=AnsweredCompound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "An answer that is two options AND a written qualification, at rest. The em dash is doing real work here: it says the two halves came from different places, so the typed words cannot be misread as an option somebody chose."
+}

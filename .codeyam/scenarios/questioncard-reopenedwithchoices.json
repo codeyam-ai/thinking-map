@@ -1,0 +1,18 @@
+{
+  "name": "QuestionCard - ReopenedWithChoices",
+  "id": "2e1bd283-e947-4321-b040-4a7fceb8a8c7",
+  "url": "/isolated-components/QuestionCard?s=AnsweredCompound",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "The pencil pressed on a compound answer — the state this whole feature exists for, and the one a resting screenshot cannot show. The options taken come back CHECKED, the options passed over are still there to reconsider, and the typed words are back in the field on their own. This card used to reopen with every option gone and the whole sentence dumped into a bare textarea, so amending one choice out of two meant retyping the rest from memory.",
+  "interactions": [
+    {
+      "action": "click",
+      "selector": "[aria-label=\"Edit this answer\"]"
+    }
+  ]
+}

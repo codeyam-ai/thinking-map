@@ -455,7 +455,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace insight stream › hands the board an empty stream on a map with no insights",
-      "line": 210,
+      "line": 214,
       "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
@@ -464,7 +464,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace insight stream › hands the board an insight before any round is finished",
-      "line": 189,
+      "line": 193,
       "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
@@ -473,7 +473,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace insight stream › leaves a themed insight in its row rather than on the stack",
-      "line": 232,
+      "line": 236,
       "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
@@ -482,7 +482,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh on the first revision it sees",
-      "line": 78,
+      "line": 82,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -491,7 +491,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh when the revision goes backwards",
-      "line": 115,
+      "line": 119,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -500,7 +500,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh when the revision repeats",
-      "line": 100,
+      "line": 104,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -509,7 +509,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › ignores an unbound bridge rather than reading it as zero",
-      "line": 129,
+      "line": 133,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -518,7 +518,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › refreshes once per advance across a run of them",
-      "line": 141,
+      "line": 145,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -527,7 +527,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › refreshes once when the revision advances",
-      "line": 87,
+      "line": 91,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -536,7 +536,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › treats the first real revision after an unbound start as a seed",
-      "line": 156,
+      "line": 160,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1319,7 +1319,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › joins the options taken to the words typed",
-      "line": 203,
+      "line": 211,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1328,7 +1328,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › offers a way past a question without answering it",
-      "line": 250,
+      "line": 262,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1337,7 +1337,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › offers no Cancel when there is nothing to cancel back to",
-      "line": 286,
+      "line": 298,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1346,7 +1346,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › offers no Skip where there is nowhere to skip to",
-      "line": 271,
+      "line": 283,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1355,7 +1355,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › offers the box for what the list does not contain, beside the list",
-      "line": 187,
+      "line": 195,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1364,7 +1364,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › records several options as one answer",
-      "line": 162,
+      "line": 165,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1373,7 +1373,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › renders its options as real buttons, not decoration",
-      "line": 123,
+      "line": 126,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1382,7 +1382,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › shows the answer on the card immediately, before the map catches up",
-      "line": 304,
+      "line": 316,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1391,7 +1391,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › takes an option without answering on the spot",
-      "line": 141,
+      "line": 144,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1400,7 +1400,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — a shortlist › will not record a blank, but will record options alone",
-      "line": 227,
+      "line": 236,
       "registeredAt": "2026-09-03T16:36:26.846924752+00:00",
       "runner": "tests"
     },
@@ -1409,7 +1409,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an answered question › returns to an editable box through the pencil",
-      "line": 349,
+      "line": 361,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1418,7 +1418,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an answered question › shows the answer with the question demoted to a label",
-      "line": 335,
+      "line": 347,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1427,7 +1427,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an insight › draws a diagram it carries even when its kind is not an insight kind",
-      "line": 389,
+      "line": 613,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1436,7 +1436,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an insight › draws a picture it carries even when its kind is not an insight kind",
-      "line": 411,
+      "line": 635,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1445,7 +1445,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an insight › names the kind it is",
-      "line": 367,
+      "line": 591,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1481,8 +1481,89 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — an open question › will not save an empty answer",
-      "line": 95,
+      "line": 98,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A compound answer is systematically longer than the single option this face was built for, and the card is a fixed size on the board — so the text is clamped rather than allowed to push the pencil off the bottom.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › clamps a long answer rather than letting it overflow the card",
+      "line": 571,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Shift+Enter is a newline, not a save. A question worth a shortlist is often worth a sentence too, and losing a paragraph to the send key would make the box unusable for the qualification it exists to hold.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › does not save on shift+enter, which is a newline",
+      "line": 544,
+      "registeredAt": "2026-09-03T20:12:23.171025323+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer recorded before any of this existed. It must open as written words with nothing checked — guessing which pills a sentence meant would silently drop part of what somebody said.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › opens a legacy answer as written words with nothing taken",
+      "line": 447,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The typed half comes back on its own, WITHOUT the options fused to the front of it — otherwise saving again would record them twice.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › puts only the typed words back in the box",
+      "line": 429,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Reopening and saving unchanged must record what was already there. A round trip that quietly rewrote the answer would make the pencil destructive.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › records the same answer when it is reopened and saved unchanged",
+      "line": 465,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The parts travel with the answer so the log keeps what the string cannot always give back — whether a comma was a separator or something typed.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › reports the answer taken apart alongside the text",
+      "line": 486,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Enter is a SECOND entry point into the same save, and the composer that owns it did not change — but what saving MEANS did. A keyboard answer must record the options taken alongside the words typed, exactly as the button does, or answering without reaching for the mouse would quietly drop half the answer.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › saves the options and the words together from the keyboard",
+      "line": 514,
+      "registeredAt": "2026-09-03T20:12:23.171025323+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The whole point of the change. A compound answer used to reopen with every option unchecked and the entire sentence dumped into the box, so amending one choice out of two meant retyping the rest from memory.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › shows the options that were taken as taken",
+      "line": 395,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The options passed over stay on the card, unchecked. Reopening an answer is a chance to reconsider it, which requires the rejected options to still be there to take.",
+      "file": "app/components/QuestionCard.render.test.tsx",
+      "format": "vitest",
+      "key": "QuestionCard — reopening an answer › still offers the options that were passed over",
+      "line": 412,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {
@@ -1490,7 +1571,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — structure › does not announce itself as a button either",
-      "line": 456,
+      "line": 680,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1499,7 +1580,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — structure › is not itself a button",
-      "line": 436,
+      "line": 660,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1508,7 +1589,7 @@
       "file": "app/components/QuestionCard.render.test.tsx",
       "format": "vitest",
       "key": "QuestionCard — structure › reports a click as a request for focus",
-      "line": 482,
+      "line": 706,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1985,7 +2066,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › ignores events that are not answers",
-      "line": 77,
+      "line": 82,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -1994,7 +2075,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › lets a later answer replace an earlier one for the same question",
-      "line": 55,
+      "line": 60,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -2003,7 +2084,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › reads a single answer back by its question id",
-      "line": 35,
+      "line": 40,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -2012,7 +2093,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › reads every answer out of a multi-answer event",
-      "line": 41,
+      "line": 46,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -2021,7 +2102,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › returns nothing for an empty log",
-      "line": 30,
+      "line": 35,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -2030,7 +2111,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › skips malformed entries without losing the good ones",
-      "line": 88,
+      "line": 93,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -2039,7 +2120,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "answersByNodeId › takes the highest-revision answer when the log arrives out of order",
-      "line": 65,
+      "line": 70,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -3461,7 +3542,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "composeAnswer › is null when nothing was picked and nothing typed",
-      "line": 68,
+      "line": 73,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -3470,7 +3551,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "composeAnswer › is the picked options when nothing was typed",
-      "line": 35,
+      "line": 40,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -3479,7 +3560,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "composeAnswer › is the typed words when nothing was picked",
-      "line": 42,
+      "line": 47,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -3488,7 +3569,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "composeAnswer › joins the picked options to the typed words, marked as separate",
-      "line": 52,
+      "line": 57,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -3497,7 +3578,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "composeAnswer › keeps a pick the shortlist no longer offers, after the ones it does",
-      "line": 76,
+      "line": 81,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -3506,7 +3587,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "composeAnswer › trims what was typed rather than recording the whitespace",
-      "line": 60,
+      "line": 65,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -7363,6 +7444,33 @@
       "runner": "tests"
     },
     {
+      "description": "A pick that is no longer on the shortlist — the partner rewrote the options while someone had one selected. Dropping it silently would record an answer they did not give; keeping it in place is the honest reading.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "orderPicks › keeps a pick the shortlist no longer offers, after the ones it does",
+      "line": 81,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The card holds picks in the order they were tapped, and the recorded structure must not. Both halves of a saved answer — the text and the parts — are ordered by this one rule, so they cannot disagree.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "orderPicks › puts the picks in the shortlist’s order, not the tapped order",
+      "line": 94,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "No shortlist at all: nothing to order against, and nothing is dropped.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "orderPicks › returns the picks unchanged when there is no shortlist",
+      "line": 111,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
       "description": "A blank name would render as a row you cannot identify or remove, so it is dropped the same way the endpoint drops it on the way in.",
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
@@ -7628,7 +7736,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "parseOptions › drops blank and non-string entries",
-      "line": 130,
+      "line": 135,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -7637,7 +7745,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "parseOptions › offers no chips for an empty array",
-      "line": 135,
+      "line": 140,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -7646,7 +7754,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "parseOptions › offers no chips when the JSON is not an array",
-      "line": 123,
+      "line": 128,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -7655,7 +7763,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "parseOptions › offers no chips when the column is not valid JSON",
-      "line": 118,
+      "line": 123,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -7664,7 +7772,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "parseOptions › offers no chips when the column is null",
-      "line": 104,
+      "line": 109,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -7673,7 +7781,7 @@
       "file": "app/lib/mapAnswers.test.ts",
       "format": "vitest",
       "key": "parseOptions › reads the stored JSON array back as chips",
-      "line": 110,
+      "line": 115,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -8857,6 +8965,105 @@
       "runner": "tests"
     },
     {
+      "description": "A run where only SOME parts are real options is not a pick list. Half a selection is worse than none, because the half it drops is invisible.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › declines the whole run when only part of it is on the shortlist",
+      "line": 194,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer that STARTS with an option but continues into prose is prose. Matching the prefix would check a pill and then leave the rest of the sentence in the box, recording it twice on the next save.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › does not part-match an option out of a longer sentence",
+      "line": 172,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Prose that resolves to nothing on the shortlist: every option stays offered and nothing is checked. Guessing here would silently drop half of what somebody said.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › opens an answer it cannot resolve as written words, checking nothing",
+      "line": 162,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing recorded at all — a card being answered for the first time. The editor opens empty rather than throwing on the null the node column holds.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › opens empty for a card with no answer yet",
+      "line": 203,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An option is free to contain the comma the picks are joined with, so a whole-string match has to be tried before splitting on one — otherwise this option becomes two options nobody offered.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › prefers a whole option containing a comma over splitting on it",
+      "line": 184,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The recorded parts win whenever the log carried them: they are what the person DID, where reading the text back is only an inference about how it came to be written.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › prefers what the log recorded over reading the text back",
+      "line": 122,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The headline case, and the one the board actually takes: no recorded parts, so the answer the node carries is read back apart. Both halves have to come back, or amending one choice means retyping the rest.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › reads options and a written qualification back apart",
+      "line": 144,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A recorded selection with no write-in still restores as one, so the field opens empty rather than inheriting whatever the display string said.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › restores a recorded selection that has no written half",
+      "line": 133,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Whatever composeAnswer writes, restoreSelection must read back — the two are one round trip and a drift between their separators would break editing silently, which is the failure this pair exists to prevent.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › round-trips whatever composeAnswer produced",
+      "line": 220,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One option, recorded verbatim by composeAnswer — the commonest answer on the whole board, and the case the plan's legacy rule names.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › treats an answer that is exactly one option as that option",
+      "line": 152,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A question with no shortlist is the ordinary text-box card, and its whole answer is the write-in.",
+      "file": "app/lib/answerDraft.test.ts",
+      "format": "vitest",
+      "key": "restoreSelection › treats the whole answer as written words when there is no shortlist",
+      "line": 210,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
       "description": "A panel that silently renders nothing is worse than one that renders something ugly: the raw shape is at least debuggable.",
       "file": "app/lib/agentDemo.test.ts",
       "format": "vitest",
@@ -9394,6 +9601,69 @@
       "key": "sectionLabel › strips only the leading prefix",
       "line": 199,
       "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "And a legacy write after a structured one must not BLANK it — that would lose information rather than decline to add any.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › does not blank an earlier selection with a later structureless write",
+      "line": 238,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The log holds every kind of event; only answers are answers.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › ignores events that are not answers",
+      "line": 82,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Editing an answer is posting another one, so the newest selection stands — the same rule answersByNodeId holds for the display string, and the two disagreeing would open the pencil on a selection the answer contradicts.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › lets a later selection replace an earlier one for the same question",
+      "line": 220,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer written before the log carried structure. Saying nothing about it is the honest result: the card falls back to reading the text apart, which beats claiming an empty selection the person never made.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › passes over an entry that carries no selection",
+      "line": 231,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary read: the parts come back as the card needs to seed itself.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › reads a recorded selection back by its question id",
+      "line": 205,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Day one: nothing has been answered, and every card is still asking.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › returns nothing for an empty log",
+      "line": 35,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One bad payload must not take out every other card's selection, the same tolerance answersByNodeId has for the string.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "selectionsByNodeId › skips malformed entries rather than throwing",
+      "line": 248,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {
@@ -10103,7 +10373,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "toggleChoice › adds a choice that was not picked",
-      "line": 6,
+      "line": 11,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -10112,7 +10382,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "toggleChoice › keeps the shortlist’s order however they were clicked",
-      "line": 22,
+      "line": 27,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -10121,7 +10391,7 @@
       "file": "app/lib/answerDraft.test.ts",
       "format": "vitest",
       "key": "toggleChoice › removes one that was",
-      "line": 12,
+      "line": 17,
       "registeredAt": "2026-09-03T16:25:57Z",
       "runner": "tests"
     },
@@ -10850,8 +11120,17 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › hands the writer the answer and the question it belongs to",
-      "line": 108,
+      "line": 125,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A card with a shortlist sends how the answer was assembled alongside it, keyed by node id so the writer can attach it to the right entry.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › hands the writer the parts when the card supplied them",
+      "line": 145,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {
@@ -10859,7 +11138,7 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › leaves other answers standing when one write fails",
-      "line": 87,
+      "line": 104,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -10868,7 +11147,7 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › offers no way to answer when there is no writer",
-      "line": 138,
+      "line": 220,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -10877,8 +11156,17 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › reads the answers already in the log",
-      "line": 39,
+      "line": 56,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The parts come back off the log for the pencil to seed itself from.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › reads the recorded selections out of the log",
+      "line": 182,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {
@@ -10886,7 +11174,7 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › replaces an earlier answer with a newer one for the same question",
-      "line": 123,
+      "line": 205,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -10895,8 +11183,17 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › reports no answers for an empty log",
-      "line": 33,
+      "line": 50,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An answer recorded before the log carried structure has none to report, and the card falls back to reading its text apart rather than opening on an empty selection nobody chose.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › reports no selection for an answer that carried none",
+      "line": 196,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {
@@ -10904,8 +11201,17 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › shows an answer immediately, before the write completes",
-      "line": 48,
+      "line": 65,
       "registeredAt": "2026-09-01T19:19:33Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The card body still shows the STRING. The parts are for reopening the editor, and letting them near the display would put a raw array on a card.",
+      "file": "app/hooks/useMapAnswers.test.ts",
+      "format": "vitest",
+      "key": "useMapAnswers › still shows the answer as text when parts were sent",
+      "line": 167,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {
@@ -10913,7 +11219,7 @@
       "file": "app/hooks/useMapAnswers.test.ts",
       "format": "vitest",
       "key": "useMapAnswers › takes the answer back off the card when the write fails",
-      "line": 71,
+      "line": 88,
       "registeredAt": "2026-09-01T19:19:33Z",
       "runner": "tests"
     },
@@ -11392,6 +11698,42 @@
       "key": "withFailure › turns a thrown database drift into a readable JSON 500",
       "line": 71,
       "registeredAt": "2026-09-02T14:01:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "One event can settle several questions, and only the ones with a shortlist carry structure. The two shapes have to survive in the same array.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "withSelections › attaches parts per entry, leaving the others untouched",
+      "line": 174,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary write from a card with a shortlist: the string stays exactly what it was, and the two structured fields ride alongside it.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "withSelections › attaches the parts to the entry that supplied them",
+      "line": 148,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A question with no shortlist supplies no parts, and its entry must come back byte-identical — this is what keeps every answer already in the database, and every card that writes one, reading exactly as before.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "withSelections › leaves an entry with no parts exactly as it was",
+      "line": 166,
+      "registeredAt": "2026-09-03T19:42:24Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The round trip, in one place. What the writer attaches is what the reader takes back off — a drift between the two field names would break editing silently, and neither half tested alone would catch it.",
+      "file": "app/lib/mapAnswers.test.ts",
+      "format": "vitest",
+      "key": "withSelections › writes what selectionsByNodeId reads back",
+      "line": 189,
+      "registeredAt": "2026-09-03T19:42:24Z",
       "runner": "tests"
     },
     {

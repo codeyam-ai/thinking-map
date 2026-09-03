@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { answersByNodeId } from '../lib/mapAnswers';
+import { answersByNodeId, selectionsByNodeId } from '../lib/mapAnswers';
 import type { ExchangeEvent } from '../lib/exchange';
+import type { AnswerSelection } from '../lib/answerDraft';
 
 /** Just enough of the bridge to record an answer. Narrowed deliberately: this
  *  hook has no business with tools, status, or the rest of the bridge, and a
@@ -11,6 +12,10 @@ export interface AnswerWriter {
   answer(
     answers: Record<string, string>,
     questions?: { id: string; text: string }[],
+    /** The same answer taken apart, keyed by question id. Optional: a caller
+     *  with nothing structured to say omits it and the write is byte-identical
+     *  to what it was before an answer could be a set. */
+    parts?: Record<string, AnswerSelection>,
   ): Promise<unknown>;
 }
 
@@ -20,7 +25,16 @@ export interface MapAnswers {
   answers: Map<string, string>;
   /** Record an answer. Absent when there is no writer, which is the isolated
    *  case: the card still reads correctly, it simply cannot be answered. */
-  answer?: (id: string, label: string, text: string) => Promise<void>;
+  answer?: (
+    id: string,
+    label: string,
+    text: string,
+    parts?: AnswerSelection,
+  ) => Promise<void>;
+  /** How each answer was assembled, where the log recorded it. The pencil
+   *  prefers this over reading the text back apart, because it is what the
+   *  person actually did rather than an inference about how it was written. */
+  selections: Map<string, AnswerSelection>;
 }
 
 /**
@@ -50,12 +64,25 @@ export function useMapAnswers(
     return logged;
   }, [events, pending]);
 
+  // The parts are read straight from the log with no optimistic layer over
+  // them. They are only ever consumed when the pencil OPENS, which is long
+  // after a write has landed — and the card that just answered already holds
+  // its own draft, so there is nothing for an optimistic selection to fix.
+  const selections = useMemo(() => selectionsByNodeId(events), [events]);
+
   const answer = useCallback(
-    async (id: string, label: string, text: string) => {
+    async (id: string, label: string, text: string, parts?: AnswerSelection) => {
       if (!writer) return;
+      // The optimistic layer stays on the display STRING. It exists so the card
+      // turns over the instant you press Save, and the string is the only part
+      // the card shows.
       setPending((current) => ({ ...current, [id]: text }));
       try {
-        await writer.answer({ [id]: text }, [{ id, text: label }]);
+        await writer.answer(
+          { [id]: text },
+          [{ id, text: label }],
+          parts ? { [id]: parts } : undefined,
+        );
       } catch (error) {
         setPending((current) => {
           const next = { ...current };
@@ -68,5 +95,5 @@ export function useMapAnswers(
     [writer],
   );
 
-  return { answers, answer: writer ? answer : undefined };
+  return { answers, selections, answer: writer ? answer : undefined };
 }

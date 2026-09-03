@@ -1,0 +1,56 @@
+{
+  "provenAt": "2026-09-03T19:42:00Z",
+  "slug": "ne--answer-a-question-with-more-than-one-thing",
+  "paths": [
+    "app/components/QuestionCard.tsx",
+    "app/lib/mapAnswers.ts"
+  ],
+  "runScope": [
+    "app/components/QuestionCard.tsx",
+    "app/lib/mapAnswers.ts"
+  ],
+  "tests": {
+    "does not blank an earlier selection with a later structureless write": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "opens a legacy answer as written words with nothing taken": {
+      "withoutFix": "pass",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "puts only the typed words back in the box": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "shows the options that were taken as taken": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "writes what selectionsByNodeId reads back": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "writes what selectionsByNodeId reads back",
+      "does not blank an earlier selection with a later structureless write"
+    ]
+  }
+}

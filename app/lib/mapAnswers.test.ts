@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { answersByNodeId, parseOptions } from './mapAnswers';
+import {
+  answersByNodeId,
+  parseOptions,
+  selectionsByNodeId,
+  withSelections,
+} from './mapAnswers';
 import type { ExchangeEvent } from './exchange';
 
 // The answer to a question lives in the log, never on the node — so this is
@@ -134,5 +139,130 @@ describe('parseOptions', () => {
   // An empty array is the same situation as no column at all.
   it('offers no chips for an empty array', () => {
     expect(parseOptions('[]')).toEqual([]);
+  });
+});
+
+describe('withSelections', () => {
+  // The ordinary write from a card with a shortlist: the string stays exactly
+  // what it was, and the two structured fields ride alongside it.
+  it('attaches the parts to the entry that supplied them', () => {
+    const entries = [{ id: 'q1', text: 'Who?', answer: 'Teachers — mostly' }];
+    expect(
+      withSelections(entries, { q1: { picked: ['Teachers'], text: 'mostly' } }),
+    ).toEqual([
+      {
+        id: 'q1',
+        text: 'Who?',
+        answer: 'Teachers — mostly',
+        selected: ['Teachers'],
+        other: 'mostly',
+      },
+    ]);
+  });
+
+  // A question with no shortlist supplies no parts, and its entry must come
+  // back byte-identical — this is what keeps every answer already in the
+  // database, and every card that writes one, reading exactly as before.
+  it('leaves an entry with no parts exactly as it was', () => {
+    const entries = [{ id: 'q1', text: 'Who?', answer: 'Just me' }];
+    expect(withSelections(entries, {})).toEqual(entries);
+    expect(withSelections(entries)).toEqual(entries);
+  });
+
+  // One event can settle several questions, and only the ones with a shortlist
+  // carry structure. The two shapes have to survive in the same array.
+  it('attaches parts per entry, leaving the others untouched', () => {
+    const entries = [
+      { id: 'q1', answer: 'Teachers' },
+      { id: 'q2', answer: 'A shared fund' },
+    ];
+    const written = withSelections(entries, {
+      q1: { picked: ['Teachers'], text: '' },
+    });
+    expect(written[0]).toMatchObject({ selected: ['Teachers'], other: '' });
+    expect(written[1]).toEqual({ id: 'q2', answer: 'A shared fund' });
+  });
+
+  // The round trip, in one place. What the writer attaches is what the reader
+  // takes back off — a drift between the two field names would break editing
+  // silently, and neither half tested alone would catch it.
+  it('writes what selectionsByNodeId reads back', () => {
+    const written = withSelections([{ id: 'q1', answer: 'Teachers — mostly' }], {
+      q1: { picked: ['Teachers'], text: 'mostly' },
+    });
+    const restored = selectionsByNodeId([answerEvent(written)]);
+    expect(restored.get('q1')).toEqual({ picked: ['Teachers'], text: 'mostly' });
+  });
+});
+
+describe('selectionsByNodeId', () => {
+  // Nothing answered yet, and nothing to say about it.
+  it('returns nothing for an empty log', () => {
+    expect(selectionsByNodeId([]).size).toBe(0);
+  });
+
+  // The ordinary read: the parts come back as the card needs to seed itself.
+  it('reads a recorded selection back by its question id', () => {
+    const events = [
+      answerEvent([
+        { id: 'q1', answer: 'Teachers', selected: ['Teachers'], other: '' },
+      ]),
+    ];
+    expect(selectionsByNodeId(events).get('q1')).toEqual({
+      picked: ['Teachers'],
+      text: '',
+    });
+  });
+
+  // Editing an answer is posting another one, so the newest selection stands —
+  // the same rule answersByNodeId holds for the display string, and the two
+  // disagreeing would open the pencil on a selection the answer contradicts.
+  it('lets a later selection replace an earlier one for the same question', () => {
+    const events = [
+      answerEvent([{ id: 'q1', answer: 'Teachers', selected: ['Teachers'] }]),
+      answerEvent([{ id: 'q1', answer: 'Nurses', selected: ['Nurses'] }]),
+    ];
+    expect(selectionsByNodeId(events).get('q1')?.picked).toEqual(['Nurses']);
+  });
+
+  // An answer written before the log carried structure. Saying nothing about
+  // it is the honest result: the card falls back to reading the text apart,
+  // which beats claiming an empty selection the person never made.
+  it('passes over an entry that carries no selection', () => {
+    const events = [answerEvent([{ id: 'q1', answer: 'Just me' }])];
+    expect(selectionsByNodeId(events).has('q1')).toBe(false);
+  });
+
+  // And a legacy write after a structured one must not BLANK it — that would
+  // lose information rather than decline to add any.
+  it('does not blank an earlier selection with a later structureless write', () => {
+    const events = [
+      answerEvent([{ id: 'q1', answer: 'Teachers', selected: ['Teachers'] }]),
+      answerEvent([{ id: 'q1', answer: 'Teachers' }]),
+    ];
+    expect(selectionsByNodeId(events).get('q1')?.picked).toEqual(['Teachers']);
+  });
+
+  // One bad payload must not take out every other card's selection, the same
+  // tolerance answersByNodeId has for the string.
+  it('skips malformed entries rather than throwing', () => {
+    const events = [
+      answerEvent('not an array'),
+      answerEvent([{ id: 42, selected: ['x'] }]),
+      answerEvent([{ id: 'q1', selected: ['Nurses', 7, null] }]),
+    ];
+    const selections = selectionsByNodeId(events);
+    expect(selections.get('q1')).toEqual({ picked: ['Nurses'], text: '' });
+  });
+
+  // A non-user.answer event has no business here — the log carries the whole
+  // exchange, agent writes included.
+  it('ignores events that are not answers', () => {
+    const events = [
+      answerEvent([{ id: 'q1', selected: ['Nurses'] }], {
+        kind: 'agent.note',
+      }),
+    ];
+    expect(selectionsByNodeId(events).size).toBe(0);
   });
 });

@@ -1,0 +1,12 @@
+{
+  "name": "QuestionCard - ManyChoices",
+  "id": "c842da9d-51b1-4dab-9ccb-3b712a932211",
+  "url": "/isolated-components/QuestionCard?s=ManyChoices",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "Eight options on a card that is a fixed 300x360. The partner decides how many options to write and the card cannot grow, so the list scrolls and the commit row stays pinned — Save is the one control that must never be what falls off the bottom. This is the state the vertical budget was reasoned against: it is why the box for your own words stays compact beneath the list rather than taking a share of it."
+}

@@ -27,6 +27,10 @@ vi.mock('./WebMcpBridge', () => ({
   useWebMcpBridge: () => ({
     revision,
     status: 'unavailable',
+    // The log, which the real bridge always carries. The workspace reads it to
+    // recover how each answer was assembled, so a mock omitting it is not a
+    // lighter stub — it is a bridge that cannot exist.
+    events: [],
     answer: vi.fn(),
     note: vi.fn(),
   }),

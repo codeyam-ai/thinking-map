@@ -163,6 +163,15 @@
     ]
   },
   {
+    "description": "A draft taken apart: which options were taken, and what was typed alongside them. The shape the card seeds its editor from and the shape the log carries beside the answer string.",
+    "filePath": "app/lib/answerDraft.ts",
+    "name": "AnswerSelection",
+    "untestabilityReason": {
+      "justification": "an interface describing the two halves of a draft; it has no behaviour of its own, and both halves are exercised through restoreSelection and withSelections",
+      "kind": "type-only"
+    }
+  },
+  {
     "description": "Just enough of the WebMCP bridge to record an answer. Narrowed deliberately: the answers hook has no business with tools or connection status, and the narrow shape is what lets a test hand it a plain function instead of standing up a context.",
     "filePath": "app/hooks/useMapAnswers.ts",
     "name": "AnswerWriter",
@@ -633,7 +642,7 @@
     ]
   },
   {
-    "description": "The shortlist on a question card and the way past it. Really two things that must both survive: the options, and an escape from them. Every list the partner writes is a guess about what you might say and the guess must never be the only thing you are allowed to say — so the options scroll and the escape stays pinned, because with a fixed-size card something has to give and it must not be that.",
+    "description": "The shortlist on a question card: the options, as real buttons that TOGGLE rather than submit. Tapping one used to send it, so a shortlist allowed exactly one answer — and two of those is ordinary, while one of those with a qualification is what most answers are. A taken option is filled and announced with aria-pressed, so the set you have built reads at a glance and is not carried by colour alone. The list scrolls and nothing else does: a card is a fixed size but the partner decides how many options to write, so the only honest choices are to clip or to scroll, and scrolling down is the only direction anything on a card may move.",
     "filePath": "app/components/CardChoiceList.tsx",
     "name": "CardChoiceList",
     "scenarios": [
@@ -1455,7 +1464,7 @@
     "testFile": "app/lib/agentPanel.test.ts"
   },
   {
-    "description": "One card on the board, in whichever of its three faces cardPresentation says it wears: an open question saturated in its theme's colour, an answered one with your words as the content and the question demoted to their label, or an insight — the partner's own thinking. Its root is deliberately a plain div with no button role: it was a button first, which hoisted the choice pills out and made them unclickable, and role=button then made the card announce its entire contents as its own name.",
+    "description": "One card on the board, in whichever of its three faces cardPresentation says it wears: an open question saturated in its theme's colour, an answered one with your words as the content and the question demoted to their label, or an insight — the partner's own thinking. An open card carries the shortlist AND the box for what the shortlist does not contain, together rather than instead of each other, and one Save records the combination. The pencil reopens that same control fully populated — the options taken checked, the ones passed over still offered, the typed words back in the field — rather than flattening the answer into prose to retype. Its root is deliberately a plain div with no button role: it was a button first, which hoisted the choice pills out and made them unclickable, and role=button then made the card announce its entire contents as its own name.",
     "filePath": "app/components/QuestionCard.tsx",
     "name": "QuestionCard",
     "scenarios": [
@@ -1992,7 +2001,7 @@
     "testFile": "app/lib/codeyamOnly.test.ts"
   },
   {
-    "description": "What gets recorded from a card's picked options and its typed words, or null when there is nothing to record. The picks are written in the SHORTLIST's order rather than the order clicked, because an answer that reads differently depending on which pill was tapped first is one answer wearing two faces. A pick the shortlist no longer offers is kept after the ones it does, since dropping it silently would record an answer the person did not give. The em dash between the picks and the typed words says the two parts came from different places.",
+    "description": "What gets recorded from a card's picked options and its typed words, or null when there is nothing to record. Orders the picks through orderPicks so the recorded string and the structure recorded beside it are two views of one answer rather than two that happen to agree. The em dash between the picks and the typed words says the two parts came from different places, so a written qualification cannot be misread as an option somebody chose — and it is the seam restoreSelection splits on to read the answer back apart when the pencil reopens.",
     "filePath": "app/lib/answerDraft.ts",
     "name": "composeAnswer",
     "testFile": "app/lib/answerDraft.test.ts"
@@ -2895,6 +2904,12 @@
     "testFile": "app/lib/boardNav.test.ts"
   },
   {
+    "description": "The picked options in the SHORTLIST's order, with any the shortlist no longer offers after them. Pulled out of composeAnswer because the structure recorded beside an answer has to be ordered by the same rule as the answer's text — the card holds picks in the order they were tapped, so two copies of the rule would let one answer record one order in its text and another in its selected field.",
+    "filePath": "app/lib/answerDraft.ts",
+    "name": "orderPicks",
+    "testFile": "app/lib/answerDraft.test.ts"
+  },
+  {
     "description": "Reads back the LEGACY attachments column: names only, and anything unreadable becomes an empty list. Superseded by readAttachments once attachments became their own table with bytes behind them, and kept for exactly as long as it takes an existing database to run prisma/backfill-attachments.ts, which reads through here. Nothing in the app calls it any more. The availability rule it established survives in its replacement: a board that cannot make sense of its own attachments must still OPEN.",
     "filePath": "app/lib/attachments.ts",
     "name": "parseAttachments",
@@ -3072,6 +3087,12 @@
     "testFile": "app/lib/readJson.test.ts"
   },
   {
+    "description": "Reads a run of recorded text back as shortlist options, or says it is not options at all. The order of its two attempts is the load-bearing part: a WHOLE-string match is tried before splitting on the comma, because an option is free to contain that comma — 'Parents, and carers' is an ordinary thing for the partner to offer — and splitting first would turn one option into two nobody chose. A split then counts only when EVERY part is an option the shortlist actually offers, since a partial match would invent a selection the person never made, which is a worse failure than showing their words exactly as typed. Private to restoreSelection, and exercised through it.",
+    "filePath": "app/lib/answerDraft.ts",
+    "name": "readPicks",
+    "testFile": "app/lib/answerDraft.test.ts"
+  },
+  {
     "description": "The refs an insight cites, normalised and ready for the resolution pass applyToolCalls performs. Strings only, blanks dropped, and an empty result turned to null - the same shape serialiseOptions uses and for the same reason: a node that named nothing should be indistinguishable from one that never had the field, rather than carrying an empty array nobody can render. Non-strings are filtered rather than stringified, because turning 42 into '42' would store a citation pointing at nothing while looking like it had worked.",
     "filePath": "app/lib/nodePlan.ts",
     "name": "readRefs",
@@ -3148,6 +3169,12 @@
       "justification": "A two-term precedence over readVisitorId, which needs a live request through next/headers. Both halves are covered: scenarioVisitorId in visitor.test.ts, and the whole path end-to-end by the saved-map scenarios.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "What the pencil opens an already-answered card with: the options that were taken, checked, and the typed words back in the field on their own. Prefers the selection the log recorded, because that is what the person did rather than an inference about how it was written; falls back to reading the answer text apart, which is the ORDINARY path rather than a legacy one, since the board renders an answer off the node's detail column and never reads the log. The fallback is deliberately timid — it restores a selection only when the text resolves entirely into options the shortlist offers, because a wrong guess silently drops part of what somebody said while declining to guess only leaves a pill unchecked.",
+    "filePath": "app/lib/answerDraft.ts",
+    "name": "restoreSelection",
+    "testFile": "app/lib/answerDraft.test.ts"
   },
   {
     "description": "The readable part of an MCP tool response — the first text block, which is what an agent would actually read. Falls back to raw JSON rather than rendering nothing, because a silently empty panel is worse than an ugly one.",
@@ -3264,6 +3291,12 @@
     "filePath": "app/components/ThemeParticles.tsx",
     "name": "seeded",
     "testFile": "app/components/ThemeParticles.render.test.tsx"
+  },
+  {
+    "description": "The latest selection per question id — the same answers as answersByNodeId, taken apart into the options chosen and the words typed. It exists because the display string cannot always be read back apart: an option containing the separator, or a write-in that happens to equal an option, are genuinely ambiguous. An event carrying no selection is passed over rather than recorded as an empty one, so a legacy write cannot blank a selection an earlier structured write recorded.",
+    "filePath": "app/lib/mapAnswers.ts",
+    "name": "selectionsByNodeId",
+    "testFile": "app/lib/mapAnswers.test.ts"
   },
   {
     "description": "Turns a model's suggested answers into the JSON array the column stores, dropping the field entirely unless at least one usable string survives — so an agent sending an empty list or a list of blanks produces a plain question rather than a node carrying an array nothing can render. Non-strings are filtered rather than coerced, because a numeric option is a mistake and stringifying it would hide one.",
@@ -3587,7 +3620,7 @@
     "testFile": "app/hooks/useFollowColumn.test.ts"
   },
   {
-    "description": "What every question on the map has been answered, and how to answer one. Merges the log's answers with an optimistic layer for answers written in this tab: the answer takes the card's body the moment it is sent, because one still sitting in the input after you pressed send reads as the answer having been lost, and it is rolled back only if the write actually failed. The pending entry is never cleared on success — the log catches up on its own, and clearing early would flicker the question back to unanswered.",
+    "description": "What every question on the map has been answered, how to answer one, and how each answer was assembled. Merges the log's answers with an optimistic layer for answers written in this tab: the answer takes the card's body the moment it is sent, because one still sitting in the input after you pressed send reads as the answer having been lost, and it is rolled back only if the write actually failed. The optimistic layer stays on the display STRING — the selections it also returns are read straight from the log with nothing over them, because they are consumed only when the pencil opens, long after a write has landed. The pending entry is never cleared on success; the log catches up on its own, and clearing early would flicker the question back to unanswered.",
     "filePath": "app/hooks/useMapAnswers.ts",
     "name": "useMapAnswers",
     "testFile": "app/hooks/useMapAnswers.test.ts"
@@ -3681,6 +3714,12 @@
     "filePath": "app/lib/apiFailure.ts",
     "name": "withFailure",
     "testFile": "app/lib/apiFailure.test.ts"
+  },
+  {
+    "description": "Attaches the structure to the log entries about to be written — the counterpart to selectionsByNodeId, deliberately in the same file so what one writes is what the other reads and the two field names cannot drift into a round trip that silently stops closing. Additive is the whole contract: an entry whose card supplied no parts comes back untouched rather than with empty fields, so a question answered without a shortlist writes precisely the entry it wrote before an answer could be a set.",
+    "filePath": "app/lib/mapAnswers.ts",
+    "name": "withSelections",
+    "testFile": "app/lib/mapAnswers.test.ts"
   },
   {
     "description": "Opens an extracted page with its own title as a markdown heading, skipping it when the article already starts with that title so the name is not said twice before the first sentence. Restores something extraction dropped rather than inventing it — without it a board started from a Wikipedia article was named 'From Wikipedia, the free encyclopedia', identical for every article on the site.",

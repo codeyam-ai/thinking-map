@@ -139,7 +139,7 @@ const nodeShape = z.object({
     .array(z.string())
     .optional()
     .describe(
-      'Offer two to four concrete options instead of a blank field. Use them when the useful answers are enumerable — experience level, who it is for, build-or-buy. The person can always type something else instead, so a list never traps them.',
+      'Offer two to four concrete options instead of a blank field. Use them when the useful answers are enumerable — experience level, who it is for, build-or-buy. A list never traps them: the options TOGGLE rather than send, so the person can take several of them, take none and write their own, or take some and add a qualification — and nothing reaches you until they save. Expect a compound answer back, not necessarily one of the strings you offered.',
     ),
   tradeoffs: z
     .object({
@@ -217,7 +217,7 @@ const themeShape = z.object({
     .array(z.string())
     .optional()
     .describe(
-      'Only meaningful on an "open-question": a few likely answers to offer as one-tap chips. The person can always type their own — a chip fills the box rather than sending it — so these are a head start, not a closed set of choices. Omit them when you genuinely cannot guess; a question with no options is an ordinary question with a text box.',
+      'Only meaningful on an "open-question": a few likely answers to offer. These are a head start, never a closed set — tapping an option selects it rather than sending it, the person can select as many as fit, and the box for words of their own sits with the list rather than instead of it, so an answer may be several options, a written reply, or both. Nothing is recorded until they save. Omit them when you genuinely cannot guess; a question with no options is an ordinary question with a text box.',
     ),
 });
 

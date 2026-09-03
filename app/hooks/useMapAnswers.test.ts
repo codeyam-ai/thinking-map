@@ -24,6 +24,23 @@ function answered(id: string, text: string): ExchangeEvent {
   } as ExchangeEvent;
 }
 
+function answeredWith(
+  id: string,
+  text: string,
+  selected: string[],
+  other: string,
+): ExchangeEvent {
+  seq += 1;
+  return {
+    id: `e${seq}`,
+    revision: seq,
+    kind: 'user.answer',
+    origin: 'user',
+    payload: { answers: [{ id, answer: text, selected, other }] },
+    createdAt: new Date('2026-01-01T00:00:00Z'),
+  } as ExchangeEvent;
+}
+
 const writerThat = (impl: () => Promise<unknown>): AnswerWriter => ({
   answer: vi.fn(impl),
 });
@@ -113,9 +130,74 @@ describe('useMapAnswers', () => {
       await result.current.answer!('q1', 'Who is it for?', 'Just me');
     });
 
-    expect(writer.answer).toHaveBeenCalledWith({ q1: 'Just me' }, [
-      { id: 'q1', text: 'Who is it for?' },
-    ]);
+    expect(writer.answer).toHaveBeenCalledWith(
+      { q1: 'Just me' },
+      [{ id: 'q1', text: 'Who is it for?' }],
+      // No parts: a card with no shortlist has no structure to send, and the
+      // write must stay exactly the write it was before an answer could be a
+      // set.
+      undefined,
+    );
+  });
+
+  // A card with a shortlist sends how the answer was assembled alongside it,
+  // keyed by node id so the writer can attach it to the right entry.
+  it('hands the writer the parts when the card supplied them', async () => {
+    const writer = writerThat(async () => {});
+    const { result } = renderHook(() => useMapAnswers([], writer));
+
+    await act(async () => {
+      await result.current.answer!(
+        'q1',
+        'Who is it for?',
+        'Teachers — mostly',
+        { picked: ['Teachers'], text: 'mostly' },
+      );
+    });
+
+    expect(writer.answer).toHaveBeenCalledWith(
+      { q1: 'Teachers — mostly' },
+      [{ id: 'q1', text: 'Who is it for?' }],
+      { q1: { picked: ['Teachers'], text: 'mostly' } },
+    );
+  });
+
+  // The card body still shows the STRING. The parts are for reopening the
+  // editor, and letting them near the display would put a raw array on a card.
+  it('still shows the answer as text when parts were sent', async () => {
+    const writer = writerThat(async () => {});
+    const { result } = renderHook(() => useMapAnswers([], writer));
+
+    await act(async () => {
+      await result.current.answer!('q1', 'Who?', 'Teachers — mostly', {
+        picked: ['Teachers'],
+        text: 'mostly',
+      });
+    });
+
+    expect(result.current.answers.get('q1')).toBe('Teachers — mostly');
+  });
+
+  // The parts come back off the log for the pencil to seed itself from.
+  it('reads the recorded selections out of the log', () => {
+    const events = [answeredWith('q1', 'Teachers — mostly', ['Teachers'], 'mostly')];
+    const { result } = renderHook(() =>
+      useMapAnswers(events, writerThat(async () => {})),
+    );
+    expect(result.current.selections.get('q1')).toEqual({
+      picked: ['Teachers'],
+      text: 'mostly',
+    });
+  });
+
+  // An answer recorded before the log carried structure has none to report,
+  // and the card falls back to reading its text apart rather than opening on
+  // an empty selection nobody chose.
+  it('reports no selection for an answer that carried none', () => {
+    const { result } = renderHook(() =>
+      useMapAnswers([answered('q1', 'Just me')], writerThat(async () => {})),
+    );
+    expect(result.current.selections.has('q1')).toBe(false);
   });
 
   // Editing an answer is posting another one, so the newer value must win on

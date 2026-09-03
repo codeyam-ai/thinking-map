@@ -1,0 +1,30 @@
+{
+  "surface": "CardChoiceList",
+  "surface_kind": "component",
+  "states": [
+    {
+      "dimension": "light",
+      "value": "true",
+      "rationale": "source-derived state light=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "light",
+      "value": "false",
+      "rationale": "source-derived state light=false",
+      "status": "covered"
+    },
+    {
+      "dimension": "on",
+      "value": "true",
+      "rationale": "source-derived state on=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "on",
+      "value": "false",
+      "rationale": "source-derived state on=false",
+      "status": "covered"
+    }
+  ]
+}

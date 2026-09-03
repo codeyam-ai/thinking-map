@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - SeveralTaken",
+  "id": "12ea7d79-91bd-45b5-8c69-19d562be38d4",
+  "url": "/isolated-components/CardChoiceList?s=SeveralTaken",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "Two options taken out of four. The change the whole list turns on: options used to SUBMIT on click, so a shortlist allowed exactly one answer — and two of those is an ordinary thing to want to say. A taken option is filled rather than merely tinted, because these pills sit on a card already saturated in its theme hue and a fill is the only difference that survives that ground."
+}

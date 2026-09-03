@@ -1,0 +1,12 @@
+{
+  "name": "CardChoiceList - TakenOnDarkCard",
+  "id": "12427089-14e2-4c0d-9ba4-0dd4be1bb492",
+  "url": "/isolated-components/CardChoiceList?s=TakenOnDarkCard",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "CardChoiceList",
+  "scenarioType": "component",
+  "description": "A taken option on the near-black surface of a card being amended, where the fill inverts to white on black. One component, two grounds — and taken-versus-untaken has to stay legible on both, which is what a card reopened through the pencil depends on."
+}

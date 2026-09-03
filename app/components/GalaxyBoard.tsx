@@ -29,6 +29,7 @@ import {
 } from '@/app/lib/boardNav';
 import { newSince } from '@/app/lib/whatChanged';
 import type { Phase } from '@/app/lib/mapKinds';
+import type { AnswerSelection } from '@/app/lib/answerDraft';
 import BoardNav from './BoardNav';
 import BoardWhereNext from './BoardWhereNext';
 import BoardToolkitPanel from './BoardToolkitPanel';
@@ -74,6 +75,7 @@ export default function GalaxyBoard({
   nodes,
   insights = [],
   bridgeStatus = 'unavailable',
+  selections,
   onAnswer,
   onChoose,
   onSay,
@@ -105,7 +107,15 @@ export default function GalaxyBoard({
   /** Takes the whole card, not just its id: the exchange log records what was
    *  asked alongside what was said, so an agent reading it later does not have
    *  to re-resolve a bare id against a map that may have moved on. */
-  onAnswer?: (card: { id: string; label: string }, answer: string) => void;
+  onAnswer?: (
+    card: { id: string; label: string },
+    answer: string,
+    parts?: AnswerSelection,
+  ) => void;
+  /** How each recorded answer was assembled, by node id. Passed straight to the
+   *  card that owns it, which is what lets the pencil reopen on the options
+   *  taken. Optional: an isolated fixture has no log to read one out of. */
+  selections?: Map<string, AnswerSelection>;
   /** Picking one of the ways forward the conclusion offers. Distinct from
    *  answering: nothing on the map is being closed, a direction is being
    *  chosen, and what the partner does next depends on which. */
@@ -487,8 +497,9 @@ export default function GalaxyBoard({
                     // drifted the moment either was tuned.
                     focusCard(card);
                   }}
-                  onAnswer={(text) => {
-                    onAnswer?.(card, text);
+                  selection={selections?.get(card.id) ?? null}
+                  onAnswer={(text, parts) => {
+                    onAnswer?.(card, text, parts);
                     advance.arm();
                   }}
                   // Not answering is a real answer to give. The question stays

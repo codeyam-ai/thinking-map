@@ -1,0 +1,18 @@
+{
+  "name": "QuestionCard - ReopenedLegacy",
+  "id": "eafd5d7d-470f-4bce-9e58-a9fc5081a93a",
+  "url": "/isolated-components/QuestionCard?s=AnsweredLegacy",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "The pencil pressed on an answer recorded before any of this existed — prose that resolves to no option on the shortlist. It opens as written words with NOTHING falsely checked, and every option still offered. Being timid here is the rule: a wrong guess silently drops part of what somebody said, while declining to guess costs only a pill they can check themselves.",
+  "interactions": [
+    {
+      "action": "click",
+      "selector": "[aria-label=\"Edit this answer\"]"
+    }
+  ]
+}

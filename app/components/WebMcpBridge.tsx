@@ -35,6 +35,8 @@ import { useAskUser, type PendingQuestion } from '@/app/hooks/useAskUser';
 import { useExchangeLog } from '@/app/hooks/useExchangeLog';
 import type { ToolClient } from '@/app/lib/toolCatalog';
 import type { ExchangeEvent } from '@/app/lib/exchange';
+import type { AnswerSelection } from '@/app/lib/answerDraft';
+import { withSelections } from '@/app/lib/mapAnswers';
 
 export type { PendingQuestion };
 
@@ -83,10 +85,16 @@ export interface BridgeState {
    * should never have to know whether an agent is blocked on them: answering
    * an open question on the map is a valid contribution either way, and a
    * pending `ask_user` is released only if one happens to be waiting.
+   *
+   * `parts` is the same answer taken apart, keyed by question id — which
+   * options were chosen and what was typed. Optional, and additive: the log
+   * keeps `answer` as the string every reader already reads, and gains the
+   * structure only for a card that had any to give.
    */
   answer(
     answers: Record<string, string>,
     questions?: PendingQuestion[],
+    parts?: Record<string, AnswerSelection>,
   ): Promise<void>;
   /** Record something the person did, so a waiting agent wakes up. */
   contribute(
@@ -174,16 +182,33 @@ export function WebMcpBridge({
   );
 
   const answer = useCallback(
-    async (answers: Record<string, string>, questions?: PendingQuestion[]) => {
+    async (
+      answers: Record<string, string>,
+      questions?: PendingQuestion[],
+      parts?: Record<string, AnswerSelection>,
+    ) => {
       const asked = questions ?? pending;
       const resolved = asked.map((q) => ({
         id: q.id,
         text: q.text,
         answer: answers[q.id] ?? '',
       }));
+      // The structure travels ALONGSIDE the answer, never instead of it.
+      //
+      // Every reader downstream — the node's `detail` column, the chat bubbles,
+      // the rail, the agent's own `read_map` — takes `answer` as a string, and
+      // none of them changed for an answer to become a set. What the two extra
+      // fields buy is the one thing the string cannot always give back: whether
+      // a comma was a separator or something a person wrote.
+      const logged = withSelections(resolved, parts);
       // The answer is written to the log BEFORE the agent's turn is released,
       // so an agent that already gave up still finds it on its next read.
-      await contribute('user.answer', { answers: resolved });
+      await contribute('user.answer', { answers: logged });
+      // `resolved`, not `logged`: an `ask_user` call resolves with the answer as
+      // a STRING, and handing the agent two extra fields it was never promised
+      // would change the tool's result shape for a page-side detail it has no
+      // use for.
+      //
       // No-op when nothing is waiting, which is the ordinary case: the person
       // answered a question on the map rather than one an agent is blocked on.
       settle(resolved);

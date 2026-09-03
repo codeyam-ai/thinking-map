@@ -25,8 +25,14 @@
 // and thinking is the thing this board is for. Re-answering replaces the
 // previous answer through the same path a first answer takes.
 
-import { useEffect, useState } from 'react';
-import { composeAnswer, toggleChoice } from '@/app/lib/answerDraft';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  composeAnswer,
+  orderPicks,
+  restoreSelection,
+  toggleChoice,
+  type AnswerSelection,
+} from '@/app/lib/answerDraft';
 import { cardCopyLabel, cardCopyText } from '@/app/lib/boardCopyText';
 import { cardEyebrow } from '@/app/lib/cardEyebrow';
 import {
@@ -47,14 +53,25 @@ export default function QuestionCard({
   onFocus,
   onAnswer,
   onSkip,
+  selection,
 }: {
   card: PlacedCard;
   focused: boolean;
   onFocus: () => void;
-  onAnswer: (text: string) => void;
+  /** Record the answer. `parts` carries the same answer taken apart — which
+   *  options were chosen and what was typed — so the log keeps the structure
+   *  alongside the text rather than leaving a later reader to guess whether a
+   *  comma was a separator or something somebody wrote. */
+  onAnswer: (text: string, parts: AnswerSelection) => void;
   /** Move on without answering. Optional: an isolated fixture has nowhere to
    *  move on TO, and a Skip that goes nowhere is worse than no Skip. */
   onSkip?: () => void;
+  /** How this answer was actually assembled, when the log recorded it. Absent
+   *  for every answer written before the log carried structure, and on the
+   *  board itself, which renders an answer off the node's own `detail` column
+   *  and never reads the log — so `restoreSelection` reading the text back
+   *  apart is the ordinary path, not the fallback. */
+  selection?: AnswerSelection | null;
 }) {
   // Which of the three faces this card shows. The rule is a property of the
   // node rather than of rendering, so it lives in `cardPresentation` where a
@@ -84,11 +101,36 @@ export default function QuestionCard({
     if (card.status === 'answered') setJustAnswered(null);
   }, [card.status]);
 
-  // Seed the editor from what is on the card, so opening the pencil shows the
-  // existing answer to amend rather than an empty box to retype.
+  // What the pencil should open with, held steady across renders.
+  //
+  // Both inputs arrive as fresh objects every render — `card.choices` is
+  // rebuilt by the layout, the recorded selection is looked up out of the log
+  // — so either one straight in a dependency list would re-seed the editor
+  // under the person's cursor on every keystroke, or loop outright.
+  // Serialising them makes the dependencies primitives, which is what lets
+  // this be a plain memo rather than a ref dance.
+  const choicesJson = JSON.stringify(card.choices ?? []);
+  const selectionJson = JSON.stringify(selection ?? null);
+  const restored = useMemo(
+    () =>
+      restoreSelection(
+        card.detail,
+        JSON.parse(choicesJson) as string[],
+        JSON.parse(selectionJson) as AnswerSelection | null,
+      ),
+    [card.detail, choicesJson, selectionJson],
+  );
+
+  // Seed BOTH halves of the editor, so the pencil opens on the answer as it
+  // was MADE — the options you took checked, the ones you passed over still
+  // there to reconsider, your own words back in the field ready to change.
+  // Seeding only the text box, which is what this did, meant amending one
+  // choice out of three required retyping the other two from memory.
   useEffect(() => {
-    if (editing) setDraft(card.detail ?? '');
-  }, [editing, card.detail]);
+    if (!editing) return;
+    setPicked(restored.picked);
+    setDraft(restored.text);
+  }, [editing, restored]);
 
   const accent = themeColor(card.hue);
   const settled = answered || justAnswered !== null;
@@ -125,8 +167,15 @@ export default function QuestionCard({
     // Turn the card over first, so the answer is visible on it before the
     // board moves on. `onAnswer` is what arms that move.
     setJustAnswered(answerText);
+    // Read the parts off before the composer clears them: `closeComposer`
+    // resets both pieces of state, and passing them afterwards would record
+    // every compound answer as an empty selection.
+    // Ordered by the shortlist, exactly as `composeAnswer` orders the string it
+    // just built — so the recorded parts and the recorded text are two views of
+    // one answer rather than two answers that happen to agree today.
+    const parts = { picked: orderPicks(picked, choices), text: draft.trim() };
     closeComposer();
-    onAnswer(answerText);
+    onAnswer(answerText, parts);
   }
 
   return (
@@ -245,7 +294,15 @@ export default function QuestionCard({
           >
             {card.label}
           </p>
-          <p className="mt-2 text-[16px] font-semibold leading-snug text-white">
+          {/* Clamped, because an answer can now be several options AND a
+              written qualification, which is systematically longer than the
+              single option this face was built for — and the card is a fixed
+              300x360 on the board, so the text has nowhere to grow into. Six
+              lines is what the centred block has room for between the label
+              and the pencil; past that it degrades to a truncated statement
+              rather than spilling out of the card, and the copy button and the
+              pencil are both still routes to the whole thing. */}
+          <p className="mt-2 line-clamp-6 text-[16px] font-semibold leading-snug text-white">
             {/* The answer just given outranks the node's own, for the moment
                 between writing it and the map catching up. */}
             {justAnswered ?? card.detail}

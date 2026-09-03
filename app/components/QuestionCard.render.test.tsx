@@ -87,7 +87,10 @@ describe('QuestionCard — an open question', () => {
     fireEvent.change(box, { target: { value: 'Practice managers' } });
     fireEvent.click(screen.getByText('Save'));
 
-    expect(onAnswer).toHaveBeenCalledWith('Practice managers');
+    expect(onAnswer).toHaveBeenCalledWith('Practice managers', {
+      picked: [],
+      text: 'Practice managers',
+    });
   });
 
   // An empty answer is not an answer. Saving one would close the question
@@ -177,7 +180,12 @@ describe('QuestionCard — a shortlist', () => {
     // The SHORTLIST's order, not the order they were clicked — an answer that
     // read differently depending on which pill was tapped first would be one
     // answer wearing two faces.
-    expect(onAnswer).toHaveBeenCalledWith('Owner call-backs, Re-checks');
+    // And the parts are ordered by the same rule, so the structure recorded
+    // beside the answer cannot disagree with the answer itself.
+    expect(onAnswer).toHaveBeenCalledWith('Owner call-backs, Re-checks', {
+      picked: ['Owner call-backs', 'Re-checks'],
+      text: '',
+    });
   });
 
   // Every list the partner writes is a guess about what you might say, and the
@@ -219,6 +227,7 @@ describe('QuestionCard — a shortlist', () => {
 
     expect(onAnswer).toHaveBeenCalledWith(
       'Re-checks — and the Friday locum ones',
+      { picked: ['Re-checks'], text: 'and the Friday locum ones' },
     );
   });
 
@@ -240,7 +249,10 @@ describe('QuestionCard — a shortlist', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Lab results' }));
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    expect(onAnswer).toHaveBeenCalledWith('Lab results');
+    expect(onAnswer).toHaveBeenCalledWith('Lab results', {
+      picked: ['Lab results'],
+      text: '',
+    });
   });
 
   // Not answering is a real answer to give. A board that only lets you proceed
@@ -358,6 +370,218 @@ describe('QuestionCard — an answered question', () => {
     // Pre-filled with what was said before: the pencil is for amending an
     // answer, and an empty box would make it retyping instead.
     expect(box.value).toBe('Owner call-backs.');
+  });
+});
+
+describe('QuestionCard — reopening an answer', () => {
+  const shortlist = ['Owner call-backs', 'Re-checks', 'Lab results'];
+  const reopened = (detail: string) =>
+    card({
+      kind: 'open-question',
+      label: 'Which handover item goes missing most often?',
+      choices: shortlist,
+      detail,
+      status: 'answered',
+    });
+
+  const pressed = () =>
+    Array.from(document.querySelectorAll('button[aria-pressed="true"]')).map(
+      (b) => b.textContent,
+    );
+
+  // The whole point of the change. A compound answer used to reopen with every
+  // option unchecked and the entire sentence dumped into the box, so amending
+  // one choice out of two meant retyping the rest from memory.
+  it('shows the options that were taken as taken', () => {
+    render(
+      <QuestionCard
+        card={reopened('Owner call-backs, Re-checks — on Fridays')}
+        focused={false}
+        onFocus={noop}
+        onAnswer={noop}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Edit this answer'));
+
+    expect(pressed()).toEqual(['Owner call-backs', 'Re-checks']);
+  });
+
+  // The options passed over stay on the card, unchecked. Reopening an answer
+  // is a chance to reconsider it, which requires the rejected options to still
+  // be there to take.
+  it('still offers the options that were passed over', () => {
+    render(
+      <QuestionCard
+        card={reopened('Owner call-backs, Re-checks — on Fridays')}
+        focused={false}
+        onFocus={noop}
+        onAnswer={noop}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Edit this answer'));
+
+    const lab = screen.getByText('Lab results');
+    expect(lab.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  // The typed half comes back on its own, WITHOUT the options fused to the
+  // front of it — otherwise saving again would record them twice.
+  it('puts only the typed words back in the box', () => {
+    render(
+      <QuestionCard
+        card={reopened('Owner call-backs, Re-checks — on Fridays')}
+        focused={false}
+        onFocus={noop}
+        onAnswer={noop}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Edit this answer'));
+
+    const box = document.querySelector('textarea') as HTMLTextAreaElement;
+    expect(box.value).toBe('on Fridays');
+  });
+
+  // An answer recorded before any of this existed. It must open as written
+  // words with nothing checked — guessing which pills a sentence meant would
+  // silently drop part of what somebody said.
+  it('opens a legacy answer as written words with nothing taken', () => {
+    render(
+      <QuestionCard
+        card={reopened('Owner call-backs. Though the porters see it first')}
+        focused={false}
+        onFocus={noop}
+        onAnswer={noop}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Edit this answer'));
+
+    expect(pressed()).toEqual([]);
+    const box = document.querySelector('textarea') as HTMLTextAreaElement;
+    expect(box.value).toBe('Owner call-backs. Though the porters see it first');
+  });
+
+  // Reopening and saving unchanged must record what was already there. A round
+  // trip that quietly rewrote the answer would make the pencil destructive.
+  it('records the same answer when it is reopened and saved unchanged', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={reopened('Owner call-backs, Re-checks — on Fridays')}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('Edit this answer'));
+    fireEvent.click(screen.getByText('Save'));
+
+    expect(onAnswer).toHaveBeenCalledWith(
+      'Owner call-backs, Re-checks — on Fridays',
+      { picked: ['Owner call-backs', 'Re-checks'], text: 'on Fridays' },
+    );
+  });
+
+  // The parts travel with the answer so the log keeps what the string cannot
+  // always give back — whether a comma was a separator or something typed.
+  it('reports the answer taken apart alongside the text', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={card({
+          kind: 'open-question',
+          label: 'Which handover item goes missing most often?',
+          choices: shortlist,
+        })}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+    fireEvent.click(screen.getByText('Re-checks'));
+    fireEvent.click(screen.getByText('Save'));
+
+    expect(onAnswer).toHaveBeenCalledWith('Re-checks', {
+      picked: ['Re-checks'],
+      text: '',
+    });
+  });
+
+  // Enter is a SECOND entry point into the same save, and the composer that
+  // owns it did not change — but what saving MEANS did. A keyboard answer must
+  // record the options taken alongside the words typed, exactly as the button
+  // does, or answering without reaching for the mouse would quietly drop half
+  // the answer.
+  it('saves the options and the words together from the keyboard', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={card({
+          kind: 'open-question',
+          label: 'Which handover item goes missing most often?',
+          choices: shortlist,
+        })}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Owner call-backs'));
+    fireEvent.change(document.querySelector('textarea')!, {
+      target: { value: 'and the Friday locum ones' },
+    });
+    fireEvent.keyDown(document.querySelector('textarea')!, { key: 'Enter' });
+
+    expect(onAnswer).toHaveBeenCalledWith(
+      'Owner call-backs — and the Friday locum ones',
+      { picked: ['Owner call-backs'], text: 'and the Friday locum ones' },
+    );
+  });
+
+  // Shift+Enter is a newline, not a save. A question worth a shortlist is often
+  // worth a sentence too, and losing a paragraph to the send key would make the
+  // box unusable for the qualification it exists to hold.
+  it('does not save on shift+enter, which is a newline', () => {
+    const onAnswer = vi.fn();
+    render(
+      <QuestionCard
+        card={card({
+          kind: 'open-question',
+          label: 'Which handover item goes missing most often?',
+          choices: shortlist,
+        })}
+        focused={false}
+        onFocus={noop}
+        onAnswer={onAnswer}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Owner call-backs'));
+    fireEvent.keyDown(document.querySelector('textarea')!, {
+      key: 'Enter',
+      shiftKey: true,
+    });
+
+    expect(onAnswer).not.toHaveBeenCalled();
+  });
+
+  // A compound answer is systematically longer than the single option this
+  // face was built for, and the card is a fixed size on the board — so the
+  // text is clamped rather than allowed to push the pencil off the bottom.
+  it('clamps a long answer rather than letting it overflow the card', () => {
+    render(
+      <QuestionCard
+        card={reopened(
+          'Owner call-backs, Re-checks, Lab results — and medication changes on Fridays, though the evening vet usually catches those first',
+        )}
+        focused={false}
+        onFocus={noop}
+        onAnswer={noop}
+      />,
+    );
+
+    const shown = screen.getByText(/and medication changes on Fridays/);
+    expect(shown.className).toContain('line-clamp');
   });
 });
 

@@ -1,0 +1,22 @@
+{
+  "name": "QuestionCard - OptionsTaken",
+  "id": "b655089d-dc64-4097-9760-5bd526c6a3f2",
+  "url": "/isolated-components/QuestionCard?s=Choices",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "QuestionCard",
+  "scenarioType": "component",
+  "description": "Two options tapped on an open question, with nothing sent. Tapping used to submit on the spot, which is what made a shortlist a cage — one option, or reject the lot and type instead. Now it toggles and the Save button commits, so the card can say two of those, or one of those with a caveat.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Owner call-backs"
+    },
+    {
+      "action": "click",
+      "text": "Re-checks"
+    }
+  ]
+}

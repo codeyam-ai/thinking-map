@@ -37,6 +37,8 @@ import { useWebMcpBridge } from './WebMcpBridge';
 import { useSelfEndingRound } from '@/app/hooks/useSelfEndingRound';
 import { boardInsightStream } from '@/app/lib/boardInsights';
 import { roundEndNote, roundIsFinished } from '@/app/lib/roundEnd';
+import { selectionsByNodeId } from '@/app/lib/mapAnswers';
+import type { AnswerSelection } from '@/app/lib/answerDraft';
 import { PHASE_ASK, type Phase } from '@/app/lib/mapKinds';
 import type { GalaxyNodeInput, GalaxyTheme } from '@/app/lib/galaxyLayout';
 import type { Attachment } from '@/app/lib/attachments';
@@ -72,8 +74,20 @@ export default function BoardWorkspace({
   const [roundPhase, setRoundPhase] = useState<RoundPhase>('idle');
   const [answeredThisRound, setAnsweredThisRound] = useState(0);
 
+  // How each recorded answer was assembled, read off the log the bridge is
+  // already holding. It is what lets the pencil reopen on the options someone
+  // took rather than on a reading of the sentence they produced.
+  const selections = useMemo(
+    () => selectionsByNodeId(bridge.events),
+    [bridge.events],
+  );
+
   const onAnswer = useCallback(
-    (card: { id: string; label: string }, answer: string) => {
+    (
+      card: { id: string; label: string },
+      answer: string,
+      parts?: AnswerSelection,
+    ) => {
       // The question is passed explicitly rather than left to the bridge's
       // pending list. `answer()` defaults to whatever an agent is currently
       // blocked on, and answering a card on the board is usually not that —
@@ -82,9 +96,14 @@ export default function BoardWorkspace({
       // Fire-and-forget: the card has already cleared its draft, and making
       // someone wait on a round trip to see their own words land would make the
       // board feel slower than the typing that produced them.
-      void bridge.answer({ [card.id]: answer }, [
-        { id: card.id, text: card.label },
-      ]);
+      void bridge.answer(
+        { [card.id]: answer },
+        [{ id: card.id, text: card.label }],
+        // The parts ride along so the log keeps what the string cannot always
+        // give back. Omitted when the card had nothing structured to say, which
+        // keeps that write exactly the write it was before.
+        parts ? { [card.id]: parts } : undefined,
+      );
       setAnsweredThisRound((n) => n + 1);
     },
     [bridge],
@@ -223,6 +242,7 @@ export default function BoardWorkspace({
         nodes={nodes}
         insights={stream.insights}
         bridgeStatus={bridge.status}
+        selections={selections}
         onAnswer={onAnswer}
         onChoose={onChoose}
         onSay={onSay}

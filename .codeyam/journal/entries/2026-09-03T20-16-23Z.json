@@ -1,0 +1,1543 @@
+{
+  "timestamp": "2026-09-03T20:16:23Z",
+  "title": "Answer a question with more than one thing",
+  "type": "feature",
+  "userRequest": "## Summary\n\nA question card lets you say exactly one thing. Tapping an option on the board\nsends it immediately, and the free-text box appears INSTEAD of the shortlist,\nnever beside it — so \"these two, plus a caveat\" cannot be said at all. Editing is\nworse: the pencil opens a bare textarea seeded from the recorded answer, with the\noptions gone entirely, so amending a choice means retyping it from memory.\n\nThis plan makes an answer a set: any number of the offered options, a write-in of\nyour own, or both. Tapping toggles rather than sends; an explicit Save commits.\nEditing reopens that same control fully populated — the options you took are\nchecked, the ones you passed over are still there to reconsider, and your typed\nwords are back in the field ready to change.\n\nTwo things make this a restoration rather than an invention. The design system\nalready rules that a suggestion chip \"fills the prompt input rather than\nsubmitting, so the person stays in control of their words\" — the board's\nsend-on-tap is the one place in the app that breaks that rule, and\n`app/lib/toolCatalog.ts` already describes to the agent the behaviour this plan\nbuilds. And `dr-design changes: Harden the Galaxy Board` specified these cards as\n\"option pills … sit **above** the free-text 'Other' field, so a shortlist never\nremoves the ability to say something else\" — both present, which is what the card\nlater abandoned when stacking them overflowed a fixed-height card. The scrolling\ncolumn below is how that original intent finally fits.\n\nThe answer stays a single string in the exchange log, so every downstream reader\nis untouched, and the structure behind it travels alongside as an additive field.\nA single option picked and nothing else still records byte-identical text to\ntoday, so no existing card or log line changes meaning.\n\n## Key Decisions\n\n- **Multi-select is always available on any card with choices.** No new tool\n  field, no agent retraining, no node schema change. The agent's `choices` keeps\n  the exact meaning it has, and no question can be accidentally over-restricted\n  by an agent that guessed wrong about how many answers there are.\n- **Tapping toggles; Save sends.** One rule for every question, whether you take\n  one option or three. It costs a tap on the simplest question and buys a\n  gesture that means the same thing everywhere — and it brings the board into\n  line with the design system's suggestion-chip rule and with what\n  `toolCatalog.ts` already tells the agent. Enter still saves, so a keyboard\n  answer is no slower than it is today.\n- **One scrolling column with the commit pinned, rather than a taller card.**\n  Cards are a fixed 300x360 (`CARD_W`, `CARD_H` in `app/lib/galaxyLayout.ts`),\n  and that height feeds the layout's row spacing and bounds — growing a card\n  while it is answered is a layout change with its own tests. The options scroll\n  in the space they have while the commit row stays pinned, which is the pattern\n  `CardChoiceList` already uses to stop its escape hatch falling off the bottom.\n- **The write-in is progressive, and shares the pinned row with the escape\n  hatch — it does not sit open permanently.** This is the decision the vertical\n  budget forces, and it is worth the arithmetic. Inside `p-7` a card has roughly\n  244x304 of content; an eyebrow and a two-line question take about 72, leaving\n  about 216 for the answer area. An option row is about 40 with an 8 gap. Today's\n  48-high escape row leaves ~168 — about three options visible. A permanently\n  open field plus its own Save row costs about 100, cutting that to ~116 and\n  about two. Since the agent is told to offer \"two to four concrete options\",\n  making the common case scroll would be a real loss of scannability. Putting\n  \"Say something else…\" and Save in ONE pinned row costs about 46 and leaves\n  ~170 — the same three-plus options visible as today, with multi-select gained\n  for free. **These figures are estimates from the current classes; confirm them\n  visually at execution before settling the field's height.**\n- **Never three controls in that row.** At 244 of usable width a row cannot hold\n  an escape hatch, a Cancel and a Save. It does not have to: while the field is\n  closed the row is [Say something else…] [Save]; once it is open the escape\n  hatch has done its job and the row becomes [Cancel] [Save]. This preserves\n  `AnswerComposer`'s existing rule that Cancel appears only when there is\n  somewhere to go back to.\n- **Selection must be legible without colour.** The options are pills on a card\n  already saturated in its theme hue, so a chosen pill cannot be distinguished by\n  fill alone. Selected options carry a check glyph and `aria-pressed`, so the\n  state is announced as well as drawn. This also keeps the markup within the\n  constraint two existing tests defend: the card root is not a `button` and\n  carries no `role=\"button\"`, and the options stay real buttons inside a plain\n  container.\n- **The recorded answer stays a string; the structure rides alongside.** The\n  `user.answer` payload gains optional `selected` and `other` fields next to the\n  existing `answer`. `the-conversation-gets-out-of-the-way` established that\n  payload's shape and colours each chat bubble by its node id, so the fields must\n  be additive: every reader keeps reading `answer` and ignores what it does not\n  know. Re-parsing prose back into selections was the alternative and it is\n  guesswork — an option containing the separator, or a write-in that happens to\n  equal an option, both break it.\n- **One selection and no write-in records exactly the option text.** No\n  separator, no wrapper. This is what keeps every answered card, chat line and\n  rail entry already in the database reading precisely as it does now.\n- **Legacy answers still edit sensibly.** An event written before this change has\n  no `selected`, so the reader falls back: text matching one of the node's\n  choices exactly is treated as that option checked; anything else is treated as\n  a write-in. Old maps get a populated editor rather than an empty one.\n- **A question becomes answered on Save, which improves the round.**\n  `the-round-ends-itself` auto-advances once `openCount` reaches zero, after a\n  grace countdown that any typing cancels. Under send-on-tap a stray tap can\n  close the last question and start that countdown; under Save a half-made\n  selection leaves the question open, which is the truthful state. The\n  always-reachable write-in also means typing to cancel the countdown is\n  possible from the card itself. No change to that plan's code is needed —\n  this is a consequence to verify, not a coupling to build.\n- **The pinned row lands in the corner the chat is known to swallow.** The\n  queued `a-card-s-pencil-cannot-be-clicked-under-the-chat` documents the chat\n  overlay eating clicks in the bottom-right of the viewport, and moves the\n  pencil to the card's bottom-left. Save sits at the right end of the pinned row\n  and is therefore exposed to exactly that collision. The composer's button row\n  already sits there today, so this is not a new defect — but this plan makes it\n  reachable on every card with choices instead of only after \"Say something\n  else…\", so it is newly common. Enter-to-save is the existing keyboard escape.\n  Whichever plan lands second should re-check the other's control; not a\n  `dependsOn`, because neither blocks the other.\n- **`CardChoiceList` keeps its name and grows a selection API** rather than being\n  replaced. It is already the tested home of the two rules that matter here —\n  the options scroll, the escape stays pinned — and those rules survive intact.\n- **Out of scope, noted:** `app/components/MapCardAnswer.tsx` and\n  `app/components/AnswerChips.tsx` are a second answering surface whose chips\n  already fill rather than send. Nothing live renders it — its only route in is\n  `app/components/MapWorkspace.tsx`, which no page mounts. Left alone\n  deliberately; if it is ever revived it should adopt this control.\n\n## Implementation\n\n### 1. Options become selectable, and the bottom row commits\n\n**File**: `app/components/CardChoiceList.tsx`\n\nReplace `onPick: (choice: string) => void` with a selection API: a `selected:\nstring[]` prop and `onToggle: (choice: string) => void`. Each option keeps its\n`button` element and gains `aria-pressed` plus a check glyph when chosen, so the\nstate is announced and not carried by fill alone. The scrolling body is\nunchanged — it is what makes the fixed height work.\n\nThe pinned bottom row becomes the card's commit row. With the write-in closed it\nholds \"Say something else…\" on the left and Save on the right; with it open the\nescape hatch is replaced by Cancel. Save is enabled once anything is selected or\ntyped.\n\n### 2. The write-in field learns to sit under a list\n\n**File**: `app/components/AnswerComposer.tsx`\n\nAdd a `compact` mode for when the field shares a card with a list: a short fixed\nfield that does not grow, so the options keep their room, with its buttons\nsupplied by the pinned row rather than drawn again underneath. Full-height\nbehaviour is unchanged for a question with no choices, which is still the common\ncase, and Enter-to-save and Escape-to-cancel apply in both.\n\n### 3. The card composes both, and holds a set\n\n**File**: `app/components/QuestionCard.tsx`\n\n- Replace the `draft` / `otherOpen` pair with selection state: the set of chosen\n  options plus the write-in text and whether its field is open.\n- Render the list and the commit row TOGETHER when the card has choices — the\n  mutual exclusion at the `composing` / `!composing` branches goes away. The\n  answer area becomes one column: options scrolling in the flexible space, the\n  optional field and the pinned row beneath.\n- `onAnswer` is called only from Save, and receives the composed answer plus its\n  parts. Nothing is sent on a tap.\n- Save is refused when nothing is selected and nothing is typed, as an empty\n  answer is refused now.\n- Opening the pencil seeds BOTH pieces of state from the recorded answer, and\n  opens the field already expanded when the restored answer has a write-in, so\n  the editor shows what was chosen, what was not, and what was typed.\n- A card with no choices behaves exactly as it does today: the full-height box,\n  no list, and Save.\n\n### 4. The answered face survives a longer answer\n\n**File**: `app/components/QuestionCard.tsx`\n\nA compound answer is systematically longer than a single option, and the\nanswered face prints `card.detail` at 16px in a fixed-height card. Clamp it to\nthe space available so a three-part answer degrades to a truncated statement\nrather than overflowing the card, leaving the pencil and the existing\n`CopyTextButton` as the ways to the full text. Confirm the clamp visually at\nexecution.\n\n### 5. Composing and reading back the answer\n\n**New file**: `app/lib/answerSelection.ts`\n\nA pure module, the counterpart to `app/lib/mapAnswers.ts`:\n\n- `composeAnswer(selected: string[], other: string): string` — options in the\n  order the card shows them, joined with ` · `; a write-in appended after ` — `\n  so typed prose is distinguishable from chosen options. One selection and no\n  write-in returns that option verbatim; a write-in alone returns it verbatim.\n- `restoreSelection(answer, choices, recorded?)` — what the editor opens with.\n  Prefers the recorded `selected` / `other` when the event carried them; falls\n  back to the legacy rule in Key Decisions otherwise.\n\nKeeping this out of the component is what lets the joining and the fallback be\ntested at their edges rather than through a rendered card.\n\n### 6. The structure travels with the answer\n\n**File**: `app/lib/mapAnswers.ts`\n\nAdd `selectionsByNodeId(events)` alongside `answersByNodeId`, returning the\nlatest `{ selected, other }` per node id for events that carried them. Same\ntolerance for malformed entries: a bad payload is skipped, never thrown.\n`answersByNodeId` is not modified — it keeps returning the display string.\n\n**File**: `app/hooks/useMapAnswers.ts`\n\nWiden `AnswerWriter.answer` and the hook's own `answer` so a selection can be\npassed rather than only a string. The optimistic-pending layer keeps working on\nthe display string; the parts ride with it. Expose the restored selection per\nnode so the card can seed its editor.\n\n**File**: `app/components/WebMcpBridge.tsx`\n\nIn the `answer` callback, carry `selected` and `other` into each entry of the\n`resolved` array written to `user.answer`. `settle(resolved)` is unchanged — the\nagent's `ask_user` result still resolves with `answer` as a string, so nothing\nagent-facing moves.\n\n### 7. Tell the agent what a list now means\n\n**File**: `app/lib/toolCatalog.ts`\n\nUpdate the `choices` description so it states what is now true: the person may\ntake several of the options, or none and write their own, and nothing is sent\nuntil they save. The current text already says a chip \"fills the box rather than\nsending it\" — which the board did not honour — so this is the description and the\nbehaviour meeting rather than a new promise.\n\n### 8. Tests\n\n**File**: `app/components/QuestionCard.render.test.tsx`\n\nThree existing tests encode decisions this plan reverses and must be rewritten\nrather than patched, each keeping its intent:\n\n- `answers with an option the moment one is picked` becomes: a tap marks the\n  option chosen and sends nothing until Save.\n- `swaps the options for a text box rather than stacking them` becomes: the\n  options and the commit row are visible together, and the options scroll rather\n  than pushing the row off the card.\n- `gives the options back when the free-text box is cancelled` becomes: Cancel\n  restores the recorded answer, discarding the in-progress selection.\n\nThe two structural assertions that the card root is neither a `button` nor\n`role=\"button\"` must keep passing unchanged — they exist because both\nregressions already happened once and both silently broke the option pills.\n\nAdd: several options selected save as one answer; an option plus a write-in save\ntogether; a chosen option is announced as pressed, not merely coloured; the\npencil opens with chosen options checked and unchosen ones still offered; the\npencil opens the field expanded when the restored answer has a write-in;\ndeselecting everything and typing leaves only the write-in; Save stays refused\nwhen nothing at all is chosen or typed.\n\n**New file**: `app/lib/answerSelection.test.ts`\n\nThe joining and the restore rules at their edges: one option verbatim, several\njoined, a write-in alone, options plus write-in, an empty selection, and the\nlegacy fallback for an answer recorded before `selected` existed.\n\n**File**: `app/lib/mapAnswers.test.ts`\n\nCover `selectionsByNodeId`: the latest selection per node wins, an event with no\nselection is passed over rather than blanking a previous one, and a malformed\nentry is skipped.\n\n**File**: `app/hooks/useMapAnswers.test.ts`\n\nThe widened writer: a selection reaches the writer intact, and a failed write\nstill rolls the optimistic answer back.\n\nRe-register affected scenarios after the UI changes.\n\n## Reused existing code\n\n- `CardChoiceList` from `app/components/CardChoiceList.tsx` (glossary entry:\n  `CardChoiceList`) — kept, with its scrolling-body / pinned-row structure\n  intact; only its selection API changes.\n- `AnswerComposer` from `app/components/AnswerComposer.tsx` (glossary entry:\n  `AnswerComposer`) — kept; gains a compact mode rather than a replacement, and\n  its \"Cancel only when there is somewhere to go back to\" rule is carried into\n  the pinned row.\n- `answersByNodeId` from `app/lib/mapAnswers.ts` — unchanged, and still the one\n  reader of the display string.\n- `parseOptions` from `app/lib/mapAnswers.ts` — how a node's stored choices\n  already become a string list; nothing new is needed to read them.\n- `useMapAnswers` from `app/hooks/useMapAnswers.ts` — the optimistic-answer\n  layer, widened rather than rebuilt; its pending-entry rules still hold.\n- `isAnsweredCard`, `isOpenCard`, `isInsightCard` from\n  `app/lib/cardPresentation.ts` — which face the card wears is unaffected by how\n  many parts the answer has.\n- `cardEyebrow` from `app/lib/cardEyebrow.ts` — the \"Editing your answer\"\n  vocabulary is already handled here.\n- `CopyTextButton` from `app/components/CopyTextButton.tsx` — the existing route\n  to a full answer the clamped face truncates.\n- `themeColor` from `app/lib/themeHue.ts` — selected and unselected options are\n  drawn from the card's existing accent, no new colours.\n- `CARD_SIZE` from `app/lib/galaxyLayout.ts` — the fixed geometry this design is\n  built to respect, not modify.\n- `ExchangeEvent` from `app/lib/exchange.ts` — the log shape the new optional\n  fields ride inside.\n\n**Existing-implementation survey.** There is no multi-select, checkbox, or\ntoggle-group control anywhere in `app/components` today — every option list in\nthe app (`CardChoiceList`, `AnswerChips`, `SuggestionChips`) is single-shot, and\nnone of them tracks a selection. There is likewise no helper that composes or\nsplits a compound answer: `app/lib/mapAnswers.ts` reads a string out of the log\nand `parseOptions` reads a list off a node, and nothing joins the two. The\nmodule in Implementation step 5 is genuinely new rather than a duplicate. The\nuser.answer payload carries no selection field today, so the two keys added in\nImplementation step 6 collide with nothing.\n\n## Scenarios to Demonstrate\n\n- An open question with four options, none chosen — all four visible without\n  scrolling, the commit row pinned beneath, Save refused. This is the case the\n  vertical budget exists to protect.\n- Two options chosen, saved as one answer.\n- One option chosen plus a written caveat, saved together.\n- No option chosen, write-in only — the same result today's \"Say something\n  else…\" produces.\n- Editing an answer: chosen options checked, passed-over options still offered,\n  the typed words back in the field.\n- Editing an answer recorded before this change whose text matches an option\n  exactly — it opens with that option checked.\n- Editing a legacy free-text answer — it opens as a write-in with every option\n  still offered.\n- Eight options — the list scrolls and the commit row never leaves the card.\n- An answered card carrying a three-part answer — clamped, not overflowing.\n- A question with no options at all — the full-height box, unchanged.\n- A card whose bottom-right sits under the open chat panel, showing what the\n  commit row has to survive.\n- Cancel during an edit — the previously recorded answer stands untouched.",
+  "description": "A question card's answer is now a set rather than a single string: the shortlist's options toggle instead of sending, any number of them can be taken alongside words of your own, and one Save records the combination. Most of that multi-select core had already shipped in c3e01ac under a different module name than the plan proposed (answerDraft.ts, not answerSelection.ts), which is why the editor's already-implemented check stayed silent — so this cycle delivered the un-built remainder, and the headline of it is EDITING. The pencil now reopens an answer as it was made: restoreSelection puts the taken options back checked, leaves the passed-over ones offered, and returns the typed words to the field on their own, instead of flattening the whole answer into prose to retype from memory. Alongside that, the structure now travels in the exchange log beside the answer string (selectionsByNodeId reads it, withSelections writes it, and the two live in one file so the round trip cannot silently stop closing), the answered card clamps a long compound answer rather than overflowing a fixed 300x360, and toolCatalog's two `choices` descriptions finally say what a list does — they still claimed a chip 'fills the box rather than sending it' while the board sent on tap.\n\nSCOPE VERDICT — delivered: the un-built slice of this plan, in full. All four remaining pieces landed (pencil restore, structure in the log, the answered-face clamp, the agent-facing copy), plus the tests for each. Deferred: nothing from this cycle. The project's deliverables list was already fully resolved before this build — 9 delivered, 1 deferred — and this feature is a refinement inside deliverables already marked delivered rather than a claim on a new one, so it moved no row. The single deferred row (registering the MCP server in a client, an assist-track item outside this build flow) carries decidedBy: user, so there is no agent-decided deferral standing unconfirmed on this project.\n\nTwo deviations worth the record. The plan specified the payload fields as `selected`/`other` and I kept those names, but the card-side type uses `picked`/`text`, because a user.answer entry ALREADY has a `text` and it means the question's label — reusing it would have made a write-in and a question indistinguishable in the log. And the plan's vertical-budget arithmetic estimated 'about three options visible' on a long shortlist and asked for visual confirmation at execution; the executed layout shows about two and a half. Not a defect (the list scrolls and the commit row stays pinned as designed), but the estimate was optimistic and the ManyChoices scenario is the record of what it actually is.\n\nAlso fixed in passing, and not part of the plan: the dev server died mid-session and the editor's proxy went on answering 404s, which the recapture pipeline reported as a 'Turbopack cold-start race' across twelve unrelated scenarios. One restart cleared all twelve — one shared cause, as the tool suspected, not twelve defects. Two CardChoiceList states the earlier commit had built but never registered (SeveralTaken, TakenOnDarkCard) were also registered, and two scenario descriptions that still told the reader 'picking one answers immediately' were corrected to describe what the board actually does now.\n\nTests: 308 passing, all partitions green; audit clean at 0 findings. Four behaviours were proven fault-pinning with prove-red rather than merely compiling — the two pencil-restore tests and the two log round-trip tests all go red with the fix reverted.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/ne--answer-a-question-with-more-than-one-thing.md\t.codeyam/plans/completed/ne--answer-a-question-with-more-than-one-thing.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/cardchoicelist-default.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/questioncard.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-choices.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-healthybinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-nothingbound--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-olderconvention--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentbinddiagnostics-refusedtools--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agenthandoff-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-attachedviamcp--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-panelopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatus-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-connected--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-unavailable--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusdot-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-boundtopage--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-noagentnoreason--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatusnarrative-overmcpserver--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-boundtopage--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-mapdeleted--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-overmcpserver--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/agentstatuspanel-partiallyrefused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-danglingreference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-fullyaccountedfor--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-middeconstruction--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/briefpanel-nothingcitedyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-addnode--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/contributionbar-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-zoomedin--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-zoomedin--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-claimalone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-nocitations--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-longclaim--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-promptfilledthebox--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentidle--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settlednoagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-waiting--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/keepthinkingpanel-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-editingananswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-finding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-nooptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-rootidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapcard-yours--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-belowresearchthreshold--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-namedbyphase--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-partlyanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-receded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-researchband--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-theidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/maprow-wrapping--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-allfamilies--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-justanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-manyrounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-mixedwithonefinding--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-quiet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-researchround--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapworkspace-wrappinground--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/summaryscreen-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-board-s-bottom-right-corner-uncovered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-nocaption--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-seeded--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-sprawling--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/thinkingmapview-withoptions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-awaitinganswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-manyquestions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/webmcpbridge-onequestion--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/weighing-the-alternatives-against-each-other--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ae25a86de623d722ffa702b5ac9d536fb7ee9270bd09935627c2624c4a8177f4.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c4461b6820c2bc50673f0fede7bbf1a749cf611929b43958043c70a4a196da91.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/QuestionCard.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/QuestionCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/WebMcpBridge.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useMapAnswers.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/hooks/useMapAnswers.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/QuestionCard/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/answerDraft.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/answerDraft.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapAnswers.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/mapAnswers.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/toolCatalog.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/cardchoicelist-severaltaken.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/cardchoicelist-takenondarkcard.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/cardchoicelist.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-answeredcompound.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-answeredlong.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-manychoices.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-optionstaken.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-reopenedlegacy.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/questioncard-reopenedwithchoices.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-severaltaken--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-severaltaken--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-takenondarkcard--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/cardchoicelist-takenondarkcard--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answeredcompound--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answeredcompound--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answeredlong--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answeredlong--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-manychoices--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-manychoices--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-optionstaken--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-optionstaken--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reopenedlegacy--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reopenedlegacy--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reopenedwithchoices--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reopenedwithchoices--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/ne--answer-a-question-with-more-than-one-thing.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/2a4f7c127251962732430362cbd430778fdddb654895844ba41f01b1083fbc25.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/a64f775ab4d46762dfc20f96bcc2501dd659e88a1bd645471e080ee9a89433aa.json",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The board's bottom-right corner, uncovered",
+      "screenshotPath": "the-board-s-bottom-right-corner-uncovered--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "Weighing the alternatives against each other",
+      "screenshotPath": "weighing-the-alternatives-against-each-other--desktop.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - HealthyBinding",
+      "screenshotPath": "agentbinddiagnostics-healthybinding--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - NothingBound",
+      "screenshotPath": "agentbinddiagnostics-nothingbound--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - OlderConvention",
+      "screenshotPath": "agentbinddiagnostics-olderconvention--tablet.png"
+    },
+    {
+      "name": "AgentBindDiagnostics - RefusedTools",
+      "screenshotPath": "agentbinddiagnostics-refusedtools--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - Default",
+      "screenshotPath": "agenthandoff-default--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - FromBrief",
+      "screenshotPath": "agenthandoff-frombrief--tablet.png"
+    },
+    {
+      "name": "AgentHandoff - LongIdea",
+      "screenshotPath": "agenthandoff-longidea--tablet.png"
+    },
+    {
+      "name": "AgentStatus - AttachedViaMcp",
+      "screenshotPath": "agentstatus-attachedviamcp--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Connected",
+      "screenshotPath": "agentstatus-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatus - MapDeleted",
+      "screenshotPath": "agentstatus-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatus - NoAgent",
+      "screenshotPath": "agentstatus-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatus - PanelOpen",
+      "screenshotPath": "agentstatus-panelopen--tablet.png"
+    },
+    {
+      "name": "AgentStatus - Working",
+      "screenshotPath": "agentstatus-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Connected",
+      "screenshotPath": "agentstatusdot-connected--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Unavailable",
+      "screenshotPath": "agentstatusdot-unavailable--tablet.png"
+    },
+    {
+      "name": "AgentStatusDot - Working",
+      "screenshotPath": "agentstatusdot-working--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - BoundToPage",
+      "screenshotPath": "agentstatusnarrative-boundtopage--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - MapDeleted",
+      "screenshotPath": "agentstatusnarrative-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgent",
+      "screenshotPath": "agentstatusnarrative-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - NoAgentNoReason",
+      "screenshotPath": "agentstatusnarrative-noagentnoreason--tablet.png"
+    },
+    {
+      "name": "AgentStatusNarrative - OverMcpServer",
+      "screenshotPath": "agentstatusnarrative-overmcpserver--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - BoundToPage",
+      "screenshotPath": "agentstatuspanel-boundtopage--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - MapDeleted",
+      "screenshotPath": "agentstatuspanel-mapdeleted--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - NoAgent",
+      "screenshotPath": "agentstatuspanel-noagent--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - OverMcpServer",
+      "screenshotPath": "agentstatuspanel-overmcpserver--tablet.png"
+    },
+    {
+      "name": "AgentStatusPanel - PartiallyRefused",
+      "screenshotPath": "agentstatuspanel-partiallyrefused--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "BriefPanel - DanglingReference",
+      "screenshotPath": "briefpanel-danglingreference--tablet.png"
+    },
+    {
+      "name": "BriefPanel - FullyAccountedFor",
+      "screenshotPath": "briefpanel-fullyaccountedfor--tablet.png"
+    },
+    {
+      "name": "BriefPanel - MidDeconstruction",
+      "screenshotPath": "briefpanel-middeconstruction--tablet.png"
+    },
+    {
+      "name": "BriefPanel - NothingCitedYet",
+      "screenshotPath": "briefpanel-nothingcitedyet--tablet.png"
+    },
+    {
+      "name": "ContributionBar - AddNode",
+      "screenshotPath": "contributionbar-addnode--tablet.png"
+    },
+    {
+      "name": "ContributionBar - Default",
+      "screenshotPath": "contributionbar-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ZoomedIn",
+      "screenshotPath": "galaxyboard-zoomedin--tablet.png"
+    },
+    {
+      "name": "InsightCard - Default",
+      "screenshotPath": "insightcard-default--tablet.png"
+    },
+    {
+      "name": "InsightCard - Experiment",
+      "screenshotPath": "insightcard-experiment--tablet.png"
+    },
+    {
+      "name": "InsightCard - LongLabel",
+      "screenshotPath": "insightcard-longlabel--tablet.png"
+    },
+    {
+      "name": "InsightCard - Stale",
+      "screenshotPath": "insightcard-stale--tablet.png"
+    },
+    {
+      "name": "InsightCard - StaleByOne",
+      "screenshotPath": "insightcard-stalebyone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - AgentWorking",
+      "screenshotPath": "insightdetail-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightDetail - ClaimAlone",
+      "screenshotPath": "insightdetail-claimalone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - Default",
+      "screenshotPath": "insightdetail-default--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoAgent",
+      "screenshotPath": "insightdetail-noagent--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoCitations",
+      "screenshotPath": "insightdetail-nocitations--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - AgentWorking",
+      "screenshotPath": "insightgodeeper-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - Listening",
+      "screenshotPath": "insightgodeeper-listening--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - LongClaim",
+      "screenshotPath": "insightgodeeper-longclaim--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - NoAgent",
+      "screenshotPath": "insightgodeeper-noagent--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - PromptFilledTheBox",
+      "screenshotPath": "insightgodeeper-promptfilledthebox--tablet.png"
+    },
+    {
+      "name": "InsightStack - CardOpened",
+      "screenshotPath": "insightstack-cardopened--tablet.png"
+    },
+    {
+      "name": "InsightStack - EdgeLabels",
+      "screenshotPath": "insightstack-edgelabels--tablet.png"
+    },
+    {
+      "name": "InsightStack - OneInsight",
+      "screenshotPath": "insightstack-oneinsight--tablet.png"
+    },
+    {
+      "name": "InsightStack - Overflowing",
+      "screenshotPath": "insightstack-overflowing--tablet.png"
+    },
+    {
+      "name": "InsightStack - ThreeInsights",
+      "screenshotPath": "insightstack-threeinsights--tablet.png"
+    },
+    {
+      "name": "InsightStack - Waiting",
+      "screenshotPath": "insightstack-waiting--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentIdle",
+      "screenshotPath": "insightstackempty-settledagentidle--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentWorking",
+      "screenshotPath": "insightstackempty-settledagentworking--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledNoAgent",
+      "screenshotPath": "insightstackempty-settlednoagent--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - Waiting",
+      "screenshotPath": "insightstackempty-waiting--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Default",
+      "screenshotPath": "keepthinkingpanel-default--tablet.png"
+    },
+    {
+      "name": "KeepThinkingPanel - Quiet",
+      "screenshotPath": "keepthinkingpanel-quiet--tablet.png"
+    },
+    {
+      "name": "MapCard - Answered",
+      "screenshotPath": "mapcard-answered--tablet.png"
+    },
+    {
+      "name": "MapCard - Default",
+      "screenshotPath": "mapcard-default--tablet.png"
+    },
+    {
+      "name": "MapCard - EditingAnAnswer",
+      "screenshotPath": "mapcard-editingananswer--tablet.png"
+    },
+    {
+      "name": "MapCard - Finding",
+      "screenshotPath": "mapcard-finding--tablet.png"
+    },
+    {
+      "name": "MapCard - LongLabel",
+      "screenshotPath": "mapcard-longlabel--tablet.png"
+    },
+    {
+      "name": "MapCard - NoOptions",
+      "screenshotPath": "mapcard-nooptions--tablet.png"
+    },
+    {
+      "name": "MapCard - RootIdea",
+      "screenshotPath": "mapcard-rootidea--tablet.png"
+    },
+    {
+      "name": "MapCard - Yours",
+      "screenshotPath": "mapcard-yours--tablet.png"
+    },
+    {
+      "name": "MapRow - BelowResearchThreshold",
+      "screenshotPath": "maprow-belowresearchthreshold--tablet.png"
+    },
+    {
+      "name": "MapRow - Default",
+      "screenshotPath": "maprow-default--tablet.png"
+    },
+    {
+      "name": "MapRow - NamedByPhase",
+      "screenshotPath": "maprow-namedbyphase--tablet.png"
+    },
+    {
+      "name": "MapRow - PartlyAnswered",
+      "screenshotPath": "maprow-partlyanswered--tablet.png"
+    },
+    {
+      "name": "MapRow - Receded",
+      "screenshotPath": "maprow-receded--tablet.png"
+    },
+    {
+      "name": "MapRow - ResearchBand",
+      "screenshotPath": "maprow-researchband--tablet.png"
+    },
+    {
+      "name": "MapRow - TheIdea",
+      "screenshotPath": "maprow-theidea--tablet.png"
+    },
+    {
+      "name": "MapRow - Wrapping",
+      "screenshotPath": "maprow-wrapping--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AllFamilies",
+      "screenshotPath": "mapworkspace-allfamilies--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - AwaitingAnswer",
+      "screenshotPath": "mapworkspace-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Default",
+      "screenshotPath": "mapworkspace-default--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - JustAnswered",
+      "screenshotPath": "mapworkspace-justanswered--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ManyRounds",
+      "screenshotPath": "mapworkspace-manyrounds--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - MixedWithOneFinding",
+      "screenshotPath": "mapworkspace-mixedwithonefinding--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Quiet",
+      "screenshotPath": "mapworkspace-quiet--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - ResearchRound",
+      "screenshotPath": "mapworkspace-researchround--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - Seeded",
+      "screenshotPath": "mapworkspace-seeded--tablet.png"
+    },
+    {
+      "name": "MapWorkspace - WrappingRound",
+      "screenshotPath": "mapworkspace-wrappinground--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Answered",
+      "screenshotPath": "questioncard-answered--tablet.png"
+    },
+    {
+      "name": "QuestionCard - AnsweredCompound",
+      "screenshotPath": "questioncard-answeredcompound--tablet.png"
+    },
+    {
+      "name": "QuestionCard - AnsweredLong",
+      "screenshotPath": "questioncard-answeredlong--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Choices",
+      "screenshotPath": "questioncard-choices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Diagram",
+      "screenshotPath": "questioncard-diagram--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Focused",
+      "screenshotPath": "questioncard-focused--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Insight",
+      "screenshotPath": "questioncard-insight--tablet.png"
+    },
+    {
+      "name": "QuestionCard - ManyChoices",
+      "screenshotPath": "questioncard-manychoices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Open",
+      "screenshotPath": "questioncard-open--tablet.png"
+    },
+    {
+      "name": "QuestionCard - OptionsTaken",
+      "screenshotPath": "questioncard-optionstaken--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Reference",
+      "screenshotPath": "questioncard-reference--tablet.png"
+    },
+    {
+      "name": "QuestionCard - ReopenedLegacy",
+      "screenshotPath": "questioncard-reopenedlegacy--tablet.png"
+    },
+    {
+      "name": "QuestionCard - ReopenedWithChoices",
+      "screenshotPath": "questioncard-reopenedwithchoices--tablet.png"
+    },
+    {
+      "name": "SummaryScreen - Default",
+      "screenshotPath": "summaryscreen-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Default",
+      "screenshotPath": "thinkingmapview-default--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Empty",
+      "screenshotPath": "thinkingmapview-empty--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - NoCaption",
+      "screenshotPath": "thinkingmapview-nocaption--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Seeded",
+      "screenshotPath": "thinkingmapview-seeded--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - Sprawling",
+      "screenshotPath": "thinkingmapview-sprawling--tablet.png"
+    },
+    {
+      "name": "ThinkingMapView - WithOptions",
+      "screenshotPath": "thinkingmapview-withoptions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - AwaitingAnswer",
+      "screenshotPath": "webmcpbridge-awaitinganswer--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - ManyQuestions",
+      "screenshotPath": "webmcpbridge-manyquestions--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - NoAgent",
+      "screenshotPath": "webmcpbridge-noagent--tablet.png"
+    },
+    {
+      "name": "WebMcpBridge - OneQuestion",
+      "screenshotPath": "webmcpbridge-onequestion--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 308,
+    "passed": 308,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 308,
+        "passed": 308
+      }
+    ]
+  }
+}

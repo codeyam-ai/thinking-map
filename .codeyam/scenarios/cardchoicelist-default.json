@@ -1,6 +1,6 @@
 {
   "name": "CardChoiceList - Default",
-  "id": "c6bb7ea5-7abf-4549-b2d5-296d0455164e",
+  "id": "893d0a83-924e-409c-a9a6-2c75149dc500",
   "url": "/isolated-components/CardChoiceList?s=Default",
   "dimensions": [
     "Tablet"
@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "CardChoiceList",
   "scenarioType": "component",
-  "description": "The shortlist on an open card: solid pills you can pick, and beneath them, in a different shape, the way to say something the list does not contain. Picking one answers immediately — a chosen option is already the whole answer."
+  "description": "The shortlist on an open card: outlined pills, none taken yet. Tapping one selects rather than submits — a chosen option is part of an answer, not the whole of it — so nothing leaves the card until Save. This is the resting state the taken states are read against."
 }

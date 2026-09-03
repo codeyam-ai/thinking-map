@@ -33,15 +33,15 @@
       "status": "planned"
     },
     {
-      "dimension": "editing",
+      "dimension": "writing",
       "value": "true",
-      "rationale": "source-derived state editing=true",
+      "rationale": "source-derived state writing=true",
       "status": "covered"
     },
     {
-      "dimension": "editing",
+      "dimension": "writing",
       "value": "false",
-      "rationale": "source-derived state editing=false",
+      "rationale": "source-derived state writing=false",
       "status": "covered"
     },
     {
@@ -81,6 +81,18 @@
       "status": "covered"
     },
     {
+      "dimension": "editing",
+      "value": "true",
+      "rationale": "source-derived state editing=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "editing",
+      "value": "false",
+      "rationale": "source-derived state editing=false",
+      "status": "covered"
+    },
+    {
       "dimension": "open",
       "value": "true",
       "rationale": "source-derived state open=true",
@@ -105,27 +117,15 @@
       "status": "covered"
     },
     {
-      "dimension": "writing",
+      "dimension": "settled",
       "value": "true",
-      "rationale": "source-derived state writing=true",
+      "rationale": "source-derived state settled=true",
       "status": "covered"
     },
     {
-      "dimension": "writing",
+      "dimension": "settled",
       "value": "false",
-      "rationale": "source-derived state writing=false",
-      "status": "covered"
-    },
-    {
-      "dimension": "answered",
-      "value": "true",
-      "rationale": "source-derived state answered=true",
-      "status": "covered"
-    },
-    {
-      "dimension": "answered",
-      "value": "false",
-      "rationale": "source-derived state answered=false",
+      "rationale": "source-derived state settled=false",
       "status": "covered"
     }
   ]
