@@ -30,15 +30,20 @@ import type { BridgeStatus } from './WebMcpBridge';
 import BoardZoomControls from './BoardZoomControls';
 import type { Attachment } from '@/app/lib/attachments';
 
-/** Below this scale the cards give way to the cluster labels alone.
+/** Below this scale the hub label grows. Out here the card text has become
+ *  texture, so the galaxy's name is the thing you are actually reading.
  *
- *  Set low on purpose. The obvious threshold is "when the text stops being
- *  readable", but hiding the cards there empties the board at exactly the zoom
- *  where someone is trying to take in its shape — and the shape IS the cards.
- *  Unreadable cards still carry the two things that matter from far away: how
- *  much thinking each galaxy holds, and how much of it is still open. Only when
- *  they degrade to single pixels is the label the more useful thing to draw. */
-const LABEL_ONLY_BELOW = 0.16;
+ *  This threshold hides nothing, and must not start to again. It used to cull
+ *  the cards below this scale, on the premise that they "degrade to single
+ *  pixels" — which is not true at these dimensions: a card is 300x360 board
+ *  units, so even at the MIN_SCALE floor of 0.12 it is a ~36x43px block of
+ *  colour, a legible patch of texture. What the cull actually did was empty the
+ *  board at exactly the zoom where someone is trying to take in its shape, and
+ *  the shape IS the cards — how much thinking each galaxy holds, and how much
+ *  of it is still open. Worse, framing a large board whole (`frameAll`, which
+ *  also runs on mount) computes a fit below this scale, so the board could open
+ *  with nothing on it at all. Cards render at every reachable zoom. */
+const HUB_LABEL_EMPHASIS_BELOW = 0.16;
 
 export default function GalaxyBoard({
   seedIdea,
@@ -118,7 +123,7 @@ export default function GalaxyBoard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes.length, themes.length]);
 
-  const far = camera.scale < LABEL_ONLY_BELOW;
+  const farOut = camera.scale < HUB_LABEL_EMPHASIS_BELOW;
   const plane = `scale(${camera.scale}) translate(${-camera.x}px, ${-camera.y}px)`;
 
   return (
@@ -252,7 +257,7 @@ export default function GalaxyBoard({
                   height: 132,
                   background: themeColor(cluster.theme.hue),
                   boxShadow: `0 0 90px ${themeColor(cluster.theme.hue, { a: 0.4 })}`,
-                  fontSize: far ? 21 : 15,
+                  fontSize: farOut ? 21 : 15,
                   // The hub lands first; its cards follow on the stagger above.
                   animation: 'cy-hub-in 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both',
                 }}
@@ -263,37 +268,36 @@ export default function GalaxyBoard({
               </div>
             </div>
 
-            {!far &&
-              cluster.cards.map((card, i) => (
-                <div
-                  key={card.id}
-                  className="absolute"
-                  style={{
-                    left: card.x,
-                    top: card.y,
-                    width: card.w,
-                    height: CARD_SIZE.height,
-                    // Staggered so a round lands as a sequence rather than as
-                    // one block appearing — the delay is what makes it read as
-                    // the partner writing rather than the page re-rendering.
-                    animation: `cy-emerge 520ms cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 90}ms both`,
+            {cluster.cards.map((card, i) => (
+              <div
+                key={card.id}
+                className="absolute"
+                style={{
+                  left: card.x,
+                  top: card.y,
+                  width: card.w,
+                  height: CARD_SIZE.height,
+                  // Staggered so a round lands as a sequence rather than as
+                  // one block appearing — the delay is what makes it read as
+                  // the partner writing rather than the page re-rendering.
+                  animation: `cy-emerge 520ms cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 90}ms both`,
+                }}
+              >
+                <QuestionCard
+                  card={card}
+                  focused={focusedId === card.id}
+                  onFocus={() => {
+                    setFocusedId(card.id);
+                    focusOn(
+                      card.x + card.w / 2,
+                      card.y + CARD_SIZE.height / 2,
+                      0.92,
+                    );
                   }}
-                >
-                  <QuestionCard
-                    card={card}
-                    focused={focusedId === card.id}
-                    onFocus={() => {
-                      setFocusedId(card.id);
-                      focusOn(
-                        card.x + card.w / 2,
-                        card.y + CARD_SIZE.height / 2,
-                        0.92,
-                      );
-                    }}
-                    onAnswer={(text) => onAnswer?.(card, text)}
-                  />
-                </div>
-              ))}
+                  onAnswer={(text) => onAnswer?.(card, text)}
+                />
+              </div>
+            ))}
           </div>
         ))}
       </div>

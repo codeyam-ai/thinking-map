@@ -6,7 +6,7 @@
       "dimension": "themes",
       "value": "empty",
       "rationale": "source-derived state themes=empty",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "themes",
@@ -18,13 +18,13 @@
       "dimension": "themes",
       "value": "many",
       "rationale": "source-derived state themes=many",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "cards",
       "value": "empty",
       "rationale": "source-derived state cards=empty",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "cards",
@@ -36,7 +36,7 @@
       "dimension": "cards",
       "value": "many",
       "rationale": "source-derived state cards=many",
-      "status": "planned"
+      "status": "covered"
     },
     {
       "dimension": "nodes",
@@ -54,18 +54,18 @@
       "dimension": "nodes",
       "value": "many",
       "rationale": "source-derived state nodes=many",
-      "status": "planned"
-    },
-    {
-      "dimension": "far",
-      "value": "true",
-      "rationale": "source-derived state far=true",
       "status": "covered"
     },
     {
-      "dimension": "far",
+      "dimension": "farOut",
+      "value": "true",
+      "rationale": "source-derived state farOut=true",
+      "status": "covered"
+    },
+    {
+      "dimension": "farOut",
       "value": "false",
-      "rationale": "source-derived state far=false",
+      "rationale": "source-derived state farOut=false",
       "status": "covered"
     },
     {

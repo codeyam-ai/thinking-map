@@ -1,0 +1,41 @@
+{
+  "provenAt": "2026-09-03T16:48:53Z",
+  "slug": "cards-disappear-when-zoomed-out",
+  "paths": [
+    "app/components/GalaxyBoard.tsx"
+  ],
+  "runScope": [
+    "app/components/GalaxyBoard.tsx"
+  ],
+  "tests": {
+    "keeps the cards on the board at the minimum zoom": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "opens a many-theme board with its cards drawn, not just its hubs": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    },
+    "still draws the hub label beside the cards when far out": {
+      "withoutFix": "fail",
+      "withFix": "pass",
+      "established": {
+        "kind": "measured"
+      }
+    }
+  },
+  "proof": {
+    "verdict": "proven",
+    "flipped": [
+      "keeps the cards on the board at the minimum zoom",
+      "opens a many-theme board with its cards drawn, not just its hubs",
+      "still draws the hub label beside the cards when far out"
+    ]
+  }
+}

@@ -2296,10 +2296,7 @@
     "description": "Creates the PostgreSQL cluster on disk with initdb. Idempotent: a cluster that already has a PG_VERSION file is kept as it stands, so a re-run of setup never destroys an existing dev database.",
     "filePath": "scripts/ensureDevDatabase.ts",
     "name": "initialiseCluster",
-    "untestabilityReason": {
-      "justification": "Runs initdb against a real data directory and chowns it; nothing observable happens except on the filesystem.",
-      "kind": "platform-glue"
-    }
+    "testFile": "scripts/ensureDevDatabase.integration.test.ts"
   },
   {
     "description": "The board's insights and how far behind the thinking they are, computed from the nodes alone. An insight is a node whose kind is in INSIGHT_STREAM_KINDS AND which carries no theme: a finding hung inside a theme is a card in that row, a themeless one is a claim about the whole idea. That rule already existed informally as CORE_INSIGHT_KINDS plus !n.themeId in GalaxyBoard, and promoting it here is what stops the agent's read and the browser disagreeing about what is on the board - a disagreement that would draw the same node twice or count it never. Staleness is read off timestamps rather than the exchange log, which is the decision that lets this be pure: MapNode.updatedAt moves when an answer lands, so one function serves both the server-side read_map and the client without either holding the log. Deriving it from MapEvent revisions was the alternative and would have forced a second query into read_map's delta branch on every turn. Nothing is hidden by being stale - an insight the thinking has moved past is still worth reading, and dropping it would silently shrink the board. Returns all zeros for an empty map, which is the day-one state and the one every capture produces.",

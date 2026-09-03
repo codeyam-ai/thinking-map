@@ -1000,6 +1000,33 @@
       "runner": "tests"
     },
     {
+      "description": "Shows that the question cards are still drawn on screen at the camera's lowest zoom, instead of the board emptying out to hubs and lines.",
+      "file": "app/components/GalaxyBoard.render.test.tsx",
+      "format": "vitest",
+      "key": "GalaxyBoard card visibility › keeps the cards on the board at the minimum zoom",
+      "line": 60,
+      "registeredAt": "2026-09-03T16:49:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Shows that a board with enough themes to frame below the old cutoff still displays every card the moment it opens, with no gesture from anyone.",
+      "file": "app/components/GalaxyBoard.render.test.tsx",
+      "format": "vitest",
+      "key": "GalaxyBoard card visibility › opens a many-theme board with its cards drawn, not just its hubs",
+      "line": 80,
+      "registeredAt": "2026-09-03T16:49:06Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Shows the hub's theme label on screen alongside the cards when zoomed far out, which is the one job the scale threshold still has.",
+      "file": "app/components/GalaxyBoard.render.test.tsx",
+      "format": "vitest",
+      "key": "GalaxyBoard card visibility › still draws the hub label beside the cards when far out",
+      "line": 102,
+      "registeredAt": "2026-09-03T16:49:06Z",
+      "runner": "tests"
+    },
+    {
       "description": "Development offers the one command that fixes it. The pill is the whole reason the route's extra fields are carried back rather than dropped.",
       "file": "app/components/IdeaPrompt.render.test.tsx",
       "format": "vitest",
@@ -5284,6 +5311,42 @@
       "runner": "tests"
     },
     {
+      "description": "Shows that a real cluster was written to the directory it was handed, rather than to the module's own default.",
+      "file": "scripts/ensureDevDatabase.integration.test.ts",
+      "format": "vitest",
+      "key": "initialiseCluster › creates a cluster in the directory it is given",
+      "line": 69,
+      "registeredAt": "2026-09-03T17:24:35.442816428+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The `finally` cleanup: a plaintext password must not survive setup.",
+      "file": "scripts/ensureDevDatabase.integration.test.ts",
+      "format": "vitest",
+      "key": "initialiseCluster › deletes the initdb password file once the cluster is made",
+      "line": 81,
+      "registeredAt": "2026-09-03T17:24:35.442816428+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "`dev` runs setup on every start, so this is the guard standing between a container restart and a wiped development database.",
+      "file": "scripts/ensureDevDatabase.integration.test.ts",
+      "format": "vitest",
+      "key": "initialiseCluster › keeps an existing cluster instead of rebuilding it",
+      "line": 87,
+      "registeredAt": "2026-09-03T17:24:35.442816428+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The permission Postgres insists on. Asserted on the bits that matter (group and other), so a stricter umask elsewhere cannot make this flap.",
+      "file": "scripts/ensureDevDatabase.integration.test.ts",
+      "format": "vitest",
+      "key": "initialiseCluster › leaves the data directory unreadable to group and other",
+      "line": 75,
+      "registeredAt": "2026-09-03T17:24:35.442816428+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "The server has the JSON string the column stores; the browser usually has the array. Both have to work, or one of the two callers reads no provenance at all while looking like it succeeded.",
       "file": "app/lib/insightStream.test.ts",
       "format": "vitest",
@@ -6226,6 +6289,15 @@
       "key": "needsConflictCheck › skips the check when the map is somehow behind the agent",
       "line": 36,
       "registeredAt": "2026-09-01T01:16:02Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The privilege check that decides whether the cluster commands have to be dropped to an unprivileged account. Compared against the process's own uid so the test states the rule rather than the environment it ran in.",
+      "file": "scripts/ensureDevDatabase.integration.test.ts",
+      "format": "vitest",
+      "key": "needsPostgresUser › reports whether this process is running as root",
+      "line": 102,
+      "registeredAt": "2026-09-03T17:24:35.442816428+00:00",
       "runner": "tests"
     },
     {

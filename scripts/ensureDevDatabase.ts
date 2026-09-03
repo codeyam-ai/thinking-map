@@ -227,7 +227,7 @@ function lookUpPostgresUser(): Ids {
  * root and no `postgres` user exists yet. Returns `null` when we are already
  * unprivileged and can run as ourselves.
  */
-function postgresIds(): Ids | null {
+export function postgresIds(): Ids | null {
   if (!needsPostgresUser()) return null;
 
   try {
@@ -244,7 +244,15 @@ function postgresIds(): Ids | null {
 /** Runs a cluster command as the Postgres account, when there is one. */
 function runAsPostgres(file: string, args: string[], ids: Ids | null): void {
   execFileSync(file, args, {
-    stdio: 'inherit',
+    // Both streams go to OUR stderr, never our stdout. initdb narrates itself
+    // at length, and this script's progress is a diagnostic rather than output
+    // anything parses — while stdout belongs to whatever invoked us. The
+    // integration test runs initdb for real inside the suite, and the test
+    // runner reads its results as JSON on stdout, so a chatty child on fd 1
+    // silently empties a 400-file test report. Same reason the dotenv loader
+    // in vitest.config.ts sets `quiet: true`. `npm run setup` still shows
+    // every line.
+    stdio: ['ignore', 2, 2],
     ...(ids ?? {}),
     env: { ...process.env, LC_MESSAGES: 'C' },
   });
@@ -262,19 +270,30 @@ function giveToPostgres(target: string, ids: Ids | null): void {
   if (ids) chownSync(target, ids.uid, ids.gid);
 }
 
-/** Creates the cluster on disk. Idempotent: a cluster that exists is kept. */
-async function initialiseCluster(ids: Ids | null): Promise<void> {
-  if (existsSync(path.join(DATA_DIR, 'PG_VERSION'))) return;
+/**
+ * Creates the cluster on disk. Idempotent: a cluster that exists is kept.
+ *
+ * The two directories are parameters, defaulting to the real ones, so a test
+ * can provision a throwaway cluster under a temp dir and assert what actually
+ * landed — the permissions Postgres insists on, and the deletion of the
+ * password file — rather than taking either on trust from a comment.
+ */
+export async function initialiseCluster(
+  ids: Ids | null,
+  dataDir: string = DATA_DIR,
+  clusterRoot: string = CLUSTER_ROOT,
+): Promise<void> {
+  if (existsSync(path.join(dataDir, 'PG_VERSION'))) return;
 
   const { initdb } = await binaries();
 
-  mkdirSync(DATA_DIR, { recursive: true });
+  mkdirSync(dataDir, { recursive: true });
   // Postgres refuses to start on a data directory that is group- or
   // world-readable, and insists on owning it itself.
-  chmodSync(DATA_DIR, 0o700);
-  giveToPostgres(DATA_DIR, ids);
+  chmodSync(dataDir, 0o700);
+  giveToPostgres(dataDir, ids);
 
-  const passwordFile = path.join(CLUSTER_ROOT, 'initdb-password');
+  const passwordFile = path.join(clusterRoot, 'initdb-password');
   writeFileSync(passwordFile, `${PASSWORD}\n`, { mode: 0o600 });
   giveToPostgres(passwordFile, ids);
 
@@ -282,7 +301,7 @@ async function initialiseCluster(ids: Ids | null): Promise<void> {
     runAsPostgres(
       initdb,
       [
-        `--pgdata=${DATA_DIR}`,
+        `--pgdata=${dataDir}`,
         '--auth=password',
         `--username=${USER}`,
         `--pwfile=${passwordFile}`,

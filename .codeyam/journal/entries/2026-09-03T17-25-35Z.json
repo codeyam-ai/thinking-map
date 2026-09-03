@@ -1,0 +1,547 @@
+{
+  "timestamp": "2026-09-03T17:25:35Z",
+  "title": "Cards Disappear When Zoomed Out",
+  "type": "fix",
+  "userRequest": "## Summary\n\nZooming the board out far enough makes every question card vanish while the\nconnector lines, hubs and backdrop stay drawn — the board empties out at exactly\nthe zoom where someone is trying to take in its shape. The cause is a hard\nvisibility cutoff in `GalaxyBoard`: `LABEL_ONLY_BELOW = 0.16` sets a `far` flag,\nand the card list is rendered behind `!far &&`, so the whole bottom quarter of\nthe zoom range (the camera floor is `MIN_SCALE = 0.12`) renders no cards at all.\nThe cutoff's stated premise — that cards \"degrade to single pixels\" out there —\nis simply not true at these sizes: a card is 300x360 board units, so even at the\n0.12 floor it is roughly 36x43 screen pixels, a legible block of texture rather\nthan a pixel. Fix: delete the visibility cutoff so cards render at every\nreachable zoom, keeping the threshold only for the one thing it legitimately\ndrives (bumping the hub label's font size when you are far out).\n\nThis also fixes a second face of the same bug that does not require the user to\ntouch the zoom controls at all: `frameAll` computes its fit scale from the\nlayout bounds and the measured viewport, and on a board with many themes that\nfit lands below 0.16 — so \"Frame the whole board\", and the on-mount framing\neffect that calls the same function, can open the board with no cards on it.\n\n## Key Decisions\n\n- **Cards render at every reachable zoom; the cutoff goes away.** Chosen over\n  keeping a far-zoom mode that draws simplified card blocks: at the 0.12 floor a\n  full card is already only ~36x43px, so the simplified renderer would be a\n  second card presentation to maintain for no visible gain. Chosen over raising\n  `MIN_SCALE` to 0.16, which would leave the label-only path as unreachable dead\n  code and would still make large boards impossible to frame whole.\n- **The `far` flag survives, narrowed to what it actually earns.** It still\n  drives the hub label's font bump (`fontSize: far ? 21 : 15`), which is a real\n  readability affordance when the card text has become texture. Renaming the\n  constant to match that single remaining job keeps the next reader from\n  re-introducing the cull.\n- **Repro is a component render test, not a camera-hook test.** `useBoardCamera`\n  is behaving correctly here — it clamps to `MIN_SCALE` as designed and its\n  existing tests pass. The defect is in what `GalaxyBoard` chooses to render at\n  a given scale, so the test has to mount the board and drive the zoom-out\n  control.\n\n## Implementation\n\n### 1. Stop culling the cards at low zoom\n\n**File**: `app/components/GalaxyBoard.tsx`\n\n- Remove the `!far &&` guard in front of `cluster.cards.map(...)` so the card\n  list renders at every scale.\n- Keep the scale threshold and the derived flag, but rename both to say what\n  they now do — the constant to something like `HUB_LABEL_EMPHASIS_BELOW` and\n  the local `far` to `farOut` (or keep `far` if it reads better once the cull is\n  gone). Its only remaining consumer is the hub label's `fontSize`.\n- Rewrite the constant's doc comment. The current one explains a hiding rule\n  that will no longer exist and states a premise (cards \"degrade to single\n  pixels\") that is false at these dimensions; replace it with the real reason\n  the threshold is still there — the hub label grows once the card text has\n  become texture — and record why the cards are never hidden: the shape of the\n  thinking *is* the cards, and an empty board at the framing zoom is the bug\n  this replaced.\n- Sanity-check the entry animation while you are here: each card carries\n  `animation: cy-emerge ... ${i * 90}ms both`. Cards that were previously\n  unmounted below the threshold will now mount on first frame instead, so\n  confirm the stagger still reads as intended on a board that opens already\n  zoomed out (the `frameAll`-on-mount path), and note in the build if it needs\n  gating.\n\n### 2. Pin the behaviour with a board render test\n\n**New file**: `app/components/GalaxyBoard.render.test.tsx`\n\nThe reproduction test described in `## Reproduction Test` below. Follow the\nstubbing convention already used by `app/components/BoardWorkspace.render.test.tsx`\n— stub the decorative/expensive children (`GalaxyBackdrop`, `ThemeParticles`,\nand `InsightStack` if it drags in anything jsdom dislikes) so the test is about\nthe card-visibility rule and nothing else. Register it with\n`codeyam-editor editor refresh-tests`.\n\n### 3. Verify the framing path no longer opens an empty board\n\n**File**: `app/components/GalaxyBoard.tsx`\n\nNo code change expected here beyond change 1 — `frameAll` is correct as written\n— but confirm as part of the build that a board with enough themes to force a\nfit below 0.16 now frames with its cards visible. If the scenario set has no\nsuch board, add one under `## Scenarios to Demonstrate` rather than tuning the\nfit factor.\n\n## Reused existing code\n\n- `useBoardCamera` from `app/hooks/useBoardCamera.ts` (glossary entry:\n  `useBoardCamera`) — the camera and its `MIN_SCALE = 0.12` floor are unchanged;\n  the plan only changes what the board draws at a given scale.\n- `clampScale` from `app/hooks/useBoardCamera.ts` (glossary entry: `clampScale`)\n  — already covered by `app/hooks/useBoardCamera.test.ts`; the zoom-limit tests\n  there stay green and are not this plan's concern.\n- `layOutGalaxy`, `CARD_SIZE` from `app/lib/galaxyLayout.ts` — the card\n  footprint (300x360) is the evidence that the \"single pixels\" premise is wrong;\n  no layout change is needed.\n- `BoardZoomControls` from `app/components/BoardZoomControls.tsx` — the repro\n  drives the real control by its existing `aria-label=\"Zoom out\"`, so no test\n  hook has to be added to production code.\n- `app/components/BoardWorkspace.render.test.tsx` — the existing pattern for\n  mounting a board-side component under jsdom with its heavy children stubbed.\n\n**Existing-implementation survey:** no other scale-based visibility gate exists\non the board. `LABEL_ONLY_BELOW` in `app/components/GalaxyBoard.tsx` is the only\nthreshold constant of its kind; a search for the camera scale finds it used\nelsewhere only to divide connector stroke widths (keeping lines hairline) and to\nscale pan deltas in `useBoardCamera`. Nothing else hides content by zoom, so\nthis change adds no duplicate rule.\n\n## Reproduction Test\n\nPins that the question cards stay on the board at the minimum zoom, instead of\ndisappearing and leaving only the connector lines and hubs.\n\n**Target**: `app/components/GalaxyBoard.render.test.tsx` (new file) — run with\n`codeyam-editor editor refresh-tests --test GalaxyBoard`.\n\n```tsx\n// Zooming all the way out must never empty the board: the cards ARE the shape\n// of the thinking, and the bug was that below 0.16 only lines and hubs drew.\nit('keeps the cards on the board at the minimum zoom', async () => {\n  render(\n    <GalaxyBoard\n      seedIdea=\"a seed\"\n      themes={[{ id: 't1', label: 'Positioning', hue: 210, order: 0 }]}\n      nodes={[\n        {\n          id: 'n1',\n          themeId: 't1',\n          kind: 'question',\n          label: 'Who is this for?',\n          detail: null,\n          status: 'open',\n        },\n      ]}\n    />,\n  );\n\n  const zoomOut = screen.getByLabelText('Zoom out');\n  for (let i = 0; i < 20; i++) fireEvent.click(zoomOut);\n\n  expect(screen.getByText('Who is this for?')).toBeTruthy();\n});\n```\n\nStatus: PROPOSED — confirm red at execution. Expected failure: with the `!far &&`\nguard in place, twenty zoom-out clicks drive the camera to `MIN_SCALE` (0.12),\nwhich is below `LABEL_ONLY_BELOW` (0.16), so no `QuestionCard` is mounted and\n`getByText('Who is this for?')` throws \"Unable to find an element with the text\".\n\nTwo things to confirm empirically rather than assume, both at execution:\n\n- **The zoom-out count and the starting scale.** jsdom reports `clientWidth`/\n  `clientHeight` as 0, so the on-mount `frameAll` computes a fit of 0 and clamps\n  to `MIN_SCALE` — the board may already be below the cutoff before a single\n  click. That makes the test red for a slightly different reason than a real\n  user's gesture. Confirm the red, then decide whether to stub the shell's\n  measurement so the test starts at a realistic scale and the clicks are what\n  crosses the threshold. Do not trust the count of 20 without observing it.\n- **The theme/node fixture shape.** The exact fields on `GalaxyTheme` and\n  `GalaxyNodeInput` (and which props `GalaxyBoard` requires) come from\n  `app/lib/galaxyLayout.ts`; fill the fixture from the real types rather than\n  from the sketch above.\n\n## Scenarios to Demonstrate\n\n- A rich multi-theme board framed whole (\"All\" / on-mount framing) where the fit\n  scale lands below 0.16 — every card visible, hub labels enlarged.\n- The same board zoomed all the way out with the zoom-out control — cards still\n  present as themed blocks, connectors and hubs unchanged.\n- A single-theme board zoomed all the way out — the small case, confirming the\n  fix is not specific to crowded layouts.\n- A board zoomed all the way in to `MAX_SCALE` — unchanged behaviour, guarding\n  against a regression at the other end.\n- An empty board (no themes) at minimum zoom — still shows the core idea and the\n  thinking indicator, with no cards to draw.",
+  "description": "Zooming the board out far enough used to empty it: below scale 0.16 GalaxyBoard drew only hubs and connector lines, on the premise that a card that far out had degraded to a single pixel. It had not — a card is 300x360 board units, so even at the camera's 0.12 floor it is a legible ~36x43px block of themed colour. The visibility cutoff is gone and cards now render at every reachable zoom; the threshold survives, renamed HUB_LABEL_EMPHASIS_BELOW, driving the one thing it earns — enlarging the hub label once the card text has become texture. This also fixes the face of the bug nobody had to trigger: frameAll computes its fit from the layout bounds, and on a twelve-theme board that fit lands near 0.128, so 'Frame the whole board' and the on-mount framing effect could open a board with nothing on it. The galaxyboard-manythemes scenario is the evidence — it previously captured twelve hubs and twelve lines running into empty space.\n\nThree render tests in app/components/GalaxyBoard.render.test.tsx pin it, covering the zoom floor, the many-theme framing case, and the surviving hub-label emphasis; prove-red confirms all three go red with the fix reverted, so they are fault-pinning rather than vacuous.\n\nScope verdict: this cycle DELIVERED the plan in full — the cutoff removal, the constant rename and its corrected rationale, and the reproduction tests. Nothing was deferred by this cycle. Of the project's ten deliverables, nine are delivered and one remains deferred ('registering the MCP server in a client such as Claude Desktop'), a user-approved deferral carried from an earlier cycle and untouched here; no deliverable is deferred on the agent's own judgement.\n\nOne planned artifact was deliberately not built, and it is worth recording why: the plan asked for a scenario showing the board driven all the way out by the zoom control. Scenario interaction replay collapses a run of identical clicks — verified twice, by measuring the captured frame — so the furthest a Default-board capture reaches is one zoom step (~0.32), above the old cutoff and therefore proving nothing about this fix. Rather than ship a scenario whose caption claimed a floor it never reached, that state is left to galaxyboard-manythemes and to the unit tests. The application code is not implicated: zoomBy uses a functional state update and accumulates correctly, and no effect resets the camera.\n\nThe cycle also cleared the audit backlog inherited from the dev-database commit (5a561a9), which the full-check path surfaced as a hard gate: description comments for its 17 tests, a test name carrying a character the registry rejects, and glossary entries for all 23 of its entities. One of those, initialiseCluster, could not honestly be classified as boundary glue without a test behind the claim, so it now takes its directories as parameters and scripts/ensureDevDatabase.integration.test.ts provisions a throwaway cluster with a real initdb to assert what lands on disk — the 0700 permissions Postgres refuses to start without, the deletion of the plaintext password file, and the idempotency guard that stops a container restart wiping a developer's database. Writing that test exposed a live hazard: runAsPostgres inherited stdout, so initdb's narration corrupted the JSON test report and silently emptied a 400-file run. Its output now goes to stderr, the same reasoning vitest.config.ts already applies to the dotenv banner. Full suite: 1145 passing, 0 failing; audit clean at 0 findings.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/cards-disappear-when-zoomed-out.md\t.codeyam/plans/completed/cards-disappear-when-zoomed-out.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/galaxyboard.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-allanswered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-endofexplore--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-roundheldopen--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-zoomedin--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-zoomedin--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-agent-worked-here-then-left--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-board-s-bottom-right-corner-uncovered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-ends-itself-on-a-real-board--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/47a844e62b229e3e28e500dcdb7f822ce3f6aa493c429f9e88ebbdc704ea3888.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.render.test.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/ensureDevDatabase.integration.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "scripts/ensureDevDatabase.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/ensureDevDatabase.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/red-proofs/cards-disappear-when-zoomed-out.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/22ce5500aae6389a074ed73d720f8cbd08604e6f510a86ae0a8c469e00c9a26d.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/ce8e6edd39b093f2c9baf43f88200ecc3869e5daa01276ba468fb964daecb6f9.json",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The agent worked here, then left",
+      "screenshotPath": "the-agent-worked-here-then-left--tablet.png"
+    },
+    {
+      "name": "The board's bottom-right corner, uncovered",
+      "screenshotPath": "the-board-s-bottom-right-corner-uncovered--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round ends itself, on a real board",
+      "screenshotPath": "the-round-ends-itself-on-a-real-board--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - AllAnswered",
+      "screenshotPath": "boardworkspace-allanswered--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - EndOfExplore",
+      "screenshotPath": "boardworkspace-endofexplore--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - RoundHeldOpen",
+      "screenshotPath": "boardworkspace-roundheldopen--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ZoomedIn",
+      "screenshotPath": "galaxyboard-zoomedin--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 1145,
+    "passed": 1145,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 1145,
+        "passed": 1145
+      }
+    ]
+  }
+}
