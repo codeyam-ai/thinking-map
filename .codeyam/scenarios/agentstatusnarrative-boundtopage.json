@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusNarrative - BoundToPage",
+  "id": "8540d718-81d3-43ab-8178-eff45e853860",
+  "url": "/isolated-components/AgentStatusNarrative?s=BoundToPage",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusNarrative",
+  "scenarioType": "component",
+  "description": "Presence explained for the channel that can do the most: bound to this page, so the agent can read the map, write to it, and put a question in front of a person and wait for the answer. That last capability is the whole reason webmcp outranks mcp when both are true."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "AgentStartCue - FromBrief",
+  "id": "25a72764-ffea-43b2-bacc-ad5864ec7973",
+  "url": "/isolated-components/AgentStartCue?s=FromBrief",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStartCue",
+  "scenarioType": "component",
+  "description": "The same cue for a map that arrived with a document. The only thing that changes is the read tool the prompt names, and that difference matters: an agent told to read the map when a brief is the real input starts from the summary rather than the source."
+}

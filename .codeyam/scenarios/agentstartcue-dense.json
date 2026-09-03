@@ -1,0 +1,12 @@
+{
+  "name": "AgentStartCue - Dense",
+  "id": "408c039e-b9d3-43a9-b7f4-3cbfa9e845eb",
+  "url": "/isolated-components/AgentStartCue?s=Dense",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStartCue",
+  "scenarioType": "component",
+  "description": "One row instead of a block, for the finished-plan view where the summary is what the person came back for. The map screen's main is a full-height flex column, so every row this takes is a row the summary loses — the same dense variant HandoffReattach carries, for the same reason."
+}

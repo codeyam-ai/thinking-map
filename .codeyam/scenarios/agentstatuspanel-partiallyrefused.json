@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusPanel - PartiallyRefused",
+  "id": "06a85b1e-4db7-42d0-8191-6802c0fe7546",
+  "url": "/isolated-components/AgentStatusPanel?s=PartiallyRefused",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusPanel",
+  "scenarioType": "component",
+  "description": "Seven tools accepted, two refused, with the browser's own reason for each. This is the state that was previously invisible in every direction: a binding that registered nothing was indistinguishable from one that worked, which is exactly how the header came to report an attached agent over zero tools. The failures show in development only, where they cost a person nothing."
+}

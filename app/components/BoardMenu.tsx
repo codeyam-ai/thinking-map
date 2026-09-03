@@ -14,7 +14,8 @@
 // might be done with: a way to start something else, and a way back to what
 // they were working on before.
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useDismissOnOutside } from '../hooks/useDismissOnOutside';
 
 export interface BoardMenuMap {
   id: string;
@@ -35,21 +36,8 @@ export default function BoardMenu({
   // Close on an outside click or on Escape. A menu that can only be closed by
   // the button that opened it is a trap on a surface where every other click
   // pans a canvas.
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (!box.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  useDismissOnOutside(box, open, close);
 
   const others = maps.filter((m) => m.id !== currentId);
 

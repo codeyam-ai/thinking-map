@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusPanel - OverMcpServer",
+  "id": "8d3a069c-e96b-4fc2-9fa7-76d7698e4714",
+  "url": "/isolated-components/AgentStatusPanel?s=OverMcpServer",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusPanel",
+  "scenarioType": "component",
+  "description": "An agent working this map over HTTP rather than through the browser. This whole state was invisible before presence stopped meaning 'a WebMCP binding exists in this tab' — the page said nobody was attached while an agent wrote nodes onto the board. The copy draws the one distinction that matters to a person: it can read and write the map, but it cannot raise a question here, so anything they add waits in the log for its next read."
+}

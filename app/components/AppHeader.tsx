@@ -11,11 +11,11 @@ import BoardMenu, { type BoardMenuMap } from './BoardMenu';
  * shows its own progress is a second, less accurate answer to the same
  * question. See BoardMenu.
  *
- * `status` is the map screen's slot for agent presence. Below `lg` it cannot
- * share a line with the wordmark and the menu, so it drops to its own
- * full-width row underneath rather than competing for the same space — the
- * responsive treatment the track used to carry, kept because the constraint it
- * solved did not go away with it.
+ * `status` is the map screen's slot for agent presence, and it stays on this
+ * one line at every width. It used to drop to a full-width row below `lg`,
+ * which was right while it spelled its reason out inline; now that the reason
+ * lives behind a click it fits, and on a narrow viewport — a phone, a split
+ * window, an agent browser's sidebar — that reclaimed row goes to the map.
  */
 export default function AppHeader({
   status,
@@ -29,11 +29,14 @@ export default function AppHeader({
   return (
     <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 lg:gap-8">
       <Wordmark />
-      {status ? (
-        <div className="order-last basis-full lg:order-none lg:basis-auto">
-          {status}
-        </div>
-      ) : null}
+      {/* One line at every width.
+          This used to drop to its own full-width row below `lg`, because the
+          status carried its reason inline — "No agent attached — no browser
+          agent (needs Chrome 146+)" genuinely could not share a line with the
+          wordmark and the menu. It is now a dot and two words, with the detail
+          behind a click, so the row it was costing goes back to the map.
+          `min-w-0` so it truncates rather than pushing the menu off the edge. */}
+      {status ? <div className="min-w-0">{status}</div> : null}
       {/* `min-w-0` so this side can actually shrink: a flex item defaults to
           `min-width: auto`, the same trap documented on ThinkingMapView. */}
       <div className="flex min-w-0 items-center gap-3 lg:order-last lg:gap-6">

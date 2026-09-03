@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import AgentStartCue from './AgentStartCue';
 import CopyablePrompt from './CopyablePrompt';
 import HandoffFootnote from './HandoffFootnote';
 import HandoffInstruction from './HandoffInstruction';
 import HandoffReattach from './HandoffReattach';
 import SeedIdeaQuote from './SeedIdeaQuote';
-import { handoffCopy } from '../lib/handoffCopy';
+import { attachedStartCopy, handoffCopy } from '../lib/handoffCopy';
 import { useOptionalWebMcpBridge } from './WebMcpBridge';
 
 /**
@@ -63,7 +64,27 @@ export default function AgentHandoff({
   // it in a browser with no agent should see their map, not a handoff pitch.
   const workedByAgent = (bridge?.events ?? []).some((e) => e.origin === 'agent');
 
-  if (listening) return null;
+  // Attached is not the same as working.
+  //
+  // Returning null here unconditionally was the bug: WebMCP is pull-only, so
+  // binding the tools makes the map REACHABLE and nothing more. The page hit
+  // its most capable state and rendered nothing to act on, while an agent sat
+  // beside it with the whole catalog and no instruction. An agent that has
+  // already written to this map plainly has its instruction, and that is the
+  // only case where showing nothing is right.
+  if (listening) {
+    if (workedByAgent) return null;
+    const cue = attachedStartCopy({ hasBrief });
+    return (
+      <AgentStartCue
+        eyebrow={cue.eyebrow}
+        instruction={cue.instruction}
+        note={cue.note}
+        prompt={cue.prompt}
+        dense={dense}
+      />
+    );
+  }
 
   const copy = handoffCopy({
     mapId,

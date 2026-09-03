@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import AgentStatus from './AgentStatus';
 import BridgeFixture from '../isolated-components/BridgeFixture';
 
@@ -42,5 +42,58 @@ describe('AgentStatus', () => {
     );
     expect(screen.getByText(/Agent attached/)).toBeTruthy();
     expect(screen.queryByText(/^r\d+$/)).toBeNull();
+  });
+
+  // The same argument as the revision badge, applied to the tool count. "Agent
+  // attached · 9 tools" answered a question nobody in front of a map asks, and
+  // spent header room doing it. The number is not deleted — it is one click
+  // away — so the guard has to be that it is absent UNTIL then.
+  it('states presence without a tool count beside it', () => {
+    render(
+      <BridgeFixture
+        status="connected"
+        channel="webmcp"
+        registered={['read_map', 'add_nodes']}
+      >
+        <AgentStatus />
+      </BridgeFixture>,
+    );
+    expect(screen.getByText('Agent attached')).toBeTruthy();
+    expect(screen.queryByText(/\d+ tools/)).toBeNull();
+    expect(screen.queryByText('read_map')).toBeNull();
+  });
+
+  // The detail did not leave the product, it moved behind a click — so the
+  // click has to work, both ways. A panel that opens over the map and cannot be
+  // put away again would be worse than the permanent badge it replaced.
+  it('opens the detail on click and closes it again', () => {
+    render(
+      <BridgeFixture
+        status="connected"
+        channel="webmcp"
+        registered={['read_map', 'add_nodes']}
+      >
+        <AgentStatus />
+      </BridgeFixture>,
+    );
+    const trigger = screen.getByRole('button', { name: /Agent attached/ });
+    fireEvent.click(trigger);
+    expect(screen.getByText('2 tools available')).toBeTruthy();
+    expect(screen.getByText('read_map')).toBeTruthy();
+    fireEvent.click(trigger);
+    expect(screen.queryByText('2 tools available')).toBeNull();
+  });
+
+  // A map deleted underneath an open tab is the one reason that stays on the
+  // line. Every other reason is context someone can go looking for; this is an
+  // error they have to act on, and a page that knows the tab is dead must not
+  // decline to say so.
+  it('keeps a deleted map visible without a click', () => {
+    render(
+      <BridgeFixture status="unavailable" mapMissing>
+        <AgentStatus />
+      </BridgeFixture>,
+    );
+    expect(screen.getByText(/map deleted, reload/i)).toBeTruthy();
   });
 });

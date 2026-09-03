@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatus - AttachedViaMcp",
+  "id": "a6e5f6c4-111b-418f-9782-2e224bbf2576",
+  "url": "/isolated-components/AgentStatus?s=AttachedViaMcp",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatus",
+  "scenarioType": "component",
+  "description": "An agent working this map over the MCP server with no WebMCP binding in the tab at all. The header used to say 'No agent attached' in exactly this situation, while that agent wrote nodes onto the board — presence meant 'a binding exists here', so a whole door was invisible. Presence is now read off the exchange log, which is the one thing every door writes to."
+}

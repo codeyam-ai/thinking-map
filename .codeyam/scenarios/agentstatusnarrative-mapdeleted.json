@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusNarrative - MapDeleted",
+  "id": "9942d4a3-6099-43be-a70f-328986355ce9",
+  "url": "/isolated-components/AgentStatusNarrative?s=MapDeleted",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusNarrative",
+  "scenarioType": "component",
+  "description": "A map deleted while this page stayed open. It outranks every other state here because it is the only one a person can and must act on — every tool bound to this tab now answers 'No such map', and the only way out is a reload."
+}

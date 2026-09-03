@@ -262,5 +262,5 @@
   },
   "scenarioType": "application",
   "pageFilePath": "app/map/[id]/page.tsx",
-  "description": "A map both sides have worked: agent notes and human contributions interleaved in the log, revision 15, and two questions the agent asked that nobody has answered yet. It also runs the other direction - the person has asked about a node, so 'Capture the thought, not the book' carries its ASKED mark and the rail names the node the question was about."
+  "description": "A map both sides have worked: agent notes and human contributions interleaved in the log, revision 15, and two questions the agent asked that nobody has answered yet. It also runs the other direction - the person has asked about a node, so 'Capture the thought, not the book' carries its ASKED mark and the rail names the node the question was about. This is also the map that proves presence now reads across every door: the capture runs in an iframe where WebMCP cannot bind, and the header still says 'Agent attached' because the log shows an agent acting. It used to say 'No agent attached' over exactly this board - an agent's own work sitting in plain view while the page denied anyone was there."
 }

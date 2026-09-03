@@ -27,9 +27,15 @@ export default function BridgeFixture({
   const value = useMemo<BridgeState>(
     () => ({
       status: 'unavailable',
+      channel: null,
+      lastAgentAt: null,
+      mapMissing: false,
       reason: 'running inside an iframe',
       pending: [],
       tools: [],
+      registered: [],
+      bindFailures: [],
+      convention: null,
       revision: null,
       events: [],
       answer: async () => {},

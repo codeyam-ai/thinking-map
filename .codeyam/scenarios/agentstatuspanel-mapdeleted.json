@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusPanel - MapDeleted",
+  "id": "9cbd8b8f-1996-4ef6-9b61-51194f38e9d5",
+  "url": "/isolated-components/AgentStatusPanel?s=MapDeleted",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusPanel",
+  "scenarioType": "component",
+  "description": "The map was deleted while this tab stayed open. The tools are still registered and the browser is still bound, so every honest-looking indicator says 'attached' while each of those tools answers 'No such map' — which is how an agent came to report the app broken to the person using it. This state outranks everything else in the panel, because it is the only one here a person can act on."
+}

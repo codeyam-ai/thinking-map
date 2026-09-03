@@ -1,0 +1,12 @@
+{
+  "name": "AgentToolChips - PartiallyAccepted",
+  "id": "27e1adf8-5d23-4319-a121-df3fc7d01a1d",
+  "url": "/isolated-components/AgentToolChips?s=PartiallyAccepted",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentToolChips",
+  "scenarioType": "component",
+  "description": "Seven names where there should be nine. This is exactly why the row lists names rather than showing a number — as a count it reads like a rounding difference, and as names the two that are missing are obvious at a glance."
+}

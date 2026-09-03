@@ -1,0 +1,18 @@
+{
+  "name": "AgentStatus - PanelOpen",
+  "id": "88e9d121-b755-4bfe-99f6-9d54673fb381",
+  "url": "/isolated-components/AgentStatus?s=Connected",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatus",
+  "scenarioType": "component",
+  "description": "The click itself. This is the state the whole header change exists to produce: the line states presence, and the detail a resting capture can never show - which channel, what it means, the nine tools that actually got through - opens underneath it. Before this, that information sat permanently over the board as a dev badge; now it costs one click and nothing when nobody wants it.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "Agent attached"
+    }
+  ]
+}

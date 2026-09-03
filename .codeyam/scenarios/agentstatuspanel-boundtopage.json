@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusPanel - BoundToPage",
+  "id": "53006f29-5ef6-40bc-9989-3a4bed83c193",
+  "url": "/isolated-components/AgentStatusPanel?s=BoundToPage",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusPanel",
+  "scenarioType": "component",
+  "description": "The strongest state the page can reach: the agent found this page's tools in the browser, all nine got through, and it can read the map, write to it, and raise a question here and wait for the answer. This is the panel behind the header line — the tool count that used to sit in the header, moved to where it only costs a click."
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { handoffCopy } from './handoffCopy';
+import { attachedStartCopy, handoffCopy } from './handoffCopy';
 
 // The same honest-copy rule askPresence pins, one surface over: a map nobody is
 // attached to must say so, and must not imply work is underway. The failure
@@ -230,6 +230,76 @@ describe('handoffCopy', () => {
       }
       for (const step of copy.steps) {
         expect(step.trim().length).toBeGreaterThan(0);
+      }
+    }
+  });
+});
+
+// The copy for the OTHER kind of stuck map: an agent is attached and nothing is
+// happening. Every string here exists because a real agent got the earlier
+// wording and did the wrong thing with it, so these pin the corrections rather
+// than the phrasing for its own sake.
+describe('attachedStartCopy', () => {
+  // The prompt has to send the thinking to the MAP. "Deconstruct the idea" is
+  // something a model satisfies beautifully in its own chat window, and the
+  // first real agent given that prompt did exactly that — tidy paragraphs back
+  // in the chat, and a board still showing nothing.
+  it('names the write tools, not just the read', () => {
+    const copy = attachedStartCopy({ hasBrief: false });
+    expect(copy.prompt).toContain('create_themes');
+    expect(copy.prompt).toContain('add_nodes');
+  });
+
+  // The same instruction said in plain words, because an agent that follows
+  // tool names but still narrates its answer has not put anything on the map.
+  it('tells the agent not to answer in chat', () => {
+    for (const hasBrief of [true, false]) {
+      expect(attachedStartCopy({ hasBrief }).prompt).toMatch(
+        /the map is the output/i,
+      );
+    }
+  });
+
+  // A map that arrived with a document should be read from the document. The
+  // read tool is the one thing that differs between the two entry points.
+  it('reads the brief when there is one and the map when there is not', () => {
+    expect(attachedStartCopy({ hasBrief: true }).prompt).toContain(
+      'read_brief',
+    );
+    expect(attachedStartCopy({ hasBrief: false }).prompt).toContain('read_map');
+  });
+
+  // Deliberately shorter than `handoffCopy`'s prompt and carrying no id: the
+  // tools are already bound to THIS map, so an id would be a fact the agent has
+  // to ignore rather than one it needs.
+  it('carries no map id, unlike the unattached hand-off prompt', () => {
+    const attached = attachedStartCopy({ hasBrief: false });
+    const unattached = handoffCopy({ mapId: MAP_ID, hasBrief: false });
+    expect(attached.prompt).not.toContain(MAP_ID);
+    expect(unattached.startPrompt).toContain(MAP_ID);
+  });
+
+  // The one sentence that stops an attached-but-idle map reading as a broken
+  // app. Without it the person sees "Agent attached" and nothing happening, and
+  // has no way to learn that a page cannot start an agent's turn.
+  it('explains why an attached agent is still not working', () => {
+    const copy = attachedStartCopy({ hasBrief: false });
+    expect(copy.note).toMatch(/cannot start an agent/i);
+    expect(copy.note.trim().length).toBeGreaterThan(0);
+  });
+
+  // Every slot the component renders must be filled in both branches — an empty
+  // eyebrow or instruction would render as a blank row above the prompt.
+  it('fills every slot for both entry points', () => {
+    for (const hasBrief of [true, false]) {
+      const copy = attachedStartCopy({ hasBrief });
+      for (const value of [
+        copy.eyebrow,
+        copy.instruction,
+        copy.note,
+        copy.prompt,
+      ]) {
+        expect(value.trim().length).toBeGreaterThan(0);
       }
     }
   });

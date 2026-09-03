@@ -1,0 +1,170 @@
+{
+  "name": "The agent worked here, then left",
+  "id": "b01b3d4d-9d8d-47be-97fa-54f5e93158f6",
+  "url": "/map/map-lapsed",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "createdAt": "2026-09-02T09:02:00.000Z",
+        "id": "le-1",
+        "kind": "node.added",
+        "mapId": "map-lapsed",
+        "origin": "user",
+        "payload": "{\"id\":\"ln-idea\",\"parentId\":null,\"kind\":\"idea\",\"label\":\"Follow-up reminders for a small clinic\",\"status\":\"answered\"}",
+        "revision": 1
+      },
+      {
+        "createdAt": "2026-09-02T09:04:00.000Z",
+        "id": "le-2",
+        "kind": "agent.note",
+        "mapId": "map-lapsed",
+        "origin": "agent",
+        "payload": "{\"text\":\"The reminder is not the hard part - deciding which follow-ups are worth chasing is.\"}",
+        "revision": 2
+      },
+      {
+        "createdAt": "2026-09-02T09:05:00.000Z",
+        "id": "le-3",
+        "kind": "node.added",
+        "mapId": "map-lapsed",
+        "origin": "agent",
+        "payload": "{\"id\":\"ln-prob\",\"parentId\":\"ln-idea\",\"kind\":\"problem\",\"label\":\"Phone chasing eats the front desk\",\"status\":\"answered\"}",
+        "revision": 3
+      },
+      {
+        "createdAt": "2026-09-02T09:06:00.000Z",
+        "id": "le-4",
+        "kind": "node.added",
+        "mapId": "map-lapsed",
+        "origin": "agent",
+        "payload": "{\"id\":\"ln-prob2\",\"parentId\":\"ln-idea\",\"kind\":\"problem\",\"label\":\"A missed follow-up is invisible until it is late\",\"status\":\"answered\"}",
+        "revision": 4
+      },
+      {
+        "createdAt": "2026-09-02T09:11:00.000Z",
+        "id": "le-5",
+        "kind": "user.node",
+        "mapId": "map-lapsed",
+        "origin": "user",
+        "payload": "{\"id\":\"ln-goal\",\"parentId\":\"ln-idea\",\"kind\":\"goal\",\"label\":\"The front desk stops being the reminder system\"}",
+        "revision": 5
+      },
+      {
+        "createdAt": "2026-09-02T09:14:00.000Z",
+        "id": "le-6",
+        "kind": "question.asked",
+        "mapId": "map-lapsed",
+        "origin": "agent",
+        "payload": "{\"questions\":[{\"id\":\"ln-q1\",\"text\":\"Which follow-ups actually matter clinically?\"}]}",
+        "revision": 6
+      }
+    ],
+    "mapNode": [
+      {
+        "id": "ln-idea",
+        "kind": "idea",
+        "label": "Follow-up reminders for a small clinic",
+        "mapId": "map-lapsed",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered"
+      },
+      {
+        "detail": "One person spends most of the afternoon on calls that mostly go to voicemail, so the reminders that matter most are the ones least likely to land.",
+        "id": "ln-prob",
+        "kind": "problem",
+        "label": "Phone chasing eats the front desk",
+        "mapId": "map-lapsed",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "ln-idea",
+        "status": "answered",
+        "themeId": "tl-friction"
+      },
+      {
+        "detail": "Nothing surfaces the patient who quietly never rebooked, so the failure shows up weeks later as a worse appointment.",
+        "id": "ln-prob2",
+        "kind": "problem",
+        "label": "A missed follow-up is invisible until it is late",
+        "mapId": "map-lapsed",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "ln-idea",
+        "status": "answered",
+        "themeId": "tl-friction"
+      },
+      {
+        "detail": "Contributed by the person directly: success is nobody having to remember to chase anyone.",
+        "id": "ln-goal",
+        "kind": "goal",
+        "label": "The front desk stops being the reminder system",
+        "mapId": "map-lapsed",
+        "order": 0,
+        "origin": "user",
+        "parentId": "ln-idea",
+        "status": "answered",
+        "themeId": "tl-outcome"
+      },
+      {
+        "id": "ln-q1",
+        "kind": "question",
+        "label": "Which follow-ups actually matter clinically?",
+        "mapId": "map-lapsed",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "ln-idea",
+        "status": "open",
+        "themeId": "tl-outcome"
+      }
+    ],
+    "message": [
+      {
+        "content": "A way for a small clinic to remind patients about follow-up appointments without a receptionist chasing everyone by phone.",
+        "id": "lm-1",
+        "mapId": "map-lapsed",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "The chasing is the symptom. What I want to pin down first is which follow-ups actually matter clinically - reminding everyone equally is how these systems get ignored.",
+        "id": "lm-2",
+        "mapId": "map-lapsed",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "tl-friction",
+        "label": "Where the chasing goes wrong",
+        "mapId": "map-lapsed",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "tl-outcome",
+        "label": "What counts as working",
+        "mapId": "map-lapsed",
+        "order": 1
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-lapsed",
+        "phase": "explore",
+        "revision": 9,
+        "seedIdea": "A way for a small clinic to remind patients about follow-up appointments without a receptionist chasing everyone by phone.",
+        "title": "Follow-up reminders for a small clinic"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "The other half of presence, and the one state the window exists to produce. An agent genuinely worked this map - its themes and nodes are on the board - but the last thing it did was hours ago, so the 90-second window has long since closed and the header says 'No agent attached' rather than keeping a stale claim alive forever. That honesty is what makes the reattach strip the right thing to show: someone returning to this map does not need the full pitch for attaching an agent, they need a route back in. Read it against 'Mid-exchange', which is the same shape of board with recent agent writes and therefore reads as attached."
+}

@@ -50,5 +50,5 @@
  },
  "scenarioType": "application",
  "pageFilePath": "app/map/[id]/page.tsx",
- "description": "The reported case, and the one state no other map scenario can show: an idea submitted seconds ago that literally nothing has touched. Every other map in the set carries an agent-origin event, which is exactly why none of them shows the handoff panel. Here the log holds only the person's own root node, so the map says plainly that nothing is working on it and hands over a prompt naming this map and the first tool to call."
+ "description": "The reported case, and the one state no other map scenario can show: an idea submitted seconds ago that literally nothing has touched. Every other map in the set carries an agent-origin event, which is exactly why none of them shows the handoff panel. Here the log holds only the person's own root node, so the map says plainly that nothing is working on it and hands over a prompt naming this map and the first tool to call. 'No agent attached' is now a stronger claim than it used to be: presence is read across every door, so it means nobody is here by WebMCP OR over the MCP server, not merely that this tab has no binding. It also sits on the header's top line beside the wordmark rather than claiming a full-width row of its own - the reason moved behind a click, so the row it was costing goes back to the map."
 }

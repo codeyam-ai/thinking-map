@@ -52,23 +52,40 @@ describe('AgentHandoff', () => {
     expect(screen.getByText(/No one is on this yet/i)).toBeTruthy();
   });
 
-  // An attached agent makes the panel wrong: something IS on this.
-  it('renders nothing when an agent is connected', () => {
-    const { container } = render(
+  // Attached is not working. WebMCP is pull-only, so a bound agent has the
+  // whole catalog and no instruction — and rendering nothing here left the page
+  // at its most capable showing nothing to act on, which is the state a person
+  // reads as "it connected and then did nothing".
+  it('asks the person to start an agent that is attached but idle', () => {
+    render(
       <BridgeFixture status="connected" events={[userEvent()]}>
         <AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />
       </BridgeFixture>,
     );
-    expect(container.textContent).toBe('');
+    expect(screen.getByText(/Your agent can see this map/i)).toBeTruthy();
+    expect(screen.getByText(/read_map/)).toBeTruthy();
+  });
+
+  // The full attach pitch is still wrong here: the agent is already attached,
+  // so two doors and an MCP command are answers to a question this person no
+  // longer has.
+  it('does not re-pitch attaching to an agent that is already attached', () => {
+    render(
+      <BridgeFixture status="connected" events={[userEvent()]}>
+        <AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />
+      </BridgeFixture>,
+    );
+    expect(screen.queryByText(/No one is on this yet/i)).toBeNull();
+    expect(screen.queryByText(/claude mcp add/i)).toBeNull();
   });
 
   // The case that would drift. `working` means a tool is mid-flight, and that
   // agent still sees this map when its turn comes round — so it counts as
   // attached, exactly as askPresence treats it. If this and the node-question
   // composer ever disagreed, one page would contradict itself.
-  it('renders nothing when an agent is mid-tool-call', () => {
+  it('renders nothing once the attached agent has actually worked the map', () => {
     const { container } = render(
-      <BridgeFixture status="working" events={[userEvent()]}>
+      <BridgeFixture status="working" events={[agentEvent()]}>
         <AgentHandoff mapId={MAP_ID} seedIdea="A chore app" hasBrief={false} />
       </BridgeFixture>,
     );

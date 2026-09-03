@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useDismissOnOutside } from '../hooks/useDismissOnOutside';
 
 /**
  * The whole brief intake, stated in a line of width instead of 140px of height.
@@ -39,24 +40,10 @@ export default function BriefMenu({
   const root = useRef<HTMLDivElement>(null);
 
   // A menu that outlives the intent to use it is in the way. Close it on the
-  // three gestures that all mean "not this": clicking away, Escape, choosing.
-  useEffect(() => {
-    if (!open) return;
-
-    function onPointerDown(event: MouseEvent) {
-      if (!root.current?.contains(event.target as Node)) setOpen(false);
-    }
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false);
-    }
-
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
+  // three gestures that all mean "not this": clicking away, Escape, choosing —
+  // the first two shared with every other overlay on the app, the third below.
+  const close = useCallback(() => setOpen(false), []);
+  useDismissOnOutside(root, open, close);
 
   function choose(action: () => void) {
     setOpen(false);

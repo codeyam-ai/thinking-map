@@ -37,6 +37,59 @@ export interface HandoffAttachTab {
   copy?: { text: string; label: string };
 }
 
+/**
+ * What a map says when an agent CAN see it but has not been asked to do
+ * anything — the state the page used to render as nothing at all.
+ *
+ * The page used to hide the whole handoff the moment WebMCP bound, on the
+ * reasoning that an attached agent needs no hand-off. That mistakes capability
+ * for intent. WebMCP is pull-only: registering tools makes the map reachable,
+ * and a reachable map is not a map anyone has been told to think about. So the
+ * page reached its most capable state and showed nothing to act on, while an
+ * agent sat beside it with nine tools and no instruction.
+ *
+ * The prompt here is deliberately shorter than `startPrompt` and names no map
+ * id: the tools are already bound to THIS map, so an id would be a fact the
+ * agent must ignore rather than one it needs.
+ */
+export interface AttachedStartCopy {
+  eyebrow: string;
+  instruction: string;
+  /** Why an attached agent is still not working — the thing that surprises
+   *  everyone exactly once. */
+  note: string;
+  prompt: string;
+}
+
+export function attachedStartCopy({
+  hasBrief,
+}: {
+  hasBrief: boolean;
+}): AttachedStartCopy {
+  return {
+    // States the capability, not a welcome. Someone reading this has already
+    // seen "Agent attached" in the header and is wondering why nothing is
+    // happening; the eyebrow's job is to confirm the half that IS true.
+    eyebrow: 'Your agent can see this map',
+    instruction: 'Ask it to start',
+    // The one sentence that stops this reading as a broken app. It is the same
+    // ceiling `askPresence` and `notifyExchangeUpdated` describe, said where a
+    // person actually meets it.
+    note: 'The tools are bound to this page, but a page cannot start an agent’s turn — ask it in your agent’s chat and it will pick the map up from there.',
+    // Names the WRITE tools, not just the read.
+    //
+    // "Read this map, then deconstruct the idea" is a prompt an agent satisfies
+    // without touching the map: deconstructing is something a model does
+    // beautifully in its own chat window, and the first real agent given this
+    // did exactly that — read_map, then five tidy paragraphs of analysis back
+    // in ChatGPT, and a board still showing nothing. The map is the artifact,
+    // so the prompt has to say where the thinking goes.
+    prompt: hasBrief
+      ? 'Read the brief with read_brief, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. Do not summarise back to me in chat — the map is the output.'
+      : 'Read the map with read_map, then put your deconstruction ON the map: call create_themes to group the questions, then add_nodes to write them. Do not summarise back to me in chat — the map is the output.',
+  };
+}
+
 export interface HandoffCopy {
   /** The small label above the panel. */
   eyebrow: string;

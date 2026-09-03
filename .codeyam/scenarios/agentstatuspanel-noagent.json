@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusPanel - NoAgent",
+  "id": "b8ea3f37-19a8-453d-bb0e-f0cd41c1df3b",
+  "url": "/isolated-components/AgentStatusPanel?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusPanel",
+  "scenarioType": "component",
+  "description": "The ordinary case, not an error. WebMCP binds only in a top-level secure page in a browser with an agent, so every preview, every capture and every ordinary browser lands here. The panel's job is to explain the gate and then say the thing that actually matters: the map is fully usable without one, and everything added lands in the log for an agent to read later."
+}

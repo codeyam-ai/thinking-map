@@ -8,6 +8,17 @@
     ]
   },
   {
+    "description": "The half of the presence panel that is only ever for whoever is building this - the registration convention, the channel, and the tools the browser REFUSED with its own reason for each. That refusal is invisible everywhere else, and the silence is exactly how a binding that registered nothing became indistinguishable from one that worked. Owns its own development-only gate, so AgentStatusPanel stays a plain composition with no environment branch in it.",
+    "filePath": "app/components/AgentBindDiagnostics.tsx",
+    "name": "AgentBindDiagnostics",
+    "scenarios": [
+      "agentbinddiagnostics-refusedtools",
+      "agentbinddiagnostics-healthybinding",
+      "agentbinddiagnostics-olderconvention",
+      "agentbinddiagnostics-nothingbound"
+    ]
+  },
+  {
     "description": "The transcript of what the stand-in agent actually called. This is the evidence that the panel drives the real bound catalog rather than a simulation: every reply is the tool's own, returned through the path a browser agent's call takes.",
     "filePath": "app/components/AgentCallLog.tsx",
     "name": "AgentCallLog",
@@ -27,7 +38,7 @@
     ]
   },
   {
-    "description": "The band a person meets when they submit an idea and nothing picks it up. Before it existed the only sign of that was 'No agent attached' in the header, which states a fact about the page rather than telling the person what to do about it. It leads with the instruction and follows with the explanation, in that order, because someone who just pressed return wants to know what to DO - the panel used to open with the explanation and reach the prompt third, which read as a footnote about agent availability rather than as the next step. A renderer and a composer only: every string comes from handoffCopy where tests pin it, and the band itself is HandoffInstruction, CopyablePrompt, SeedIdeaQuote and HandoffFootnote in that order. What it decides is whether to appear at all - it hides when an agent is listening, using the identical predicate NodeQuestionComposer uses so working counts as attached and the two surfaces cannot contradict each other, and it hides when the log already carries an agent-origin event, because a map an agent has already worked is not waiting for one.",
+    "description": "What the page shows a map depending on whether an agent is attached and whether one has actually worked it. Three states, not two: nobody attached gets the full pitch with both doors and a start prompt; attached but idle gets AgentStartCue, because WebMCP is pull-only and a bound page has made the map reachable rather than started anyone thinking about it; an agent that has already written to the map gets the demoted reattach strip, or nothing while it is still here. Returning null the moment WebMCP bound was the bug - the page reached its most capable state and showed nothing to act on.",
     "filePath": "app/components/AgentHandoff.tsx",
     "name": "AgentHandoff",
     "scenarios": [
@@ -54,7 +65,17 @@
     ]
   },
   {
-    "description": "Whether an agent can reach this page, stated plainly. Unavailable is the ordinary case rather than an error - WebMCP is top-level-secure-context only, so a preview iframe, Safari, and any page opened without a browser agent all land there. It sits in the header because presence is a fact about the whole page. It deliberately shows NO revision counter: r{revision} was a debugging aid that leaked into the product header, where beside 'No agent attached' it read as a build tag on an error. The log it counted is already visible in BoardChat, and BridgeReadout keeps its own display for the diagnostic case where a raw revision is the point.",
+    "description": "The nudge for a map an agent can see but has not been asked to work. AgentHandoff used to return null the moment WebMCP bound, which mistook capability for intent: WebMCP is pull-only, so registering tools makes the map reachable and a reachable map is not one anyone has been told to think about. Its own component for the same reason HandoffReattach is - it owns a subtraction. Everything about attaching an agent is already solved for whoever is reading this; what they are missing is one sentence to send it.",
+    "filePath": "app/components/AgentStartCue.tsx",
+    "name": "AgentStartCue",
+    "scenarios": [
+      "agentstartcue-fromidea",
+      "agentstartcue-frombrief",
+      "agentstartcue-dense"
+    ]
+  },
+  {
+    "description": "Whether an agent can reach this page, stated plainly - one line, and nothing else. The tool count that used to sit here answered a question nobody in front of a map is asking, so it moved behind a click into AgentStatusPanel rather than out of the product. Presence now reads across every door, so an agent working the map over the MCP server counts as attached. The one exception to the single line is a map deleted underneath an open tab, which is an error a person has to act on rather than context they can go looking for.",
     "filePath": "app/components/AgentStatus.tsx",
     "name": "AgentStatus",
     "scenarios": [
@@ -71,6 +92,40 @@
       "agentstatusdot-connected",
       "agentstatusdot-working",
       "agentstatusdot-unavailable"
+    ]
+  },
+  {
+    "description": "What agent presence MEANS on this page, in prose. Split out of AgentStatusPanel because it is the only part carrying wording, and the wording is the interface here - the difference between 'it can ask you questions' and 'anything you add waits in the log' is the entire practical difference between the two doors, stated to someone who has never heard of either. A deleted map outranks both channels, because it is the only state a person can act on.",
+    "filePath": "app/components/AgentStatusNarrative.tsx",
+    "name": "AgentStatusNarrative",
+    "scenarios": [
+      "agentstatusnarrative-boundtopage",
+      "agentstatusnarrative-overmcpserver",
+      "agentstatusnarrative-noagent",
+      "agentstatusnarrative-noagentnoreason",
+      "agentstatusnarrative-mapdeleted"
+    ]
+  },
+  {
+    "description": "Everything about agent presence that is not the one-line answer, opened from the header by a click. This is where the bottom-left dev badge went: a permanent readout was the right information in the wrong place - it sat over the board whether or not anyone wanted it, and spent its rows saying nothing had changed. A frame composing three parts that answer three different questions - what presence means in prose, which tools the browser actually took, and the build-time detail behind both.",
+    "filePath": "app/components/AgentStatusPanel.tsx",
+    "name": "AgentStatusPanel",
+    "scenarios": [
+      "agentstatuspanel-boundtopage",
+      "agentstatuspanel-overmcpserver",
+      "agentstatuspanel-noagent",
+      "agentstatuspanel-partiallyrefused",
+      "agentstatuspanel-mapdeleted"
+    ]
+  },
+  {
+    "description": "The tools the browser actually ACCEPTED, named rather than counted. This row is the visible proof of the bug the whole feature was built around: the page said '9 tools' while the browser had taken none of them, and nothing anywhere printed which ones got through. Names rather than a number because as a count a shortfall reads like a rounding difference. Renders nothing at zero, since '0 tools available' under a line already saying no agent is attached is the same fact twice.",
+    "filePath": "app/components/AgentToolChips.tsx",
+    "name": "AgentToolChips",
+    "scenarios": [
+      "agenttoolchips-allnine",
+      "agenttoolchips-partiallyaccepted",
+      "agenttoolchips-onlyone"
     ]
   },
   {
@@ -126,7 +181,7 @@
     ]
   },
   {
-    "description": "Wordmark left, phase track right. Shared by the landing screen and the map workspace so the two never drift.",
+    "description": "Wordmark left, agent presence and the board menu right. The phase track that used to sit here is gone - it named stages the board no longer walks through, and the board draws its own progress. The status slot now stays on this one line at every width: it used to drop to a full-width row below lg while it spelled its reason out inline, and now that the reason lives behind a click, that reclaimed row goes to the map.",
     "filePath": "app/components/AppHeader.tsx",
     "name": "AppHeader",
     "scenarios": [
@@ -900,7 +955,10 @@
       "a-plan-with-a-gap-one-slice-proves-nothing",
       "sprawling-a-deep-wide-map",
       "the-round-is-answered-and-the-map-reaches-on",
-      "an-older-question-three-rounds-up-still-open"
+      "an-older-question-three-rounds-up-still-open",
+      "the-agent-worked-here-then-left",
+      "mid-exchange-agent-and-human-on-one-map",
+      "nobody-has-picked-this-up-yet"
     ]
   },
   {
@@ -1283,7 +1341,7 @@
     }
   },
   {
-    "description": "Mounts the page's own front door. Binds the tool catalog to the current map for as long as the map page is open, disposing on unmount and on map change because re-registering a live tool name throws InvalidStateError. Holds the pending ask_user state and resolves the agent's turn when the person answers, writing the answer to the log BEFORE releasing it so an agent that already gave up still finds it. Publishes the headless driver whether or not a real agent is present, which is the only way the tools are reachable inside a capture iframe. Reports connection state through the same context, and exposes the tool names from the catalog rather than from the published driver - a consumer's effect runs before its parent's, so reading the driver would race the binding that creates it.",
+    "description": "Mounts the page front door. Binds the tool catalog to the current map for as long as the map page is open, holds the questions an agent has asked but nobody has answered yet, and reports whether an agent is attached at all. Binding is deferred to whenever the model context appears rather than done once at mount, because the agent injects it and that routinely lands after hydration. Connected requires that the browser actually accepted at least one tool - a registration that failed must not read as connected, which is how the header came to report nine tools over none. Presence is composed from agentPresence across every door, and a 15s tick lets it lapse with no other re-render to trigger it. A deleted map outranks every other signal.",
     "filePath": "app/components/WebMcpBridge.tsx",
     "name": "WebMcpBridge",
     "scenarios": [
@@ -1313,6 +1371,12 @@
     "filePath": "app/lib/agentPanel.ts",
     "name": "agentPanelRequested",
     "testFile": "app/lib/agentPanel.test.ts"
+  },
+  {
+    "description": "Whether an agent is on this map, across every door rather than just the WebMCP binding in this tab. Presence used to mean 'a binding exists here', which made an agent working through /api/mcp invisible - the header said 'No agent attached' while that agent wrote nodes onto the board. So presence is read off the evidence every door leaves behind, the exchange log: a binding proves an agent CAN act, a recent agent event proves one IS acting, and either is enough. webmcp outranks mcp when both hold, because only a bound page can raise a question and wait for the answer. Pure, so the wording it drives can be pinned.",
+    "filePath": "app/lib/agentPresence.ts",
+    "name": "agentPresence",
+    "testFile": "app/lib/agentPresence.test.ts"
   },
   {
     "description": "When each of the person's answers landed, as milliseconds. Reads updatedAt rather than createdAt, and that is the whole rule: a question is CREATED open and UPDATED when it is answered, so its creation time says when it was ASKED. Reading createdAt here would date every answer to the moment the agent posed the question, which on a map where a batch of questions is asked at once and answered over an hour makes every insight look current no matter how far the thinking has moved past it. Unparseable timestamps sort as epoch rather than NaN, which would make every comparison against them false and silently drop the node from every count.",
@@ -1369,6 +1433,18 @@
     "filePath": "app/lib/exchangeRail.ts",
     "name": "askedNodeIds",
     "testFile": "app/lib/exchangeRail.test.ts"
+  },
+  {
+    "description": "One exchange event's timestamp as milliseconds, tolerating both shapes the log arrives in - a Date on the server render, an ISO string from the poll. Presence is compared against a 90-second window, so a timestamp read wrong is a page that claims an agent who left or drops one who is still working.",
+    "filePath": "app/lib/agentPresence.ts",
+    "name": "at",
+    "testFile": "app/lib/agentPresence.test.ts"
+  },
+  {
+    "description": "The words for a map an agent can see but has not been asked to work. WebMCP is pull-only, so binding the tools makes the map reachable and nothing more - the page used to reach its most capable state and render nothing to act on. The prompt names the WRITE tools deliberately: 'deconstruct the idea' is something a model satisfies beautifully in its own chat window, and the first real agent given that wording read the map and answered in five tidy paragraphs with the board still empty. Shorter than handoffCopy's prompt and carries no map id, because the tools are already bound to this map.",
+    "filePath": "app/lib/handoffCopy.ts",
+    "name": "attachedStartCopy",
+    "testFile": "app/lib/handoffCopy.test.ts"
   },
   {
     "description": "Offers the exchange log as a subscribable MCP resource. Deliberately speculative: resource subscriptions are an open proposal, so this no-ops on every browser that exists today. Same feature-detection shape as bindTools, and kept in the only file allowed to name navigator.modelContext.",
@@ -1913,6 +1989,12 @@
     "testFile": "app/lib/boardConnectors.test.ts"
   },
   {
+    "description": "A catalog tool's Zod schema converted to JSON Schema, memoized per tool. This is the whole reason a browser agent can discover these tools at all: registerTool sends the descriptor across an agent boundary, so every field must survive a structured clone, and a Zod schema is a live graph of class instances and closures that does not. Handing one over threw a DataCloneError the binding swallowed, leaving a page that reported an attached agent and exposed nothing to it. Converts with io input, describing what the agent must send rather than what comes back. The server doors never need this - the MCP SDK converts internally - so only the page door converts.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "jsonSchemaFor",
+    "testFile": "app/lib/toolInvocation.test.ts"
+  },
+  {
     "description": "Places the idea, the lines of thinking fanning off it, each row of question cards, and the point where the rows converge — in abstract board units, knowing nothing about pixels or zoom. Each card sits at the running sum of the widths before it rather than at an index times a constant, which is what lets a card carrying a diagram or a picture push its neighbours along instead of being drawn on top of them. The convergence clears the longest row, and an empty map still returns finite bounds so a board with nothing on it frames on something real.",
     "filePath": "app/lib/galaxyLayout.ts",
     "name": "layOutGalaxy",
@@ -1965,6 +2047,12 @@
       "justification": "A bare findUnique selecting only the id, coerced to a boolean. The work is the database call itself; the route behaviour it guards is covered by the exchange route's own probes and the mid-exchange scenario.",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "An unknown thrown value as the reason string a bind report carries. A browser refusing a tool throws whatever it likes, and the whole point of the report is that a per-tool failure stops being silent - so a non-Error rejection has to arrive as printable text rather than collapsing the report that names it.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "messageFor",
+    "testFile": "app/lib/webmcp.test.ts"
   },
   {
     "description": "Gets a message string out of an unknown thrown value: an Error, an object carrying a string message, or the value stringified. Exists because what reaches the classifier is genuinely unknown - a throw is not obliged to throw an Error - and the screen must render something rather than crash on the way to explaining a crash.",
@@ -2037,6 +2125,12 @@
       "justification": "branches entirely on navigator.modelContext.notifyResourceUpdated, an unshipped W3C proposal no browser implements; the only reachable path today is the no-op",
       "kind": "platform-glue"
     }
+  },
+  {
+    "description": "Calls back as soon as a browser agent is reachable, now or later. The model context is injected by the agent rather than the page, and in the ChatGPT and Chrome integrated browsers it routinely lands after hydration - so a one-shot check at mount reports 'no browser agent' on a page that acquires one a few hundred milliseconds later and never looks again. Fires immediately when the API is already there, otherwise polls and listens for the modelcontextready and mcp-ready announcements. Bounded at 30 seconds: an agent that has not appeared by then is not coming, and a map left open for hours must not keep an interval alive for one.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "onModelContextReady",
+    "testFile": "app/lib/webmcp.test.ts"
   },
   {
     "description": "Reads back the list of things brought along with an idea. Names only, and anything unreadable becomes an empty list — the rule is about availability rather than correctness: a board that cannot parse its own attachment column must still OPEN, because one stray string taking the whole page down is a far worse outcome than a board rendering without its attachments.",
@@ -2192,6 +2286,12 @@
     "testFile": "app/lib/exchangeFormat.test.ts"
   },
   {
+    "description": "Asks the host to bring the page forward before running work the person has to see, falling back to running it directly where the host does not support that. Wraps the ask_user hand-off so a question is not raised in a background tab. Lives here so this file stays the only one that names where the browser keeps its model context - the bridge used to reach for navigator.modelContext itself, which quietly made it a second place the discovery fix had to be applied.",
+    "filePath": "app/lib/webmcp.ts",
+    "name": "requestUserInteraction",
+    "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
     "description": "Closes the open questions an answer resolved, logging one node.updated per node that actually moved. Answering the same question twice logs the second answer without inventing a second change, and a node the agent has since deleted is skipped rather than failing the write.",
     "filePath": "app/lib/contributions.ts",
     "name": "resolveAnswered",
@@ -2276,6 +2376,12 @@
     "filePath": "app/lib/nodePlan.ts",
     "name": "serialiseOptions",
     "testFile": "app/lib/nodePlan.test.ts"
+  },
+  {
+    "description": "Why a tool descriptor cannot cross the agent boundary, or null when it can. structuredClone is not a proxy for the check, it IS the check - the same algorithm the browser applies on the way out - so running it here turns an opaque DataCloneError thrown from inside Chrome into a named tool and a printable reason. Also catches the descriptors that clone fine but are useless to an agent: no description, or an input schema that is not an object schema.",
+    "filePath": "app/lib/toolInvocation.ts",
+    "name": "serializationProblem",
+    "testFile": "app/lib/toolInvocation.test.ts"
   },
   {
     "description": "The sentence the bounded shimmer resolves into, for each of the three things that can be true about who can hear the log: an agent mid-turn has what was added, an agent is attached but not in a turn, or nothing can reach the page at all. The three are deliberately distinct claims — collapsing them would make the page sound more attended-to than it is. Says what you have added rather than your answers, because the same row appears on a day-one map that has only a seed idea. Exported so the isolated-component fixtures cite the real sentence instead of a hand-copy that can drift.",
@@ -2405,6 +2511,12 @@
     "filePath": "app/hooks/useBoundedWait.ts",
     "name": "useBoundedWait",
     "testFile": "app/hooks/useBoundedWait.test.ts"
+  },
+  {
+    "description": "Closes an open overlay on the two gestures that both mean 'not this' - a pointer down outside its element, or Escape. Extracted because three surfaces had each grown their own copy of the effect: AgentStatus's presence panel, BoardMenu, and BriefMenu. Uses mousedown rather than click so a drag that starts inside the panel and ends outside it - selecting the prompt text - is not read as a dismissal. Listens only while open, so the document carries listeners just for as long as there is something to dismiss.",
+    "filePath": "app/hooks/useDismissOnOutside.ts",
+    "name": "useDismissOnOutside",
+    "testFile": "app/hooks/useDismissOnOutside.test.ts"
   },
   {
     "description": "The page's own copy of the exchange log, kept current. Polls the log forward from the cursor it holds — the same way an agent reads it, because WebMCP is pull-only and there is no push channel — and re-renders the server component when the log moves past what was rendered, so the server-rendered map does not sit out of step with its own log.",

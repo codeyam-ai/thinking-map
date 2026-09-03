@@ -1,0 +1,12 @@
+{
+  "name": "AgentStatusNarrative - OverMcpServer",
+  "id": "14aa710b-1c4a-4d9e-a482-227ec394e61c",
+  "url": "/isolated-components/AgentStatusNarrative?s=OverMcpServer",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStatusNarrative",
+  "scenarioType": "component",
+  "description": "The same presence, reached over HTTP. The sentence that has to land is the limit: this agent can read and write the map but cannot raise a question here, so anything the person adds waits in the log for its next read. Without it someone would sit waiting for a reply that is structurally never coming."
+}

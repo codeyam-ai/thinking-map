@@ -6,7 +6,7 @@
 // say, which questions came back pending, what an answered call reports — lives
 // here instead, where it is ordinary testable code.
 
-import type { z } from 'zod';
+import { z } from 'zod';
 import {
   TOOL_CATALOG,
   findTool,
@@ -89,13 +89,78 @@ export function answeredResponse(
   };
 }
 
+/** A plain JSON Schema object — no class instances, no closures, nothing a
+ *  structured clone would refuse. The shape the browser can actually take. */
+export type JsonSchema = Record<string, unknown>;
+
 /** One tool as the WebMCP draft wants it described. */
 export interface ToolDescriptor {
   name: string;
   description: string;
-  inputSchema: unknown;
+  inputSchema: JsonSchema;
   annotations?: Record<string, unknown>;
   execute(args: unknown): Promise<McpToolResponse>;
+}
+
+// One conversion per tool for the life of the page. The catalog is frozen at
+// module scope, so re-deriving on every bind would be pure waste — and a stable
+// identity means a re-registration hands the browser the same schema it saw.
+const schemaCache = new Map<string, JsonSchema>();
+
+/**
+ * The catalog's Zod schema as JSON Schema.
+ *
+ * This is the whole reason a browser agent can see these tools at all.
+ * `registerTool()` sends the descriptor across an agent boundary, so every
+ * field has to survive a structured clone. A Zod schema does not: it is a live
+ * graph of class instances and closures, and handing one over throws — which
+ * the binding swallowed, leaving a page that reported an attached agent and
+ * exposed nothing to it.
+ *
+ * The server doors never hit this because the MCP SDK converts internally. Only
+ * the page door passes a schema across by itself, so only the page door has to
+ * do the conversion by itself.
+ */
+export function jsonSchemaFor(tool: ToolSpec): JsonSchema {
+  const cached = schemaCache.get(tool.name);
+  if (cached) return cached;
+  // `io: 'input'` describes what the agent must SEND, which is what a tool's
+  // input schema means; the output view would encode defaults as required.
+  const schema = z.toJSONSchema(tool.inputSchema, { io: 'input' }) as JsonSchema;
+  schemaCache.set(tool.name, schema);
+  return schema;
+}
+
+/**
+ * Why a descriptor cannot cross the agent boundary, or null if it can.
+ *
+ * `structuredClone` is not a proxy for the check — it IS the check, the same
+ * algorithm the browser applies on the way out. Running it here turns an opaque
+ * `DataCloneError` thrown from inside the browser into a named tool and a
+ * reason the dev diagnostic can print.
+ */
+export function serializationProblem(
+  descriptor: ToolDescriptor,
+): string | null {
+  try {
+    structuredClone({
+      name: descriptor.name,
+      description: descriptor.description,
+      inputSchema: descriptor.inputSchema,
+      annotations: descriptor.annotations,
+    });
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+  if (!descriptor.description) return 'no description';
+  const schema = descriptor.inputSchema;
+  if (!schema || typeof schema !== 'object') {
+    return 'input schema is not an object';
+  }
+  if (schema.type !== 'object') {
+    return `input schema type is ${String(schema.type)}, not object`;
+  }
+  return null;
 }
 
 /**
@@ -111,7 +176,7 @@ export function buildToolDescriptors(
   return TOOL_CATALOG.map((tool) => ({
     name: tool.name,
     description: tool.description,
-    inputSchema: tool.inputSchema,
+    inputSchema: jsonSchemaFor(tool),
     ...(tool.annotations ? { annotations: tool.annotations } : {}),
     execute: execute(tool.name),
   }));

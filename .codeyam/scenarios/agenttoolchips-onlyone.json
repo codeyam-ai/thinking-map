@@ -1,0 +1,12 @@
+{
+  "name": "AgentToolChips - OnlyOne",
+  "id": "f5334dac-96d9-4340-9ccd-b7fb58dd4471",
+  "url": "/isolated-components/AgentToolChips?s=OnlyOne",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentToolChips",
+  "scenarioType": "component",
+  "description": "One tool through — the state the original bug actually produced, where a browser agent could reach post_note and nothing else while the header claimed nine. The boundary case for pluralization too: one chip, and the eyebrow still counting."
+}

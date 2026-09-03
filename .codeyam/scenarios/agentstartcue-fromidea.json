@@ -1,0 +1,12 @@
+{
+  "name": "AgentStartCue - FromIdea",
+  "id": "59a33dad-27ce-4d74-9b00-19ed4bb515b6",
+  "url": "/isolated-components/AgentStartCue?s=FromIdea",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "AgentStartCue",
+  "scenarioType": "component",
+  "description": "The map an agent can see but nobody has asked to work. This is the state that used to render nothing at all: binding the tools makes the map REACHABLE and nothing more, so the page hit its most capable state and showed nothing to act on while an agent sat beside it with the whole catalog and no instruction. The prompt names the write tools deliberately — an agent told to deconstruct the idea does it beautifully in its own chat window and leaves the board empty."
+}

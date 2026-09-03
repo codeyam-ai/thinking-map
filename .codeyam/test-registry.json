@@ -1,11 +1,29 @@
 {
   "tests": [
     {
+      "description": "Attached is not working. WebMCP is pull-only, so a bound agent has the whole catalog and no instruction — and rendering nothing here left the page at its most capable showing nothing to act on, which is the state a person reads as \"it connected and then did nothing\".",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › asks the person to start an agent that is attached but idle",
+      "line": 59,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The full attach pitch is still wrong here: the agent is already attached, so two doors and an MCP command are answers to a question this person no longer has.",
+      "file": "app/components/AgentHandoff.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentHandoff › does not re-pitch attaching to an agent that is already attached",
+      "line": 72,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "The demoted band is a SUBTRACTION, and presence-only assertions cannot see a subtraction come undone. The steps and the seed quote are written for a first meeting; putting them back here is the drift this pins.",
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › drops the first-meeting steps and quote from the reattach strip",
-      "line": 97,
+      "line": 114,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -14,7 +32,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › drops the heading but keeps both commands when dense",
-      "line": 131,
+      "line": 148,
       "registeredAt": "2026-09-02T14:31:49Z",
       "runner": "tests"
     },
@@ -23,7 +41,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › gives the reattach strip the command flat, with no tabs",
-      "line": 185,
+      "line": 202,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -32,7 +50,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › keeps the heading on the reattach strip by default",
-      "line": 146,
+      "line": 163,
       "registeredAt": "2026-09-02T14:31:49Z",
       "runner": "tests"
     },
@@ -41,7 +59,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › offers the MCP command alongside the prompt when reattaching",
-      "line": 113,
+      "line": 130,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -50,7 +68,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › opens the full band on the endpoint every agent can use",
-      "line": 160,
+      "line": 177,
       "registeredAt": "2026-09-02T21:03:12Z",
       "runner": "tests"
     },
@@ -59,7 +77,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › puts the instruction before the explanation in document order",
-      "line": 238,
+      "line": 255,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -68,26 +86,17 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › reaches the Claude Code command through its tab",
-      "line": 173,
+      "line": 190,
       "registeredAt": "2026-09-02T21:03:12Z",
-      "runner": "tests"
-    },
-    {
-      "description": "An attached agent makes the panel wrong: something IS on this.",
-      "file": "app/components/AgentHandoff.render.test.tsx",
-      "format": "vitest",
-      "key": "AgentHandoff › renders nothing when an agent is connected",
-      "line": 56,
-      "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
     {
       "description": "The case that would drift. `working` means a tool is mid-flight, and that agent still sees this map when its turn comes round — so it counts as attached, exactly as askPresence treats it. If this and the node-question composer ever disagreed, one page would contradict itself.",
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
-      "key": "AgentHandoff › renders nothing when an agent is mid-tool-call",
-      "line": 69,
-      "registeredAt": "2026-09-01T17:36:57Z",
+      "key": "AgentHandoff › renders nothing once the attached agent has actually worked the map",
+      "line": 86,
+      "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
     {
@@ -95,7 +104,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders the instruction and both steps",
-      "line": 227,
+      "line": 244,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -104,7 +113,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders the steps as an ordered list",
-      "line": 254,
+      "line": 271,
       "registeredAt": "2026-09-02T11:13:46Z",
       "runner": "tests"
     },
@@ -122,7 +131,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › renders without a bridge provider at all",
-      "line": 198,
+      "line": 215,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -131,7 +140,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › shows a start prompt naming this map",
-      "line": 204,
+      "line": 221,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -140,7 +149,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › shows no quoted idea for a map started from a brief",
-      "line": 215,
+      "line": 232,
       "registeredAt": "2026-09-01T17:36:57Z",
       "runner": "tests"
     },
@@ -149,7 +158,7 @@
       "file": "app/components/AgentHandoff.render.test.tsx",
       "format": "vitest",
       "key": "AgentHandoff › still offers a way back in on a map an agent has already worked",
-      "line": 83,
+      "line": 100,
       "registeredAt": "2026-09-02T13:54:01Z",
       "runner": "tests"
     },
@@ -181,6 +190,15 @@
       "runner": "tests"
     },
     {
+      "description": "A map deleted underneath an open tab is the one reason that stays on the line. Every other reason is context someone can go looking for; this is an error they have to act on, and a page that knows the tab is dead must not decline to say so.",
+      "file": "app/components/AgentStatus.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentStatus › keeps a deleted map visible without a click",
+      "line": 91,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "The removal was unconditional, not a fix scoped to the unavailable state — a header that showed the counter only once an agent attached would pass the test above and still put debugging output in front of a person.",
       "file": "app/components/AgentStatus.render.test.tsx",
       "format": "vitest",
@@ -190,12 +208,30 @@
       "runner": "tests"
     },
     {
+      "description": "The detail did not leave the product, it moved behind a click — so the click has to work, both ways. A panel that opens over the map and cannot be put away again would be worse than the permanent badge it replaced.",
+      "file": "app/components/AgentStatus.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentStatus › opens the detail on click and closes it again",
+      "line": 69,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "The state the badge was worst in: \"No agent attached\" reads as a failure, and an unexplained `r14` beside it reads as the build that failed. The bridge is handed a revision here specifically so the header has one to leak.",
       "file": "app/components/AgentStatus.render.test.tsx",
       "format": "vitest",
       "key": "AgentStatus › states presence without a revision badge beside it",
       "line": 22,
       "registeredAt": "2026-09-02T19:55:20Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The same argument as the revision badge, applied to the tool count. \"Agent attached · 9 tools\" answered a question nobody in front of a map asks, and spent header room doing it. The number is not deleted — it is one click away — so the guard has to be that it is absent UNTIL then.",
+      "file": "app/components/AgentStatus.render.test.tsx",
+      "format": "vitest",
+      "key": "AgentStatus › states presence without a tool count beside it",
+      "line": 51,
+      "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
     {
@@ -1441,11 +1477,20 @@
       "runner": "tests"
     },
     {
+      "description": "A tab left open across a map's deletion. The binding is intact and the browser is still attached, so every ordinary signal reads \"connected\" — while each registered tool answers \"No such map\". The first agent to meet this reported the app as broken to the person using it, which is the cost of a page that cannot tell a dead map from a dropped request.",
+      "file": "app/components/WebMcpBridge.render.test.tsx",
+      "format": "vitest",
+      "key": "WebMcpBridge - NoAgent › says the map is gone when the log 404s, rather than claiming a binding",
+      "line": 108,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "With nothing outstanding, WebMcpBridge shows the trigger rather than the answer block, and displays a zero count.",
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - NoAgent › shows nothing awaiting an answer",
-      "line": 105,
+      "line": 126,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -1454,7 +1499,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › clears the questions and records the answer once the person replies",
-      "line": 165,
+      "line": 186,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -1463,7 +1508,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders a single outstanding question",
-      "line": 116,
+      "line": 137,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -1472,7 +1517,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders both questions and marks the agent as working",
-      "line": 129,
+      "line": 150,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -1481,7 +1526,7 @@
       "file": "app/components/WebMcpBridge.render.test.tsx",
       "format": "vitest",
       "key": "WebMcpBridge - pending states › renders every question when an agent asks several at once",
-      "line": 146,
+      "line": 167,
       "registeredAt": "2026-09-01T09:51:30.044626945+00:00",
       "runner": "tests"
     },
@@ -1576,6 +1621,78 @@
       "runner": "tests"
     },
     {
+      "description": "The case that was wrong: no binding, but the log shows an agent mid-session.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › counts an agent working through the MCP door as attached",
+      "line": 27,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The person's own writes are not an agent being present. Counting them would make every map claim an agent the moment someone typed into it.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › does not mistake the person for an agent",
+      "line": 69,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The failure the window is sized to prefer. A turn spent reading a brief can leave a real gap between two writes, and dropping to \"nobody is here\" in the middle of one agent's turn is the exact bug the window exists to fix.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › holds presence through a gap inside one turn",
+      "line": 60,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The empty case, which is most maps most of the time. It must report plain absence rather than a null-ish shape the callers have to interpret — three components read this to decide what to tell a person.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › is honest about a map no agent has ever touched",
+      "line": 108,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The other half of honesty: an agent that left must stop counting, or the page promises someone a reply that is not coming.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › lets presence lapse once the window has passed",
+      "line": 50,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The log arrives as JSON from the poll and as Dates from the server render.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › reads a timestamp that arrived as a JSON string",
+      "line": 80,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A bound page can be ASKED — ask_user puts a question in front of a person and waits. A map reached over HTTP cannot, so the channel has to survive even when both signals are true.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › reports webmcp when the page is bound, whatever the log says",
+      "line": 39,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Latest wins, not last-in-array: the poll appends, but nothing guarantees order across a merge of the initial render and a later page of events.",
+      "file": "app/lib/agentPresence.test.ts",
+      "format": "vitest",
+      "key": "agentPresence › takes the most recent agent event rather than the last one listed",
+      "line": 92,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "The rule this function exists to hold: a question is CREATED open and UPDATED when it is answered, so `createdAt` dates the ASKING. Reading it here would make every insight look current however far the thinking moved.",
       "file": "app/lib/insightStream.test.ts",
       "format": "vitest",
@@ -1607,7 +1724,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "answeredResponse › marks the result answered and is not an error",
-      "line": 149,
+      "line": 152,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -1616,7 +1733,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "answeredResponse › reports each question with the answer it received",
-      "line": 138,
+      "line": 141,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -1882,6 +1999,60 @@
       "runner": "tests"
     },
     {
+      "description": "Deliberately shorter than `handoffCopy`'s prompt and carrying no id: the tools are already bound to THIS map, so an id would be a fact the agent has to ignore rather than one it needs.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › carries no map id, unlike the unattached hand-off prompt",
+      "line": 275,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The one sentence that stops an attached-but-idle map reading as a broken app. Without it the person sees \"Agent attached\" and nothing happening, and has no way to learn that a page cannot start an agent's turn.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › explains why an attached agent is still not working",
+      "line": 285,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Every slot the component renders must be filled in both branches — an empty eyebrow or instruction would render as a blank row above the prompt.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › fills every slot for both entry points",
+      "line": 293,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The prompt has to send the thinking to the MAP. \"Deconstruct the idea\" is something a model satisfies beautifully in its own chat window, and the first real agent given that prompt did exactly that — tidy paragraphs back in the chat, and a board still showing nothing.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › names the write tools, not just the read",
+      "line": 247,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A map that arrived with a document should be read from the document. The read tool is the one thing that differs between the two entry points.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › reads the brief when there is one and the map when there is not",
+      "line": 265,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The same instruction said in plain words, because an agent that follows tool names but still narrates its answer has not put anything on the map.",
+      "file": "app/lib/handoffCopy.test.ts",
+      "format": "vitest",
+      "key": "attachedStartCopy › tells the agent not to answer in chat",
+      "line": 255,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "Clearing has to leave NOTHING, not an empty JSON array. `[]` is truthy as a stored string, so the board would go on rendering the \"brought along\" strip with no items in it — a stray empty row where the attachments used to be.",
       "file": "app/lib/contributions.integration.test.ts",
       "format": "vitest",
@@ -1945,11 +2116,20 @@
       "runner": "tests"
     },
     {
+      "description": "The surface that actually matters. Chrome's imperative-API guide and ChatGPT's WebMCP docs both register on `document.modelContext`; the page read only `navigator`, so a browser WITH WebMCP reported \"no browser agent\" and registered nothing. This is that bug, pinned.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › binds to document.modelContext, where the browser actually keeps it",
+      "line": 263,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "No agent at all — the common case, including every codeyam capture. It must be a silent no-op with a disposer that is safe to call.",
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › does nothing and returns a safe disposer with no browser agent",
-      "line": 181,
+      "line": 281,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -1958,7 +2138,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › falls back to provideContext when only the older convention exists",
-      "line": 167,
+      "line": 179,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -1967,8 +2147,17 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › keeps binding the rest when one registration throws",
-      "line": 150,
+      "line": 162,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Chrome unregisters by AbortSignal rather than by name, so the binding has to hand one over — a disposer that cannot cancel leaves the next map's binding failing on live names.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › passes an abort signal that disposal fires",
+      "line": 218,
+      "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
     {
@@ -1976,8 +2165,26 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › registers every tool through registerTool when that convention is present",
-      "line": 119,
+      "line": 131,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The descriptors have to reach a real `postMessage`-shaped boundary intact. A browser that clones on the way in is the honest simulation of Chrome's own behaviour, and the old Zod-schema descriptors died exactly here.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › registers through a browser that structured-clones the descriptor",
+      "line": 238,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Registration used to fail silently, so a page could report an attached agent while offering nothing. The report is what makes the difference observable — to the header, to the dev panel, and to this test.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "bindTools › reports which tools the browser accepted and which it refused",
+      "line": 194,
+      "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
     {
@@ -1985,7 +2192,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "bindTools › unregisters everything it registered when disposed",
-      "line": 135,
+      "line": 147,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -2129,7 +2336,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › attaches annotations only to the tools that declare them",
-      "line": 202,
+      "line": 250,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2138,7 +2345,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › binds each descriptor to its own tool name",
-      "line": 210,
+      "line": 258,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2147,7 +2354,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › carries each tool’s description and schema through",
-      "line": 192,
+      "line": 195,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
       "runner": "tests"
     },
@@ -2156,8 +2363,44 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "buildToolDescriptors › describes every catalog tool",
-      "line": 184,
+      "line": 187,
       "registeredAt": "2026-09-01T01:28:02.147000376+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The bug this pins: descriptors used to carry the catalog's live Zod schema straight through. `registerTool` copies the descriptor across an agent boundary, so a Zod schema throws DataCloneError there — and the binding's catch swallowed it, leaving a page that claimed an attached agent and registered nothing. `toBeDefined()` above passes for a Zod schema too, which is precisely why it did not catch this.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › describes every tool with a schema that survives a structured clone",
+      "line": 209,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Not merely cloneable — actually JSON Schema. A cloneable object of the wrong shape would register and then be uncallable, which is worse than a registration that fails loudly.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › gives read_map a JSON Schema an agent can fill in",
+      "line": 218,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "And catches the regression if the Zod schema is ever wired back in.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › names the offending field when a schema cannot be cloned",
+      "line": 240,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The check the binding runs before handing a descriptor to the browser, so a bad one is named here rather than thrown anonymously from inside Chrome.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "buildToolDescriptors › reports no serialization problem for any catalog tool",
+      "line": 230,
+      "registeredAt": "2026-09-02T22:39:15Z",
       "runner": "tests"
     },
     {
@@ -3128,7 +3371,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "errorResponse › marks the response as an error carrying the message",
-      "line": 226,
+      "line": 377,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -4586,7 +4829,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is available in a top-level secure page with a browser agent",
-      "line": 49,
+      "line": 52,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4595,7 +4838,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is unavailable inside an iframe",
-      "line": 68,
+      "line": 71,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4604,7 +4847,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is unavailable outside a secure context",
-      "line": 62,
+      "line": 65,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4613,7 +4856,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "isWebMcpAvailable › is unavailable without a browser agent",
-      "line": 55,
+      "line": 58,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -4651,6 +4894,51 @@
       "key": "joinPath › leaves from the far edge of the last card",
       "line": 108,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "`io: 'input'` describes what the agent must SEND, which is what a tool's input schema means. The output view would encode defaults as required and demand fields the agent is not supposed to supply.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "jsonSchemaFor › describes the input side, so defaulted fields stay optional",
+      "line": 296,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Memoization keyed per tool, not one schema shared by all of them — the bug a single cached value would introduce is every tool advertising read_map's arguments.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "jsonSchemaFor › gives different tools their own schemas",
+      "line": 312,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Plain JSON Schema, not a Zod object wearing one. This is the property the browser actually depends on.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "jsonSchemaFor › produces a plain object schema for every catalog tool",
+      "line": 277,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The property the descriptors are built on: whatever comes back must survive the same algorithm the browser applies on the way out.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "jsonSchemaFor › produces a schema that survives a structured clone",
+      "line": 287,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Memoized: the catalog is frozen, so re-deriving on every bind is waste, and a stable identity means a re-registration hands the browser the same object rather than a look-alike.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "jsonSchemaFor › returns the same object on a second call for one tool",
+      "line": 304,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
     {
@@ -5248,6 +5536,69 @@
       "runner": "tests"
     },
     {
+      "description": "Server rendering has no window to watch, and this runs during the bridge's setup — throwing here would take the whole map page down.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › does nothing outside a browser",
+      "line": 454,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The common case in an ordinary browser: the agent is already there, so the page must bind now rather than wait a poll interval to notice.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › fires immediately when the model context is already present",
+      "line": 353,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Some hosts announce themselves rather than make the page poll. Honouring the event removes up to a quarter-second of lag when they do.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › fires on a host-announced ready event without waiting for a poll",
+      "line": 383,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The race this exists for. Nothing at mount, an agent a moment later, and the page has to notice on its own.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › fires once the model context appears later",
+      "line": 363,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "An announcement with no agent actually behind it is not readiness. Firing here would bind against nothing and report a connection that does not exist — the exact class of lie this feature was built to end.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › ignores a ready event when no model context arrived with it",
+      "line": 400,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Bounded on purpose: an agent that has not appeared within the window is not coming, and a map left open for hours must not keep an interval and two listeners alive waiting for one.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › stops watching after the deadline and never fires",
+      "line": 416,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "Navigating between boards disposes the watch. A leaked one would keep polling for a map the page has already left.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "onModelContextReady › stops watching when disposed",
+      "line": 435,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "A blank name would render as a row you cannot identify or remove, so it is dropped the same way the endpoint drops it on the way in.",
       "file": "app/lib/attachments.test.ts",
       "format": "vitest",
@@ -5576,7 +5927,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › asks nothing when the call failed",
-      "line": 95,
+      "line": 98,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -5585,7 +5936,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › asks nothing when the result carries no questions",
-      "line": 107,
+      "line": 110,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -5594,7 +5945,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › drops entries that are not a well-formed question",
-      "line": 118,
+      "line": 121,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -5603,7 +5954,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "pendingQuestions › reads the questions out of a pending ask_user result",
-      "line": 82,
+      "line": 85,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -6116,7 +6467,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "publishAgentDriver › leaves a newer map’s driver alone when an older disposer runs",
-      "line": 214,
+      "line": 314,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -6125,7 +6476,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "publishAgentDriver › publishes a driver listing every catalog tool",
-      "line": 190,
+      "line": 290,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -6134,7 +6485,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "publishAgentDriver › removes its own driver on disposal",
-      "line": 205,
+      "line": 305,
       "registeredAt": "2026-09-01T01:28:58.247759396+00:00",
       "runner": "tests"
     },
@@ -6499,6 +6850,42 @@
       "runner": "tests"
     },
     {
+      "description": "The supported host: the work is handed to the browser so it can surface the tab first, and the result still comes back to the caller.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "requestUserInteraction › delegates to the host and returns the result",
+      "line": 470,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A rejection is the agent's to handle. Swallowing it here would settle a pending question with nothing and leave the agent waiting on a turn that already failed.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "requestUserInteraction › propagates a rejection from the work",
+      "line": 512,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "A host without the capability must still run the work. Requiring it would mean a question that is never asked rather than one asked in a background tab, and the second is plainly the better failure.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "requestUserInteraction › runs the work directly when the host does not support it",
+      "line": 491,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "No agent at all — an ordinary browser, or a captured scenario — takes the same path rather than throwing on a missing model context.",
+      "file": "app/lib/webmcp.test.ts",
+      "format": "vitest",
+      "key": "requestUserInteraction › runs the work directly when there is no model context",
+      "line": 501,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
       "description": "The tolerance `testsNodeId` is documented to have: the node an insight named may since have been deleted, and an insight that stopped reading because one of its sources is gone would be worse than one citing fewer.",
       "file": "app/lib/insightStream.test.ts",
       "format": "vitest",
@@ -6802,6 +7189,51 @@
       "key": "sectionLabel › strips only the leading prefix",
       "line": 199,
       "registeredAt": "2026-09-01T15:57:26Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A descriptor the browser would accept and an agent could not use. It clones fine, so only an explicit check catches it.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "serializationProblem › reports a missing description, which clones fine but is useless",
+      "line": 347,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "And the degenerate version of the same, where there is no schema to inspect rather than a wrong one.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "serializationProblem › reports an input schema that is not an object at all",
+      "line": 363,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "WebMCP input schemas are object schemas. A bare string schema would be registered and then reject every call the agent made.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "serializationProblem › reports an input schema that is not an object schema",
+      "line": 355,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case: a well-formed descriptor has nothing to report, and reporting a problem here would make every binding look broken.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "serializationProblem › reports null for a well-formed descriptor",
+      "line": 330,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
+      "runner": "tests"
+    },
+    {
+      "description": "The original bug, caught by name. A function anywhere in the schema is exactly what a Zod object smuggles across.",
+      "file": "app/lib/toolInvocation.test.ts",
+      "format": "vitest",
+      "key": "serializationProblem › reports the clone failure when the schema carries a function",
+      "line": 336,
+      "registeredAt": "2026-09-02T22:43:29.402700+00:00",
       "runner": "tests"
     },
     {
@@ -7223,7 +7655,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "toolSummaries › summarises every catalog tool with a name, title and description",
-      "line": 159,
+      "line": 162,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7489,6 +7921,78 @@
       "runner": "tests"
     },
     {
+      "description": "The keyboard route out, which is the only one a person navigating without a pointer has.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › dismisses on Escape",
+      "line": 55,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary dismissal: a pointer lands somewhere that is not the overlay.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › dismisses on a pointer down outside the element",
+      "line": 31,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing is open, so nothing is listening — every one of these surfaces spends most of its life closed, and a closed menu firing a dismissal would be a callback nobody asked for.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › does not listen while closed",
+      "line": 81,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Escape is the exit, not every key. A person typing into a field inside the overlay must not close it on the first letter.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › ignores keys other than Escape",
+      "line": 67,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The half that makes it usable rather than a trap: clicking the overlay's own contents must not close the thing being clicked.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › leaves the overlay open for a pointer down inside it",
+      "line": 43,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Unmounting is the other way an overlay goes away — navigating off the map while the panel is open — and it must clean up the same way closing does.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › stops listening on unmount",
+      "line": 123,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The teardown. Without it every open/close cycle would leave another listener on the document, and the callback would fire once per cycle the surface had ever been through.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › stops listening once it closes",
+      "line": 106,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A ref that has not attached yet cannot contain anything, so the pointer is outside by definition rather than a crash on `.contains` of null.",
+      "file": "app/hooks/useDismissOnOutside.test.ts",
+      "format": "vitest",
+      "key": "useDismissOnOutside › treats a null ref as outside rather than throwing",
+      "line": 94,
+      "registeredAt": "2026-09-02T22:39:15Z",
+      "runner": "tests"
+    },
+    {
       "description": "Nothing changed, so there is nothing to react to.",
       "file": "app/hooks/useFollowColumn.test.ts",
       "format": "vitest",
@@ -7646,7 +8150,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › accepts a missing payload for a tool that needs no arguments",
-      "line": 41,
+      "line": 44,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7655,7 +8159,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › accepts input that fits the tool and hands back the parsed value",
-      "line": 30,
+      "line": 33,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7664,7 +8168,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › names the field that did not fit",
-      "line": 47,
+      "line": 50,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7673,7 +8177,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a call missing a required field",
-      "line": 57,
+      "line": 60,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7682,7 +8186,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a node kind the map cannot draw",
-      "line": 64,
+      "line": 67,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7691,7 +8195,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a phase outside the loop",
-      "line": 73,
+      "line": 76,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7700,7 +8204,7 @@
       "file": "app/lib/toolInvocation.test.ts",
       "format": "vitest",
       "key": "validateToolInput › rejects a tool the catalog does not define",
-      "line": 19,
+      "line": 22,
       "registeredAt": "2026-09-01T01:26:13.029126186+00:00",
       "runner": "tests"
     },
@@ -7844,7 +8348,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › names the iframe",
-      "line": 91,
+      "line": 94,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7853,7 +8357,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › names the insecure context",
-      "line": 84,
+      "line": 87,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7862,7 +8366,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › names the missing browser agent",
-      "line": 98,
+      "line": 101,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7871,7 +8375,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › reports nothing to explain when the page is bound",
-      "line": 77,
+      "line": 80,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
@@ -7880,7 +8384,7 @@
       "file": "app/lib/webmcp.test.ts",
       "format": "vitest",
       "key": "webMcpUnavailableReason › reports the security problem first when several apply",
-      "line": 105,
+      "line": 108,
       "registeredAt": "2026-09-01T01:16:02Z",
       "runner": "tests"
     },
