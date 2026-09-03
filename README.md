@@ -74,31 +74,30 @@ attached the sentence becomes optional.
 
 ### The map mid-round
 
-<img src=".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png" alt="A dark board with an idea card on the left and three coloured branches leading to question cards" width="420">
+<img src=".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png" alt="A full-height dark board: one idea card on the left, four coloured branches fanning right into rows of question and finding cards" width="600">
 
 Your idea sits on the left. Each coloured branch is a theme the partner pulled out of
 it, and the cards hanging off it are what it wants to know. A question and the node it
 becomes are the same card — you answer inside the map rather than reading the question
-in one place and answering it in another. Down the right is what the partner is
-thinking: things to try, suggestions, risks.
+in one place and answering it in another. The bar along the top always says what is
+still waiting on you.
+
+### One map, both hands on it
+
+<img src=".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png" alt="The board mid-exchange, with cards contributed by the agent and by the person on the same branches" width="600">
+
+The partner writes to the map and so do you, and the map does not distinguish between
+the two by putting them in separate places. An answered question and a node the agent
+added sit on the same branch, because what matters is where a thought belongs, not who
+had it.
 
 ### Arriving with a brief
 
-<img src=".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png" alt="The board with a brief-seeded idea card, and a chat panel showing the agent reading the brief's outline" width="420">
+<img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="The board seeded from an attached brief, with the source document standing behind the first card" width="600">
 
 A twenty-page spec is stored whole as the map's source. The partner reads it the way
 anyone reads a long document — the outline first, then the passages that matter — so a
-long brief cannot quietly fill the context that ought to be spent thinking about it. The
-chat panel says what it read and what the brief does *not* answer.
-
-### The conversation, over the map
-
-<img src=".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png" alt="The board with the chat panel open, showing an exchange between the person and the agent" width="420">
-
-The chat sits in a corner rather than across the middle: the map is the thing being
-talked about. The footer tracks the round — how many questions are answered, how many
-are still open — and offers the one action that ends it. Zoom with `+` / `−`, or `ALL`
-to fit the whole map.
+long brief cannot quietly fill the context that ought to be spent thinking about it.
 
 ### The plan you leave with
 
