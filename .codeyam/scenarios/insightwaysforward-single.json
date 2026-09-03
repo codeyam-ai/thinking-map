@@ -1,0 +1,12 @@
+{
+  "name": "InsightWaysForward - Single",
+  "id": "86c5bb0f-2fe7-4a2f-84cb-c77dcf69bfaa",
+  "url": "/isolated-components/InsightWaysForward?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightWaysForward",
+  "scenarioType": "component",
+  "description": "One route is a legitimate offer and must not read as a submit button - the same rule AnswerChips holds for its own single chip."
+}

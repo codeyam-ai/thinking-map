@@ -1,0 +1,12 @@
+{
+  "name": "InsightCard - Default",
+  "id": "6d4803e6-aac2-4ad0-9861-2ecb9fdeb9bd",
+  "url": "/isolated-components/InsightCard?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCard",
+  "scenarioType": "component",
+  "description": "One insight, closed: the kind and the claim. This is what four of them stacked are made of, and it is what the person reads before deciding to open anything - opening is a second, separate act because a click that fired a question at the agent would spend their one attention-getting channel on a card they only wanted to read."
+}

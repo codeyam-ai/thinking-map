@@ -1,0 +1,12 @@
+{
+  "name": "InsightStack - ThreeInsights",
+  "id": "79fba273-915f-4df9-9ab4-1dd025c7af85",
+  "url": "/isolated-components/InsightStack?s=ThreeInsights",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStack",
+  "scenarioType": "component",
+  "description": "Three, which is the number the agent's standing ask names as the target. A suggestion, an experiment and a stale risk together - the column reads as a stack rather than as one card repeated, and the third says on its face that it was written before the person's last two answers."
+}

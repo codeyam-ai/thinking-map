@@ -1,0 +1,12 @@
+{
+  "name": "InsightStackEmpty - SettledAgentWorking",
+  "id": "9f6ad5a7-a093-47d6-9799-3b468373dc2e",
+  "url": "/isolated-components/InsightStackEmpty?s=SettledAgentWorking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStackEmpty",
+  "scenarioType": "component",
+  "description": "A turn is running right now, so 'has everything you have added' is a true statement here rather than a hopeful one. Read beside SettledAgentIdle this is the whole reason the three states are distinguished at all."
+}

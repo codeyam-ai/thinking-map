@@ -11,12 +11,13 @@
 // told the answer directly — it finds it, attributed, the next time it reads
 // the map, exactly as the person finds the agent's questions here.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import GalaxyBoard from './GalaxyBoard';
 import RoundControl, { type RoundPhase } from './RoundControl';
 import BoardChat from './BoardChat';
 import { useWebMcpBridge } from './WebMcpBridge';
+import { boardInsightStream } from '@/app/lib/boardInsights';
 import type { GalaxyNodeInput, GalaxyTheme } from '@/app/lib/galaxyLayout';
 
 export default function BoardWorkspace({
@@ -127,6 +128,13 @@ export default function BoardWorkspace({
     }
   }, [phase, bridge.revision]);
 
+  // Computed once, here, and handed down. The stream is the same reading of
+  // the same nodes that `read_map` gives the agent, so deriving it inside the
+  // board would let the two drift — and this is also where the live refresh
+  // already re-runs on every revision bump, so a newly written insight appears
+  // in the stack without anything new being wired.
+  const stream = useMemo(() => boardInsightStream(nodes), [nodes]);
+
   const openCount = nodes.filter(
     (n) => n.status === 'open' && n.kind === 'open-question',
   ).length;
@@ -147,6 +155,8 @@ export default function BoardWorkspace({
         attachments={attachments}
         themes={themes}
         nodes={nodes}
+        insights={stream.insights}
+        bridgeStatus={bridge.status}
         onAnswer={onAnswer}
         onChoose={onChoose}
       />

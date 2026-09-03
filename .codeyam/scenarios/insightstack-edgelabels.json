@@ -1,0 +1,15 @@
+{
+  "name": "InsightStack - EdgeLabels",
+  "id": "19aef6b1-c1d4-41e0-ae0e-bb92db928a7f",
+  "url": "/isolated-components/InsightStack?s=EdgeLabels",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStack",
+  "scenarioType": "component",
+  "description": "What an agent actually writes, rather than what a fixture author would: a claim that wraps to four lines, a kind the eyebrow map has never heard of and falls back to the raw word for, and one so old the staleness marker is the widest thing on its line. The column has to stay a column - cards of very different heights sharing one gap, none of them clipped.",
+  "demonstratesState": {
+    "insights": "many"
+  }
+}

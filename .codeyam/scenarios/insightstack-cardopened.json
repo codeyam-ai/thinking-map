@@ -1,0 +1,18 @@
+{
+  "name": "InsightStack - CardOpened",
+  "id": "ed45eeb2-a3ba-4c3e-8072-0afdf15aab26",
+  "url": "/isolated-components/InsightStack?s=ThreeInsights",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStack",
+  "scenarioType": "component",
+  "description": "The key action on this surface, driven: clicking an insight opens it IN PLACE - its detail, the questions it came out of, the ways forward and the go-deeper box unfold inside the column while the cards below stay collapsed and keep their positions. A resting screenshot of the stack cannot show that the column is a set of things you open rather than a list you read.",
+  "interactions": [
+    {
+      "action": "click",
+      "text": "The whiteboard is a symptom of an ownership gap"
+    }
+  ]
+}

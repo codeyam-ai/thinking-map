@@ -1,0 +1,12 @@
+{
+  "name": "InsightStackEmpty - Waiting",
+  "id": "82b86e2d-eb52-4005-b419-2f7a3a7e6102",
+  "url": "/isolated-components/InsightStackEmpty?s=Waiting",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStackEmpty",
+  "scenarioType": "component",
+  "description": "The dim marker while the wait is still young. It names the PLACE rather than the wait - 'composing' would be the same lie the old cycling word was on a board nobody is attached to, because this page cannot know that anything is being written."
+}

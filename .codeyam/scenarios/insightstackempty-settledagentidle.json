@@ -1,0 +1,12 @@
+{
+  "name": "InsightStackEmpty - SettledAgentIdle",
+  "id": "4aedf680-8ee9-4ee2-b452-3047dd21d341",
+  "url": "/isolated-components/InsightStackEmpty?s=SettledAgentIdle",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStackEmpty",
+  "scenarioType": "component",
+  "description": "Attached but not in a turn: it will see the board when its turn comes round, which is deliberately a weaker claim than an agent that is working right now."
+}

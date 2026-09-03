@@ -36,6 +36,18 @@ export interface GalaxyNodeInput {
   imageUrl?: string | null;
   imageAlt?: string | null;
   diagram?: { steps: string[]; note?: string } | null;
+  /** The fields `insightStream` reads, carried through so the board can build
+   *  the stream from the same nodes it lays out rather than fetching twice.
+   *
+   *  `layOutGalaxy` itself never touches them: an insight is themeless, so it
+   *  is already excluded from every cluster by the `themeId === theme.id`
+   *  filter below, and no geometry moves because these are here. They are
+   *  optional so every existing caller — and every layout test — is unchanged. */
+  origin?: string | null;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  /** Node ids this insight was drawn out of, already parsed. */
+  fromNodeIds?: string[] | null;
 }
 
 export interface PlacedCard extends GalaxyNodeInput {
@@ -150,7 +162,12 @@ export function layOutGalaxy(
   // yet still frames on something real rather than on an inverted-infinity box.
   let minX = core.x - CORE_RADIUS;
   let minY = core.y - CORE_RADIUS;
-  let maxX = convergence.x + 260;
+  // Wide enough for the insight stack that stands here. It is a 460-unit
+  // column starting 40 to the LEFT of the convergence point, so the board runs
+  // 420 past it — under-reporting that framed the board with the newest
+  // insight half outside the frame, which is the one thing at this end of the
+  // board somebody is trying to read.
+  let maxX = convergence.x + 440;
   let maxY = core.y + CORE_RADIUS;
   for (const cluster of clusters) {
     minY = Math.min(minY, cluster.y - HUB_RADIUS);

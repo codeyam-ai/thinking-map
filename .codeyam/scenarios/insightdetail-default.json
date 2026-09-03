@@ -1,0 +1,12 @@
+{
+  "name": "InsightDetail - Default",
+  "id": "4d04b498-5c11-4b1e-afc9-a83c44332313",
+  "url": "/isolated-components/InsightDetail?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightDetail",
+  "scenarioType": "component",
+  "description": "What opening an insight reveals, with an agent attached: the detail, the questions this came out of, the ways forward, and the box that asks the partner to go further on this one specifically. The citations are the reason the card opens at all - a claim about the whole idea is worth what the thinking behind it is visible."
+}

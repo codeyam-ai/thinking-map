@@ -1,0 +1,12 @@
+{
+  "name": "InsightSources - NoSources",
+  "id": "f46217a8-103e-4043-970c-0bf0c2cd345c",
+  "url": "/isolated-components/InsightSources?s=NoSources",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightSources",
+  "scenarioType": "component",
+  "description": "Nothing cited - an insight drawn from the whole map, or one written by an agent that never learned the field. It renders NOTHING: a 'What this came out of' heading with an empty list under it reads as something that failed to load rather than as an honest absence."
+}

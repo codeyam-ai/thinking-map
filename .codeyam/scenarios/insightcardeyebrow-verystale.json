@@ -1,0 +1,12 @@
+{
+  "name": "InsightCardEyebrow - VeryStale",
+  "id": "565e2eed-d374-476c-bb09-5eeb9982f0ef",
+  "url": "/isolated-components/InsightCardEyebrow?s=VeryStale",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCardEyebrow",
+  "scenarioType": "component",
+  "description": "A long session leaves a genuinely large gap. The sentence keeps its shape rather than degrading to 'many' - the number is the point, and this is the widest the right half ever gets."
+}

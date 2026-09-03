@@ -1,0 +1,12 @@
+{
+  "name": "InsightGoDeeper - NoAgent",
+  "id": "fcfd4a48-ea44-4bc1-ba15-159db5992056",
+  "url": "/isolated-components/InsightGoDeeper?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightGoDeeper",
+  "scenarioType": "component",
+  "description": "Two prompts and a box, with nothing attached. The send control and the line beneath it both say the question will wait in the log - this is the state every real capture produces, so it is the honest default rather than an edge case."
+}

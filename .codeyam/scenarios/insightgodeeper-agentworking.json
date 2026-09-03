@@ -1,0 +1,12 @@
+{
+  "name": "InsightGoDeeper - AgentWorking",
+  "id": "4ba6f812-ce4c-4968-9a0d-03c4259b65b7",
+  "url": "/isolated-components/InsightGoDeeper?s=AgentWorking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightGoDeeper",
+  "scenarioType": "component",
+  "description": "Mid-tool-call still counts as listening - the agent sees the question when its turn comes back round - so 'working' must not read as absence."
+}

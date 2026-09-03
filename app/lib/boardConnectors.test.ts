@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { fanPath, joinPath, rowDone } from './boardConnectors';
+import {
+  fanPath,
+  joinPath,
+  rowDone,
+  rowFeedsInsights,
+  rowJoinsStack,
+} from './boardConnectors';
 import type { PlacedCard, PlacedCluster } from './galaxyLayout';
 
 // The lines between things on the board.
@@ -198,5 +204,108 @@ describe('rowDone', () => {
       ],
     });
     expect(rowDone(notDone)).toBe(false);
+  });
+});
+
+/** An insight as the connectors read one: only its citations matter here. */
+const cites = (...ids: string[]) => ({ from: ids.map((id) => ({ id })) });
+
+describe('rowFeedsInsights', () => {
+  // The case the old gate could not express, and the reason this exists: a row
+  // still holding an open question has visibly produced something at the far
+  // end, because an insight names one of its cards.
+  it('feeds the stack even while the row still has an open question', () => {
+    const c = cluster({
+      cards: [card({ id: 'q-owner', status: 'open' }), card({ id: 'q-two' })],
+    });
+
+    expect(rowFeedsInsights(c, [cites('q-owner')])).toBe(true);
+  });
+
+  // An insight drawn from the whole map cites nothing. That is the ordinary
+  // case for an agent that never learned the field, and it must not read as
+  // "this row fed it" for every row on the board.
+  it('is not fed by an insight that cites nothing', () => {
+    const c = cluster({ cards: [card({ id: 'q-owner' })] });
+
+    expect(rowFeedsInsights(c, [cites()])).toBe(false);
+  });
+
+  // A citation belongs to ONE row. An insight drawn out of another line of
+  // thinking must not light up this one.
+  it('is not fed by an insight citing a card in another row', () => {
+    const c = cluster({ cards: [card({ id: 'q-owner' })] });
+
+    expect(rowFeedsInsights(c, [cites('q-elsewhere')])).toBe(false);
+  });
+
+  // Several insights, one of which reaches into this row. The check is over the
+  // whole stack, not just the newest card.
+  it('is fed when any insight on the stack cites the row', () => {
+    const c = cluster({ cards: [card({ id: 'q-owner' })] });
+
+    expect(
+      rowFeedsInsights(c, [cites('q-elsewhere'), cites('q-owner', 'q-other')]),
+    ).toBe(true);
+  });
+
+  // A board with nothing at the far end yet — day one, and every capture.
+  it('is not fed when the stack is empty', () => {
+    const c = cluster({ cards: [card({ id: 'q-owner' })] });
+
+    expect(rowFeedsInsights(c, [])).toBe(false);
+  });
+
+  // An empty row has no cards to be cited, so it feeds nothing. Same reading as
+  // `rowDone`: it has not started.
+  it('is not fed when the row has no cards', () => {
+    expect(rowFeedsInsights(cluster({ cards: [] }), [cites('q-owner')])).toBe(
+      false,
+    );
+  });
+});
+
+describe('rowJoinsStack', () => {
+  // The clause that is new. Under the old rule this row got no line at all,
+  // because one of its questions was still open — even though the partner had
+  // visibly drawn something out of it.
+  it('joins an unfinished row that fed the stack', () => {
+    const c = cluster({
+      cards: [card({ id: 'q-owner', status: 'open' })],
+    });
+
+    expect(rowDone(c)).toBe(false);
+    expect(rowJoinsStack(c, [cites('q-owner')])).toBe(true);
+  });
+
+  // The fallback. On a map whose agent never writes citations, every insight
+  // cites nothing and the rule has to degrade to the old gate rather than to a
+  // board with no join lines at all.
+  it('falls back to the finished-row rule when nothing cites anything', () => {
+    const c = cluster({ cards: [card({ id: 'q', status: 'answered' })] });
+
+    expect(rowJoinsStack(c, [cites()])).toBe(true);
+  });
+
+  // Neither clause: unfinished, and nothing at the far end came out of it.
+  it('does not join a row that is neither finished nor cited', () => {
+    const c = cluster({ cards: [card({ id: 'q', status: 'open' })] });
+
+    expect(rowJoinsStack(c, [cites('q-elsewhere')])).toBe(false);
+  });
+
+  // An empty stack on a finished row is the state a board reaches before the
+  // partner has written anything. The row still earned its line.
+  it('joins a finished row with nothing yet at the far end', () => {
+    const c = cluster({ cards: [card({ id: 'q', status: 'answered' })] });
+
+    expect(rowJoinsStack(c, [])).toBe(true);
+  });
+
+  // An empty row satisfies neither clause, which is what keeps a line from
+  // being drawn out of a line of thinking nobody has said anything in.
+  it('never joins an empty row', () => {
+    expect(rowJoinsStack(cluster({ cards: [] }), [cites('q')])).toBe(false);
+    expect(rowJoinsStack(cluster({ cards: [] }), [])).toBe(false);
   });
 });

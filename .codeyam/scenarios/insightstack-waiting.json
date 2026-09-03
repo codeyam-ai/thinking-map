@@ -1,0 +1,15 @@
+{
+  "name": "InsightStack - Waiting",
+  "id": "353ab58f-c5f2-403d-b4d0-880da7227796",
+  "url": "/isolated-components/InsightStack?s=Waiting",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStack",
+  "scenarioType": "component",
+  "demonstratesState": {
+    "insights": "empty"
+  },
+  "description": "Day one at the far end of the board: a seed idea, no themes, nothing written. It has to read as a place waiting to be filled rather than as a failure - this corner used to be a dashed ring for most of a session, and the whole point of the stack is that it fills from the first insight instead."
+}

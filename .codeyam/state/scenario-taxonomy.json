@@ -211,6 +211,34 @@
         "status": "covered"
       }
     },
+    "InsightStack": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The page never issues a request, so nothing is ever in flight to be loading. WebMCP is pull-only: an agent arrives on its own schedule and the board cannot ask it for anything. The nearest honest state is the bounded marker before the wait elapses, which is a statement about who can hear this page rather than about work in progress - it is captured as the empty state and again, resolved, on InsightStackEmpty."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The stack has no failure surface. It reads insights off nodes the server already rendered, so there is no fetch to reject and no request to time out; a bridge fault surfaces in the agent status indicator, not here. The one thing that could mislead - implying an answer is coming when nothing is attached - is handled as an honest empty state rather than as an error."
+      },
+      "key-interaction": {
+        "status": "added"
+      }
+    },
     "MapCardHeader": {
       "empty": {
         "status": "n-a",

@@ -1,0 +1,12 @@
+{
+  "name": "InsightSources - OtherRow",
+  "id": "4b92dcc0-f872-4413-92c5-17ec05c2981b",
+  "url": "/isolated-components/InsightSources?s=OtherRow",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightSources",
+  "scenarioType": "component",
+  "description": "The same citations in another row's colour. Read beside Default this is the argument for the rule carrying the hue at all - two colours could be a coincidence of the palette, and the difference is what says which line of thinking produced this."
+}

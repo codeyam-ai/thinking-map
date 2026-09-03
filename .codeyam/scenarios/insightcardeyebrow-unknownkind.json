@@ -1,0 +1,12 @@
+{
+  "name": "InsightCardEyebrow - UnknownKind",
+  "id": "c12e557a-df6e-41c2-add7-ca63e3a3d496",
+  "url": "/isolated-components/InsightCardEyebrow?s=UnknownKind",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCardEyebrow",
+  "scenarioType": "component",
+  "description": "A kind the eyebrow map has no entry for falls back to the raw word rather than rendering blank. An agent can write any kind it likes, and a card that lost its label because of one would be worse than a card wearing an unfamiliar one."
+}

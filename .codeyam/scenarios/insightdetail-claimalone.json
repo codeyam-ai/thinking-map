@@ -1,0 +1,12 @@
+{
+  "name": "InsightDetail - ClaimAlone",
+  "id": "a50fa501-a924-4dce-96db-07d37855593f",
+  "url": "/isolated-components/InsightDetail?s=ClaimAlone",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightDetail",
+  "scenarioType": "component",
+  "description": "A claim with no routes offered and no supporting paragraph: the partner named something without proposing ways to take it. Both absences close up rather than leaving gaps where a heading would have been, and the go-deeper box is what keeps the card from being a dead end."
+}

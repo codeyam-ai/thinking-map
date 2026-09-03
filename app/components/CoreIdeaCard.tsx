@@ -24,24 +24,21 @@ const CORE_RADIUS = 250;
 /** One turn. Slow on purpose — see above. */
 const ORBIT_SECONDS = 54;
 
-export interface CoreInsight {
-  id: string;
-  label: string;
-  detail: string | null;
-}
+// The partner's reading of the idea used to be printed here as well, under the
+// circle. It is not any more: the far end of the board now carries a live stack
+// of insights, and a board that also printed the newest one on the core would
+// be drawing the same node twice on one plane. Two homes for one insight is
+// worse than either home on its own, and the far end is the one the board's
+// left-to-right argument points at.
 
 export default function CoreIdeaCard({
   seedIdea,
-  insight,
   mapId,
   attachments = [],
 }: {
   seedIdea: string;
   mapId?: string;
   attachments?: Attachment[];
-  /** The partner's current answer to the idea itself, as opposed to its
-   *  answer to any one line of thinking. Null until a round has produced one. */
-  insight?: CoreInsight | null;
 }) {
   // Long ideas get smaller type rather than a bigger circle: the circle's size
   // is what marks it as the centre, so it has to stay put while the text it
@@ -111,28 +108,6 @@ export default function CoreIdeaCard({
           style={{ top: CORE_RADIUS * 2 + 26 }}
         >
           <CoreAttachments mapId={mapId} attachments={attachments} />
-        </div>
-      ) : null}
-
-      {/* Each round's answer to the idea, hung under the circle rather than
-          crammed inside it — the circle holds the person's words, and nothing
-          the partner writes should be set in the same frame as them. */}
-      {insight ? (
-        <div
-          className="absolute left-1/2 w-[430px] -translate-x-1/2 rounded-[20px] border border-white/12 bg-[#0b0b0c] p-6"
-          style={{ top: CORE_RADIUS * 2 + (mapId ? 110 : 40) }}
-        >
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#e4ec4b]">
-            What that tells us
-          </span>
-          <p className="mt-2 text-[17px] font-medium leading-snug text-white">
-            {insight.label}
-          </p>
-          {insight.detail ? (
-            <p className="mt-2 text-[13px] leading-relaxed text-white/60">
-              {insight.detail}
-            </p>
-          ) : null}
         </div>
       ) : null}
 

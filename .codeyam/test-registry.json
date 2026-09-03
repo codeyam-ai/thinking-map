@@ -415,11 +415,38 @@
       "runner": "tests"
     },
     {
+      "description": "A map with nothing at the far end yet hands down an EMPTY stream rather than omitting the prop — the stack's own empty state is what draws the honest marker, and it can only do that if it is mounted.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace insight stream › hands the board an empty stream on a map with no insights",
+      "line": 206,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The claim the feature rests on: a themeless insight reaches the board, with no round finished and nothing answered anywhere on the map.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace insight stream › hands the board an insight before any round is finished",
+      "line": 185,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The rule the stack rests on, asserted through the workspace rather than only through `insightStream`: a node of an insight kind that lives inside a theme is a card in that row, not a claim about the whole idea. Get this wrong and the same node is drawn twice on one plane.",
+      "file": "app/components/BoardWorkspace.render.test.tsx",
+      "format": "vitest",
+      "key": "BoardWorkspace insight stream › leaves a themed insight in its row rather than on the stack",
+      "line": 228,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
       "description": "The first revision it sees only SEEDS the reference. Refreshing on mount would re-fetch the page the person just loaded — a wasted round trip on every single board open, and a visible flash for nothing.",
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh on the first revision it sees",
-      "line": 58,
+      "line": 74,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -428,7 +455,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh when the revision goes backwards",
-      "line": 95,
+      "line": 111,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -437,7 +464,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › does not refresh when the revision repeats",
-      "line": 80,
+      "line": 96,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -446,7 +473,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › ignores an unbound bridge rather than reading it as zero",
-      "line": 109,
+      "line": 125,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -455,7 +482,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › refreshes once per advance across a run of them",
-      "line": 121,
+      "line": 137,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -464,7 +491,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › refreshes once when the revision advances",
-      "line": 67,
+      "line": 83,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -473,7 +500,7 @@
       "file": "app/components/BoardWorkspace.render.test.tsx",
       "format": "vitest",
       "key": "BoardWorkspace live refresh › treats the first real revision after an unbound start as a seed",
-      "line": 136,
+      "line": 152,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -1990,6 +2017,51 @@
       "runner": "tests"
     },
     {
+      "description": "A themed node of an insight kind is a card in that row, not a claim about the whole idea. This is the rule the whole stack rests on, so it is checked through the board's own entry point and not only through insightStream.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "boardInsightStream › leaves a themed insight in its row rather than putting it on the stack",
+      "line": 40,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Real rows carry real dates, and staleness has to survive the trip through the board's node shape: an answer that landed AFTER an insight was written puts the insight behind the thinking.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "boardInsightStream › marks a dated insight the person has since answered past",
+      "line": 52,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Day one: a board with nothing on it at all. This is the state every capture produces, so it must be a clean empty rather than a throw.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "boardInsightStream › reads an empty board as an empty stream",
+      "line": 96,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The board's own nodes carry no timestamps in a fixture. Every one of them gets the SAME stand-in, so nothing was written after anything and nothing reads as stale — staleness would be a claim about answers nobody gave.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "boardInsightStream › reads an undated map as one cohort in which nothing is stale",
+      "line": 20,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The citations the card renders as \"What this came out of\" arrive as a parsed array on the board, where the server hands the stream a raw string.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "boardInsightStream › resolves the citations the board passes as an array",
+      "line": 76,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
       "description": "Some pages carry a whole sentence as their title. Past the limit the title stops helping and starts pushing the address out of a chip, so the address wins — it is the half that cannot be re-derived.",
       "file": "app/lib/briefFormat.test.ts",
       "format": "vitest",
@@ -3362,7 +3434,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "fanPath › handles a row level with the idea",
-      "line": 75,
+      "line": 81,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -3371,7 +3443,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "fanPath › leaves the idea flat and arrives at the row flat",
-      "line": 41,
+      "line": 47,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -3380,7 +3452,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "fanPath › mirrors for a row above the idea",
-      "line": 86,
+      "line": 92,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -3389,7 +3461,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "fanPath › places both control points midway along the run",
-      "line": 64,
+      "line": 70,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -3398,7 +3470,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "fanPath › runs rim to rim rather than centre to centre",
-      "line": 54,
+      "line": 60,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4622,7 +4694,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "joinPath › accounts for the last card’s width, not just its position",
-      "line": 134,
+      "line": 140,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4631,7 +4703,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "joinPath › arrives flat on the conclusion’s line",
-      "line": 117,
+      "line": 123,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4640,7 +4712,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "joinPath › draws nothing for a row with no cards",
-      "line": 128,
+      "line": 134,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -4649,7 +4721,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "joinPath › leaves from the far edge of the last card",
-      "line": 108,
+      "line": 114,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -6701,7 +6773,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "rowDone › does not count insights as answered questions",
-      "line": 175,
+      "line": 181,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -6710,7 +6782,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "rowDone › is done when every question in the row is answered",
-      "line": 145,
+      "line": 151,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -6719,7 +6791,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "rowDone › is not done when the row has no questions at all",
-      "line": 169,
+      "line": 175,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -6728,7 +6800,7 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "rowDone › is not done while any question is still open",
-      "line": 158,
+      "line": 164,
       "registeredAt": "2026-09-02T17:40:53Z",
       "runner": "tests"
     },
@@ -6737,8 +6809,107 @@
       "file": "app/lib/boardConnectors.test.ts",
       "format": "vitest",
       "key": "rowDone › judges a mixed row on its questions alone",
-      "line": 185,
+      "line": 191,
       "registeredAt": "2026-09-02T17:40:53Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The case the old gate could not express, and the reason this exists: a row still holding an open question has visibly produced something at the far end, because an insight names one of its cards.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowFeedsInsights › feeds the stack even while the row still has an open question",
+      "line": 217,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Several insights, one of which reaches into this row. The check is over the whole stack, not just the newest card.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowFeedsInsights › is fed when any insight on the stack cites the row",
+      "line": 244,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A citation belongs to ONE row. An insight drawn out of another line of thinking must not light up this one.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowFeedsInsights › is not fed by an insight citing a card in another row",
+      "line": 236,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An insight drawn from the whole map cites nothing. That is the ordinary case for an agent that never learned the field, and it must not read as \"this row fed it\" for every row on the board.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowFeedsInsights › is not fed by an insight that cites nothing",
+      "line": 228,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty row has no cards to be cited, so it feeds nothing. Same reading as `rowDone`: it has not started.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowFeedsInsights › is not fed when the row has no cards",
+      "line": 261,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A board with nothing at the far end yet — day one, and every capture.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowFeedsInsights › is not fed when the stack is empty",
+      "line": 253,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Neither clause: unfinished, and nothing at the far end came out of it.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowJoinsStack › does not join a row that is neither finished nor cited",
+      "line": 291,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The fallback. On a map whose agent never writes citations, every insight cites nothing and the rule has to degrade to the old gate rather than to a board with no join lines at all.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowJoinsStack › falls back to the finished-row rule when nothing cites anything",
+      "line": 284,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty stack on a finished row is the state a board reaches before the partner has written anything. The row still earned its line.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowJoinsStack › joins a finished row with nothing yet at the far end",
+      "line": 299,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The clause that is new. Under the old rule this row got no line at all, because one of its questions was still open — even though the partner had visibly drawn something out of it.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowJoinsStack › joins an unfinished row that fed the stack",
+      "line": 272,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty row satisfies neither clause, which is what keeps a line from being drawn out of a line of thinking nobody has said anything in.",
+      "file": "app/lib/boardConnectors.test.ts",
+      "format": "vitest",
+      "key": "rowJoinsStack › never joins an empty row",
+      "line": 307,
+      "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
     {
@@ -6955,6 +7126,96 @@
       "key": "splitIntoSections › splits a headed document on its headings",
       "line": 21,
       "registeredAt": "2026-09-01T14:26:57Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A zero or negative limit is a misconfiguration, not a request to show everything: it collapses the column entirely rather than defeating the bound the limit exists to enforce.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "splitStack › collapses the column rather than unbounding it on a zero limit",
+      "line": 136,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Over the limit: four stand, the rest are counted for the affordance's label.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "splitStack › counts the overflow so the affordance can name it",
+      "line": 120,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Exactly the limit is the boundary that produces a phantom \"show 0 older\" if the arithmetic is wrong by one.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "splitStack › draws no affordance when the stack is exactly full",
+      "line": 112,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "An empty stack never reaches this — the empty state renders instead — but it must not produce a negative hidden count if it ever does.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "splitStack › hides nothing on an empty stack",
+      "line": 129,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Fewer than the limit: everything stands and there is no affordance to draw.",
+      "file": "app/lib/boardInsights.test.ts",
+      "format": "vitest",
+      "key": "splitStack › shows everything and hides nothing when the stack is short",
+      "line": 106,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The ordinary case, and the one the demo shows.",
+      "file": "app/lib/insightStale.test.ts",
+      "format": "vitest",
+      "key": "staleNote › counts the answers when there is more than one",
+      "line": 20,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "Nothing has landed since this was written, so there is nothing to admit. Null rather than an empty string so a caller that forgets to check renders nothing rather than an empty marker holding space in the layout.",
+      "file": "app/lib/insightStale.test.ts",
+      "format": "vitest",
+      "key": "staleNote › has no marker for an insight nothing has happened since",
+      "line": 8,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A long session leaves a genuinely large gap. The sentence stays the same shape rather than degrading to \"many\" — the number is the point.",
+      "file": "app/lib/insightStale.test.ts",
+      "format": "vitest",
+      "key": "staleNote › keeps counting on a map that has moved a long way",
+      "line": 27,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "The singular is the FIRST thing anyone ever reads here — the marker appears the moment one answer lands after an insight — so \"your last 1 answers\" would be the debut, not an edge case.",
+      "file": "app/lib/insightStale.test.ts",
+      "format": "vitest",
+      "key": "staleNote › says answer, not answers, after exactly one",
+      "line": 15,
+      "registeredAt": "2026-09-03T00:09:35Z",
+      "runner": "tests"
+    },
+    {
+      "description": "A negative can only come from a counting bug upstream. It reads as not-stale rather than rendering \"your last -1 answers\", which would put the bug in front of the person instead of in the logs.",
+      "file": "app/lib/insightStale.test.ts",
+      "format": "vitest",
+      "key": "staleNote › treats an impossible negative count as not stale",
+      "line": 34,
+      "registeredAt": "2026-09-03T00:09:35Z",
       "runner": "tests"
     },
     {

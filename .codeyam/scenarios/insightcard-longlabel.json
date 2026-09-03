@@ -1,0 +1,12 @@
+{
+  "name": "InsightCard - LongLabel",
+  "id": "284e7858-f1d6-46c6-9269-8b0556f648c3",
+  "url": "/isolated-components/InsightCard?s=LongLabel",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCard",
+  "scenarioType": "component",
+  "description": "A claim long enough to wrap, which an agent can freely write. It sets the card's height rather than being clipped - this is a thing to read, and the column has room to grow downward."
+}

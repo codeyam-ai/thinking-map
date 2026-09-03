@@ -1,0 +1,12 @@
+{
+  "name": "InsightCardEyebrow - Stale",
+  "id": "ff413c80-ea0e-478d-9c59-07c9aed97f74",
+  "url": "/isolated-components/InsightCardEyebrow?s=Stale",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCardEyebrow",
+  "scenarioType": "component",
+  "description": "The ordinary stale case, and close to the longest the line gets - this is the width the kind and the marker have to share without colliding. They sit at opposite ends because they answer different questions: what is this, and can I still trust it."
+}

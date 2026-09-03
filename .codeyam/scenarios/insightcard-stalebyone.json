@@ -1,0 +1,12 @@
+{
+  "name": "InsightCard - StaleByOne",
+  "id": "268891fb-a957-445b-9ea3-852fdfba5229",
+  "url": "/isolated-components/InsightCard?s=StaleByOne",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCard",
+  "scenarioType": "component",
+  "description": "One answer, not four. The singular is its own case because the marker first appears the moment ONE answer lands after an insight - so 'your last 1 answers' would be the first thing anybody ever read here."
+}
