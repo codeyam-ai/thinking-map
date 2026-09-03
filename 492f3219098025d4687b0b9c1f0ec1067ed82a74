@@ -1,0 +1,1 @@
+{"commitKind":"unfinalized","pushedRef":"refs/heads/main","reason":"codeyam tooling refresh + revalidate route rename; whole-branch finalize blocked by a concurrent session's in-flight plan, not by this work (524 tests pass, 271 scenarios fresh)","timestamp":"2026-09-02T13:04:11Z","user":"jared@codeyam.com"}
