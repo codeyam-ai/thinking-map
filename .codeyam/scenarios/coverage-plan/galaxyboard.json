@@ -39,42 +39,6 @@
       "status": "planned"
     },
     {
-      "dimension": "rows",
-      "value": "empty",
-      "rationale": "source-derived state rows=empty",
-      "status": "planned"
-    },
-    {
-      "dimension": "rows",
-      "value": "one",
-      "rationale": "source-derived state rows=one",
-      "status": "covered"
-    },
-    {
-      "dimension": "rows",
-      "value": "many",
-      "rationale": "source-derived state rows=many",
-      "status": "planned"
-    },
-    {
-      "dimension": "loose",
-      "value": "empty",
-      "rationale": "source-derived state loose=empty",
-      "status": "planned"
-    },
-    {
-      "dimension": "loose",
-      "value": "one",
-      "rationale": "source-derived state loose=one",
-      "status": "covered"
-    },
-    {
-      "dimension": "loose",
-      "value": "many",
-      "rationale": "source-derived state loose=many",
-      "status": "planned"
-    },
-    {
       "dimension": "nodes",
       "value": "empty",
       "rationale": "source-derived state nodes=empty",
@@ -114,18 +78,6 @@
       "dimension": "last",
       "value": "false",
       "rationale": "source-derived state last=false",
-      "status": "covered"
-    },
-    {
-      "dimension": "coreInsight",
-      "value": "true",
-      "rationale": "source-derived state coreInsight=true",
-      "status": "covered"
-    },
-    {
-      "dimension": "coreInsight",
-      "value": "false",
-      "rationale": "source-derived state coreInsight=false",
       "status": "covered"
     },
     {

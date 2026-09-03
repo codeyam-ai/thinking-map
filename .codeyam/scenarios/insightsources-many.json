@@ -1,0 +1,12 @@
+{
+  "name": "InsightSources - Many",
+  "id": "c408cabb-0105-4834-b752-dc6e619ba03b",
+  "url": "/isolated-components/InsightSources?s=Many",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightSources",
+  "scenarioType": "component",
+  "description": "Four sources including one long enough to wrap. An agent can write questions of any length and the list wraps rather than clipping - these are things to read, not labels."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "InsightCardEyebrow - Experiment",
+  "id": "764d3892-625a-470a-96af-2fe43af1e58d",
+  "url": "/isolated-components/InsightCardEyebrow?s=Experiment",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCardEyebrow",
+  "scenarioType": "component",
+  "description": "An experiment says 'Try this' - the same eyebrow every other card on the map uses, so an insight names its kind the way a card inside a row does rather than inventing a second vocabulary for the far end of the board."
+}

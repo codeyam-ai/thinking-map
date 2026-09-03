@@ -1,0 +1,12 @@
+{
+  "name": "InsightSources - Default",
+  "id": "5575e969-85dd-4d67-9105-5bac075138fc",
+  "url": "/isolated-components/InsightSources?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightSources",
+  "scenarioType": "component",
+  "description": "The questions an insight came out of - two the person actually answered. The rule down the left edge carries the row's own colour, so the list says WHERE from without a word of explanation."
+}

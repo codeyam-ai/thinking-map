@@ -1,0 +1,12 @@
+{
+  "name": "InsightDetail - NoAgent",
+  "id": "390eeb89-18c4-4fa0-b7af-0ea9a844a69d",
+  "url": "/isolated-components/InsightDetail?s=NoAgent",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightDetail",
+  "scenarioType": "component",
+  "description": "The same surface with nobody attached. The send control says the question will wait in the log rather than implying an answer is coming - WebMCP is pull-only, and that is the one thing this feature could genuinely mislead about."
+}

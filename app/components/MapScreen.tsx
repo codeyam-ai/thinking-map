@@ -28,6 +28,25 @@ function parseChoices(raw: string | null | undefined): string[] | null {
   }
 }
 
+/** Read the ids an insight cites. Same total, degrade-to-null contract as
+ *  parseChoices, and it matters more here: a malformed value must yield no
+ *  citations rather than throwing away the insight that carries it. An insight
+ *  whose sources cannot be read is still a claim worth showing — one that took
+ *  the board down with it would not be. */
+function parseFromNodeIds(raw: string | null | undefined): string[] | null {
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+    const cleaned = parsed.filter(
+      (id): id is string => typeof id === 'string' && id.length > 0,
+    );
+    return cleaned.length > 0 ? cleaned : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Read the stored diagram. Same contract as parseChoices: anything that will
  *  not draw becomes null, so a card degrades to its text rather than throwing. */
 function parseDiagram(raw: string | null | undefined) {
@@ -77,6 +96,16 @@ export default function MapScreen({
       imageUrl?: string | null;
       imageAlt?: string | null;
       diagram?: string | null;
+      /** The JSON array of cited node ids, as the column stores it. Optional
+       *  for the same reason `choices` is: most nodes are not insights, and a
+       *  fixture mounting this screen has no reason to invent one. */
+      fromNodeIds?: string | null;
+      /** When the node was written and when it last moved. Optional so an
+       *  isolated fixture can mount the screen without dating every node; an
+       *  undated map is one cohort in which nothing is behind anything, which
+       *  is the right reading of a fixture. */
+      createdAt?: Date | string;
+      updatedAt?: Date | string;
     })[];
 }) {
   return (
@@ -125,6 +154,15 @@ export default function MapScreen({
             diagram: parseDiagram(n.diagram),
             imageUrl: n.imageUrl ?? null,
             imageAlt: n.imageAlt ?? null,
+            // What the insight stack reads: when a claim was written, when the
+            // questions around it were answered, and which of them it came out
+            // of. Carried on the same nodes the board already lays out rather
+            // than fetched again — the stream is a reading of these nodes, not
+            // a second collection.
+            origin: n.origin ?? null,
+            createdAt: n.createdAt,
+            updatedAt: n.updatedAt,
+            fromNodeIds: parseFromNodeIds(n.fromNodeIds),
           }))}
         />
       )}

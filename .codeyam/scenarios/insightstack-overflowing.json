@@ -1,0 +1,15 @@
+{
+  "name": "InsightStack - Overflowing",
+  "id": "764a5cef-d47f-49c7-a53a-b6808ae7799e",
+  "url": "/isolated-components/InsightStack?s=Overflowing",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStack",
+  "scenarioType": "component",
+  "demonstratesState": {
+    "insights": "many"
+  },
+  "description": "Six insights past the column's bounds: four stand and the rest go behind a show-older affordance. The plane has bounds and the stack hangs off one point on it, so an unbounded column would run off the board - but silently dropping the older ones would lose the map's history to a layout constraint."
+}

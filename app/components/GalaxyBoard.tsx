@@ -17,14 +17,16 @@ import {
   type GalaxyNodeInput,
 } from '@/app/lib/galaxyLayout';
 import { themeColor } from '@/app/lib/themeHue';
-import { fanPath, joinPath, rowDone } from '@/app/lib/boardConnectors';
+import { fanPath, joinPath, rowJoinsStack } from '@/app/lib/boardConnectors';
 import { useBoardCamera } from '@/app/hooks/useBoardCamera';
 import QuestionCard from './QuestionCard';
 import CoreIdeaCard from './CoreIdeaCard';
 import ThemeParticles from './ThemeParticles';
 import GalaxyBackdrop from './GalaxyBackdrop';
 import ThinkingIndicator from './ThinkingIndicator';
-import ConvergenceNode, { type ConvergenceState } from './ConvergenceNode';
+import InsightStack from './InsightStack';
+import type { BoardInsight } from './InsightCard';
+import type { BridgeStatus } from './WebMcpBridge';
 import BoardZoomControls from './BoardZoomControls';
 
 /** Below this scale the cards give way to the cluster labels alone.
@@ -37,17 +39,14 @@ import BoardZoomControls from './BoardZoomControls';
  *  they degrade to single pixels is the label the more useful thing to draw. */
 const LABEL_ONLY_BELOW = 0.16;
 
-/** Kinds that count as an answer to the whole idea rather than to one theme.
- *  Deliberately narrow: a `finding` or a `direction` is a claim about where the
- *  idea stands, while a `problem` or a `goal` is a piece of it. */
-const CORE_INSIGHT_KINDS = new Set(['direction', 'finding', 'assumption']);
-
 export default function GalaxyBoard({
   seedIdea,
   mapId,
   attachments,
   themes,
   nodes,
+  insights = [],
+  bridgeStatus = 'unavailable',
   onAnswer,
   onChoose,
 }: {
@@ -56,6 +55,16 @@ export default function GalaxyBoard({
   attachments?: { name: string }[];
   themes: GalaxyTheme[];
   nodes: GalaxyNodeInput[];
+  /** The stack at the far end, newest first, as `insightStream` returns it.
+   *  Computed by `BoardWorkspace` from these same nodes rather than derived
+   *  here: the agent's `read_map` reads the same function, and a second
+   *  selection rule living in the board is how the two came to disagree about
+   *  what is on it. */
+  insights?: BoardInsight[];
+  /** Whether an agent can reach the page. Read only by the stack's empty
+   *  state, which is the one place the board may claim something about who is
+   *  listening. */
+  bridgeStatus?: BridgeStatus;
   /** Takes the whole card, not just its id: the exchange log records what was
    *  asked alongside what was said, so an agent reading it later does not have
    *  to re-resolve a bare id against a map that may have moved on. */
@@ -101,52 +110,6 @@ export default function GalaxyBoard({
     frameAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes.length, themes.length]);
-
-  // The partner's answer to the idea itself: an insight belonging to no theme.
-  // Last one wins, because a later round has read everything the earlier one
-  // did — the core carries the current reading, not a history of them.
-  //
-  // Withheld until at least one question has been answered. Describing an idea
-  // is not yet material to draw a conclusion from, and a board that responded
-  // to one typed sentence with "what that tells us" would be inventing a
-  // reading of a person it has not asked anything yet — the exact move that
-  // makes a thinking partner feel like a horoscope.
-  const coreInsight = useMemo(() => {
-    const earned = nodes.some(
-      (n) => n.kind === 'open-question' && n.status === 'answered',
-    );
-    if (!earned) return null;
-    const loose = nodes.filter(
-      (n) => !n.themeId && CORE_INSIGHT_KINDS.has(n.kind),
-    );
-    const last = loose[loose.length - 1];
-    return last
-      ? {
-          id: last.id,
-          label: last.label,
-          detail: last.detail,
-          choices: last.choices ?? null,
-        }
-      : null;
-  }, [nodes]);
-
-  // What the meeting point is currently showing. `composing` is the honest
-  // reading of "every row is finished and no conclusion has arrived": the
-  // partner may be writing it, or may not have looked yet, and the page has no
-  // way to tell those apart.
-  const convergenceState: ConvergenceState = useMemo(() => {
-    const rows = layout.clusters;
-    const allDone = rows.length > 0 && rows.every(rowDone);
-    if (!allDone) return { kind: 'waiting' };
-    return coreInsight
-      ? {
-          kind: 'ready',
-          label: coreInsight.label,
-          detail: coreInsight.detail,
-          choices: coreInsight.choices,
-        }
-      : { kind: 'composing' };
-  }, [layout.clusters, coreInsight]);
 
   const far = camera.scale < LABEL_ONLY_BELOW;
   const plane = `scale(${camera.scale}) translate(${-camera.x}px, ${-camera.y}px)`;
@@ -210,10 +173,10 @@ export default function GalaxyBoard({
                     strokeWidth={w}
                   />
                 ) : null}
-                {/* Only drawn once the row is finished: a line running to a
-                    conclusion that has not been reached would promise
-                    something the board cannot yet show. */}
-                {join && rowDone(c) ? (
+                {/* Drawn when this row has earned its line — see
+                    `rowJoinsStack`, which holds both clauses and the reason
+                    they are in that order. */}
+                {join && rowJoinsStack(c, insights) ? (
                   <path d={join} fill="none" stroke={stroke} strokeWidth={w} />
                 ) : null}
               </g>
@@ -223,7 +186,6 @@ export default function GalaxyBoard({
 
         <CoreIdeaCard
           seedIdea={seedIdea}
-          insight={coreInsight}
           mapId={mapId}
           attachments={attachments}
         />
@@ -237,12 +199,22 @@ export default function GalaxyBoard({
           <ThinkingIndicator x={CORE_SIZE.radius} />
         ) : null}
 
+        {/* The far end. Mounted from the first theme onwards and never gated on
+            the rows being finished: a suggestion is a hunch the partner is
+            willing to be wrong about in front of you, and withholding it until
+            everything is answered is what left this corner of the board a
+            dashed ring for most of a session. Each card says how far behind
+            the thinking it is, which is what keeps showing one early honest. */}
         {themes.length > 0 ? (
           <div
             className="absolute"
             style={{ left: layout.convergence.x, top: layout.convergence.y }}
           >
-            <ConvergenceNode state={convergenceState} onChoose={onChoose} />
+            <InsightStack
+              insights={insights}
+              status={bridgeStatus}
+              onChoose={onChoose}
+            />
           </div>
         ) : null}
 

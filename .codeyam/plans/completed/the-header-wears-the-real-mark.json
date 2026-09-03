@@ -1,0 +1,25 @@
+{
+  "claimStartedAt": "2026-09-02T22:57:10Z",
+  "completedAt": "2026-09-02T23:25:55Z",
+  "completedBy": {
+    "agentProvider": "claude",
+    "codeyamEditorVersion": "0.1.0",
+    "currentStep": "ui-step22",
+    "machine": "codeyam-editor-codeyam-editor-12",
+    "originId": "955b5426-a400-4480-b26d-423a56ca66fa",
+    "pid": 7,
+    "priority": 0,
+    "selectedPlan": "the-header-wears-the-real-mark",
+    "sessionId": "1d758c05-e60c-45b5-8373-ee0a6c0561bb",
+    "startedAt": "2026-09-02T22:57:10Z"
+  },
+  "createdAt": "2026-09-02T19:50:23Z",
+  "deliverables": [
+    "app/components/Wordmark.tsx"
+  ],
+  "journalTimestamp": "2026-09-02T23:25:55Z",
+  "mode": "ui",
+  "planFile": "completed/the-header-wears-the-real-mark.md",
+  "slug": "the-header-wears-the-real-mark",
+  "title": "The Header Wears the Real Mark"
+}

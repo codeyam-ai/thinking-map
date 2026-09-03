@@ -1,0 +1,12 @@
+{
+  "name": "InsightStack - OneInsight",
+  "id": "01c55e22-1229-4cdc-904b-e6d2c0967b26",
+  "url": "/isolated-components/InsightStack?s=OneInsight",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightStack",
+  "scenarioType": "component",
+  "description": "The first insight, on a board where nothing is finished. This is what ungating buys: under the old rule every row had to be answered through before the partner was allowed to say anything about the idea as a whole, so this card would not exist yet."
+}

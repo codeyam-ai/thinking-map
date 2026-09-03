@@ -529,18 +529,6 @@
     ]
   },
   {
-    "description": "Where the lines of thinking come back together. Three states in sequence rather than three variants: an empty ring while nothing has been answered, a cycling label while the partner reads the round, and the conclusion with ways forward attached. Choosing one is not answering — nothing on the map is closed, a direction is taken, and what the partner does next depends on which.",
-    "filePath": "app/components/ConvergenceNode.tsx",
-    "name": "ConvergenceNode",
-    "scenarios": [
-      "convergencenode-waiting",
-      "convergencenode-composing",
-      "convergencenode-ready",
-      "convergencenode-readynochoices",
-      "convergencenode-readynodetail"
-    ]
-  },
-  {
     "description": "A block of text whose whole purpose is to end up somewhere else. Its own component because it is the only part of the handoff band with behavior, and the behavior has a failure mode worth being deliberate about: clipboard access can be refused, and a copy button that silently does nothing is worse than one that never claimed to work. The text stays on screen either way, so there is always the select-and-copy path underneath. A tone prop defaults to the original secondary appearance and promotes to a lime-filled primary for the handoff band, so promoting that one caller cannot restyle the others. Promoted to the primary action on the arrival screen, the label flip is the entire success signal, so it sits in an aria-live region rather than being a purely visual confirmation. Every tone states a wrapping rule and none leaves it unset: default and primary carry break-words so an origin-bearing command, which is one unbreakable token wider than its box, wraps inside the border instead of overflowing it, while inline carries truncate because that tone exists to hold exactly one row.",
     "filePath": "app/components/CopyablePrompt.tsx",
     "name": "CopyablePrompt",
@@ -828,6 +816,111 @@
       "inlineerror-diagnosis-in-production",
       "inlineerror-upload",
       "inlineerror-silent"
+    ]
+  },
+  {
+    "description": "One thing the partner is willing to say about the idea as a whole. Collapsed it is a claim; opened it is InsightDetail. Opening is deliberately NOT the same act as asking: a single click that fired a request at the agent would spend the person's one attention-getting channel on a card they may only have wanted to read, and WebMCP gives them exactly one - a contribution wakes an agent parked on await_user_activity and there is no way to un-send it. So the click expands to what is already on the board and the composer underneath is what sends. A plain div and deliberately NOT role=button, the same rule QuestionCard sets out at length: an accessible name is computed from contents, so a card announcing itself as a button would swallow the ways-forward buttons, the prompts and the composer's field into one enormous label. Carries data-insight-card as the handle for a container that has no role and no accessible name.",
+    "filePath": "app/components/InsightCard.tsx",
+    "name": "InsightCard",
+    "scenarios": [
+      "insightcard-default",
+      "insightcard-stale",
+      "insightcard-stalebyone",
+      "insightcard-experiment",
+      "insightcard-longlabel"
+    ]
+  },
+  {
+    "description": "The line above an insight's claim: what kind of thing it is, and how far behind the thinking it has fallen. Presentational only in the manner of MapCardEyebrow - which words go in the line is cardEyebrow's and staleNote's business, because both are string logic with rules worth testing rather than anything about rendering. The two facts sit at opposite ends of one line rather than stacking, because they answer different questions - what is this, and can I still trust it - and someone scanning a column of four cards reads the left edge for the first and notices the second only on the cards that have it.",
+    "filePath": "app/components/InsightCardEyebrow.tsx",
+    "name": "InsightCardEyebrow",
+    "scenarios": [
+      "insightcardeyebrow-default",
+      "insightcardeyebrow-stalebyone",
+      "insightcardeyebrow-stale",
+      "insightcardeyebrow-verystale",
+      "insightcardeyebrow-experiment",
+      "insightcardeyebrow-unknownkind"
+    ]
+  },
+  {
+    "description": "The thinking behind one insight: what it came out of, where it could go, and the box for asking the partner to go further. Its own component because it is what OPENING a card reveals, and a component reachable only by clicking its parent could only ever be photographed in the closed state - the same split PendingRow makes against ThinkingMapView and InsightStackEmpty against InsightStack. Composition only: each section decides for itself whether it has anything to say, so the order here is the argument and nothing else - what this IS, what it came OUT of, where it GOES, and how to push on it.",
+    "filePath": "app/components/InsightDetail.tsx",
+    "name": "InsightDetail",
+    "scenarios": [
+      "insightdetail-default",
+      "insightdetail-noagent",
+      "insightdetail-nocitations",
+      "insightdetail-claimalone",
+      "insightdetail-agentworking"
+    ]
+  },
+  {
+    "description": "Asking the partner to go further on one insight: two prompts and a box. The prompts FILL the box and never send it - the rule AnswerChips and SuggestionChips already hold, for the same reason: a prompt that submitted would turn 'dig into this' into a menu of two approved questions, when the whole point of the box is that the person asks their own. Two rather than four, because a longer list reads as the set of things it is permissible to ask. The composer is NodeQuestionComposer in its dark tone rather than a second composer written for the board: the user.question write, the drag guard and the send control that says whether anybody is actually listening are the substantial part, and a copy would drift away from them first. The whole section swallows clicks, because everything in it is a reason to have opened the card rather than a reason to close it again.",
+    "filePath": "app/components/InsightGoDeeper.tsx",
+    "name": "InsightGoDeeper",
+    "scenarios": [
+      "insightgodeeper-noagent",
+      "insightgodeeper-listening",
+      "insightgodeeper-agentworking",
+      "insightgodeeper-longclaim",
+      "insightgodeeper-promptfilledthebox"
+    ]
+  },
+  {
+    "description": "The small-caps heading above a section of an opened insight. One styled span forwarding children and a spacing class - no branching, no iteration, no data. It exists because the fourth hand-copy of the same six utility classes is where one of them drifts a shade or a letter-spacing away from the others with no way to notice. Deliberately not the app eyebrow class, which is the paper palette and renders invisible on the board plane.",
+    "filePath": "app/components/InsightSectionLabel.tsx",
+    "name": "InsightSectionLabel",
+    "untestabilityReason": {
+      "justification": "A single span forwarding children and a spacing class. No props that branch, no iteration, one visual state - its every appearance is already captured inside InsightSources, InsightWaysForward, InsightGoDeeper and InsightStack.",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
+    "description": "The questions an insight came out of - the reason the card opens at all. A claim about the whole idea is worth exactly as much as the thinking behind it is visible, and the alternative to showing this is asking the person to take the partner's word for it. Renders NOTHING when there are no citations rather than an empty heading: an agent that never learned the field, and an insight genuinely drawn from the whole map, both produce that case, and 'What this came out of' with nothing under it reads as something that failed to load rather than as an honest absence. Each source wears a rule in the row's own colour rather than a bullet - these are quotations from elsewhere on the board, and the colour is what says where from.",
+    "filePath": "app/components/InsightSources.tsx",
+    "name": "InsightSources",
+    "scenarios": [
+      "insightsources-default",
+      "insightsources-single",
+      "insightsources-nosources",
+      "insightsources-many",
+      "insightsources-otherrow"
+    ]
+  },
+  {
+    "description": "The far end of the board. The board's argument is left-to-right - one idea, several lines of thinking, back together at the far end - so a claim about the whole idea belongs exactly there, which is why this takes the coordinates ConvergenceNode had rather than floating over the board as a dock competing with BoardChat, or opening a second region that would say the board has two conclusions. What changed is the GATING: the convergence node showed something only when every row was finished AND a question had been answered AND a themeless insight existed, so for most of a session it was a dashed ring. A suggestion is not a conclusion - it is a hunch the partner is willing to be wrong about in front of you - and the honest way to show one is early, marked as provisional, which the per-card staleness marker does. Four cards stand and the rest go behind a show-older affordance, because the plane has bounds. Positions itself around its parent's origin CONSISTENTLY in every state, unlike the node it replaced, whose ring was centred on the origin while its panel ran from 40 units left of it.",
+    "filePath": "app/components/InsightStack.tsx",
+    "name": "InsightStack",
+    "scenarios": [
+      "insightstack-waiting",
+      "insightstack-oneinsight",
+      "insightstack-threeinsights",
+      "insightstack-overflowing"
+    ]
+  },
+  {
+    "description": "What the far end of the board says before the partner has written anything. Presentational and stateless in the manner of PendingRow: the clock that decides which of its two states is true lives in InsightStack, and splitting it that way is what lets BOTH be captured - a component owning its own twenty-second timer could only ever be photographed in the first one. The rule is the pending row's rule for the same reason: WebMCP is pull-only, so this page cannot summon an agent, cannot start its turn, and has no way of knowing whether one is coming. The marker is therefore bounded, and what it resolves into is settledNote's statement about who can actually hear this board rather than a promise that something is on its way. The pre-settle copy names the PLACE rather than the wait, because 'composing' would be the same lie the old cycling word was on a board nobody is attached to.",
+    "filePath": "app/components/InsightStackEmpty.tsx",
+    "name": "InsightStackEmpty",
+    "scenarios": [
+      "insightstackempty-waiting",
+      "insightstackempty-settlednoagent",
+      "insightstackempty-settledagentidle",
+      "insightstackempty-settledagentworking"
+    ]
+  },
+  {
+    "description": "The ways forward an insight offers. Taking one is NOT answering: no question on the map is being closed, a direction is being taken, and what the partner does next depends on which - BoardWorkspace records it as a user.note for exactly that reason, because an answer would have to name the question it answered and there isn't one. Renders nothing when the partner named a direction without proposing routes; the thinking can still continue by other means, and an empty row where the buttons would have been says the opposite. Each button stops the click from propagating, because the card above toggles on click and taking a way forward must not also close the card it was taken from.",
+    "filePath": "app/components/InsightWaysForward.tsx",
+    "name": "InsightWaysForward",
+    "scenarios": [
+      "insightwaysforward-default",
+      "insightwaysforward-single",
+      "insightwaysforward-nochoices",
+      "insightwaysforward-emptychoices",
+      "insightwaysforward-longchoice",
+      "insightwaysforward-otherrow"
     ]
   },
   {
@@ -1353,7 +1446,7 @@
     "testFile": "app/components/WebMcpBridge.render.test.tsx"
   },
   {
-    "description": "The product mark: three nodes and the connectors between them, doubling as the link home from every screen.",
+    "description": "The product lockup — the mark and the name — doubling as the link home from every screen. Drawn from the real design asset as inline SVG in the manner of CardIcon and NodeAccentMark, not an img tag: the exported file is white on transparent and this product is light-only by design, so the fills are currentColor and inherit the page's ink rather than rendering invisible on paper. Under 520px it renders a second svg cropped to the mark's own bounding box, because hiding the name paths with CSS would leave the viewBox reserving the full lockup width and strand the mark in dead space; viewBox is not a CSS property, so the crop takes its own element. The name is outlined paths rather than a text node, so the anchor carries an explicit aria-label to keep the home link from announcing as unnamed.",
     "filePath": "app/components/Wordmark.tsx",
     "name": "Wordmark",
     "scenarios": [
@@ -1460,6 +1553,12 @@
     "filePath": "app/lib/webmcp.ts",
     "name": "bindTools",
     "testFile": "app/lib/webmcp.test.ts"
+  },
+  {
+    "description": "The insight stream as the BOARD computes it, from the nodes it already lays out. insightStream is shared with the server door that renders read_map, so it takes rows where every node carries createdAt and updatedAt; the board is passed GalaxyNodeInputs, where those are optional because an isolated fixture mounts the board with hand-written nodes and has no reason to invent timestamps. Bridging the two is a decision rather than a cast, which is why it is a named function: every undated node gets the SAME epoch stand-in, so an undated map is one cohort in which nothing was written after anything and nothing reads as stale - the right answer for a fixture, where staleness would be a claim about answers the person never gave. Date.now() was the alternative and is worse twice: a new value every render defeats the memo, and on a partly-dated map it sorts every undated node to the front. Deliberately not a second query - the board and the agent's read_map read the same rule over the same nodes, which is the disagreement insightStream was extracted to prevent.",
+    "filePath": "app/lib/boardInsights.ts",
+    "name": "boardInsightStream",
+    "testFile": "app/lib/boardInsights.test.ts"
   },
   {
     "description": "Names a brief pulled off the web: the page title paired with its host and path, or the bare address when the page is untitled or its title runs past 80 characters. The address is the half that always survives because this string is the only record of where a fetched brief came from — the page itself is not kept.",
@@ -2163,6 +2262,15 @@
     "testFile": "app/components/QuestionCard.render.test.tsx"
   },
   {
+    "description": "Reads the JSON array of node ids an insight cites off the row, with the same total, degrade-to-null contract parseChoices holds - and it matters more here. A malformed value must yield no citations rather than throwing away the insight that carries it: an insight whose sources cannot be read is still a claim worth showing, and one that took the board's whole rendering down with it would not be. An empty array reads as null so the card renders no 'What this came out of' heading rather than an empty one.",
+    "filePath": "app/components/MapScreen.tsx",
+    "name": "parseFromNodeIds",
+    "untestabilityReason": {
+      "justification": "A module-local JSON.parse guard in a rendering component, not exported and not reachable from a test; it is the third instance of the parseChoices/parseDiagram shape already pinned beside it.",
+      "kind": "trivial-wrapper"
+    }
+  },
+  {
     "description": "Reads a nudge batch off a request body, returning the parsed batch or the message to send back — the caller picks the status code, this decides what is acceptable. Offsets must be FINITE, not merely numeric: NaN and Infinity are both typeof number and either would put a node nowhere. One bad entry rejects the whole batch, since a partial arrangement is harder to explain than a refused one. Vestigial along with its route: nothing produces a nudge now that the map is a scrolling column of cards.",
     "filePath": "app/lib/nudges.ts",
     "name": "parseNudges",
@@ -2334,6 +2442,18 @@
     "testFile": "app/lib/boardConnectors.test.ts"
   },
   {
+    "description": "Whether a line of thinking produced something at the far end of the board: a live insight cites one of its cards. Distinct from rowDone, which asks whether the row is FINISHED - a row can feed an insight while still holding an open question, and that is exactly the case the old convergence gate could not express, so the board withheld the join line from a row the partner had visibly drawn a conclusion out of. An insight that cites nothing feeds no row rather than every row, which is the ordinary case for an agent that never learned the field. An empty row feeds nothing, matching rowDone's reading that it has not started.",
+    "filePath": "app/lib/boardConnectors.ts",
+    "name": "rowFeedsInsights",
+    "testFile": "app/lib/boardConnectors.test.ts"
+  },
+  {
+    "description": "Whether a row has earned its line to the far end of the board. Two clauses, and the order is the argument: having FED the stack is the truer claim - the board can point at the insight this row produced - so it is asked first, and being FINISHED is the fallback. That fallback is what keeps a map whose agent never writes citations looking exactly as it does today: every insight cites nothing, the first clause is false everywhere, and the rule degrades to the old rowDone gate rather than to a board with no join lines at all. Named rather than left as a disjunction in the board's JSX because it is the rule and not the rendering - a screenshot of one map that happens to satisfy both clauses cannot tell you whether either is wired up.",
+    "filePath": "app/lib/boardConnectors.ts",
+    "name": "rowJoinsStack",
+    "testFile": "app/lib/boardConnectors.test.ts"
+  },
+  {
     "description": "How far a collapsible run of adds or updates extends from an index. An agent turn that writes six nodes is one thing that happened, not six. Returns 1 for anything not collapsible, so the caller can always advance by the result.",
     "filePath": "app/lib/exchangeRail.ts",
     "name": "runLength",
@@ -2418,6 +2538,18 @@
     "filePath": "app/lib/briefSections.ts",
     "name": "splitOnParagraphs",
     "testFile": "app/lib/briefSections.test.ts"
+  },
+  {
+    "description": "How many insights stand in the column and how many wait behind 'show older'. The plane has bounds and the stack hangs off one point on it, so a column that grew with the map would run past them - but a hard cap that silently dropped the older ones would lose the map's history to a layout constraint, so the split is the compromise. The arithmetic is worth pinning because its failure is invisible: showing four and claiming 'show 3 older' out of six looks correct in a screenshot of any map that happens to have exactly five. A zero or negative limit collapses the column rather than unbounding it, so a misconfiguration cannot defeat the bound the limit exists to enforce.",
+    "filePath": "app/lib/boardInsights.ts",
+    "name": "splitStack",
+    "testFile": "app/lib/boardInsights.test.ts"
+  },
+  {
+    "description": "How far behind the thinking an insight is, in words. The stack is ungated - an insight goes up the moment it is written, long before the rows around it are answered - so what keeps that honest is not withholding the card but SAYING the gap on its face. An insight the person has since answered four questions past is still worth reading, and hiding it would silently shrink the board. Returns null at zero rather than an empty string, so a caller that forgets to check renders nothing instead of an empty marker holding space in the layout. The singular is a real case rather than a nicety: the marker first appears the moment one answer lands after an insight, so 'written before your last 1 answers' would be the FIRST thing anyone ever read here. Lives beside askPresence and settledNote for the same reason they do - the copy IS the interface, and the only way to check a ternary inside JSX is to look at a screenshot.",
+    "filePath": "app/lib/insightStale.ts",
+    "name": "staleNote",
+    "testFile": "app/lib/insightStale.test.ts"
   },
   {
     "description": "The standing ask as numbers, carried on read_map's structured output so an agent reading structured results does not have to parse the prose back into the figures it is being asked to compare itself against. The insights themselves are deliberately NOT included - they are already in the map the same call rendered, and repeating them would double the size of every read.",

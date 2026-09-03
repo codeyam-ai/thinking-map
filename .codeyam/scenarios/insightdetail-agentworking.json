@@ -1,0 +1,12 @@
+{
+  "name": "InsightDetail - AgentWorking",
+  "id": "774e34f6-ad46-416e-b806-f3dfdcadb7d0",
+  "url": "/isolated-components/InsightDetail?s=AgentWorking",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightDetail",
+  "scenarioType": "component",
+  "description": "Mid-tool-call still counts as listening - the agent sees the question when its turn comes back round - so 'working' must not read as absence. Read beside NoAgent this is the distinction the send label exists to draw."
+}

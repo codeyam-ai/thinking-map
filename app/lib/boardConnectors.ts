@@ -56,3 +56,50 @@ export function rowDone(cluster: PlacedCluster): boolean {
   const questions = cluster.cards.filter((c) => c.kind === 'open-question');
   return questions.length > 0 && questions.every((q) => q.status === 'answered');
 }
+
+/**
+ * Whether this line of thinking produced something at the far end: a live
+ * insight cites one of its cards.
+ *
+ * Distinct from `rowDone`, which asks whether the row is FINISHED. A row can
+ * feed an insight while still holding an open question, and that is exactly the
+ * case the old gate could not express — the board withheld the join line from a
+ * row the partner had visibly drawn a conclusion out of, because one card in it
+ * was still unanswered.
+ *
+ * A row with no cards feeds nothing, which falls out of the `some` without a
+ * special case, and matches `rowDone`'s reading of an empty row: it has not
+ * started, so there is nothing to draw a line from.
+ */
+export function rowFeedsInsights(
+  cluster: PlacedCluster,
+  insights: { from: { id: string }[] }[],
+): boolean {
+  const cited = new Set(
+    insights.flatMap((insight) => insight.from.map((source) => source.id)),
+  );
+  return cluster.cards.some((card) => cited.has(card.id));
+}
+
+/**
+ * Whether this row has earned its line to the far end of the board.
+ *
+ * The two clauses are two different claims and the order is the argument.
+ * Having FED the stack is the truer one — the board can point at the insight
+ * this line of thinking produced — so it is asked first. Being FINISHED is the
+ * fallback, and it is what keeps a map whose agent never writes citations
+ * looking exactly as it does today: every insight cites nothing, so the first
+ * clause is false everywhere and the rule degrades to the old `rowDone` gate
+ * rather than to a board with no join lines at all.
+ *
+ * Named rather than left as a disjunction in the board's JSX because it is the
+ * rule, not the rendering: this is the sentence the board makes about a row,
+ * and a screenshot of one map that happens to satisfy both clauses cannot tell
+ * you whether either is wired up.
+ */
+export function rowJoinsStack(
+  cluster: PlacedCluster,
+  insights: { from: { id: string }[] }[],
+): boolean {
+  return rowFeedsInsights(cluster, insights) || rowDone(cluster);
+}

@@ -1,0 +1,12 @@
+{
+  "name": "InsightDetail - NoCitations",
+  "id": "9cce6f12-157a-4057-b292-5aafecbe76d2",
+  "url": "/isolated-components/InsightDetail?s=NoCitations",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightDetail",
+  "scenarioType": "component",
+  "description": "The agent cited nothing - an insight drawn from the whole map, or written before the field existed. 'What this came out of' is absent entirely rather than an empty heading, which would read as something that failed to load."
+}

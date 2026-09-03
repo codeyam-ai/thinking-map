@@ -31,6 +31,37 @@
         "reason": "Its one action is the copy button, which belongs to CopyablePrompt and is recorded on that view. The copied label needs a successful navigator.clipboard write, which the capture browser refuses."
       }
     },
+    "AppHeader": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "The only collection reaching this header is the map list, which it forwards untouched to BoardMenu. The one-map and many-map boundaries are that component's to show and are captured on BoardMenu, not duplicated here."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "Same seam as single: a long map list overflows inside BoardMenu's own popover, which is captured there. The header's own row is three fixed items and cannot overflow from data."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The header renders synchronously from props. Agent presence arrives already resolved in the status slot, and the in-progress wording is AgentStatus's to show, captured there."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The header has no failure of its own - it renders identically on the not-found page, which is the app's error surface, and that is captured as NotFound - Default."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "The header binds no handlers itself. Both actions belong to children and are captured there - opening the map list on BoardMenu, and following the lockup home on Wordmark."
+      }
+    },
     "BriefDrop": {
       "empty": {
         "status": "covered"
@@ -178,6 +209,34 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "InsightStack": {
+      "empty": {
+        "status": "covered"
+      },
+      "single": {
+        "status": "covered"
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "covered"
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "The page never issues a request, so nothing is ever in flight to be loading. WebMCP is pull-only: an agent arrives on its own schedule and the board cannot ask it for anything. The nearest honest state is the bounded marker before the wait elapses, which is a statement about who can hear this page rather than about work in progress - it is captured as the empty state and again, resolved, on InsightStackEmpty."
+      },
+      "edge": {
+        "status": "added"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "The stack has no failure surface. It reads insights off nodes the server already rendered, so there is no fetch to reject and no request to time out; a bridge fault surfaces in the agent status indicator, not here. The one thing that could mislead - implying an answer is coming when nothing is attached - is handled as an honest empty state rather than as an error."
+      },
+      "key-interaction": {
+        "status": "added"
       }
     },
     "MapCardHeader": {
@@ -536,6 +595,38 @@
       },
       "key-interaction": {
         "status": "covered"
+      }
+    },
+    "Wordmark": {
+      "empty": {
+        "status": "n-a",
+        "reason": "The component takes no props and no data. It draws the same lockup on every render, so there is no zero-items or blank-input state it can be in."
+      },
+      "single": {
+        "status": "n-a",
+        "reason": "Nothing here is a collection. The mark and the name are fixed vector artwork, so there is no empty-to-many boundary to cross."
+      },
+      "typical": {
+        "status": "covered"
+      },
+      "many": {
+        "status": "n-a",
+        "reason": "It never renders a list, and the lockup is fixed-width artwork rather than text that can overflow. The only way it gets smaller is the breakpoint crop, which is the edge archetype."
+      },
+      "loading": {
+        "status": "n-a",
+        "reason": "It renders synchronously from static vector data. There is nothing to fetch and no pending phase to picture."
+      },
+      "edge": {
+        "status": "covered"
+      },
+      "error": {
+        "status": "n-a",
+        "reason": "There is no input it can reject and no request that can fail. The paths are inlined in the component, so there is not even a missing-asset state an img tag would have."
+      },
+      "key-interaction": {
+        "status": "n-a",
+        "reason": "Its one action is following the link home, which navigates away rather than producing a state of this component. There is no hover, open, or selected treatment to show."
       }
     }
   }

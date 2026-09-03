@@ -1,0 +1,207 @@
+{
+  "name": "The partner is already thinking",
+  "id": "1174db1d-b3ca-4ecf-8fa1-d170da30c08b",
+  "url": "/map/map-insights",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "seed": {
+    "mapEvent": [
+      {
+        "id": "xev-1",
+        "kind": "node.added",
+        "mapId": "map-insights",
+        "origin": "user",
+        "payload": "{\"id\": \"x-idea\", \"parentId\": null, \"kind\": \"idea\", \"label\": \"A tool library for the street\", \"status\": \"answered\"}",
+        "revision": 1
+      },
+      {
+        "id": "xev-2",
+        "kind": "agent.note",
+        "mapId": "map-insights",
+        "origin": "agent",
+        "payload": "{\"text\": \"Taking the custody of a tool between two people as the real problem rather than the lending.\"}",
+        "revision": 2
+      }
+    ],
+    "mapNode": [
+      {
+        "createdAt": "2026-08-30T09:00:00.000Z",
+        "detail": "Nobody on this street needs to own a tile cutter, and four of us have bought one.",
+        "id": "x-idea",
+        "kind": "idea",
+        "label": "A tool library for the street",
+        "mapId": "map-insights",
+        "order": 0,
+        "origin": "user",
+        "parentId": null,
+        "status": "answered",
+        "updatedAt": "2026-08-30T09:00:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T09:05:00.000Z",
+        "detail": "Whoever it is now, nobody has agreed to be.",
+        "id": "x-who-1",
+        "kind": "open-question",
+        "label": "Who is carrying a tool between the person who lent it and the person who wants it next?",
+        "mapId": "map-insights",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "themeId": "x-who",
+        "updatedAt": "2026-08-30T11:00:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T09:05:00.000Z",
+        "detail": "The four of us, to start. It falls over if it needs strangers on day one.",
+        "id": "x-who-2",
+        "kind": "open-question",
+        "label": "Is this the whole street, or the four of you who already know each other?",
+        "mapId": "map-insights",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "themeId": "x-who",
+        "updatedAt": "2026-08-30T11:02:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T09:06:00.000Z",
+        "id": "x-keep-1",
+        "kind": "open-question",
+        "label": "What happens the moment something comes back broken?",
+        "mapId": "map-insights",
+        "options": "[\"Whoever broke it replaces it\", \"A shared pot pays for it\", \"Nobody has decided\"]",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "open",
+        "themeId": "x-keeping",
+        "updatedAt": "2026-08-30T09:06:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T09:06:00.000Z",
+        "id": "x-keep-2",
+        "kind": "assumption",
+        "label": "The tools outlast the people who bought them",
+        "mapId": "map-insights",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "themeId": "x-keeping",
+        "updatedAt": "2026-08-30T09:06:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T09:07:00.000Z",
+        "detail": "In whoever's shed has room, which is the problem.",
+        "id": "x-where-1",
+        "kind": "open-question",
+        "label": "Where do the tools actually live between borrowings?",
+        "mapId": "map-insights",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "themeId": "x-where",
+        "updatedAt": "2026-08-30T11:04:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T10:00:00.000Z",
+        "detail": "Money between neighbours is a different relationship from a borrowed drill, and it arrives before anyone has borrowed anything.",
+        "fromNodeIds": "[\"x-keep-1\"]",
+        "id": "x-risk",
+        "kind": "risk",
+        "label": "A shared pot is the thing most likely to end this",
+        "mapId": "map-insights",
+        "order": 0,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "updatedAt": "2026-08-30T10:00:00.000Z"
+      },
+      {
+        "choices": "[\"Design the handover, not the catalogue\", \"Try it with four people and one tool\", \"Something else\"]",
+        "createdAt": "2026-08-30T12:00:00.000Z",
+        "detail": "Every version falls over at the same point: the moment a tool is between two people and belongs to neither. Lending is the easy half.",
+        "fromNodeIds": "[\"x-who-1\", \"x-keep-1\", \"x-where-1\"]",
+        "id": "x-suggestion",
+        "kind": "suggestion",
+        "label": "The collapse you are describing is a custody problem, not a lending one",
+        "mapId": "map-insights",
+        "order": 1,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "updatedAt": "2026-08-30T12:00:00.000Z"
+      },
+      {
+        "createdAt": "2026-08-30T12:01:00.000Z",
+        "detail": "If a piece of paper on a fridge survives a fortnight, the custody problem is smaller than it looks.",
+        "fromNodeIds": "[\"x-who-2\"]",
+        "id": "x-experiment",
+        "kind": "experiment",
+        "label": "Lend one tool to one neighbour this week and write down who has it",
+        "mapId": "map-insights",
+        "order": 2,
+        "origin": "agent",
+        "parentId": "x-idea",
+        "status": "answered",
+        "updatedAt": "2026-08-30T12:01:00.000Z"
+      }
+    ],
+    "message": [
+      {
+        "content": "Four people on my street have each bought a tile cutter they used once. I want to fix that, but every version of it I imagine collapses the moment someone moves away.",
+        "id": "xm-1",
+        "mapId": "map-insights",
+        "origin": "user",
+        "role": "user"
+      },
+      {
+        "content": "The collapsing is the interesting part. Before we design the lending: who is it for, what happens when something comes back broken, and where do the tools actually live?",
+        "id": "xm-2",
+        "mapId": "map-insights",
+        "origin": "agent",
+        "role": "assistant"
+      }
+    ],
+    "theme": [
+      {
+        "hue": 318,
+        "id": "x-who",
+        "label": "Who it is for",
+        "mapId": "map-insights",
+        "order": 0
+      },
+      {
+        "hue": 96,
+        "id": "x-keeping",
+        "label": "Keeping it running",
+        "mapId": "map-insights",
+        "order": 1
+      },
+      {
+        "hue": 200,
+        "id": "x-where",
+        "label": "Where things live",
+        "mapId": "map-insights",
+        "order": 2
+      }
+    ],
+    "thinkingMap": [
+      {
+        "id": "map-insights",
+        "phase": "explore",
+        "revision": 22,
+        "seedIdea": "Four people on my street have each bought a tile cutter they used once. I want to fix that, but every version of it I imagine collapses the moment someone moves away.",
+        "title": "A tool library for the street"
+      }
+    ]
+  },
+  "scenarioType": "application",
+  "pageFilePath": "app/map/[id]/page.tsx",
+  "description": "Three insights standing at the far end of the board while a question in the middle row is still open. This is the whole argument for ungating: under the old rule this corner was a dashed ring, because a conclusion was withheld until every row was finished. One of the three says on its face that it was written before the person's last two answers, and the row holding the open question still draws its line to the stack — because it fed it."
+}

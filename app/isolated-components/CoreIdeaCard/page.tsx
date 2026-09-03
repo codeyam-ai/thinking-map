@@ -38,23 +38,12 @@ const scenarios: Record<string, Props> = {
     ],
   },
 
-  // The partner's answer to the IDEA itself, as opposed to its answer to any
-  // one line of thinking. Withheld until a round has produced one, because a
-  // board that responded to a single typed sentence with "what that tells us"
-  // would be inventing a reading of somebody it has not asked anything yet.
-  WithInsight: {
-    seedIdea: MEDIUM,
-    mapId: "map-galaxy",
-    insight: {
-      id: "i1",
-      label: "The whiteboard is a symptom of an ownership gap",
-      detail:
-        "Nothing is lost while it is on the board. Things are lost at the moment it is wiped and nobody is carrying them.",
-    },
-  },
-
-  // Day one: an idea and nothing else. No attachments, no insight — the state
-  // someone meets in the second after they press return.
+  // Day one: an idea and nothing else. No attachments — the state someone
+  // meets in the second after they press return.
+  //
+  // There is no WithInsight case any more. The partner's reading of the idea
+  // is the insight stack's, at the far end of the board; printing it here as
+  // well would be the same node drawn twice on one plane.
   DayOne: { seedIdea: SHORT },
 };
 

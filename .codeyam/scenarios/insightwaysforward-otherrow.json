@@ -1,0 +1,12 @@
+{
+  "name": "InsightWaysForward - OtherRow",
+  "id": "2c85ec8d-9c7c-48cb-96cb-3043aae05722",
+  "url": "/isolated-components/InsightWaysForward?s=OtherRow",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightWaysForward",
+  "scenarioType": "component",
+  "description": "Another row's colour, because the buttons take the hue of the line of thinking they belong to - the same rule the citation rules follow directly above them."
+}

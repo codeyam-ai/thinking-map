@@ -1,0 +1,12 @@
+{
+  "name": "InsightCardEyebrow - Default",
+  "id": "f0064082-06f8-4f32-b6d1-639146d1e078",
+  "url": "/isolated-components/InsightCardEyebrow?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCardEyebrow",
+  "scenarioType": "component",
+  "description": "A hunch the partner is willing to be wrong about in front of you, current as of the last thing the person said. No staleness marker at all - the right half of the line is empty because there is nothing to admit."
+}

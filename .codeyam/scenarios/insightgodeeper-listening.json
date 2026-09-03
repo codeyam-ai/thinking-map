@@ -1,0 +1,12 @@
+{
+  "name": "InsightGoDeeper - Listening",
+  "id": "e40f2091-a52d-4a5c-9a30-4da7f20f4260",
+  "url": "/isolated-components/InsightGoDeeper?s=Listening",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightGoDeeper",
+  "scenarioType": "component",
+  "description": "An agent is bound and idle: asking wakes it, and the control says so. Reachable only by supplying the bridge state, because an isolated capture renders in an iframe where WebMCP is unreachable by definition."
+}

@@ -1,0 +1,12 @@
+{
+  "name": "InsightSources - Single",
+  "id": "a7fdc179-ab27-44b1-b67a-5d1cb4e99d53",
+  "url": "/isolated-components/InsightSources?s=Single",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightSources",
+  "scenarioType": "component",
+  "description": "One source. A single citation still has to read as a list rather than as a stray line, which is what the rule down the left edge is for."
+}

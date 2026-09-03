@@ -1,0 +1,12 @@
+{
+  "name": "InsightWaysForward - LongChoice",
+  "id": "5d1417c7-35d1-40cd-b08c-7c660ad467b1",
+  "url": "/isolated-components/InsightWaysForward?s=LongChoice",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightWaysForward",
+  "scenarioType": "component",
+  "description": "A route long enough to wrap onto several lines. The button grows to hold it rather than truncating - a way forward you cannot read is not a way forward."
+}

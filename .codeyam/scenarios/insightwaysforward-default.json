@@ -1,0 +1,12 @@
+{
+  "name": "InsightWaysForward - Default",
+  "id": "8e2fd065-e942-4206-a43b-e542d1be9d5a",
+  "url": "/isolated-components/InsightWaysForward?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightWaysForward",
+  "scenarioType": "component",
+  "description": "Three routes, which is the number an agent tends to offer: two real ones and a way of saying neither. Taking one is not answering - no question on the map is closed, a direction is taken - which is why they are solid buttons in the row's colour rather than the outlined chips a question card uses."
+}

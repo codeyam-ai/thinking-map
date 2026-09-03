@@ -1,0 +1,12 @@
+{
+  "name": "InsightCard - Experiment",
+  "id": "cd18c917-cf04-46f1-b5d2-8a106929b12a",
+  "url": "/isolated-components/InsightCard?s=Experiment",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCard",
+  "scenarioType": "component",
+  "description": "An experiment rather than a suggestion: the eyebrow says 'Try this', exactly as it would on the same node drawn inside a row. An insight names its kind the way every other card in the app does, which is what lets the map read without a legend."
+}

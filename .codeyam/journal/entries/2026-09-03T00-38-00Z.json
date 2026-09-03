@@ -1,0 +1,1663 @@
+{
+  "timestamp": "2026-09-03T00:38:00Z",
+  "title": "An Always-On Insight Stack You Can Dig Into",
+  "type": "feature",
+  "userRequest": "## Summary\n\nThe far right of the board is a dashed empty ring for the whole of a session's useful life. `ConvergenceNode` shows something only when every row is finished AND at least one question has been answered AND a themeless `direction | finding | assumption` exists (`app/components/GalaxyBoard.tsx:104-148`) — three gates, all of which must pass before the partner is allowed to say anything about the idea as a whole. Before that it is a ring, or a cycling nonsense word. This plan replaces it with a stack of insights that is populated from the first one written and never gated, where each insight opens in place to show the thinking behind it — the questions it came out of, the detail, the ways forward — and carries a composer that asks the agent to go further on that specific insight. The digging path is not new machinery: `user.question` is fully implemented end to end (validated in the `user.question` branch of `app/api/maps/[id]/exchange/route.ts`, plumbed through `WebMcpBridge`, and listed in `USER_EVENT_KINDS` precisely so it wakes an agent parked on `await_user_activity`), and `NodeQuestionComposer` is a finished, tested component that is currently mounted nowhere but its own isolated fixture. This plan puts it on screen.\n\n## Key Decisions\n\n- **The convergence point becomes the stack; it is not a fourth surface.** The board's argument is left-to-right — one idea, several lines, back together at the far end — and the far end is exactly where a claim about the whole idea belongs. A dock floating over the board would be chrome competing with `BoardChat`; a new region would say the board has two conclusions. So `ConvergenceNode` is retired and `InsightStack` takes its coordinates.\n- **No gate on \"every row done\".** That rule exists because a conclusion drawn before the rows are answered would be a conclusion about nothing. A *suggestion* is not a conclusion: it is a hunch the partner is willing to be wrong about in front of you, and the honest way to show one is early and marked as provisional. The staleness marker from `insightStream` is what carries that honesty — an insight written before your last four answers says so on its face rather than being silently withdrawn.\n- **The `earned` gate stays retired with `CoreIdeaCard`'s insight slot, not moved.** `GalaxyBoard` currently also prints the newest insight on the core card. With a live stack at the far end that is the same node drawn twice on one plane, so `CoreIdeaCard` stops taking `insight` and the core card is the idea alone. This is a removal the ungating forces, not scope: two homes for one insight is worse than either home on its own.\n- **Click opens in place; going deeper is a second, explicit act.** A single click that fired a request to the agent would spend the person's one attention-getting channel on a card they may only have wanted to read. So the card expands to what is already there — detail, sources, \"where next\" — and the composer underneath is what sends. The send control states whether anyone is listening, because `askPresence` already makes that distinction and the alternative is the UI implying an answer is coming when nothing is attached.\n- **Reuse `NodeQuestionComposer` with a tone, rather than writing a second composer.** It carries the whole honest-presence argument in its own docstring and has its own tests and scenarios. It is styled for the light surface, so it gains `tone?: 'light' | 'dark'` defaulting to today's appearance — the existing fixture and its scenarios stay valid byte for byte, and the board passes `dark`.\n- **The go-deeper prompts fill the box; they never send it.** Same rule as `AnswerChips` and `SuggestionChips`, for the same reason: a prompt that submitted would turn \"dig into this\" into a menu of two approved questions.\n- **A row draws its line to the stack when it FED the stack.** `rowDone` gated the join line on the row being finished, which was right for a conclusion. With `fromNodeIds`, the board can draw the truer claim: this line of thinking produced something at the far end. `rowDone` stays as the fallback for insights that cite nothing, so a map whose agent never sends `fromRefs` looks exactly as it does today.\n\n## Implementation\n\n### 1. The stack\n\n**New file**: `app/components/InsightStack.tsx`\n\nReplaces `ConvergenceNode` at `layout.convergence`. Takes the `InsightStream` from `app/lib/insightStream.ts` (built by the dependency plan) plus the bridge status, and renders one of two things:\n\n- **Insights** — up to four `InsightCard`s in a column, newest at the top, headed by a small eyebrow (\"What the partner is thinking\"). More than four are behind a \"show older\" affordance rather than an unbounded column that would grow past the plane's bounds.\n- **Nothing yet** — the honest empty state. Reuse the bounded-wait pattern the map column already uses rather than inventing a second one: `useBoundedWait(true, SETTLE_AFTER_MS, insightCount)` from `app/hooks/useBoundedWait.ts`, and once it elapses, `settledNote(status)` from `app/lib/pendingRow.ts` — the exported, tested sentence that says whether an agent can hear this page at all. Before it elapses, the dim marker. The cycling-word `composing` state goes with `ConvergenceNode`: it was honest for a wait the person had just earned by finishing every row, and it would be a lie on a board nobody is attached to.\n\nThe stack positions itself around its parent's origin the way `ConvergenceNode` did — the isolated fixture's comment at `app/isolated-components/ConvergenceNode/page.tsx` records that the states disagree about where that leaves them, so the new component should be consistent about it and the fixture should say so.\n\n### 2. One insight\n\n**New file**: `app/components/InsightCard.tsx`\n\nCollapsed: the eyebrow from `cardEyebrow({ kind })` (so a suggestion says \"Suggestion\" and an experiment says \"Try this\", matching every other card in the app), the label, and — when `stale` — a quiet marker naming the gap (\"written before your last 4 answers\"). Clicking toggles expansion; the card is a container that takes the click, with no `role=\"button\"`, for the reason `QuestionCard`'s comment at `app/components/QuestionCard.tsx:100-113` sets out at length: an accessible name computed from its contents would swallow every control inside it into one label.\n\nExpanded, in order:\n\n1. `detail`, when there is one.\n2. **What this came out of** — the resolved `from` entries, each rendering the question's own words. Absent entirely when the agent cited nothing, rather than an empty heading.\n3. **Where next** — `choices` as buttons, calling the same `onChoose` the convergence node had, which `BoardWorkspace` already turns into a `user.note` (`app/components/BoardWorkspace.tsx:58-70`). Unchanged behaviour, new home.\n4. **Go deeper** — two prompt chips that FILL the composer (\"Why do you think that?\", \"What would settle it?\"), and `NodeQuestionComposer` bound to this insight's node id.\n\n### 3. A composer that works on a dark ground\n\n**File**: `app/components/NodeQuestionComposer.tsx`\n\nAdd `tone?: 'light' | 'dark'`, defaulting to `'light'` so nothing about the existing fixture or its scenarios changes. Dark swaps the shell, field and text classes for the board's palette (the values `QuestionCard` and `BoardChat` already use for cards on the plane). Add an optional `prefill` prop so a chip can put text in the field; the chip fills, the person sends.\n\nKeep the `onPointerDown` stop — the board is a drag surface and without it dragging inside the field pans the plane.\n\n### 4. Mount it, and stop drawing insights twice\n\n**File**: `app/components/GalaxyBoard.tsx`\n\n- Delete `CORE_INSIGHT_KINDS` and the `coreInsight` memo (`app/components/GalaxyBoard.tsx:42`, `104-148`); the selection rule now lives in `insightStream`.\n- Delete the `convergenceState` memo and render `InsightStack` at `layout.convergence` instead, passing the stream and `onChoose`.\n- Stop passing `insight` to `CoreIdeaCard`.\n- The join-line condition becomes `join && (rowFeedsInsights(cluster, stream.insights) || rowDone(cluster))`.\n\n**File**: `app/components/CoreIdeaCard.tsx`\n\nRemove the `insight` prop and the block it renders, and the now-unused `CoreInsight` type. Retire the `CoreIdeaCard - WithInsight` fixture case at `app/isolated-components/CoreIdeaCard/page.tsx:45` and its scenario.\n\n**File**: `app/components/ConvergenceNode.tsx` — deleted, along with `app/isolated-components/ConvergenceNode/page.tsx` and its registered scenarios. Its two live behaviours both survive: the ways-forward buttons move to `InsightCard`, and the honest-wait state is served by `pendingRow`'s tested sentence.\n\n### 5. Which rows fed the stack\n\n**File**: `app/lib/boardConnectors.ts`\n\nAdd, beside `rowDone`:\n\n```ts\n/** Whether this line of thinking produced something at the far end: a live\n *  insight cites one of its cards. Distinct from `rowDone`, which asks whether\n *  the row is finished — a row can feed an insight while still holding an open\n *  question, and that is exactly the case the old gate could not draw. */\nexport function rowFeedsInsights(\n  cluster: PlacedCluster,\n  insights: { from: { id: string }[] }[],\n): boolean;\n```\n\nPure and testable like everything else in that module: an empty insight list, an insight citing nothing, an insight citing a card in another row, and an insight citing a card in this one.\n\n### 6. The new fields reach the board\n\n**File**: `app/lib/galaxyLayout.ts`\n\n`GalaxyNodeInput` gains `origin`, `createdAt`, `updatedAt` and `fromNodeIds` — the fields `insightStream` reads. `layOutGalaxy` itself is unchanged: insights are themeless, so they are already excluded from every cluster by the `n2.themeId === theme.id` filter, and no geometry moves.\n\n**File**: `app/components/MapScreen.tsx`\n\nPass the new fields through the node mapping (alongside the existing `parseChoices` / `parseDiagram` work), parsing `fromNodeIds` with the same total, degrade-to-null discipline `parseChoices` uses at `app/components/MapScreen.tsx:19-29` — a malformed value yields no citations rather than throwing away the insight.\n\n**File**: `app/components/BoardWorkspace.tsx`\n\nCompute the stream once with `insightStream(nodes)` and pass it to `GalaxyBoard`. This is also where the existing live-refresh already re-renders on every revision bump (`app/components/BoardWorkspace.tsx:96-110`), so a newly written insight appears without anything new being wired.\n\n### 7. The test the absence of which let this through\n\n**File**: `app/components/BoardWorkspace.render.test.tsx`\n\nThe existing suite mocks `GalaxyBoard` out entirely (`app/components/BoardWorkspace.render.test.tsx:35`), so nothing today asserts that the board mounts an insight surface at all — the same shape of hole that let the handoff band go missing. Add a render test asserting that a map carrying one themeless insight puts its label on the screen, and that a map carrying none renders the empty state rather than nothing.\n\n## Reused existing code\n\n- `NodeQuestionComposer` from `app/components/NodeQuestionComposer.tsx` — finished, tested, and currently mounted nowhere but its isolated fixture. It carries the `askPresence` honesty rule and the `user.question` write.\n- The `user.question` path end to end: `USER_EVENT_KINDS` in `app/lib/exchange.ts:58-63`, the node-existence validation and label denormalisation in the `user.question` branch of `app/api/maps/[id]/exchange/route.ts`, `contribute` on `WebMcpBridge`, and `describeEvent`'s rendering of it (glossary entry: `describeEvent`). No new endpoint, no new event kind.\n- `settledNote` and `SETTLE_AFTER_MS` from `app/lib/pendingRow.ts`, and `useBoundedWait` from `app/hooks/useBoundedWait.ts` — the bounded, honest wait, already tested and already the answer to \"how long may a page imply something is coming\".\n- `askPresence` from `app/lib/askPresence.ts` and `AskPresenceNote` — the send-label wording.\n- `cardEyebrow` from `app/lib/cardEyebrow.ts` (glossary entry: `cardEyebrow`) — so an insight names its kind the same way every other card does.\n- `AnswerChips` from `app/components/AnswerChips.tsx` — the fill-don't-submit chip, and the model for the go-deeper prompts.\n- `rowDone`, `joinPath`, `fanPath` from `app/lib/boardConnectors.ts` — the connector math `rowFeedsInsights` joins.\n- `onChoose` → `user.note` in `app/components/BoardWorkspace.tsx:58-70` — the ways-forward behaviour, moved not rewritten.\n- `insightStream`, `TARGET_LIVE_INSIGHTS` and the `suggestion` / `experiment` kinds from the plan this one depends on.\n- **Existing-implementation survey:** there is no insight panel, dock or list anywhere in the tree. `ConvergenceNode` is the only surface that ever displays a themeless insight, and `CoreIdeaCard`'s `insight` prop the only other place one is drawn; both are addressed above rather than left beside a third.\n\n## Scenarios to Demonstrate\n\n- Day one: a board with a seed idea, no themes, no insights — the stack reads as a place waiting to be filled, not as a failure.\n- Nobody attached, the wait elapsed — the stack carries the real `settledNote('unavailable')` sentence.\n- One live insight, collapsed.\n- One insight expanded: detail, two cited questions, three ways forward, and the go-deeper composer with an agent attached.\n- The same insight expanded with no agent attached — the send control says so.\n- A stale insight: written before the person's last four answers, marked as such and still readable.\n- Four insights stacked, with older ones behind the affordance.\n- An insight citing a question in a row that still has an open question — the join line is drawn because the row fed the stack, which the old `rowDone` gate could not express.",
+  "description": "The far right of the board was a dashed empty ring for most of a session: the convergence node showed something only when every row was finished AND a question had been answered AND a themeless insight existed. This replaces it with InsightStack, which is populated from the first insight written and never gated - each card opens in place to show the thinking behind it, the questions it came out of, the ways forward, and a composer bound to that insight, where a go-deeper prompt fills the box rather than sending it. What keeps ungating honest is that nothing is hidden: an insight the thinking has moved past says on its face that it was written before your last N answers, instead of being silently withdrawn.\n\nA row now draws its line to the far end when it FED the stack, not only when it is finished - rowJoinsStack asks the truer question first and falls back to the old rowDone rule so a map whose agent never writes citations looks exactly as it did. ConvergenceNode is retired along with CoreIdeaCard's insight slot, so one insight has one home rather than being drawn twice on one plane; its two live behaviours both survive, the ways-forward buttons in InsightCard and the honest wait in InsightStackEmpty's tested settledNote sentence. NodeQuestionComposer gained a dark tone and a prefill prop rather than being copied for the board.\n\nSCOPE VERDICT. This cycle delivered the slice the plan described in full: the stack, the per-card staleness marker, the open-in-place detail, the go-deeper composer, the fed-the-stack join rule, and the new node fields reaching the board. Nothing planned was cut. It DEFERRED nothing of its own. Against the project's deliverables the position is unchanged: 9 of 10 remain delivered, and the single standing deferral - registering the MCP server in a client config, which is the assist track rather than this build flow - was deferred by the user and is untouched here. No agent-decided deferral was added this cycle.\n\nCoverage: 29 new tests (staleNote's plural rule, boardInsightStream's undated-cohort and themed-insight rules, splitStack's boundary arithmetic, rowFeedsInsights and rowJoinsStack, and three BoardWorkspace render tests that close the hole where nothing asserted the board mounted an insight surface at all). 42 new scenarios across six components plus one board scenario carrying real insights with citations. Audit passed with 0 findings.",
+  "modifiedFiles": [
+    {
+      "path": ".codeyam/dependency-graph.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/glossary.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/per-test-evidence.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/plans/an-always-on-insight-stack-you-can-dig-into.md\t.codeyam/plans/completed/an-always-on-insight-stack-you-can-dig-into.md",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/convergencenode-composing.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/convergencenode-ready.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/convergencenode-readynochoices.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/convergencenode-readynodetail.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/convergencenode-waiting.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/coreideacard-withinsight.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/galaxyboard.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/.capture-pipeline.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-brief-and-nobody-has-picked-it-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/a-plan-with-a-gap-one-slice-proves-nothing--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askpresencenote-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/askpresencenote-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-boardvisibleonly--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-empty--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-justopened--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchat-threethemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-deletedtheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-longanswer--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-nothemesyet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardchattranscript-overflowing--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/boardworkspace-working-agent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/complete-what-to-do-next--desktop.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/conflict-declined-the-person-rewording-survived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-composing--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-composing--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-ready--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-ready--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-readynochoices--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-readynochoices--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-readynodetail--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-readynodetail--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-waiting--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/convergencenode-waiting--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-dayone--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-longidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-shortidea--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withattachments--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withinsight--tablet.png",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/coreideacard-withinsight--tablet.png.hash",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-emptytheme--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-firsttime--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/galaxyboard-manythemes--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/grounded-research-and-its-gaps--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/just-started--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-frombrief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-justarrived--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-reattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summary--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-summaryreattach--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mapscreen-working--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/mid-exchange-agent-and-human-on-one-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nobody-has-picked-this-up-yet--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-agentworking--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-listening--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestioncomposer-noagent--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestionheader-default--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/nodequestionheader-longlabel--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/old-arrangement-data-now-inert--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/partly-answered-two-settled-one-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/pivoted-now-it-is-for-teachers--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-answered--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-choices--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-diagram--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-focused--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-insight--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-open--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/questioncard-reference--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/seed-planted-three-open-questions--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/sprawling-a-deep-wide-map--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/started-from-a-client-brief--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-dev-panel-deliberately-opted-into--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-map-builds-downward-four-rounds--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-round-is-answered-and-the-map-reaches-on--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/what-already-exists-a-research-round-set-apart--tablet.png.hash",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/finalize-debt.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/state/scenario-taxonomy.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/all.json",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/7aea0d4874226edb9f664857eb3b6135001f218a890f010552c45285137b0f2e.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/fa7ef73c207c595372a6bbf6d0b6f9c21bd2a8e01883a119564b0bb7879ab686.json",
+      "status": "deleted"
+    },
+    {
+      "path": ".codeyam/test-registry.json",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/AskPresenceNote.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.render.test.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/BoardWorkspace.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/ConvergenceNode.tsx",
+      "status": "deleted"
+    },
+    {
+      "path": "app/components/CoreIdeaCard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/GalaxyBoard.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/MapScreen.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/NodeQuestionComposer.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/components/NodeQuestionHeader.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/isolated-components/ConvergenceNode/page.tsx",
+      "status": "deleted"
+    },
+    {
+      "path": "app/isolated-components/CoreIdeaCard/page.tsx",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/boardConnectors.test.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/boardConnectors.ts",
+      "status": "modified"
+    },
+    {
+      "path": "app/lib/galaxyLayout.ts",
+      "status": "modified"
+    },
+    {
+      "path": ".codeyam/scenarios/coverage-plan/insightstack.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcard-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcard-experiment.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcard-longlabel.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcard-stale.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcard-stalebyone.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcardeyebrow-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcardeyebrow-experiment.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcardeyebrow-stale.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcardeyebrow-stalebyone.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcardeyebrow-unknownkind.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightcardeyebrow-verystale.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightdetail-agentworking.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightdetail-claimalone.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightdetail-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightdetail-noagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightdetail-nocitations.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightgodeeper-agentworking.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightgodeeper-listening.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightgodeeper-longclaim.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightgodeeper-noagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightgodeeper-promptfilledthebox.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightsources-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightsources-many.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightsources-nosources.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightsources-otherrow.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightsources-single.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstack-cardopened.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstack-edgelabels.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstack-oneinsight.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstack-overflowing.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstack-threeinsights.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstack-waiting.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstackempty-settledagentidle.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstackempty-settledagentworking.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstackempty-settlednoagent.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightstackempty-waiting.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightwaysforward-default.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightwaysforward-emptychoices.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightwaysforward-longchoice.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightwaysforward-nochoices.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightwaysforward-otherrow.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/insightwaysforward-single.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-experiment--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-longlabel--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stale--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcard-stalebyone--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-experiment--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-experiment--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-stale--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-stale--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-stalebyone--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-stalebyone--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-unknownkind--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-unknownkind--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-verystale--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightcardeyebrow-verystale--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-agentworking--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-agentworking--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-claimalone--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-claimalone--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-noagent--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-noagent--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-nocitations--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightdetail-nocitations--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-agentworking--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-agentworking--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-listening--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-listening--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-longclaim--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-longclaim--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-noagent--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-noagent--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-promptfilledthebox--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightgodeeper-promptfilledthebox--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-many--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-many--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-nosources--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-nosources--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-otherrow--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-otherrow--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-single--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightsources-single--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-cardopened--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-edgelabels--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-oneinsight--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-overflowing--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-threeinsights--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstack-waiting--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentidle--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentidle--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentworking--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settledagentworking--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settlednoagent--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-settlednoagent--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-waiting--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightstackempty-waiting--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-default--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-default--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-emptychoices--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-emptychoices--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-longchoice--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-longchoice--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-nochoices--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-nochoices--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-otherrow--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-otherrow--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-single--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/insightwaysforward-single--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/screenshots/the-partner-is-already-thinking--tablet.png.hash",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/scenarios/the-partner-is-already-thinking.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/c3cc10a0510939503ae050bfdf278bf6dcbe44c5e860b68fdccb302d7b363579.json",
+      "status": "added"
+    },
+    {
+      "path": ".codeyam/test-cache/blobs/cb17c6a372a9020c645cff1389352886459cbda66bf31951f3b4dd082c07a084.json",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightCard.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightCardEyebrow.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightDetail.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightGoDeeper.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightSectionLabel.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightSources.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightStack.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightStackEmpty.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/components/InsightWaysForward.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightCard/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightCardEyebrow/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightDetail/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightGoDeeper/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightSources/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightStack/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightStackEmpty/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/isolated-components/InsightWaysForward/page.tsx",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardInsights.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/boardInsights.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/insightStale.test.ts",
+      "status": "added"
+    },
+    {
+      "path": "app/lib/insightStale.ts",
+      "status": "added"
+    }
+  ],
+  "scenarioScreenshots": [
+    {
+      "name": "A board with pictures, a drawn shape and a shortlist",
+      "screenshotPath": "a-board-with-pictures-a-drawn-shape-and-a-shortlist--tablet.png"
+    },
+    {
+      "name": "A brief, and nobody has picked it up yet",
+      "screenshotPath": "a-brief-and-nobody-has-picked-it-up-yet--tablet.png"
+    },
+    {
+      "name": "A plan with a gap - one slice proves nothing",
+      "screenshotPath": "a-plan-with-a-gap-one-slice-proves-nothing--desktop.png"
+    },
+    {
+      "name": "An older question, three rounds up, still open",
+      "screenshotPath": "an-older-question-three-rounds-up-still-open--tablet.png"
+    },
+    {
+      "name": "Complete - what to do next",
+      "screenshotPath": "complete-what-to-do-next--desktop.png"
+    },
+    {
+      "name": "Conflict declined - the person rewording survived",
+      "screenshotPath": "conflict-declined-the-person-rewording-survived--tablet.png"
+    },
+    {
+      "name": "Grounded - research and its gaps",
+      "screenshotPath": "grounded-research-and-its-gaps--tablet.png"
+    },
+    {
+      "name": "Just started",
+      "screenshotPath": "just-started--tablet.png"
+    },
+    {
+      "name": "Mid-exchange - agent and human on one map",
+      "screenshotPath": "mid-exchange-agent-and-human-on-one-map--tablet.png"
+    },
+    {
+      "name": "Nobody has picked this up yet",
+      "screenshotPath": "nobody-has-picked-this-up-yet--tablet.png"
+    },
+    {
+      "name": "Old arrangement data, now inert",
+      "screenshotPath": "old-arrangement-data-now-inert--tablet.png"
+    },
+    {
+      "name": "Partly answered - two settled, one open",
+      "screenshotPath": "partly-answered-two-settled-one-open--tablet.png"
+    },
+    {
+      "name": "Pivoted - now it is for teachers",
+      "screenshotPath": "pivoted-now-it-is-for-teachers--tablet.png"
+    },
+    {
+      "name": "Seed planted - three open questions",
+      "screenshotPath": "seed-planted-three-open-questions--tablet.png"
+    },
+    {
+      "name": "Sprawling - a deep, wide map",
+      "screenshotPath": "sprawling-a-deep-wide-map--tablet.png"
+    },
+    {
+      "name": "Started from a client brief",
+      "screenshotPath": "started-from-a-client-brief--tablet.png"
+    },
+    {
+      "name": "The dev panel, deliberately opted into",
+      "screenshotPath": "the-dev-panel-deliberately-opted-into--tablet.png"
+    },
+    {
+      "name": "The map builds downward - four rounds",
+      "screenshotPath": "the-map-builds-downward-four-rounds--tablet.png"
+    },
+    {
+      "name": "The partner is already thinking",
+      "screenshotPath": "the-partner-is-already-thinking--tablet.png"
+    },
+    {
+      "name": "The round is answered, and the map reaches on",
+      "screenshotPath": "the-round-is-answered-and-the-map-reaches-on--tablet.png"
+    },
+    {
+      "name": "What already exists - a research round set apart",
+      "screenshotPath": "what-already-exists-a-research-round-set-apart--tablet.png"
+    },
+    {
+      "name": "AskPresenceNote - Listening",
+      "screenshotPath": "askpresencenote-listening--tablet.png"
+    },
+    {
+      "name": "AskPresenceNote - NoAgent",
+      "screenshotPath": "askpresencenote-noagent--tablet.png"
+    },
+    {
+      "name": "BoardChat - BoardVisibleOnly",
+      "screenshotPath": "boardchat-boardvisibleonly--tablet.png"
+    },
+    {
+      "name": "BoardChat - Default",
+      "screenshotPath": "boardchat-default--tablet.png"
+    },
+    {
+      "name": "BoardChat - DeletedTheme",
+      "screenshotPath": "boardchat-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChat - Empty",
+      "screenshotPath": "boardchat-empty--tablet.png"
+    },
+    {
+      "name": "BoardChat - JustOpened",
+      "screenshotPath": "boardchat-justopened--tablet.png"
+    },
+    {
+      "name": "BoardChat - LongAnswer",
+      "screenshotPath": "boardchat-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChat - ThreeThemes",
+      "screenshotPath": "boardchat-threethemes--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Default",
+      "screenshotPath": "boardchattranscript-default--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - DeletedTheme",
+      "screenshotPath": "boardchattranscript-deletedtheme--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - LongAnswer",
+      "screenshotPath": "boardchattranscript-longanswer--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - NoThemesYet",
+      "screenshotPath": "boardchattranscript-nothemesyet--tablet.png"
+    },
+    {
+      "name": "BoardChatTranscript - Overflowing",
+      "screenshotPath": "boardchattranscript-overflowing--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - JustArrived",
+      "screenshotPath": "boardworkspace-justarrived--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - NoAgent",
+      "screenshotPath": "boardworkspace-noagent--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working",
+      "screenshotPath": "boardworkspace-working--tablet.png"
+    },
+    {
+      "name": "BoardWorkspace - Working_Agent",
+      "screenshotPath": "boardworkspace-working-agent--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - DayOne",
+      "screenshotPath": "coreideacard-dayone--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - Default",
+      "screenshotPath": "coreideacard-default--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - LongIdea",
+      "screenshotPath": "coreideacard-longidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - ShortIdea",
+      "screenshotPath": "coreideacard-shortidea--tablet.png"
+    },
+    {
+      "name": "CoreIdeaCard - WithAttachments",
+      "screenshotPath": "coreideacard-withattachments--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - Default",
+      "screenshotPath": "galaxyboard-default--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - EmptyTheme",
+      "screenshotPath": "galaxyboard-emptytheme--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - FirstTime",
+      "screenshotPath": "galaxyboard-firsttime--tablet.png"
+    },
+    {
+      "name": "GalaxyBoard - ManyThemes",
+      "screenshotPath": "galaxyboard-manythemes--tablet.png"
+    },
+    {
+      "name": "InsightCard - Default",
+      "screenshotPath": "insightcard-default--tablet.png"
+    },
+    {
+      "name": "InsightCard - Experiment",
+      "screenshotPath": "insightcard-experiment--tablet.png"
+    },
+    {
+      "name": "InsightCard - LongLabel",
+      "screenshotPath": "insightcard-longlabel--tablet.png"
+    },
+    {
+      "name": "InsightCard - Stale",
+      "screenshotPath": "insightcard-stale--tablet.png"
+    },
+    {
+      "name": "InsightCard - StaleByOne",
+      "screenshotPath": "insightcard-stalebyone--tablet.png"
+    },
+    {
+      "name": "InsightCardEyebrow - Default",
+      "screenshotPath": "insightcardeyebrow-default--tablet.png"
+    },
+    {
+      "name": "InsightCardEyebrow - Experiment",
+      "screenshotPath": "insightcardeyebrow-experiment--tablet.png"
+    },
+    {
+      "name": "InsightCardEyebrow - Stale",
+      "screenshotPath": "insightcardeyebrow-stale--tablet.png"
+    },
+    {
+      "name": "InsightCardEyebrow - StaleByOne",
+      "screenshotPath": "insightcardeyebrow-stalebyone--tablet.png"
+    },
+    {
+      "name": "InsightCardEyebrow - UnknownKind",
+      "screenshotPath": "insightcardeyebrow-unknownkind--tablet.png"
+    },
+    {
+      "name": "InsightCardEyebrow - VeryStale",
+      "screenshotPath": "insightcardeyebrow-verystale--tablet.png"
+    },
+    {
+      "name": "InsightDetail - AgentWorking",
+      "screenshotPath": "insightdetail-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightDetail - ClaimAlone",
+      "screenshotPath": "insightdetail-claimalone--tablet.png"
+    },
+    {
+      "name": "InsightDetail - Default",
+      "screenshotPath": "insightdetail-default--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoAgent",
+      "screenshotPath": "insightdetail-noagent--tablet.png"
+    },
+    {
+      "name": "InsightDetail - NoCitations",
+      "screenshotPath": "insightdetail-nocitations--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - AgentWorking",
+      "screenshotPath": "insightgodeeper-agentworking--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - Listening",
+      "screenshotPath": "insightgodeeper-listening--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - LongClaim",
+      "screenshotPath": "insightgodeeper-longclaim--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - NoAgent",
+      "screenshotPath": "insightgodeeper-noagent--tablet.png"
+    },
+    {
+      "name": "InsightGoDeeper - PromptFilledTheBox",
+      "screenshotPath": "insightgodeeper-promptfilledthebox--tablet.png"
+    },
+    {
+      "name": "InsightSources - Default",
+      "screenshotPath": "insightsources-default--tablet.png"
+    },
+    {
+      "name": "InsightSources - Many",
+      "screenshotPath": "insightsources-many--tablet.png"
+    },
+    {
+      "name": "InsightSources - NoSources",
+      "screenshotPath": "insightsources-nosources--tablet.png"
+    },
+    {
+      "name": "InsightSources - OtherRow",
+      "screenshotPath": "insightsources-otherrow--tablet.png"
+    },
+    {
+      "name": "InsightSources - Single",
+      "screenshotPath": "insightsources-single--tablet.png"
+    },
+    {
+      "name": "InsightStack - CardOpened",
+      "screenshotPath": "insightstack-cardopened--tablet.png"
+    },
+    {
+      "name": "InsightStack - EdgeLabels",
+      "screenshotPath": "insightstack-edgelabels--tablet.png"
+    },
+    {
+      "name": "InsightStack - OneInsight",
+      "screenshotPath": "insightstack-oneinsight--tablet.png"
+    },
+    {
+      "name": "InsightStack - Overflowing",
+      "screenshotPath": "insightstack-overflowing--tablet.png"
+    },
+    {
+      "name": "InsightStack - ThreeInsights",
+      "screenshotPath": "insightstack-threeinsights--tablet.png"
+    },
+    {
+      "name": "InsightStack - Waiting",
+      "screenshotPath": "insightstack-waiting--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentIdle",
+      "screenshotPath": "insightstackempty-settledagentidle--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledAgentWorking",
+      "screenshotPath": "insightstackempty-settledagentworking--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - SettledNoAgent",
+      "screenshotPath": "insightstackempty-settlednoagent--tablet.png"
+    },
+    {
+      "name": "InsightStackEmpty - Waiting",
+      "screenshotPath": "insightstackempty-waiting--tablet.png"
+    },
+    {
+      "name": "InsightWaysForward - Default",
+      "screenshotPath": "insightwaysforward-default--tablet.png"
+    },
+    {
+      "name": "InsightWaysForward - EmptyChoices",
+      "screenshotPath": "insightwaysforward-emptychoices--tablet.png"
+    },
+    {
+      "name": "InsightWaysForward - LongChoice",
+      "screenshotPath": "insightwaysforward-longchoice--tablet.png"
+    },
+    {
+      "name": "InsightWaysForward - NoChoices",
+      "screenshotPath": "insightwaysforward-nochoices--tablet.png"
+    },
+    {
+      "name": "InsightWaysForward - OtherRow",
+      "screenshotPath": "insightwaysforward-otherrow--tablet.png"
+    },
+    {
+      "name": "InsightWaysForward - Single",
+      "screenshotPath": "insightwaysforward-single--tablet.png"
+    },
+    {
+      "name": "MapScreen - FromBrief",
+      "screenshotPath": "mapscreen-frombrief--tablet.png"
+    },
+    {
+      "name": "MapScreen - JustArrived",
+      "screenshotPath": "mapscreen-justarrived--tablet.png"
+    },
+    {
+      "name": "MapScreen - NoAgent",
+      "screenshotPath": "mapscreen-noagent--tablet.png"
+    },
+    {
+      "name": "MapScreen - Reattach",
+      "screenshotPath": "mapscreen-reattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Summary",
+      "screenshotPath": "mapscreen-summary--tablet.png"
+    },
+    {
+      "name": "MapScreen - SummaryReattach",
+      "screenshotPath": "mapscreen-summaryreattach--tablet.png"
+    },
+    {
+      "name": "MapScreen - Working",
+      "screenshotPath": "mapscreen-working--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - AgentWorking",
+      "screenshotPath": "nodequestioncomposer-agentworking--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - Listening",
+      "screenshotPath": "nodequestioncomposer-listening--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - LongLabel",
+      "screenshotPath": "nodequestioncomposer-longlabel--tablet.png"
+    },
+    {
+      "name": "NodeQuestionComposer - NoAgent",
+      "screenshotPath": "nodequestioncomposer-noagent--tablet.png"
+    },
+    {
+      "name": "NodeQuestionHeader - Default",
+      "screenshotPath": "nodequestionheader-default--tablet.png"
+    },
+    {
+      "name": "NodeQuestionHeader - LongLabel",
+      "screenshotPath": "nodequestionheader-longlabel--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Answered",
+      "screenshotPath": "questioncard-answered--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Choices",
+      "screenshotPath": "questioncard-choices--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Diagram",
+      "screenshotPath": "questioncard-diagram--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Focused",
+      "screenshotPath": "questioncard-focused--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Insight",
+      "screenshotPath": "questioncard-insight--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Open",
+      "screenshotPath": "questioncard-open--tablet.png"
+    },
+    {
+      "name": "QuestionCard - Reference",
+      "screenshotPath": "questioncard-reference--tablet.png"
+    }
+  ],
+  "testResults": {
+    "total": 912,
+    "passed": 912,
+    "failed": 0,
+    "runners": [
+      {
+        "name": "tests",
+        "total": 912,
+        "passed": 912
+      }
+    ]
+  }
+}

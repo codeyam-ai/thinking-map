@@ -32,7 +32,23 @@ vi.mock('./WebMcpBridge', () => ({
   }),
 }));
 
-vi.mock('./GalaxyBoard', () => ({ default: () => <div data-testid="board" /> }));
+// The board itself is stubbed — what is under test here is the workspace, not
+// the canvas — but the stub PRINTS the insight stream it was handed. Without
+// that the mock swallows the one thing this file cannot otherwise see: whether
+// the workspace computes a stack at all and hands it down. A board mounted with
+// no insight surface is exactly the shape of hole that let the handoff band go
+// missing, and a stub that rendered a bare div would pass through it.
+vi.mock('./GalaxyBoard', () => ({
+  default: ({ insights }: { insights?: { id: string; label: string }[] }) => (
+    <div data-testid="board">
+      {(insights ?? []).map((insight) => (
+        <span key={insight.id} data-testid="board-insight">
+          {insight.label}
+        </span>
+      ))}
+    </div>
+  ),
+}));
 vi.mock('./BoardChat', () => ({ default: () => <div data-testid="chat" /> }));
 vi.mock('./RoundControl', () => ({ default: () => <div data-testid="round" /> }));
 
@@ -145,5 +161,84 @@ describe('BoardWorkspace live refresh', () => {
     revision = 13;
     rerender(<BoardWorkspace {...props} />);
     expect(refresh).toHaveBeenCalledTimes(1);
+  });
+});
+
+// What the board is handed to draw at its far end.
+//
+// This suite exists because nothing asserted the workspace mounted an insight
+// surface at ALL. The stack is the whole feature and it is fed by one memo; a
+// board rendered with an empty stream looks, in every screenshot of a map that
+// has no insights yet, exactly like a board rendered correctly.
+
+const insightNode = (over: { id: string; label: string; themeId?: string }) => ({
+  kind: 'suggestion',
+  detail: null,
+  status: 'answered',
+  themeId: null,
+  ...over,
+});
+
+describe('BoardWorkspace insight stream', () => {
+  // The claim the feature rests on: a themeless insight reaches the board,
+  // with no round finished and nothing answered anywhere on the map.
+  it('hands the board an insight before any round is finished', () => {
+    const { getAllByTestId } = render(
+      <BoardWorkspace
+        {...props}
+        nodes={[
+          insightNode({
+            id: 'i-1',
+            label: 'The whiteboard is a symptom of an ownership gap',
+          }),
+        ]}
+      />,
+    );
+
+    expect(getAllByTestId('board-insight').map((el) => el.textContent)).toEqual([
+      'The whiteboard is a symptom of an ownership gap',
+    ]);
+  });
+
+  // A map with nothing at the far end yet hands down an EMPTY stream rather
+  // than omitting the prop — the stack's own empty state is what draws the
+  // honest marker, and it can only do that if it is mounted.
+  it('hands the board an empty stream on a map with no insights', () => {
+    const { getByTestId, queryAllByTestId } = render(
+      <BoardWorkspace
+        {...props}
+        nodes={[
+          insightNode({
+            id: 'q-1',
+            label: 'Who is carrying it?',
+            themeId: 't-who',
+          }),
+        ]}
+      />,
+    );
+
+    expect(getByTestId('board')).toBeTruthy();
+    expect(queryAllByTestId('board-insight')).toHaveLength(0);
+  });
+
+  // The rule the stack rests on, asserted through the workspace rather than
+  // only through `insightStream`: a node of an insight kind that lives inside a
+  // theme is a card in that row, not a claim about the whole idea. Get this
+  // wrong and the same node is drawn twice on one plane.
+  it('leaves a themed insight in its row rather than on the stack', () => {
+    const { queryAllByTestId } = render(
+      <BoardWorkspace
+        {...props}
+        nodes={[
+          insightNode({
+            id: 'i-themed',
+            label: 'The tools outlast the people who bought them',
+            themeId: 't-keeping',
+          }),
+        ]}
+      />,
+    );
+
+    expect(queryAllByTestId('board-insight')).toHaveLength(0);
   });
 });

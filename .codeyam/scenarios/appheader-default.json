@@ -8,5 +8,5 @@
   "mocks": {},
   "componentName": "AppHeader",
   "scenarioType": "component",
-  "description": "Wordmark left, phase track right, at the Idea phase."
+  "description": "The lockup left, the board menu right, on one line - the header with no agent-presence slot filled. The tightest test of horizontal room, and where the real lockup has to sit comfortably beside the menu."
 }

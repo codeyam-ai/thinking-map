@@ -1,0 +1,12 @@
+{
+  "name": "InsightWaysForward - EmptyChoices",
+  "id": "c91bc112-0244-495d-83c9-2f4dd0089cc0",
+  "url": "/isolated-components/InsightWaysForward?s=EmptyChoices",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightWaysForward",
+  "scenarioType": "component",
+  "description": "The other shape the same absence arrives in: an agent that wrote the field and put nothing in it. It has to render identically to a null - two code paths reaching one appearance is exactly the pair a screenshot of only one of them would let drift."
+}

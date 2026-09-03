@@ -1,0 +1,12 @@
+{
+  "name": "InsightWaysForward - NoChoices",
+  "id": "22e2ed5c-63a3-4d34-a58b-d51b66971692",
+  "url": "/isolated-components/InsightWaysForward?s=NoChoices",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightWaysForward",
+  "scenarioType": "component",
+  "description": "The partner named a direction without proposing routes. The thinking can still continue by other means, so the absence has to CLOSE UP rather than leave an empty row where the buttons would have been."
+}

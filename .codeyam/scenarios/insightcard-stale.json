@@ -1,0 +1,12 @@
+{
+  "name": "InsightCard - Stale",
+  "id": "f55c3b7a-b3a1-46c2-9b4f-f901818330c3",
+  "url": "/isolated-components/InsightCard?s=Stale",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCard",
+  "scenarioType": "component",
+  "description": "Behind the person's last four answers. Nothing is hidden by being stale - an insight the thinking has moved past is still worth reading - so the gap is named on the card's face instead of the card being withdrawn. That marker is the whole honesty mechanism of the ungated stack."
+}

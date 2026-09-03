@@ -1,0 +1,12 @@
+{
+  "name": "InsightGoDeeper - LongClaim",
+  "id": "c255aafb-9100-4cfc-be7f-4c9a90ddd06b",
+  "url": "/isolated-components/InsightGoDeeper?s=LongClaim",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightGoDeeper",
+  "scenarioType": "component",
+  "description": "A long claim, which an agent can freely write. The composer's header truncates rather than pushing the field or the close control out of the card - the full text is on the insight directly above it."
+}

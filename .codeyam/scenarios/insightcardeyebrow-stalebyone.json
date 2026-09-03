@@ -1,0 +1,12 @@
+{
+  "name": "InsightCardEyebrow - StaleByOne",
+  "id": "2e77b630-9571-49c0-a470-7c83d7065c62",
+  "url": "/isolated-components/InsightCardEyebrow?s=StaleByOne",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "InsightCardEyebrow",
+  "scenarioType": "component",
+  "description": "The singular, which is the first thing anyone ever reads here: the marker appears the moment one answer lands after an insight. 'Your last 1 answers' would be its debut, which is why the plural rule is pinned by a test rather than left to a template literal."
+}
