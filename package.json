@@ -6,7 +6,7 @@
     "postinstall": "node scripts/postinstall.mjs",
     "setup": "npm install && npm run db:push && npm run db:seed",
     "dev": "next dev --webpack -H 127.0.0.1",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
