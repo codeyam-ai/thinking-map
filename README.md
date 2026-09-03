@@ -362,6 +362,10 @@ States captured as runnable scenarios with codeyam-editor:
 
 <img src=".codeyam/scenarios/screenshots/all-eight-the-list-expanded--tablet.png" alt="All eight, the list expanded" width="280">
 
+### Weighing the alternatives against each other
+
+<img src=".codeyam/scenarios/screenshots/weighing-the-alternatives-against-each-other--desktop.png" alt="Weighing the alternatives against each other" width="280">
+
 ### An older question, three rounds up, still open
 
 <img src=".codeyam/scenarios/screenshots/an-older-question-three-rounds-up-still-open--tablet.png" alt="An older question, three rounds up, still open" width="280">
@@ -369,8 +373,4 @@ States captured as runnable scenarios with codeyam-editor:
 ### Brief attached, nothing cited yet
 
 <img src=".codeyam/scenarios/screenshots/brief-attached-nothing-cited-yet--tablet.png" alt="Brief attached, nothing cited yet" width="280">
-
-### Brief fully accounted for
-
-<img src=".codeyam/scenarios/screenshots/brief-fully-accounted-for--tablet.png" alt="Brief fully accounted for" width="280">
 <!-- codeyam:scenario-gallery:end -->

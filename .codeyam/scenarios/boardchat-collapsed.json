@@ -1,0 +1,18 @@
+{
+  "name": "BoardChat - Collapsed",
+  "id": "d6e55a9c-e6ae-4aa9-9c53-cefc3fe8a759",
+  "url": "/isolated-components/BoardChat?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "The middle of the panel's three states: the transcript folded away, the input row kept. This is the claim the panel makes about itself — the conversation is always here — held even when the map is what you want to look at. Every other BoardChat scenario shows the panel open, so this and ClosedToPill are the only record of what the other two states look like.",
+  "interactions": [
+    {
+      "action": "click",
+      "selector": "[aria-label=\"Hide the conversation\"]"
+    }
+  ]
+}

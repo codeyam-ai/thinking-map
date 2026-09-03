@@ -5,6 +5,26 @@ createdAt: "2026-09-03T16:08:42Z"
 source: manual
 ---
 
+## OBSOLETE — DO NOT BUILD THIS
+
+**The bug described below no longer exists.** `c3e01ac` *feat: One Bar Over the
+Map* unmounted `BoardChat` from `BoardWorkspace` ("the panel is HIDDEN, not
+deleted… What it used to carry moved into `BoardNav`"), so nothing occupies the
+board's bottom-right corner and the pencil there is already unobstructed.
+
+This plan was built out on 2026-09-03 and **deliberately abandoned unshipped**
+when that landed mid-cycle. Its fix moved the pencil to the card's bottom-LEFT —
+which is where `BoardZoomControls` (`absolute bottom-6 left-6`) now sits, so
+shipping it would have reproduced the same bug mirrored. Do not move the pencil.
+
+The collision CLASS is real and recurring, and the remaining live case is
+tracked in **`cards-can-land-under-the-board-s-zoom-controls`**, which carries
+the findings from this cycle. Build that instead. The abandoned implementation
+(including a working `app/lib/boardSafeArea.ts` with 9 passing tests) is
+recoverable from the reflog at commit `42ac37b`.
+
+Everything below is retained as the historical record of the original defect.
+
 ## Summary
 
 An answered card sitting in the board's bottom-right corner cannot be edited:

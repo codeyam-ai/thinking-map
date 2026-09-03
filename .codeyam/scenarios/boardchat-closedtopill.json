@@ -1,0 +1,18 @@
+{
+  "name": "BoardChat - ClosedToPill",
+  "id": "1b1c197a-6f88-4d6b-9063-e80d18450ca1",
+  "url": "/isolated-components/BoardChat?s=Default",
+  "dimensions": [
+    "Tablet"
+  ],
+  "mocks": {},
+  "componentName": "BoardChat",
+  "scenarioType": "component",
+  "description": "Closed to a single pill, one click from typing — the smallest of the three states, and the reason 'closed' is not the same as 'gone'. Worth having on record while the panel is unmounted from the board: the component and its parts still stand, and this is what its quietest state looks like on the day a transcript earns its place back on that surface.",
+  "interactions": [
+    {
+      "action": "click",
+      "selector": "[aria-label=\"Close the conversation\"]"
+    }
+  ]
+}
