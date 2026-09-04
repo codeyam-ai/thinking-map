@@ -1,5 +1,5 @@
 // codeyam-generated — DO NOT EDIT.
-// codeyam-editor: 0.1.7  build: 93463d02c2106dade496718a19a6711c3c626c9a  source-sha256: 7b774a8fb3089d125d40732545faa0516fad67a8fb876566d405e8d2dab2fd90
+// codeyam-editor: 0.1.7  build: 2c2ee89df86b0902dfd9a88e5200b9427bb8e3f5  source-sha256: 7b774a8fb3089d125d40732545faa0516fad67a8fb876566d405e8d2dab2fd90
 const {
   hasLoadingMarkers,
   shouldStopWaitingForImages,
